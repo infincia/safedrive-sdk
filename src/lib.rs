@@ -1,6 +1,6 @@
-mod core;
-mod constants;
-mod util;
+pub mod core;
+pub mod constants;
+pub mod util;
 
 pub mod models;
 pub mod c_api;
