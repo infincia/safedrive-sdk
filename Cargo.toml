@@ -1,0 +1,34 @@
+[package]
+name = "sdsync"
+version = "0.1.0"
+authors = ["Stephen Oliver <steve@infincia.com>"]
+build = "build.rs"
+
+[profile.release]
+debug = true
+
+[dependencies]
+sodiumoxide = "*"
+rusqlite = "*"
+libsqlite3-sys = "*"
+time = "*"
+uuid = { version = "0.3", features = ["v4"] }
+libc = "*"
+walkdir = "*"
+cdc = "*"
+tar = "*"
+rustc-serialize = "*"
+ssh2 = "*"
+openssl = "*"
+
+[build-dependencies]
+rusty-cheddar = "0.3.3"
+
+[lib]
+name = "sdsync"
+crate-type = ["staticlib"]
+
+[[bin]]
+name = "sdsync"
+path = "src/main.rs"
+doc = false
