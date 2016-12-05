@@ -1,0 +1,7 @@
+target
+dist*
+.idea
+.vscode
+test
+SyncEngine
+SyncEngineTests
