@@ -70,13 +70,13 @@ pub struct CSyncSession {
 #[allow(dead_code)]
 #[link(name = "sqlite3", kind = "static")]
 #[link(name = "sodium", kind = "static")]
-pub extern "C" fn sdsync_initialize(db_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut CContext {
-    let dbs: &CStr = unsafe {
-        assert!(!db_path.is_null());
-        CStr::from_ptr(db_path)
+pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut CContext {
+    let lstorage: &CStr = unsafe {
+        assert!(!local_storage_path.is_null());
+        CStr::from_ptr(local_storage_path)
     };
 
-    let db_directory: String = str::from_utf8(dbs.to_bytes()).unwrap().to_owned();
+    let storage_directory: String = str::from_utf8(lstorage.to_bytes()).unwrap().to_owned();
 
     let uids: &CStr = unsafe {
         assert!(!unique_client_id.is_null());
@@ -85,7 +85,7 @@ pub extern "C" fn sdsync_initialize(db_path: *const std::os::raw::c_char, unique
 
     let uid: String = str::from_utf8(uids.to_bytes()).unwrap().to_owned();
 
-    let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(db_directory, uid);
+    let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(storage_directory, uid);
 
     let context = Context {
         db_path: db_path,

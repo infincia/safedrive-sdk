@@ -41,15 +41,15 @@ use util::*;
 
 // internal functions
 
-pub fn initialize(db_directory: String, unique_client_id: String) -> (PathBuf, PathBuf, PathBuf, String) {
+pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf, PathBuf, PathBuf, String) {
 
     if !sodiumoxide::init() == true {
         panic!("Rust<sdsync_initialize>: sodium initialization failed, cannot continue");
     }
 
-    let storage_path = Path::new(&db_directory).to_owned();
+    let storage_path = Path::new(&local_directory).to_owned();
 
-    let mut unique_client_path = Path::new(&db_directory).to_owned();
+    let mut unique_client_path = Path::new(&local_directory).to_owned();
     unique_client_path.push(&unique_client_id);
     if let Err(e) = fs::create_dir_all(&unique_client_path) {
         println!("Rust<sdsync_initialize>: failed to create local directories: {}", e);
