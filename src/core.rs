@@ -296,9 +296,9 @@ pub fn create_archive(main_key_array: [u8; 32],
     let archive_file = Vec::new();
 
     if let Some(folder) = get_sync_folder(&db, folder_id) {
-
-        println!("Rust<sdsync_create_archive>: creating archive for: {}", folder_id);
-
+        if DEBUG_STATISTICS {
+            println!("Rust<sdsync_create_archive>: creating archive for: {}", folder_id);
+        }
 
         let mut ar = Builder::new(archive_file);
         let mut archive_size: i64 = 0;
@@ -327,13 +327,13 @@ pub fn create_archive(main_key_array: [u8; 32],
 
         let mut progress = 0.0;
         for item in WalkDir::new(&folder.path).into_iter().filter_map(|e| e.ok()) {
-            //println!("------------------\nRust<sdsync_create_archive>: backing up {}", item.path().display());
+            if DEBUG_STATISTICS {
+                println!("Rust<sdsync_create_archive>: examining {}", item.path().display());
+            }
             progress = progress + 1.0;
             let percent_completed: f64 = (progress / entry_count as f64) * 100.0;
             let p = item.path();
             let p_relative = p.strip_prefix(&folder.path).expect("failed to unwrap relative path");
-
-            //println!("Rust<sdsync_create_archive>: using relative path {}", p_relative.display());
 
             let f = match File::open(p) {
                 Ok(file) => file,
@@ -351,7 +351,9 @@ pub fn create_archive(main_key_array: [u8; 32],
             // store metadata for directory or file
             let mut header = Header::new_ustar();
             if let Err(err) = header.set_path(p_relative) {
-                println!("Rust<sdsync_create_archive>: NOTICE - not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
+                if DEBUG_STATISTICS {
+                    println!("Rust<sdsync_create_archive>: NOTICE - not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
+                }
                 failed + failed + 1;
                 continue // we don't care about errors here, they'll only happen for truly invalid paths
             }
@@ -537,8 +539,9 @@ pub fn create_archive(main_key_array: [u8; 32],
         let archive_name = Uuid::new_v4().hyphenated().to_string() + ".sdsyncv1";
         let mut archive_path = archive_directory(&unique_client_id);
         archive_path.push(&archive_name);
-        println!("Rust<sdsync_create_archive>: uploading archive to: {}", archive_path.display());
-
+        if DEBUG_STATISTICS {
+            println!("Rust<sdsync_create_archive>: uploading archive to: {}", archive_path.display());
+        }
 
         let mut file = match sftp_session.create(&archive_path) {
             Ok(file) => file,
