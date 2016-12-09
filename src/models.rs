@@ -12,6 +12,9 @@ pub struct Context {
     pub unique_client_path: PathBuf,
     pub storage_path: PathBuf,
     pub unique_client_id: String,
+    pub username: Option<String>,
+    pub password: Option<String>,
+    pub api_token: Option<String>,
     pub ssh_username: Option<String>,
     pub ssh_password: Option<String>,
     pub safedrive_sftp_client_ip: Option<String>,
@@ -27,6 +30,9 @@ impl Context {
             unique_client_path: unique_client_path,
             storage_path: storage_path,
             unique_client_id: unique_client_id,
+            username: None,
+            password: None,
+            api_token: None,
             ssh_username: None,
             ssh_password: None,
             safedrive_sftp_client_ip: None,
@@ -41,6 +47,47 @@ impl Context {
         self.hmac_key = Some(hmac_key);
     }
 
+    pub fn get_api_token(&self) -> &String {
+        let tok = match self.api_token {
+            Some(ref t) => t,
+            None => panic!("attempt to use api token before setting")
+        };
+
+        tok
+    }
+
+    pub fn set_api_token(&mut self, token: String) {
+        self.api_token = Some(token);
+    }
+
+
+    pub fn get_unique_client_id(&self) -> &String {
+        &self.unique_client_id
+    }
+
+    pub fn set_account(&mut self, username: String, password: String) {
+        self.username = Some(username);
+        self.password = Some(password);
+    }
+
+    pub fn get_account_username(&self) -> &String {
+        let username = match self.username {
+            Some(ref u) => u,
+            None => panic!("attempt to use account username before setting")
+        };
+
+        username
+    }
+
+    pub fn get_account_password(&self) ->  &String {
+        let password = match self.password {
+            Some(ref p) => p,
+            None => panic!("attempt to use account password before setting")
+        };
+        password
+
+    }
+
     pub fn set_ssh_credentials(&mut self, username: String, password: String, ip: String, port: u16) {
         self.ssh_username = Some(username);
         self.ssh_password = Some(password);
@@ -51,7 +98,7 @@ impl Context {
     pub fn get_ssh_username(&self) -> &String {
         let username = match self.ssh_username {
             Some(ref u) => u,
-            None => panic!("attempt to use username before setting")
+            None => panic!("attempt to use ssh username before setting")
         };
 
         username
@@ -60,7 +107,7 @@ impl Context {
     pub fn get_ssh_password(&self) ->  &String {
         let password = match self.ssh_password {
             Some(ref p) => p,
-            None => panic!("attempt to use password before setting")
+            None => panic!("attempt to use ssh password before setting")
         };
         password
 
