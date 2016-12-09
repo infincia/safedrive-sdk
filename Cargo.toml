@@ -20,6 +20,7 @@ tar = "*"
 rustc-serialize = "*"
 ssh2 = "*"
 openssl = "*"
+interfaces = "*"
 
 [build-dependencies]
 rusty-cheddar = "0.3.3"
