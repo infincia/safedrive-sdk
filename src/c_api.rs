@@ -25,6 +25,8 @@ use ::core::sync_sessions;
 use ::core::create_archive;
 use ::util::unique_client_hash;
 
+use ::sdapi::client_register;
+
 // exports
 
 
@@ -107,6 +109,65 @@ pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_c
     let ccontext = CContext(context);
     Box::into_raw(Box::new(ccontext))
 }
+
+/// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
+///
+/// Will assert non-null on each parameter
+///
+///
+/// Parameters:
+///
+///     context: an opaque pointer obtained from calling sdsync_initialize()
+///
+///     account_username: a stack-allocated pointer to a username for a SafeDrive account
+///
+///     account_password: a stack-allocated pointer to a password for a SafeDrive account
+///
+///
+/// Return:
+///
+///     0: success
+///
+///     1+: failure
+///
+///
+/// # Examples
+///
+/// ```c
+/// if (0 != sdsync_login(&context, "user@safedrive.io", "password")) {
+///     printf("Login failed");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sdsync_login(context: *mut CContext,
+                               username: *const std::os::raw::c_char,
+                               password:  *const std::os::raw::c_char) -> std::os::raw::c_int {
+    let mut c = unsafe{ assert!(!context.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * context };
+
+    let c_username: &CStr = unsafe { CStr::from_ptr(username) };
+    let un: String = str::from_utf8(c_username.to_bytes()).unwrap().to_owned();
+
+    let c_password: &CStr = unsafe { CStr::from_ptr(password) };
+    let pa: String = str::from_utf8(c_password.to_bytes()).unwrap().to_owned();
+
+    match client_register(&un, &pa) {
+        Ok(t) => {
+            c.0.set_account(un, pa);
+            c.0.set_api_token(t);
+            0
+        },
+        Err(e) => {
+            1
+        }
+    }
+}
+
+
+
+
+
+
 
 
 /// Load keys, must be called before any other function that takes a context parameter
