@@ -231,12 +231,12 @@ pub fn add_block(db: &PathBuf,
     // remote chunk writing
     let mut file = match sftp_session.create(&chunk_path) {
         Ok(file) => file,
-        Err(e) => { println!("sftp file create failed: {}", e); return false },
+        Err(e) => { println!("Rust<sdsync_add_block>: sftp file create failed: {}", e); return false },
     };
 
     match file.write_all(&to_write) {
-        Err(e) => println!("sftp write failed: {}", e),
-        _ => println!("sftp wrote: {}", to_write.len())
+        Err(e) => println!("Rust<sdsync_add_block>: sftp write failed: {}", e),
+        _ => {}
     };
 
     // now that we know the chunk is safely written to disk somewhere, we can record it in the table
