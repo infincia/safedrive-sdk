@@ -321,7 +321,9 @@ pub fn create_archive(main_key_array: [u8; 32],
             true => {},
             false => return false
         };
+        let entry_count = WalkDir::new(&folder.path).into_iter().count() as u64;
 
+        let mut failed = 0;
 
         for item in WalkDir::new(&folder.path).into_iter().filter_map(|e| e.ok()) {
             //println!("------------------\nRust<sdsync_create_archive>: backing up {}", item.path().display());
@@ -332,9 +334,13 @@ pub fn create_archive(main_key_array: [u8; 32],
 
             let f = match File::open(p) {
                 Ok(file) => file,
-                Err(e) => { println!("Rust<sdsync_create_archive>: error opening file: {}", e); continue },
+                Err(e) => { failed = failed +1; continue },
             };
-            let md = f.metadata().expect("Rust<sdsync_create_archive>: failed to get metadata for file");
+            let md = match f.metadata() {
+                Ok(m) => m,
+                Err(e) => { failed = failed +1; continue },
+            };
+
             let stream_length = md.len();
             let is_file = md.file_type().is_file();
             let is_dir = md.file_type().is_dir();
@@ -343,6 +349,7 @@ pub fn create_archive(main_key_array: [u8; 32],
             let mut header = Header::new_ustar();
             if let Err(err) = header.set_path(p_relative) {
                 println!("Rust<sdsync_create_archive>: NOTICE - not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
+                failed + failed + 1;
                 continue // we don't care about errors here, they'll only happen for truly invalid paths
             }
             header.set_metadata(&md);
