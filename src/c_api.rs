@@ -316,8 +316,9 @@ pub extern "C" fn sdsync_generate_symmetric_key(mut buffer: *mut *mut u8) -> std
 
     let sample = sodiumoxide::randombytes::randombytes(size);
     unsafe {
-        *buffer = sample.as_ptr() as *mut u8;
-        mem::forget(sample);
+        let ret = Box::into_raw(sample.into_boxed_slice());
+        mem::forget(&ret);
+        *buffer = ret as *mut u8;
     }
     0
 }
