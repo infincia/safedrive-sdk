@@ -590,8 +590,8 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
     let id: i32 = folder_id;
 
     match create_archive(main_key_array, hmac_key_array, ssh_username, ssh_password, safedrive_sftp_client_ip, safedrive_sftp_client_port, unique_client_id, db, id) {
-        false => return 1,
-        true => return 0
+        Ok(_) => return 0,
+        Err(e) => return 0
     }
 }
 

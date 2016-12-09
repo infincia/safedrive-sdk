@@ -291,7 +291,7 @@ pub fn create_archive(main_key_array: [u8; 32],
                       safedrive_sftp_client_port: u16,
                       unique_client_id: &str,
                       db: PathBuf,
-                      folder_id: i32) -> bool {
+                      folder_id: i32) -> Result<(), String> {
 
     let archive_file = Vec::new();
 
@@ -319,7 +319,7 @@ pub fn create_archive(main_key_array: [u8; 32],
         // ensure remote directories exist
         match create_directories(&sftp_session, &unique_client_id) {
             true => {},
-            false => return false
+            false => return Err("Rust<sdsync_create_archive>: failed to create remote directories".to_string())
         };
         let entry_count = WalkDir::new(&folder.path).into_iter().count() as u64;
 
@@ -390,8 +390,7 @@ pub fn create_archive(main_key_array: [u8; 32],
                         let mut data: Vec<u8> = Vec::with_capacity(100000); //expected size of largest block
 
                         if let Err(e) = buffer.read_to_end(&mut data) {
-                            println!("Rust<sdsync_create_archive>: could not read from file: {}", e);
-                            return false
+                            return Err(format!("Rust<sdsync_create_archive>: could not read from file: {}", e))
                         }
 
                         let raw_chunk = data.as_slice();
@@ -441,8 +440,7 @@ pub fn create_archive(main_key_array: [u8; 32],
 
                             // pass the hmac, wrapped key, and encrypted block out to storage code
                             if !add_block(&db, &sftp_session, &unique_client_id, &block_hmac.as_ref(), &wrapped_block_key, &encrypted_chunk) {
-                                println!("Rust<sdsync_create_archive>: failed to add block!!!");
-                                return false
+                                return Err(format!("Rust<sdsync_create_archive>: failed to add block!!!"))
                             }
                         } else {
                             skipped_blocks = skipped_blocks + 1;
@@ -488,8 +486,7 @@ pub fn create_archive(main_key_array: [u8; 32],
         }
 
         if let Err(e) = ar.finish() {
-            println!("Rust<sdsync_create_archive>: error finalizing archive: {}", e);
-            return false
+            return Err(format!("Rust<sdsync_create_archive>: error finalizing archive: {}", e))
         }
 
         let raw_archive = &ar.into_inner().unwrap();
@@ -542,11 +539,11 @@ pub fn create_archive(main_key_array: [u8; 32],
 
         let mut file = match sftp_session.create(&archive_path) {
             Ok(file) => file,
-            Err(e) => { println!("Rust<sdsync_create_archive>: archive create: {}", e); return false},
+            Err(e) => { return Err(format!("Rust<sdsync_create_archive>: archive create: {}", e)) },
         };
 
         match file.write_all(&complete_archive) {
-            Err(e) => { println!("Rust<sdsync_create_archive>: archive write failed: {}", e); return false },
+            Err(e) => { return Err(format!("Rust<sdsync_create_archive>: archive write failed: {}", e)) },
             _ => {}
         };
 
@@ -556,12 +553,12 @@ pub fn create_archive(main_key_array: [u8; 32],
                             (folder_id, size, filename, date) \
                             VALUES ($1, $2, $3, $4)",
                                &[&folder_id, &archive_size, &archive_name, &t]) {
-                Err(e) => println!("Rust<sdsync_create_archive>:  failed to store archive record {}", e),
-                _ => return true
+                Err(e) => return Err(format!("Rust<sdsync_create_archive>:  failed to store archive record {}", e)),
+                _ => {}
             };
         }
     }
-    false
+    Ok(())
 }
 
 
