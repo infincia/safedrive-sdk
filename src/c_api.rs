@@ -86,13 +86,14 @@ pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_c
 
     let uid: String = str::from_utf8(uids.to_bytes()).unwrap().to_owned();
 
-    let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(storage_directory, uid);
+
+    let (db_path, storage_path, client_path, client_id) = initialize(storage_directory, uid);
 
     let context = Context {
         db_path: db_path,
         storage_path: storage_path,
-        unique_client_path: unique_client_path,
-        unique_client_id: unique_client_id,
+        unique_client_path: client_path,
+        unique_client_id: client_id,
         ssh_username: None,
         ssh_password: None,
         safedrive_sftp_client_ip: None,
