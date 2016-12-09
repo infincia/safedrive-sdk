@@ -325,8 +325,11 @@ pub fn create_archive(main_key_array: [u8; 32],
 
         let mut failed = 0;
 
+        let mut progress = 0.0;
         for item in WalkDir::new(&folder.path).into_iter().filter_map(|e| e.ok()) {
             //println!("------------------\nRust<sdsync_create_archive>: backing up {}", item.path().display());
+            progress = progress + 1.0;
+            let percent_completed: f64 = (progress / entry_count as f64) * 100.0;
             let p = item.path();
             let p_relative = p.strip_prefix(&folder.path).expect("failed to unwrap relative path");
 
