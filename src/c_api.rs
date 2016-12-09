@@ -23,6 +23,7 @@ use ::core::add_sync_folder;
 use ::core::sync_folders;
 use ::core::sync_sessions;
 use ::core::create_archive;
+use ::util::unique_client_hash;
 
 // exports
 
@@ -178,13 +179,13 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, main: *const u8, hmac
 ///
 ///     context: an opaque pointer obtained from calling sdsync_initialize()
 ///
-///     username: a stack-allocated pointer to a username for sftp-client.safedrive.io
+///     username: a stack-allocated pointer to a username for SafeDrive sftp endpoint
 ///
-///     password: a stack-allocated pointer to a password for sftp-client.safedrive.io
+///     password: a stack-allocated pointer to a password for SafeDrive sftp endpoint
 ///
-///     ip_address: a stack-allocated pointer to ip
+///     ip_address: a stack-allocated pointer to ip for SafeDrive sftp endpoint
 ///
-///     hmac: a stack-allocated pointer to a 32byte hmac key
+///     port: a stack-allocated pointer to TCP port for SafeDrive sftp endpoint
 ///
 ///
 /// Return:
