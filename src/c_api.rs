@@ -232,6 +232,57 @@ pub extern "C" fn sdsync_load_credentials(context: *mut CContext,
     0
 }
 
+/// Generate a unique client ID using the users email address and store it in the `unique_client_id` parameter
+///
+/// Will return a failure code if for any reason the hash cannot be generated properly
+///
+/// Return codes will be expanded in the future to provide more specific information on the failure
+///
+///
+/// Parameters:
+///
+///
+///     email: a stack-allocated, NULL terminated string representing the user email address
+///
+///     unique_client_id: an allocated pointer with exactly 64bytes + 1byte NULL terminator storage,
+///                       will be initialized by the library and must be freed by the caller
+///
+/// Return:
+///
+///     0: success
+///
+///     1+: failure
+///
+///
+/// # Examples
+///
+/// ```c
+/// char * unique_client_id = malloc((64 * sizeof(char)) + 1);
+/// int success = sdsync_get_unique_client_id("user@example.com");
+/// free(unique_client_id);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char,
+                                              mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_int {
+
+    let c_email: &CStr = unsafe { CStr::from_ptr(email) };
+    let e: String = str::from_utf8(c_email.to_bytes()).unwrap().to_owned();
+
+    match unique_client_hash(e) {
+        Ok(hash) => {
+            let c_hash = Box::new(CString::new(hash).expect("Failed to get unique client id hash"));
+            mem::forget(&c_hash);
+
+            unsafe {
+                *unique_client_id = c_hash.into_raw();
+            }
+            return 0
+        },
+        Err(_) => return 1,
+    }
+}
+
 /// Generate a single key
 ///
 /// Keys generated should be persisted on-disk for future use
