@@ -20,7 +20,11 @@ tar = "*"
 rustc-serialize = "*"
 ssh2 = "*"
 openssl = "*"
+clap = "*"
+reqwest = "*"
 interfaces = "*"
+serde = "0.8"
+serde_json = "0.8"
 
 [build-dependencies]
 rusty-cheddar = "0.3.3"
