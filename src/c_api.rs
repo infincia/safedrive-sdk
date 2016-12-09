@@ -270,7 +270,7 @@ pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char
     let c_email: &CStr = unsafe { CStr::from_ptr(email) };
     let e: String = str::from_utf8(c_email.to_bytes()).unwrap().to_owned();
 
-    match unique_client_hash(e) {
+    match unique_client_hash(&e) {
         Ok(hash) => {
             let c_hash = Box::new(CString::new(hash).expect("Failed to get unique client id hash"));
             mem::forget(&c_hash);
