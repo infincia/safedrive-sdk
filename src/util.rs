@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 use core::rustc_serialize::hex::{ToHex};
-
+extern crate sodiumoxide;
+extern crate interfaces;
 
 pub fn block_directory(unique_client_id: &str, hmac: &[u8]) -> PathBuf {
 
@@ -19,6 +20,23 @@ pub fn archive_directory(unique_client_id: &str) -> PathBuf {
     storage_dir.push(&unique_client_id);
     storage_dir.push(&Path::new("archives"));
     storage_dir
+}
+
+pub fn unique_client_hash(email: String) -> Result<String, String> {
+    if let Ok(en0) = interfaces::Interface::get_by_name("en0") {
+        if let Some(interface) = en0 {
+            if let Ok(mac) = interface.hardware_addr() {
+                let mac_string = mac.as_bare_string();
+                let to_hash = mac_string + &email;
+                let hashed = sodiumoxide::crypto::hash::sha256::hash(to_hash.as_bytes());
+                let h = hashed.as_ref().to_hex();
+                return Ok(h)
+            }
+        }
+    } else {
+        println!("Could not find en0 interface");
+    }
+    Err("failed to get mac address".to_string())
 }
 
 // not being used at the moment
