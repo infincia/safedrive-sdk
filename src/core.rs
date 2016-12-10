@@ -58,7 +58,10 @@ pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf
     let mut db_path = Path::new(&unique_client_path).to_owned();
     db_path.push("sdsync.sqlite3");
 
-    setup_tables(&db_path);
+    match setup_tables(&db_path) {
+        Ok(_) => {},
+        Err(e) => panic!("Rust<sdsync_initialize>: failed to create sqlite database"),
+    };
 
     let sodium_version = sodiumoxide::version::version_string();
 
@@ -72,7 +75,7 @@ pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf
     (db_path, storage_path, unique_client_path, unique_client_id)
 }
 
-pub fn setup_tables(db: &PathBuf) {
+pub fn setup_tables(db: &PathBuf) -> Result<(), String> {
     if let Ok(conn) = Connection::open(db) {
         conn.execute("CREATE TABLE IF NOT EXISTS folders (
                  id INTEGER PRIMARY KEY,
@@ -99,8 +102,9 @@ pub fn setup_tables(db: &PathBuf) {
         conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS block_hmac
                   on blocks (hmac) ;", &[]).unwrap();
     } else {
-        println!("Rust<setup_tables>: failed to get sqlite connection to {}", &db.as_os_str().to_str().unwrap());
+        return Err(format!("Rust<setup_tables>: failed to get sqlite connection to {}", &db.as_os_str().to_str().unwrap()))
     }
+    Ok(())
 }
 
 pub fn get_sync_folder(db: &PathBuf,
@@ -124,18 +128,18 @@ pub fn get_sync_folder(db: &PathBuf,
 
 pub fn add_sync_folder(db: PathBuf,
                        name: &str,
-                       path: &str) -> bool {
+                       path: &str) -> Result<(), String> {
     if let Ok(conn) = Connection::open(&db) {
         if let Ok(_) = conn.execute("INSERT INTO folders (name, path) VALUES ($1, $2)", &[&name, &path]) {
-            return true
+            return Ok(())
         } else {
-            println!("Rust<sdsync_add_sync_folder>: failed to store folder");
+            return Err(format!("Rust<sdsync_add_sync_folder>: failed to store folder"))
         }
-    }
-    return false
+    };
+    Ok(())
 }
 
-pub fn sync_folders(db: &PathBuf) -> Vec<Folder> {
+pub fn sync_folders(db: &PathBuf) -> Result<Vec<Folder>, String> {
     let mut folder_list: Vec<Folder> = Vec::new();
     if let Ok(conn) = Connection::open(db) {
         let mut stmt = conn.prepare("SELECT id, name, path FROM folders").unwrap();
@@ -155,16 +159,16 @@ pub fn sync_folders(db: &PathBuf) -> Vec<Folder> {
             if let Ok(folder) = result {
                 folder_list.push(folder);
             } else {
-                println!("Rust<sync_folders>: failed to unwrap folder result!");
+                return Err(format!("Rust<sync_folders>: failed to unwrap folder result!"))
             }
         }
     } else {
-        println!("Rust<sync_folders>: failed to get sqlite connection");
+        return Err(format!("Rust<sync_folders>: failed to get sqlite connection"))
     }
-    folder_list
+    return Ok(folder_list)
 }
 
-pub fn sync_sessions(db: &PathBuf, folder_id: i32) -> Vec<SyncSession> {
+pub fn sync_sessions(db: &PathBuf, folder_id: i32) -> Result<Vec<SyncSession>, String> {
     let mut session_list: Vec<SyncSession> = Vec::new();
     if let Ok(conn) = Connection::open(db) {
         let mut stmt = conn.prepare("SELECT * FROM syncsession WHERE id = ?").unwrap();
@@ -187,13 +191,13 @@ pub fn sync_sessions(db: &PathBuf, folder_id: i32) -> Vec<SyncSession> {
             if let Ok(session) = result {
                 session_list.push(session);
             } else {
-                println!("Rust<sync_sessions>: failed to unwrap session result!");
+                return Err(format!("Rust<sync_sessions>: failed to unwrap session result!"))
             }
         }
     } else {
-        println!("Rust<sync_sessions>: failed to get sqlite connection");
+        return Err(format!("Rust<sync_sessions>: failed to get sqlite connection"))
     }
-    session_list
+    Ok(session_list)
 }
 
 

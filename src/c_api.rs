@@ -429,10 +429,9 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = str::from_utf8(c_path.to_bytes()).unwrap().to_owned();
     let db = Path::new(&c.0.db_path).to_owned();
-    let result = add_sync_folder(db, &n, &p);
-    match result {
-        true => return 0,
-        false => return 1,
+    match add_sync_folder(db, &n, &p) {
+        Ok(_) => return 0,
+        Err(e) => return 1,
     }
 }
 
@@ -474,7 +473,12 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
     let db = &(c.0.db_path);
 
-    let mut f = sync_folders(db).into_iter().map(|folder| {
+    let result = match sync_folders(db) {
+        Ok(folders) => folders,
+        Err(e) => panic!("Rust<sdsync_get_sync_folders> failed to get list of sync folders: {}", e),
+    };
+
+    let mut f = result.into_iter().map(|folder| {
         let s_name = Box::new(CString::new(folder.name.as_str()).unwrap());
         let s_path = Box::new(CString::new(folder.path.as_str()).unwrap());
         forget(&s_name);
@@ -545,8 +549,12 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
     let id: i32 = folder_id;
 
 
+    let result = match sync_sessions(db, id) {
+        Ok(ses) => ses,
+        Err(e) => panic!("Rust<sdsync_get_sync_sessions> failed to get list of sync sessions: {}", e),
+    };
 
-    let mut s = sync_sessions(db, id).into_iter().map(|ses| {
+    let mut s = result.into_iter().map(|ses| {
         let s_id = ses.id;
         let folder_id = ses.folder_id;
         let s_filename = Box::new(CString::new(ses.filename.as_str()).unwrap());
