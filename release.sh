@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -rf dist
+rm -rf dist-osx
 
 export SODIUM_LIB_DIR=dep-osx/lib
 export SODIUM_STATIC
