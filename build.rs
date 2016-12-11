@@ -12,6 +12,8 @@ fn main() {
     env::set_var("OPENSSL_STATIC", "");
     env::set_var("OPENSSL_DIR", "dep-osx/lib");
 
+    println!("cargo:rustc-link-args=-mmacosx-version-min=10.9");
+
     println!("cargo:rustc-link-search=native=dep-osx/lib");
 
     println!("cargo:rustc-link-lib=z");
