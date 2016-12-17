@@ -419,6 +419,7 @@ pub extern "C" fn sdsync_generate_symmetric_key(mut buffer: *mut *mut u8) -> std
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
+                                     folder_id: std::os::raw::c_int,
                                      name: *const std::os::raw::c_char,
                                      path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
@@ -429,7 +430,10 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = str::from_utf8(c_path.to_bytes()).unwrap().to_owned();
     let db = Path::new(&c.0.db_path).to_owned();
-    match add_sync_folder(db, &n, &p) {
+
+    let id: i32 = folder_id;
+
+    match add_sync_folder(db, id, &n, &p) {
         Ok(_) => return 0,
         Err(e) => return 1,
     }

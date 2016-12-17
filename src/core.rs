@@ -127,10 +127,11 @@ pub fn get_sync_folder(db: &PathBuf,
 }
 
 pub fn add_sync_folder(db: PathBuf,
+                       id: i32,
                        name: &str,
                        path: &str) -> Result<(), String> {
     if let Ok(conn) = Connection::open(&db) {
-        if let Ok(_) = conn.execute("INSERT INTO folders (name, path) VALUES ($1, $2)", &[&name, &path]) {
+        if let Ok(_) = conn.execute("INSERT INTO folders (id, name, path) VALUES ($1, $2, $3)", &[&id, &name, &path]) {
             return Ok(())
         } else {
             return Err(format!("Rust<sdsync_add_sync_folder>: failed to store folder"))

@@ -5,8 +5,8 @@
 
 static CContext *context = NULL;
 
-int add(const char * name, const char * path) {
-	return sdsync_add_sync_folder(context, name, path);
+int add(int32_t folder_id, const char * name, const char * path) {
+	return sdsync_add_sync_folder(context, folder_id, name, path);
 }
 
 int main ( int argc, char **argv ) {
@@ -31,7 +31,7 @@ int main ( int argc, char **argv ) {
 
     sdsync_load_credentials(context, "username", "password", "sftp-client.safedrive.io", "22");
 
-    int result = add("Documents", "/Users/steve/Documents");
+    int result = add(3, "Documents", "/Users/steve/Documents");
     if (result != 0) {
         printf("C<test/main>: Failed to add folder: %d\n", result);
     }
