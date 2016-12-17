@@ -52,7 +52,7 @@ pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf
     let mut unique_client_path = Path::new(&local_directory).to_owned();
     unique_client_path.push(&unique_client_id);
     if let Err(e) = fs::create_dir_all(&unique_client_path) {
-        println!("Rust<sdsync_initialize>: failed to create local directories: {}", e);
+        panic!("Rust<sdsync_initialize>: failed to create local directories: {}", e);
     }
 
     let mut db_path = Path::new(&unique_client_path).to_owned();
