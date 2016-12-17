@@ -461,7 +461,7 @@ pub fn create_archive(main_key_array: [u8; 32],
                     header.set_cksum();
                     ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append chunk archive header");
 
-                    if nb_chunk != skipped_blocks || DEBUG_STATISTICS {
+                    if nb_chunk != skipped_blocks && DEBUG_STATISTICS {
                         println!("Rust<sdsync_create_archive>: {} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
                     }
                     if DEBUG_STATISTICS {
