@@ -58,7 +58,7 @@ pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf
 
     match setup_tables(&db_path) {
         Ok(_) => {},
-        Err(e) => panic!("Rust<sdsync_initialize>: failed to create sqlite database"),
+        Err(_) => panic!("Rust<sdsync_initialize>: failed to create sqlite database"),
     };
 
     let sodium_version = sodiumoxide::version::version_string();
@@ -340,11 +340,11 @@ pub fn create_archive(main_key_array: [u8; 32],
 
             let f = match File::open(p) {
                 Ok(file) => file,
-                Err(e) => { failed = failed +1; continue },
+                Err(_) => { failed = failed +1; continue },
             };
             let md = match f.metadata() {
                 Ok(m) => m,
-                Err(e) => { failed = failed +1; continue },
+                Err(_) => { failed = failed +1; continue },
             };
 
             let stream_length = md.len();

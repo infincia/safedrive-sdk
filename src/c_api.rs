@@ -156,7 +156,7 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
             c.0.set_api_token(t);
             0
         },
-        Err(e) => {
+        Err(_) => {
             1
         }
     }
@@ -434,7 +434,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 
     match add_sync_folder(db, id, &n, &p) {
         Ok(_) => return 0,
-        Err(e) => return 1,
+        Err(_) => return 1,
     }
 }
 
@@ -666,7 +666,7 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
 
     match create_archive(main_key_array, hmac_key_array, ssh_username, ssh_password, safedrive_sftp_client_ip, safedrive_sftp_client_port, unique_client_id, db, id) {
         Ok(_) => return 0,
-        Err(e) => return 0
+        Err(_) => return 0
     }
 }
 
