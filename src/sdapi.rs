@@ -81,3 +81,34 @@ pub fn client_register(email: &String, password: &String) -> Result<String, Stri
     }
 
 }
+
+pub fn account_key(master: &str, main: &str, hmac: &str) -> Result<(String, String, String), SDAPIError> {
+
+
+    let mut map = HashMap::new();
+    map.insert("master", master);
+    map.insert("main", main);
+    map.insert("hmac", hmac);
+
+    let client = reqwest::Client::new().unwrap();
+    let result = client.post("https://safedrive.io/api/1/account/key").json(&map).send();
+    let mut response = String::new();
+
+    let mut r = try!(result);
+    try!(r.read_to_string(&mut response));
+
+    let response_map: self::serde_json::Map<String, String> = try!(serde_json::from_str(&response));
+    let real_master = match response_map.get("master") {
+        Some(k) => k.clone(),
+        None => return Err(SDAPIError::RequestFailed)
+    };
+    let real_main = match response_map.get("main") {
+        Some(k) => k.clone(),
+        None => return Err(SDAPIError::RequestFailed)
+    };
+    let real_hmac = match response_map.get("hmac") {
+        Some(k) => k.clone(),
+        None => return Err(SDAPIError::RequestFailed)
+    };
+    Ok((real_master, real_main, real_hmac))
+}
