@@ -123,3 +123,42 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
     Ok((phrase, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()))
 }
 
+pub fn decrypt_keyset(phrase: &String, master: String, main: String, hmac: String) -> Result<(String, String, String), CryptoError> {
+
+    let mnemonic = try!(Bip39::from_mnemonic(phrase.clone(), Language::English, "".to_string()));
+
+    let seed = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
+    let hashed_seed = seed.as_ref();
+
+    let recovery_key = sodiumoxide::crypto::secretbox::Key::from_slice(&hashed_seed)
+        .expect("Rust<decrypt_keyset>: failed to get recovery key struct");
+
+    // decrypt the master key with the recovery phrase and static nonce
+    let master_key_wrapped = try!(master.from_hex());
+    let master_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[1u8; 24]).expect("Rust<decrypt_keyset>: failed to get master nonce");
+    let master_key_raw = match sodiumoxide::crypto::secretbox::open(&master_key_wrapped, &master_nonce, &recovery_key) {
+        Ok(k) => k,
+        Err(_) => return Err(CryptoError::DecryptFailed)
+    };
+    let master_key = sodiumoxide::crypto::secretbox::Key::from_slice(&master_key_raw).expect("Rust<decrypt_keyset>: failed to get master key struct");
+
+
+    // decrypt the main key with the master key and static nonce
+    let main_key_wrapped = try!(main.from_hex());
+    let main_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[2u8; 24]).expect("Rust<decrypt_keyset>: failed to get main nonce");
+    let main_key_raw = match sodiumoxide::crypto::secretbox::open(&main_key_wrapped, &main_nonce, &master_key) {
+        Ok(k) => k,
+        Err(_) => return Err(CryptoError::DecryptFailed)
+    };
+
+    // decrypt the hmac key with the master key and static nonce
+    let hmac_key_wrapped = try!(hmac.from_hex());
+    let hmac_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[3u8; 24]).expect("Rust<decrypt_keyset>: failed to get hmac nonce");
+    let hmac_key_raw = match sodiumoxide::crypto::secretbox::open(&hmac_key_wrapped, &hmac_nonce, &master_key) {
+        Ok(k) => k,
+        Err(_) => return Err(CryptoError::DecryptFailed)
+    };
+
+
+    Ok((master_key_raw.to_hex(), main_key_raw.to_hex(), hmac_key_raw.to_hex()))
+}
