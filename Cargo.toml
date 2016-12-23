@@ -32,6 +32,7 @@ rusty-cheddar = "0.3.3"
 [lib]
 name = "sdsync"
 crate-type = ["rlib", "staticlib"]
+doctest = false
 
 [[bin]]
 name = "sdsync"
