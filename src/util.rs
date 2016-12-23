@@ -165,3 +165,19 @@ pub fn decrypt_keyset(phrase: &String, master: String, main: String, hmac: Strin
 
     Ok((master_key_raw.to_hex(), main_key_raw.to_hex(), hmac_key_raw.to_hex()))
 }
+
+
+
+#[test]
+fn key_wrap_test() {
+    let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) = match generate_keyset() {
+        Ok((p, mas, main, hmac)) => (p, mas, main, hmac),
+        Err(e) => { assert!(true == false); return }
+    };
+
+
+    match decrypt_keyset(&new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) {
+        Ok(_) => {},
+        Err(e) => { assert!(true == false); return }
+    };
+}
