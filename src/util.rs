@@ -25,6 +25,20 @@ impl From<FromHexError> for CryptoError {
         CryptoError::InvalidKey
     }
 }
+
+impl From<Bip39Error> for CryptoError {
+    fn from(err: Bip39Error) -> CryptoError {
+        match err {
+            Bip39Error::InvalidChecksum => CryptoError::DecryptFailed,
+            Bip39Error::EntropyUnavailable => CryptoError::KeyGenerationFailed,
+            Bip39Error::InvalidKeysize => CryptoError::InvalidKey,
+            Bip39Error::InvalidWordLength => CryptoError::InvalidKey,
+            Bip39Error::LanguageUnavailable => CryptoError::DecryptFailed
+        }
+    }
+}
+
+
 pub fn block_directory(unique_client_id: &str, hmac: &[u8]) -> PathBuf {
 
     let shard_identifier = hmac[0..1].to_hex().chars().next().unwrap(); //unwrap is safe here, they're always going to be 0-9 or a-f
