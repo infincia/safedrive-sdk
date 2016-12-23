@@ -12,7 +12,6 @@ sodiumoxide = "*"
 rusqlite = "*"
 libsqlite3-sys = "*"
 time = "*"
-uuid = { version = "0.3", features = ["v4"] }
 libc = "*"
 walkdir = "*"
 cdc = "*"
