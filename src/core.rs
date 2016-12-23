@@ -541,16 +541,17 @@ pub fn create_archive(name: &str,
 
         // wrap the archive key with the main encryption key
         let wrapped_archive_key = sodiumoxide::crypto::secretbox::seal(&archive_key_raw, &nonce, &main_key);
+        assert!(wrapped_archive_key.len() == key_size + mac_size);
 
         let mut complete_archive = Vec::new();
 
         // bytes 0-47 will be the wrapped archive key
         complete_archive.extend(wrapped_archive_key);
 
-        // bytes 48-72 will be the nonce
+        // bytes 48-71 will be the nonce
         complete_archive.extend(nonce_raw);
 
-        // byte 73+ will be the encrypted archive data
+        // byte 72+ will be the encrypted archive data
         complete_archive.extend(encrypted_archive);
 
 
