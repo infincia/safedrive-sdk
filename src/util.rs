@@ -86,7 +86,10 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
         name: s_name,
         path: s_path,
     }
-}*/pub fn generate_keyset() -> Result<(String, String, String, String), CryptoError> {
+}*/
+
+
+pub fn generate_keyset() -> Result<(String, String, String, String), CryptoError> {
     let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
 
     // generate a recovery phrase that will be used to encrypt the master key
