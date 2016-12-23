@@ -21,14 +21,12 @@ extern crate rusqlite;
 extern crate libsqlite3_sys;
 extern crate openssl;
 
-extern crate uuid;
 extern crate walkdir;
 extern crate cdc;
 
 use self::ssh2::{Session, Sftp};
 use self::tar::{Builder, Header};
 use self::rusqlite::Connection;
-use self::uuid::Uuid;
 use self::walkdir::WalkDir;
 use self::cdc::*;
 use self::time::Timespec;
