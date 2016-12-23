@@ -341,47 +341,6 @@ pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char
     }
 }
 
-/// Generate a single key
-///
-/// Keys generated should be persisted on-disk for future use
-///
-/// Parameters:
-///
-///     buffer: an allocated pointer with exactly (32 * sizeof(uint8_t)) storage
-///
-///
-/// Return:
-///
-///     0: success
-///
-///     1+: failure
-///
-///
-/// # Examples
-///
-/// ```c
-/// uint8_t * key = malloc((32 * sizeof(uint8_t)));
-/// sdsync_generate_symmetric_key(&key);
-/// // do something with the returned buffer here
-/// free(key);
-/// ```
-#[no_mangle]
-#[allow(dead_code)]
-pub extern "C" fn sdsync_generate_symmetric_key(mut buffer: *mut *mut u8) -> std::os::raw::c_int {
-    // generate some randomness using libsodium
-    // we need exactly 32 bytes
-    let size = sodiumoxide::crypto::secretbox::KEYBYTES;
-
-    let sample = sodiumoxide::randombytes::randombytes(size);
-    unsafe {
-        let ret = Box::into_raw(sample.into_boxed_slice());
-        mem::forget(&ret);
-        *buffer = ret as *mut u8;
-    }
-    0
-}
-
-
 /// Add a sync folder to the local database
 ///
 /// Will return a failure code if for any reason the folder cannot be added to the database
