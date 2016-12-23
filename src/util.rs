@@ -86,4 +86,40 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
         name: s_name,
         path: s_path,
     }
-}*/
+}*/pub fn generate_keyset() -> Result<(String, String, String, String), CryptoError> {
+    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+
+    // generate a recovery phrase that will be used to encrypt the master key
+    let mnemonic_keytype = KeyType::Key128;
+    let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
+
+
+    let phrase = mnemonic.mnemonic;
+    println!("Rust<generate_keyset>: phrase: {}", phrase);
+    let seed = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
+    let hashed_seed = seed.as_ref();
+
+    let recovery_key = sodiumoxide::crypto::secretbox::Key::from_slice(&hashed_seed)
+        .expect("Rust<generate_keyset>: failed to get recovery key struct");
+
+    // generate a master key and encrypt it with the recovery phrase and static nonce
+    // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
+    let master_key_raw = sodiumoxide::randombytes::randombytes(key_size);
+    let master_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[1u8; 24]).expect("Rust<generate_keyset>: failed to get master nonce");
+    let master_key = sodiumoxide::crypto::secretbox::Key::from_slice(&master_key_raw).expect("Rust<generate_keyset>: failed to get master key struct");
+    let master_key_wrapped = sodiumoxide::crypto::secretbox::seal(&master_key_raw, &master_nonce, &recovery_key);
+
+    // generate a main key and encrypt it with the master key and static nonce
+    let main_key_raw = sodiumoxide::randombytes::randombytes(key_size);
+    let main_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[2u8; 24]).expect("Rust<generate_keyset>: failed to get main nonce");
+    let main_key_wrapped = sodiumoxide::crypto::secretbox::seal(&main_key_raw, &main_nonce, &master_key);
+
+    // generate an hmac key and encrypt it with the master key and static nonce
+    let hmac_key_raw = sodiumoxide::randombytes::randombytes(key_size);
+    let hmac_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[3u8; 24]).expect("Rust<generate_keyset>: failed to get hmac nonce");
+    let hmac_key_wrapped = sodiumoxide::crypto::secretbox::seal(&hmac_key_raw, &hmac_nonce, &master_key);
+
+
+    Ok((phrase, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()))
+}
+
