@@ -234,7 +234,7 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, main: *const u8, hmac
 }
 
 
-/// Load SSH credentials, must be called before any other function that creates or enumerates backups/chunks
+/// Load SSH credentials, must be called before any other function that operates on archives
 ///
 /// Will assert non-null on each parameter
 ///
@@ -261,14 +261,8 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, main: *const u8, hmac
 ///
 /// # Examples
 ///
-/// ```c
-/// uint8_t * main = malloc(32);
-/// uint8_t * hmac = malloc(32)
-/// sdsync_generate_symmetric_key(&main);
-/// sdsync_generate_symmetric_key(&hmac);
-/// sdsync_load_keys(&context, main_key, hmac_key);
-/// free(main);
-/// free(hmac);
+/// ```
+/// int ret = sdsync_load_credentials(&context, "Wx534lkj3lk2h423kl4hlkj", "password", "sftp-client.safedrive.io", "22");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
