@@ -24,6 +24,9 @@ extern crate openssl;
 extern crate walkdir;
 extern crate cdc;
 
+use self::rustc_serialize::hex::{FromHex};
+
+
 use self::ssh2::{Session, Sftp};
 use self::tar::{Builder, Header};
 use self::rusqlite::Connection;
@@ -36,6 +39,7 @@ use self::time::Timespec;
 use models::{Folder, Block, SyncSession};
 use constants::*;
 use util::*;
+use sdapi::*;
 
 // internal functions
 
@@ -103,6 +107,55 @@ pub fn setup_tables(db: &PathBuf) -> Result<(), String> {
         return Err(format!("Rust<setup_tables>: failed to get sqlite connection to {}", &db.as_os_str().to_str().unwrap()))
     }
     Ok(())
+}
+
+pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), CryptoError> {
+    // generate new keys in all cases, the account *may* already have some stored, we only
+    // find out for sure while trying to store them.
+    //
+    // we do this on purpose:
+    //
+    //    1. to eliminate possible race conditions where two clients generate valid keysets and try
+    //       to store them at the same time, only the server knows who won and we only need one HTTP
+    //       request to find out
+    //
+    //    2. clients are never allowed to supply their own recovery phrases and keys to the SDK.
+    //       either we actually need new keys, in which case the ones we safely generated internally
+    //       are stored on the server immediately, or we're wrong and the server tells us what
+    //       to use instead
+    //
+    //
+    // in all cases, the library will only use keys that have been returned by the server, this
+    // guarantees that the keys we actually use are correct as long as the server is correct
+    //
+    let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) = match generate_keyset() {
+        Ok((p, mas, main, hmac)) => (p, mas, main, hmac),
+        Err(_) => return Err(CryptoError::GenerateFailed)
+    };
+
+
+    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped)) = account_key(&master_key_wrapped, &main_key_wrapped, &hmac_key_wrapped) {
+        // now we check to see if the keys returned by the server match the existing phrase or not
+
+        // if we were given an existing phrase try it, otherwise try the new one
+        let phrase_to_check = match recovery_phrase {
+            Some(p) => p,
+            None => new_phrase
+        };
+        match decrypt_keyset(&phrase_to_check, real_master_wrapped, real_main_wrapped, real_hmac_wrapped) {
+            Ok((mas, main, hmac)) => {
+                // this is the right phrase so tell the caller to store it
+                store_recovery_key(&phrase_to_check);
+                let master_key = try!(mas.from_hex());
+                let main_key = try!(main.from_hex());
+                let hmac_key = try!(hmac.from_hex());
+
+                return Ok((master_key, main_key, hmac_key))
+            },
+            Err(_) => return Err(CryptoError::DecryptFailed)
+        };
+    };
+    return Err(CryptoError::DecryptFailed)
 }
 
 pub fn get_sync_folder(db: &PathBuf,
