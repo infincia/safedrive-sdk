@@ -433,8 +433,10 @@ pub fn create_archive(name: &str,
 
                         if !have_stored_block(&db, &block_hmac.as_ref()) {
                             // generate a new chunk key
-                            let size = sodiumoxide::crypto::secretbox::KEYBYTES;
-                            let block_key_raw = sodiumoxide::randombytes::randombytes(size);
+                            let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+                            let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+
+                            let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
                             let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
                                 .expect("failed to get block key struct");
 
@@ -446,7 +448,7 @@ pub fn create_archive(name: &str,
                             // output block, which is critical for versioning and deduplication
                             // across all backups of all sync folders
                             let nonce_slice = block_hmac.as_ref();
-                            let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..NONCE_SIZE as usize])
+                            let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
                                 .expect("Rust<sdsync_create_archive>: failed to get nonce");
 
                             // we use the same nonce both while wrapping the block key, and the block itself
@@ -518,13 +520,16 @@ pub fn create_archive(name: &str,
             .expect("Rust<sdsync_create_archive>: failed to get main key struct");
 
         // generate a new archive key
-        let size = sodiumoxide::crypto::secretbox::KEYBYTES;
-        let archive_key_raw = sodiumoxide::randombytes::randombytes(size);
+        let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+        let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+        let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
+
+        let archive_key_raw = sodiumoxide::randombytes::randombytes(key_size);
         let archive_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&archive_key_raw)
             .expect("Rust<sdsync_create_archive>: failed to get archive key struct");
 
         // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
-        let nonce_raw = sodiumoxide::randombytes::randombytes(size);
+        let nonce_raw = sodiumoxide::randombytes::randombytes(nonce_size);
         let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw[0..24])
             .expect("Rust<sdsync_create_archive>: failed to get nonce");
 
