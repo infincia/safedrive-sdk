@@ -36,6 +36,6 @@ crate-type = ["rlib", "staticlib"]
 doctest = false
 
 [[bin]]
-name = "sdsync"
+name = "safedrive"
 path = "src/main.rs"
 doc = false
