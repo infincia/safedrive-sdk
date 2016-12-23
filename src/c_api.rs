@@ -11,7 +11,6 @@ use std::str::FromStr;
 // external imports
 
 extern crate libc;
-extern crate sodiumoxide;
 
 //internal imports
 
@@ -22,6 +21,8 @@ use ::core::add_sync_folder;
 use ::core::sync_folders;
 use ::core::sync_sessions;
 use ::core::create_archive;
+use ::core::load_keys;
+
 use ::util::unique_client_hash;
 
 use ::sdapi::client_register;
@@ -169,19 +170,25 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
 
 
 
-/// Load keys, must be called before any other function that takes a context parameter
+/// Load keys, must be called before any other function that operates on archives
 ///
-/// Will assert non-null on each parameter
+/// Will assert non-null on the context parameter only, the others will cause a crash if null
 ///
-/// Keys should be obtained from calls to sdsync_generate_symmetric_key() and persisted on disk
 ///
 /// Parameters:
 ///
 ///     context: an opaque pointer obtained from calling sdsync_initialize()
 ///
-///     main: a stack-allocated pointer to a 32byte main encryption key
+///     recovery_phrase: a stack-allocated pointer to a recovery phrase obtained by previous calls.
+///                      can be null if no phrase is available
 ///
-///     hmac: a stack-allocated pointer to a 32byte hmac key
+///     store_recovery_key: a C function pointer that will be called when the app should store a
+///                         recovery phrase
+///
+///     store_recovery_key(new_phrase): a pointer to a recovery phrase that should be stored by the app.
+///                                     note that the pointer becomes invalid after the callback function
+///                                     returns
+///
 ///
 ///
 /// Return:
@@ -193,43 +200,46 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
 ///
 /// # Examples
 ///
-/// ```c
-/// uint8_t * main = malloc(32);
-/// uint8_t * hmac = malloc(32)
-/// sdsync_generate_symmetric_key(&main);
-/// sdsync_generate_symmetric_key(&hmac);
-/// sdsync_load_keys(&context, main_key, hmac_key);
-/// free(main);
-/// free(hmac);
+/// ```
+/// void store_recovery_key_cb(char const* new_phrase) {
+///     // do something with new_phrase, pointer becomes invalid after return
+/// }
+/// sdsync_load_keys(&context, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_load_keys(context: *mut CContext, main: *const u8, hmac: *const u8) -> std::os::raw::c_int {
+pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!context.is_null()); &mut * context };
 
-    let keysize = sodiumoxide::crypto::secretbox::KEYBYTES;
-
-    let main_key = unsafe {
-        assert!(!main.is_null());
-        let mut array = [0u8; 32];
-        let s = slice::from_raw_parts(main, keysize as usize);
-        for (&x, p) in s.iter().zip(array.iter_mut()) {
-            *p = x;
-        };
-        array
+    let phrase: Option<String> = unsafe {
+        if !context.is_null() {
+            let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
+            match str::from_utf8(c_recovery.to_bytes()) {
+                Ok(s) => Some(s.to_owned()),
+                Err(_) => None
+            }
+        }
+        else {
+            None
+        }
     };
+    match load_keys(phrase, &|new_phrase| {
+        // call back to C to store phrase
+        let c_new_phrase = CString::new(new_phrase).unwrap();
+        store_recovery_key(c_new_phrase.into_raw());
+    }) {
+        Ok((_, main_key, hmac_key)) => {
+            let mut h = [0u8; 32];
+            h.clone_from_slice(&hmac_key);
 
-    let hmac_key = unsafe {
-        assert!(!hmac.is_null());
-        let mut array = [0u8; 32];
-        let s = slice::from_raw_parts(hmac, keysize as usize);
-        for (&x, p) in s.iter().zip(array.iter_mut()) {
-            *p = x;
-        };
-        array
-    };
+            let mut m = [0u8; 32];
+            m.clone_from_slice(&main_key);
 
-    c.0.set_keys(main_key, hmac_key);
+            c.0.set_keys(m, h);
+        },
+        Err(_) => { return 1 }
+    }
+
     0
 }
 
