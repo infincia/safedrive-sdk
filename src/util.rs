@@ -2,6 +2,8 @@ use std::path::{Path, PathBuf};
 extern crate rustc_serialize;
 
 use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
+use std::process::Command;
+
 extern crate sodiumoxide;
 extern crate interfaces;
 
@@ -87,6 +89,27 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
         path: s_path,
     }
 }*/
+
+
+pub fn get_local_user() -> Result<String, String> {
+
+
+    let username: String;
+
+    if cfg!(target_os="windows") {
+        let output = match Command::new("echo").arg(r"%USERNAME%").output() {
+            Ok(out) => { let u = String::from_utf8_lossy(&out.stdout); username = u.to_string() },
+            Err(e) => return Err(format!("Failed to get local username: {}", e)),
+        };
+    } else {
+        let output = match Command::new("whoami").output() {
+            Ok(out) => { let u = String::from_utf8_lossy(&out.stdout); username = u.to_string()  },
+            Err(e) => return Err(format!("Failed to get local username: {}", e)),
+        };
+    }
+
+    return Ok(username)
+}
 
 
 pub fn generate_keyset() -> Result<(String, String, String, String), CryptoError> {
