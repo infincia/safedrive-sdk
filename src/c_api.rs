@@ -1,7 +1,6 @@
 use std;
 use std::ffi::{CStr, CString};
 use std::str;
-use std::slice;
 use std::path::{Path};
 use std::mem;
 use std::mem::forget;
