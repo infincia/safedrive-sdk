@@ -216,13 +216,20 @@ pub fn add_block(db: &PathBuf,
     // At some point we might be able to make this more transactional, so that if one or the other
     // fails, the other is rolled back for consistency
 
+    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
     // prepend the key to the actual encrypted chunk data so they can be written to the file together
     let mut to_write = Vec::new();
 
     // bytes 0-47 will be the key
     to_write.extend(key);
 
-    // byte 48+ will be the the chunk data
+    // bytes 48-71 will be the nonce/hmac
+    to_write.extend(&hmac[0..nonce_size as usize]);
+    assert!(to_write.len() == key_size + mac_size + nonce_size);
+
+    // byte 72+ will be the the chunk data
     to_write.extend(chunk_data);
 
     // we store chunks inside a sharded directory structure consisting of 15 separate
