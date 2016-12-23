@@ -204,7 +204,7 @@ pub fn add_block(db: &PathBuf,
                  sftp_session: &Sftp,
                  unique_client_id: &str,
                  hmac: &[u8],
-                 key: &[u8],
+                 wrapped_key: &[u8],
                  chunk_data: &[u8]) -> bool {
     // we always write the chunk to disk first, before recording it in the block table. This ensures
     // that we never end up with a record of a chunk that we don't have, which is the safest choice
@@ -219,11 +219,15 @@ pub fn add_block(db: &PathBuf,
     let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
     let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
     let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
+
+    assert!(wrapped_key.len() == key_size + mac_size);
+
+
     // prepend the key to the actual encrypted chunk data so they can be written to the file together
     let mut to_write = Vec::new();
 
-    // bytes 0-47 will be the key
-    to_write.extend(key);
+    // bytes 0-47 will be the wrapped key
+    to_write.extend(wrapped_key);
 
     // bytes 48-71 will be the nonce/hmac
     to_write.extend(&hmac[0..nonce_size as usize]);
