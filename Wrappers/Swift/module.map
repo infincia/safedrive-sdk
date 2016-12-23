@@ -1,0 +1,4 @@
+module sdsync [system][extern_c] {
+    header "../../dist-osx/include/sdsync.h"
+    export *
+}
