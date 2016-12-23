@@ -5,6 +5,21 @@ use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
 extern crate sodiumoxide;
 extern crate interfaces;
 
+#[derive(Debug)]
+pub enum CryptoError {
+    GenerateFailed,
+    InvalidKey,
+    KeyGenerationFailed,
+    DecryptFailed,
+    EncryptFailed,
+    RetrieveFailed
+}
+
+impl From<FromHexError> for CryptoError {
+    fn from(err: FromHexError) -> CryptoError {
+        CryptoError::InvalidKey
+    }
+}
 pub fn block_directory(unique_client_id: &str, hmac: &[u8]) -> PathBuf {
 
     let shard_identifier = hmac[0..1].to_hex().chars().next().unwrap(); //unwrap is safe here, they're always going to be 0-9 or a-f
