@@ -604,8 +604,12 @@ pub extern "C" fn sdsync_gc(context: *mut CContext) -> std::os::raw::c_int {
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sdsync_create_archive(context: *mut CContext,
-                                    folder_id: std::os::raw::c_int) -> std::os::raw::c_int {
+                                        name: *const std::os::raw::c_char,
+                                        folder_id: std::os::raw::c_int) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
+    let c_name: &CStr = unsafe { CStr::from_ptr(name) };
+    let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
+
     let main_key_array = (*c).0.get_main_key();
     let hmac_key_array = (*c).0.get_hmac_key();
     let ssh_username = (*c).0.get_ssh_username();
@@ -617,7 +621,7 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
     //let uid = &c.unique_client_id;
     let id: i32 = folder_id;
 
-    match create_archive(main_key_array, hmac_key_array, ssh_username, ssh_password, safedrive_sftp_client_ip, safedrive_sftp_client_port, unique_client_id, db, id) {
+    match create_archive(&n, main_key_array, hmac_key_array, ssh_username, ssh_password, safedrive_sftp_client_ip, safedrive_sftp_client_port, unique_client_id, db, id) {
         Ok(_) => return 0,
         Err(_) => return 0
     }

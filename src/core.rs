@@ -297,7 +297,8 @@ pub fn have_stored_block(db: &PathBuf,
 
 
 
-pub fn create_archive(main_key_array: [u8; 32],
+pub fn create_archive(name: &str,
+                      main_key_array: [u8; 32],
                       hmac_key_array: [u8; 32],
                       ssh_username: &str,
                       ssh_password: &str,
@@ -550,7 +551,7 @@ pub fn create_archive(main_key_array: [u8; 32],
 
         let t = time::get_time();
 
-        let archive_name = Uuid::new_v4().hyphenated().to_string() + ".sdsyncv1";
+        let archive_name = name.to_string() + ".sdsyncv1";
         let mut archive_path = archive_directory(&unique_client_id);
         archive_path.push(&archive_name);
         if DEBUG_STATISTICS {
