@@ -25,6 +25,7 @@ reqwest = "*"
 interfaces = "*"
 serde = "0.8"
 serde_json = "0.8"
+bip39 = "*"
 
 [build-dependencies]
 rusty-cheddar = "0.3.3"
