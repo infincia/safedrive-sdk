@@ -8,8 +8,6 @@ extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
 
-use self::serde_json::Map;
-
 use util::*;
 
 #[derive(Debug)]
@@ -76,7 +74,7 @@ pub fn client_register(email: &String, password: &String) -> Result<String, Stri
     let mut response = String::new();
 
     let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
-    let response_map: Map<String, String> = serde_json::from_str(&response).unwrap();
+    let response_map: self::serde_json::Map<String, String> = serde_json::from_str(&response).unwrap();
     match response_map.get("token") {
         Some(token) => Ok(token.clone()),
         None => Err(format!("failed to get token"))
