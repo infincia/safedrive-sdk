@@ -653,8 +653,8 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sdsync_restore_archive(context: *mut CContext,
-                                     name: *const std::os::raw::c_char,
-                                     destination: *const std::os::raw::c_char) -> std::os::raw::c_int {
+                                         name: *const std::os::raw::c_char,
+                                         destination: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!context.is_null()); &mut * context };
 
     //let size = sodiumoxide::crypto::secretbox::KEYBYTES;
