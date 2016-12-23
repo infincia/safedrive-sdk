@@ -1,5 +1,7 @@
 use std::path::{Path, PathBuf};
-use core::rustc_serialize::hex::{ToHex};
+extern crate rustc_serialize;
+
+use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
 extern crate sodiumoxide;
 extern crate interfaces;
 
