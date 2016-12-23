@@ -1,3 +1,4 @@
+use std;
 use std::collections::hash_map::HashMap;
 use std::io::Read;
 
@@ -10,6 +11,40 @@ extern crate serde_json;
 use self::serde_json::Map;
 
 use util::*;
+
+#[derive(Debug)]
+pub enum SDAPIError {
+    RequestFailed
+}
+
+impl From<std::io::Error> for SDAPIError {
+    fn from(err: std::io::Error) -> SDAPIError {
+        match err {
+            _ => SDAPIError::RequestFailed
+        }
+    }
+}
+
+impl From<self::reqwest::Error> for SDAPIError {
+    fn from(err: self::reqwest::Error) -> SDAPIError {
+        match err {
+            _ => SDAPIError::RequestFailed
+        }
+    }
+}
+
+impl From<self::serde_json::Error> for SDAPIError {
+    fn from(err: self::serde_json::Error) -> SDAPIError {
+        match err {
+            _ => SDAPIError::RequestFailed
+        }
+    }
+}
+
+
+
+
+
 
 
 // SD API
