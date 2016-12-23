@@ -5,6 +5,11 @@ use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
 extern crate sodiumoxide;
 extern crate interfaces;
 
+extern crate bip39;
+
+use self::bip39::{Bip39, Bip39Error, KeyType, Language};
+
+
 #[derive(Debug)]
 pub enum CryptoError {
     GenerateFailed,
