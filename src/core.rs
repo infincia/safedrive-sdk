@@ -536,18 +536,13 @@ pub fn create_archive(name: &str,
                         println!("Rust<sdsync_create_archive>: Largest chunk: {} bytes.", largest_size);
                         println!("Rust<sdsync_create_archive>: Standard size deviation: {} bytes.", (size_variance as f64 / nb_chunk as f64).sqrt() as u64);
                     }
+                } else {
+                    header.set_size(0); // hmac list size is zero when file has no actual data
+                    let chunks: Vec<u8> = Vec::new();
+                    let chunklist = BufReader::new(chunks.as_slice());
+                    header.set_cksum();
+                    ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append zero length archive header");
                 }
-                    else {
-                        header.set_size(0); // hmac list size is zero when file has no actual data
-                        let chunks: Vec<u8> = Vec::new();
-                        let chunklist = BufReader::new(chunks.as_slice());
-                        header.set_cksum();
-                        ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append zero length archive header");
-
-
-                    }
-
-
             }
                 else if is_dir {
                     // folder
@@ -556,7 +551,6 @@ pub fn create_archive(name: &str,
                     let chunklist = BufReader::new(chunks.as_slice());
                     header.set_cksum();
                     ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append folder to archive header");
-
                 }
         }
 
