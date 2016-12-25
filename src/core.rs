@@ -40,6 +40,8 @@ use models::{Folder, Block, SyncSession};
 use constants::*;
 use util::*;
 use sdapi::*;
+use keys::*;
+use error::CryptoError;
 
 // internal functions
 

@@ -2,6 +2,8 @@ pub mod core;
 pub mod constants;
 pub mod util;
 pub mod sdapi;
+pub mod keys;
+pub mod error;
 pub mod context;
 
 pub mod models;
