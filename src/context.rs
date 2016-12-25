@@ -1,5 +1,7 @@
 use std::path::{PathBuf};
 
+use keys::Key;
+
 #[derive(Debug)]
 pub struct Context {
     pub db_path: PathBuf,
@@ -13,8 +15,8 @@ pub struct Context {
     pub ssh_password: Option<String>,
     pub safedrive_sftp_client_ip: Option<String>,
     pub safedrive_sftp_client_port: Option<u16>,
-    pub main_key: Option<[u8; 32]>,
-    pub hmac_key: Option<[u8; 32]>,
+    pub main_key: Option<Key>,
+    pub hmac_key: Option<Key>,
 }
 
 impl Context {
@@ -36,7 +38,7 @@ impl Context {
         }
     }
 
-    pub fn set_keys(&mut self, main_key: [u8; 32], hmac_key: [u8; 32]) {
+    pub fn set_keys(&mut self, main_key: Key, hmac_key: Key) {
         self.main_key = Some(main_key);
         self.hmac_key = Some(hmac_key);
     }
@@ -118,11 +120,19 @@ impl Context {
         self.safedrive_sftp_client_port.expect("attenpt to use port before setting")
     }
 
-    pub fn get_main_key(&self) -> [u8; 32] {
-        self.main_key.expect("Attempted to use main key before it was set")
+    pub fn get_main_key(&self) -> &Key {
+        let key = match self.main_key {
+            Some(ref key) => key,
+            None => panic!("Attempted to use main key before it was set")
+        };
+        key
     }
 
-    pub fn get_hmac_key(&self) -> [u8; 32] {
-        self.hmac_key.expect("Attempted to use hmac key before it was set")
+    pub fn get_hmac_key(&self) -> &Key {
+        let key = match self.hmac_key {
+            Some(ref key) => key,
+            None => panic!("Attempted to use hmac key before it was set")
+        };
+        key
     }
 }

@@ -353,8 +353,8 @@ pub fn have_stored_block(db: &PathBuf,
 
 
 pub fn create_archive(name: &str,
-                      main_key_array: [u8; 32],
-                      hmac_key_array: [u8; 32],
+                      main_key: &Key,
+                      hmac_key: &Key,
                       ssh_username: &str,
                       ssh_password: &str,
                       safedrive_sftp_client_ip: &str,
@@ -471,13 +471,11 @@ pub fn create_archive(name: &str,
                         let raw_chunk = data.as_slice();
 
 
-                        let main_key_slice: &[u8] = &main_key_array;
-                        let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key_slice)
+                        let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
                             .expect("failed to get main key struct");
 
                         // calculate hmac of the block
-                        let hmac_key_slice: &[u8] = &hmac_key_array;
-                        let hmac_key = sodiumoxide::crypto::auth::Key::from_slice(hmac_key_slice)
+                        let hmac_key = sodiumoxide::crypto::auth::Key::from_slice(hmac_key.as_ref())
                             .expect("failed to get hmac key struct");
 
                         let block_hmac = sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
@@ -570,8 +568,7 @@ pub fn create_archive(name: &str,
 
         // get the main key
 
-        let main_key_slice: &[u8] = &main_key_array;
-        let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key_slice)
+        let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
             .expect("Rust<sdsync_create_archive>: failed to get main key struct");
 
         // generate a new archive key

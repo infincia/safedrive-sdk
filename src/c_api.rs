@@ -229,13 +229,7 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *con
         store_recovery_key(c_new_phrase.into_raw());
     }) {
         Ok((_, main_key, hmac_key)) => {
-            let mut h = [0u8; 32];
-            h.clone_from_slice(&hmac_key.as_ref());
-
-            let mut m = [0u8; 32];
-            m.clone_from_slice(&main_key.as_ref());
-
-            c.0.set_keys(m, h);
+            c.0.set_keys(main_key, hmac_key);
         },
         Err(_) => { return 1 }
     }
@@ -620,8 +614,8 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
 
-    let main_key_array = (*c).0.get_main_key();
-    let hmac_key_array = (*c).0.get_hmac_key();
+    let main_key = (*c).0.get_main_key();
+    let hmac_key = (*c).0.get_hmac_key();
     let ssh_username = (*c).0.get_ssh_username();
     let ssh_password = (*c).0.get_ssh_password();
     let safedrive_sftp_client_ip = (*c).0.get_safedrive_sftp_client_ip();
@@ -631,7 +625,7 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
     //let uid = &c.unique_client_id;
     let id: i32 = folder_id;
 
-    match create_archive(&n, main_key_array, hmac_key_array, ssh_username, ssh_password, safedrive_sftp_client_ip, safedrive_sftp_client_port, unique_client_id, db, id) {
+    match create_archive(&n, main_key, hmac_key, ssh_username, ssh_password, safedrive_sftp_client_ip, safedrive_sftp_client_port, unique_client_id, db, id) {
         Ok(_) => return 0,
         Err(_) => return 0
     }
