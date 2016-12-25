@@ -230,10 +230,10 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *con
     }) {
         Ok((_, main_key, hmac_key)) => {
             let mut h = [0u8; 32];
-            h.clone_from_slice(&hmac_key);
+            h.clone_from_slice(&hmac_key.as_ref());
 
             let mut m = [0u8; 32];
-            m.clone_from_slice(&main_key);
+            m.clone_from_slice(&main_key.as_ref());
 
             c.0.set_keys(m, h);
         },

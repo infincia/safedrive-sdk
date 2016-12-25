@@ -2,11 +2,13 @@ use std;
 use std::collections::hash_map::HashMap;
 use std::io::Read;
 
-extern crate rustc_serialize;
 extern crate reqwest;
-
+extern crate rustc_serialize;
 extern crate serde;
 extern crate serde_json;
+
+use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
+
 
 use util::*;
 
@@ -82,7 +84,7 @@ pub fn client_register(email: &String, password: &String) -> Result<String, Stri
 
 }
 
-pub fn account_key(master: &str, main: &str, hmac: &str) -> Result<(String, String, String), SDAPIError> {
+pub fn account_key(master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
 
 
     let mut map = HashMap::new();
@@ -110,5 +112,7 @@ pub fn account_key(master: &str, main: &str, hmac: &str) -> Result<(String, Stri
         Some(k) => k.clone(),
         None => return Err(SDAPIError::RequestFailed)
     };
+
+
     Ok((real_master, real_main, real_hmac))
 }

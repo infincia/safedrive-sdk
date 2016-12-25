@@ -24,7 +24,7 @@ extern crate openssl;
 extern crate walkdir;
 extern crate cdc;
 
-use self::rustc_serialize::hex::{FromHex};
+use self::rustc_serialize::hex::{ToHex, FromHex};
 
 
 use self::ssh2::{Session, Sftp};
@@ -109,7 +109,7 @@ pub fn setup_tables(db: &PathBuf) -> Result<(), String> {
     Ok(())
 }
 
-pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Vec<u8>, Vec<u8>, Vec<u8>), CryptoError> {
+pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key), CryptoError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
     //
@@ -134,7 +134,7 @@ pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str))
     };
 
 
-    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped)) = account_key(&master_key_wrapped, &main_key_wrapped, &hmac_key_wrapped) {
+    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped)) = account_key(master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()) {
         // now we check to see if the keys returned by the server match the existing phrase or not
 
         // if we were given an existing phrase try it, otherwise try the new one
@@ -142,14 +142,14 @@ pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str))
             Some(p) => p,
             None => new_phrase
         };
-        match decrypt_keyset(&phrase_to_check, real_master_wrapped, real_main_wrapped, real_hmac_wrapped) {
-            Ok((mas, main, hmac)) => {
+        let wrapped_master_key = try!(WrappedKey::from_hex(real_master_wrapped, KeyType::KeyTypeMaster));
+        let wrapped_main_key = try!(WrappedKey::from_hex(real_main_wrapped, KeyType::KeyTypeMain));
+        let wrapped_hmac_key = try!(WrappedKey::from_hex(real_hmac_wrapped, KeyType::KeyTypeHMAC));
+
+        match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key) {
+            Ok((master_key, main_key, hmac_key)) => {
                 // this is the right phrase so tell the caller to store it
                 store_recovery_key(&phrase_to_check);
-                let master_key = try!(mas.from_hex());
-                let main_key = try!(main.from_hex());
-                let hmac_key = try!(hmac.from_hex());
-
                 return Ok((master_key, main_key, hmac_key))
             },
             Err(_) => return Err(CryptoError::DecryptFailed)

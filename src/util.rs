@@ -1,7 +1,4 @@
 use std::path::{Path, PathBuf};
-extern crate rustc_serialize;
-
-use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
 use std::process::Command;
 
 extern crate sodiumoxide;
@@ -9,8 +6,109 @@ extern crate interfaces;
 
 extern crate bip39;
 
-use self::bip39::{Bip39, Bip39Error, KeyType, Language};
+use self::bip39::{Bip39, Bip39Error, Language};
 
+extern crate rustc_serialize;
+
+use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
+
+#[derive(Debug)]
+pub struct WrappedKey {
+    pub bytes: Vec<u8>,
+    pub key_type: KeyType
+}
+
+impl WrappedKey {
+    pub fn new(key: Vec<u8>, key_type: KeyType) -> WrappedKey {
+
+        WrappedKey { bytes: key, key_type: key_type }
+    }
+
+    pub fn from_hex(hex_key: String, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
+        Ok(WrappedKey::new(try!(hex_key.from_hex()), key_type))
+    }
+
+    pub fn to_key(&self, wrapping_key: &[u8]) -> Result<Key, CryptoError> {
+
+        // decrypt the key with the recovery key and nonce
+        let wrapping_key_s = sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key).expect("failed to get wrapping key struct");
+
+        let key_raw = match sodiumoxide::crypto::secretbox::open(&self.bytes, &self.key_type.nonce(), &wrapping_key_s) {
+            Ok(k) => k,
+            Err(_) => return Err(CryptoError::DecryptFailed)
+        };
+
+        Ok(Key { bytes: key_raw, key_type: self.key_type })
+    }
+
+    pub fn as_ref(&self) -> &[u8] {
+        self.bytes.as_slice()
+    }
+}
+
+impl ToHex for WrappedKey {
+    fn to_hex(&self) -> String {
+        self.bytes.to_hex()
+    }
+}
+
+#[derive(Debug)]
+pub struct Key {
+    pub bytes: Vec<u8>,
+    pub key_type: KeyType
+}
+
+impl Key {
+
+    pub fn new(key_type: KeyType) -> Key {
+        let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+        let key = sodiumoxide::randombytes::randombytes(key_size);
+
+        Key { bytes: key.to_vec(), key_type: key_type }
+    }
+
+    pub fn as_sodium_key(&self) -> sodiumoxide::crypto::secretbox::Key {
+        sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get key struct")
+    }
+
+    pub fn to_wrapped(&self, wrapping_key: &[u8]) -> Result<WrappedKey, CryptoError> {
+        let nonce = self.key_type.nonce();
+        let wrapping_key_s = sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key).expect("failed to get wrapping key struct");
+        let wrapped_key = sodiumoxide::crypto::secretbox::seal(self.bytes.as_ref(), &nonce, &wrapping_key_s);
+
+
+        Ok(WrappedKey { bytes: wrapped_key, key_type: self.key_type })
+    }
+
+    pub fn as_ref(&self) -> &[u8] {
+        self.bytes.as_slice()
+    }
+}
+
+
+
+#[derive(Debug)]
+#[derive(Copy, Clone)]
+pub enum KeyType {
+    KeyTypeMaster,
+    KeyTypeMain,
+    KeyTypeHMAC,
+    KeyTypeRecovery
+}
+
+impl KeyType {
+    pub fn nonce(&self) -> sodiumoxide::crypto::secretbox::Nonce {
+        let nonce_value = match *self {
+            KeyType::KeyTypeMaster => [1u8; 24],
+            KeyType::KeyTypeMain => [2u8; 24],
+            KeyType::KeyTypeHMAC => [3u8; 24],
+            KeyType::KeyTypeRecovery => { panic!("recovery key has no nonce, it is not wrapped!");  }
+        };
+        let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_value).expect("failed to get nonce");
+
+        nonce
+    }
+}
 
 #[derive(Debug)]
 pub enum CryptoError {
@@ -112,81 +210,40 @@ pub fn get_local_user() -> Result<String, String> {
 }
 
 
-pub fn generate_keyset() -> Result<(String, String, String, String), CryptoError> {
-    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
-
+pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey), CryptoError> {
     // generate a recovery phrase that will be used to encrypt the master key
-    let mnemonic_keytype = KeyType::Key128;
+    let mnemonic_keytype = self::bip39::KeyType::Key128;
     let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
-
-
-    let phrase = mnemonic.mnemonic;
-    println!("Rust<generate_keyset>: phrase: {}", phrase);
-    let seed = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-    let hashed_seed = seed.as_ref();
-
-    let recovery_key = sodiumoxide::crypto::secretbox::Key::from_slice(&hashed_seed)
-        .expect("Rust<generate_keyset>: failed to get recovery key struct");
+    println!("Rust<generate_keyset>: phrase: {}", mnemonic.mnemonic);
+    let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
 
     // generate a master key and encrypt it with the recovery phrase and static nonce
     // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
-    let master_key_raw = sodiumoxide::randombytes::randombytes(key_size);
-    let master_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[1u8; 24]).expect("Rust<generate_keyset>: failed to get master nonce");
-    let master_key = sodiumoxide::crypto::secretbox::Key::from_slice(&master_key_raw).expect("Rust<generate_keyset>: failed to get master key struct");
-    let master_key_wrapped = sodiumoxide::crypto::secretbox::seal(&master_key_raw, &master_nonce, &recovery_key);
+    let master_key_type = KeyType::KeyTypeMaster;
+    let master_key = Key::new(master_key_type);
+    let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key.as_ref()));
 
     // generate a main key and encrypt it with the master key and static nonce
-    let main_key_raw = sodiumoxide::randombytes::randombytes(key_size);
-    let main_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[2u8; 24]).expect("Rust<generate_keyset>: failed to get main nonce");
-    let main_key_wrapped = sodiumoxide::crypto::secretbox::seal(&main_key_raw, &main_nonce, &master_key);
+    let main_key_type = KeyType::KeyTypeMain;
+    let main_key = Key::new(main_key_type);
+    let main_key_wrapped = try!(main_key.to_wrapped(&master_key.as_ref()));
 
     // generate an hmac key and encrypt it with the master key and static nonce
-    let hmac_key_raw = sodiumoxide::randombytes::randombytes(key_size);
-    let hmac_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[3u8; 24]).expect("Rust<generate_keyset>: failed to get hmac nonce");
-    let hmac_key_wrapped = sodiumoxide::crypto::secretbox::seal(&hmac_key_raw, &hmac_nonce, &master_key);
+    let hmac_key_type = KeyType::KeyTypeHMAC;
+    let hmac_key = Key::new(hmac_key_type);
+    let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key.as_ref()));
 
-
-    Ok((phrase, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()))
+    Ok((mnemonic.mnemonic, master_key_wrapped, main_key_wrapped, hmac_key_wrapped))
 }
 
-pub fn decrypt_keyset(phrase: &String, master: String, main: String, hmac: String) -> Result<(String, String, String), CryptoError> {
-
+pub fn decrypt_keyset(phrase: &String, master: WrappedKey, main: WrappedKey, hmac: WrappedKey) -> Result<(Key, Key, Key), CryptoError> {
     let mnemonic = try!(Bip39::from_mnemonic(phrase.clone(), Language::English, "".to_string()));
+    let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
+    let master_key = try!(master.to_key(recovery_key.as_ref()));
+    let main_key = try!(main.to_key(master_key.as_ref()));
+    let hmac_key = try!(hmac.to_key(master_key.as_ref()));
 
-    let seed = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-    let hashed_seed = seed.as_ref();
-
-    let recovery_key = sodiumoxide::crypto::secretbox::Key::from_slice(&hashed_seed)
-        .expect("Rust<decrypt_keyset>: failed to get recovery key struct");
-
-    // decrypt the master key with the recovery phrase and static nonce
-    let master_key_wrapped = try!(master.from_hex());
-    let master_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[1u8; 24]).expect("Rust<decrypt_keyset>: failed to get master nonce");
-    let master_key_raw = match sodiumoxide::crypto::secretbox::open(&master_key_wrapped, &master_nonce, &recovery_key) {
-        Ok(k) => k,
-        Err(_) => return Err(CryptoError::DecryptFailed)
-    };
-    let master_key = sodiumoxide::crypto::secretbox::Key::from_slice(&master_key_raw).expect("Rust<decrypt_keyset>: failed to get master key struct");
-
-
-    // decrypt the main key with the master key and static nonce
-    let main_key_wrapped = try!(main.from_hex());
-    let main_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[2u8; 24]).expect("Rust<decrypt_keyset>: failed to get main nonce");
-    let main_key_raw = match sodiumoxide::crypto::secretbox::open(&main_key_wrapped, &main_nonce, &master_key) {
-        Ok(k) => k,
-        Err(_) => return Err(CryptoError::DecryptFailed)
-    };
-
-    // decrypt the hmac key with the master key and static nonce
-    let hmac_key_wrapped = try!(hmac.from_hex());
-    let hmac_nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&[3u8; 24]).expect("Rust<decrypt_keyset>: failed to get hmac nonce");
-    let hmac_key_raw = match sodiumoxide::crypto::secretbox::open(&hmac_key_wrapped, &hmac_nonce, &master_key) {
-        Ok(k) => k,
-        Err(_) => return Err(CryptoError::DecryptFailed)
-    };
-
-
-    Ok((master_key_raw.to_hex(), main_key_raw.to_hex(), hmac_key_raw.to_hex()))
+    Ok((master_key, main_key, hmac_key))
 }
 
 
