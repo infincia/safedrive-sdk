@@ -14,7 +14,7 @@ extern crate libc;
 
 //internal imports
 
-use ::models::Context;
+use ::context::Context;
 
 use ::core::initialize;
 use ::core::add_sync_folder;
