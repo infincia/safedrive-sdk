@@ -3,12 +3,8 @@ use std::collections::hash_map::HashMap;
 use std::io::Read;
 
 extern crate reqwest;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate serde_json;
-
-use self::rustc_serialize::hex::{ToHex, FromHex, FromHexError};
-
 
 use util::*;
 

@@ -24,7 +24,7 @@ extern crate openssl;
 extern crate walkdir;
 extern crate cdc;
 
-use self::rustc_serialize::hex::{ToHex, FromHex};
+use self::rustc_serialize::hex::{ToHex};
 
 
 use self::ssh2::{Session, Sftp};
