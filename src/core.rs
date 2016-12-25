@@ -521,8 +521,10 @@ pub fn create_archive(name: &str,
                             skipped_blocks = skipped_blocks + 1;
                         }
                     }
+                    let hmac_tag_size = sodiumoxide::crypto::auth::TAGBYTES;
+
                     let chunklist = BufReader::new(chunks.as_slice());
-                    header.set_size(nb_chunk * HMAC_SIZE as u64); // hmac list size
+                    header.set_size(nb_chunk * hmac_tag_size as u64); // hmac list size
                     header.set_cksum();
                     ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append chunk archive header");
 
