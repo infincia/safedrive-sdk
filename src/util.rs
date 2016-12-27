@@ -39,7 +39,7 @@ pub fn archive_directory(unique_client_id: &str) -> PathBuf {
 
 #[cfg(target_os = "windows")]
 pub fn unique_client_hash(email: &String) -> Result<String, String> {
-    "".to_string()
+    Ok("".to_string())
 }
 
 #[cfg(not(target_os = "windows"))]
