@@ -1,22 +1,22 @@
-ECHO building %PLATFORM% (%BIT%)
+ECHO building SafeDrive for Windows-%BIT%
 
-rmdir /s /q dist-win-%PLATFORM%-vs2015
+rmdir /s /q dist-win-%BIT%-vs2015
 
-set SODIUM_LIB_DIR=dep-win-%PLATFORM%-vs2015\lib
+set SODIUM_LIB_DIR=dep-win-%BIT%-vs2015\lib
 set SODIUM_STATIC=""
 
-set OPENSSL_DIR=%CD%\dep-win-%PLATFORM%-vs2015
+set OPENSSL_DIR=%CD%\dep-win-%BIT%-vs2015
 set OPENSSL_STATIC=""
 
 set RUSTFLAGS=""
 
 cargo.exe build --release --verbose
 
-mkdir dist-win-%PLATFORM%-vs2015
-mkdir dist-win-%PLATFORM%-vs2015\lib
-mkdir dist-win-%PLATFORM%-vs2015\include
+mkdir dist-win-%BIT%-vs2015
+mkdir dist-win-%BIT%-vs2015\lib
+mkdir dist-win-%BIT%-vs2015\include
 
-copy target\release\libsdsync.lib dist-win-%PLATFORM%-vs2015\lib\
+copy target\release\libsdsync.lib dist-win-%BIT%-vs2015\lib\
 
-copy dep-win-%PLATFORM%-vs2015\lib\* dist-win-%PLATFORM%-vs2015\lib\
-copy dep-win-%PLATFORM%-vs2015\include\* dist-win-%PLATFORM%-vs2015\include\
+copy dep-win-%BIT%-vs2015\lib\* dist-win-%BIT%-vs2015\lib\
+copy dep-win-%BIT%-vs2015\include\* dist-win-%BIT%-vs2015\include\
