@@ -10,8 +10,6 @@ set SODIUM_STATIC=""
 set OPENSSL_DIR=%CD%\dep-win-%BIT%-vs2015
 set OPENSSL_STATIC=""
 
-set RUSTFLAGS=""
-
 set
 
 cargo.exe build --release --verbose
