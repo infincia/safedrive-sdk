@@ -13,6 +13,8 @@ set OPENSSL_STATIC=""
 
 set RUSTFLAGS=""
 
+set
+
 cargo.exe build --release --verbose
 
 copy target\release\libsdsync.lib dist-win-%BIT%-vs2015\lib\
