@@ -1,6 +1,5 @@
 ECHO building SafeDrive for Windows-%BIT%
 
-rmdir /s /q dist-win-%BIT%-vs2015
 mkdir dist-win-%BIT%-vs2015
 mkdir dist-win-%BIT%-vs2015\lib
 mkdir dist-win-%BIT%-vs2015\include
