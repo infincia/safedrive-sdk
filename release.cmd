@@ -5,7 +5,7 @@ mkdir dist-win-%BIT%-vs2015
 mkdir dist-win-%BIT%-vs2015\lib
 mkdir dist-win-%BIT%-vs2015\include
 
-set SODIUM_LIB_DIR=dep-win-%BIT%-vs2015\lib
+set SODIUM_LIB_DIR=%CD%\dep-win-%BIT%-vs2015\lib
 set SODIUM_STATIC=""
 
 set OPENSSL_DIR=%CD%\dep-win-%BIT%-vs2015
