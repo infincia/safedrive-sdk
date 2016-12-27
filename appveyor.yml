@@ -17,7 +17,7 @@ install:
   - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
   - mkdir C:\Users\appveyor\lib
   - mkdir C:\Users\appveyor\lib64
-  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;C:\Users\appveyor\lib;C:\Users\appveyor\lib64;
+  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
   - rustc -Vv
   - cargo -V
   - curl -O https://sqlite.org/2016/sqlite-dll-win32-x86-3150200.zip
