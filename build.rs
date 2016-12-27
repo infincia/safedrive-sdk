@@ -4,13 +4,6 @@ extern crate cheddar;
 
 
 fn main() {
-    env::set_var("SODIUM_LIB_DIR", "dep-osx/lib");
-    env::set_var("SODIUM_STATIC", "");
-
-    env::set_var("SQLITE3_LIB_DIR", "dep-osx/lib");
-
-    env::set_var("OPENSSL_STATIC", "");
-    env::set_var("OPENSSL_DIR", "dep-osx/lib");
 
     println!("cargo:rustc-link-args=-mmacosx-version-min=10.9");
 
