@@ -1,4 +1,4 @@
-ECHO "building %PLATFORM%"
+ECHO building %PLATFORM% (%BIT%)
 
 rmdir /s /q dist-win-%PLATFORM%-vs2015
 
