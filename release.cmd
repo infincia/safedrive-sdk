@@ -1,3 +1,5 @@
+ECHO "building %Platform%"
+
 rmdir /s /q dist-win-%Platform%-vs2015
 
 set SODIUM_LIB_DIR=dep-win-%Platform%-vs2015\lib
