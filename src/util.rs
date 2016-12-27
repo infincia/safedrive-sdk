@@ -1,7 +1,10 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+#[cfg(not(target_os = "windows"))]
 extern crate interfaces;
+
+
 extern crate sodiumoxide;
 
 extern crate rustc_serialize;
@@ -34,6 +37,12 @@ pub fn archive_directory(unique_client_id: &str) -> PathBuf {
     storage_dir
 }
 
+#[cfg(target_os = "windows")]
+pub fn unique_client_hash(email: &String) -> Result<String, String> {
+    "".to_string()
+}
+
+#[cfg(not(target_os = "windows"))]
 pub fn unique_client_hash(email: &String) -> Result<String, String> {
     if let Ok(en0) = interfaces::Interface::get_by_name("en0") {
         if let Some(interface) = en0 {
