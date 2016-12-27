@@ -21,9 +21,13 @@ install:
   - rustc -Vv
   - cargo -V
   - curl -O https://sqlite.org/2016/sqlite-dll-win32-x86-3150200.zip
-  - 7z x sqlite-dll-win32-x86-3150200.zip -o "C:\Users\appveyor\lib" -y
+  - 7z x sqlite-dll-win32-x86-3150200.zip -y
+  - copy /y sqlite3.dll C:\Users\appveyor\lib
+  - copy /y sqlite3.def C:\Users\appveyor\lib
   - curl -O https://sqlite.org/2016/sqlite-dll-win64-x64-3150200.zip
-  - 7z x sqlite-dll-win64-x64-3150200.zip -o "C:\Users\appveyor\lib64" -y
+  - 7z x sqlite-dll-win64-x64-3150200.zip -y
+  - copy /y sqlite3.dll C:\Users\appveyor\lib64
+  - copy /y sqlite3.def C:\Users\appveyor\lib64
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
