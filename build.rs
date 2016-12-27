@@ -31,8 +31,8 @@ fn main() {
     println!("cargo:rustc-link-lib=z");
     println!("cargo:rustc-link-lib=sqlite3");
     println!("cargo:rustc-link-lib=static=sodium");
-    println!("cargo:rustc-link-lib=static=crypto");
-    println!("cargo:rustc-link-lib=static=ssl");
+    println!("cargo:rustc-link-lib=static=libcrypto");
+    println!("cargo:rustc-link-lib=static=libssl");
 
     let dist = format!("dist-win-{}-vs2015\\include\\sdsync.h", bit);
 
