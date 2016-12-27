@@ -1,4 +1,4 @@
-rmdir /s dist-win-vs2015
+rmdir /s /q dist-win-vs2015
 
 set SODIUM_LIB_DIR=dep-win-vs2015\lib
 set SODIUM_STATIC=""
