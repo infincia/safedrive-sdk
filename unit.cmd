@@ -8,12 +8,12 @@ set OPENSSL_STATIC=""
 
 if [%BIT%] EQU [x64] (
     echo linking 64bit sqlite
-    set SQLITE3_LIB_DIR=C:\Users\appveyor\lib64
+    set SQLITE3_LIB_DIR=C:\Users\appveyor\libx64
 )
 
 if [%BIT%] EQU [x86] (
     echo linking 32bit sqlite
-    set SQLITE3_LIB_DIR=C:\Users\appveyor\lib
+    set SQLITE3_LIB_DIR=C:\Users\appveyor\libx86
 )
 
 

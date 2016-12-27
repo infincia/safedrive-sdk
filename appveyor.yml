@@ -6,9 +6,11 @@ environment:
     - TARGET: i686-pc-windows-msvc
       CHANNEL: stable
       BIT: x86
+      WIDTH: 32
     - TARGET: x86_64-pc-windows-msvc
       CHANNEL: stable
       BIT: x64
+      WIDTH: 64
 
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
@@ -22,12 +24,12 @@ install:
   - cargo -V
   - curl -O https://sqlite.org/2016/sqlite-dll-win32-x86-3150200.zip
   - 7z x sqlite-dll-win32-x86-3150200.zip -y
-  - copy /y sqlite3.dll C:\Users\appveyor\lib
-  - copy /y sqlite3.def C:\Users\appveyor\lib
+  - copy /y sqlite3.dll C:\Users\appveyor\libx86
+  - copy /y sqlite3.def C:\Users\appveyor\libx86
   - curl -O https://sqlite.org/2016/sqlite-dll-win64-x64-3150200.zip
   - 7z x sqlite-dll-win64-x64-3150200.zip -y
-  - copy /y sqlite3.dll C:\Users\appveyor\lib64
-  - copy /y sqlite3.def C:\Users\appveyor\lib64
+  - copy /y sqlite3.dll C:\Users\appveyor\libx64
+  - copy /y sqlite3.def C:\Users\appveyor\libx64
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
