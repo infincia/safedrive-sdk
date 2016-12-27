@@ -10,12 +10,12 @@ set SODIUM_STATIC=""
 set OPENSSL_DIR=%CD%\dep-win-%BIT%-vs2015
 set OPENSSL_STATIC=""
 
-if [%BIT%] EQ [x64] (
+if [%BIT%] EQU [x64] (
     echo linking 64bit sqlite
     set SQLITE3_LIB_DIR=C:\Users\appveyor\lib64
 )
 
-if [%BIT%] EQ [x86] (
+if [%BIT%] EQU [x86] (
     echo linking 32bit sqlite
     set SQLITE3_LIB_DIR=C:\Users\appveyor\lib
 )
