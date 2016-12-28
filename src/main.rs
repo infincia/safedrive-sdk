@@ -14,6 +14,7 @@ use self::pbr::ProgressBar;
 extern crate sdsync;
 use sdsync::core::initialize;
 use sdsync::util::unique_client_hash;
+use sdsync::util::get_app_directory;
 use sdsync::sdapi::client_register;
 
 
@@ -45,19 +46,22 @@ fn main() {
         )
         .get_matches();
 
+    let app_directory = get_app_directory().expect("Error: could not determine local storage directory");
+    let a = app_directory.to_str().expect("Error: could not determine local storage directory");
+
+    println!("Using local dir: {}", &a);
+
 
     // prompt for account
     let username = rpassword::prompt_password_stdout("Username").unwrap();
     let password = rpassword::prompt_password_stdout("Password: ").unwrap();
-
-    let db_directory = "~/".to_string();
 
     let uid = match unique_client_hash(&username) {
         Ok(hash) => hash,
         Err(e) => return,
     };
 
-    let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(db_directory, uid);
+    let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(a, uid);
 
     let token = match client_register(&username, &password) {
         Ok(t) => t,

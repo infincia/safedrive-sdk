@@ -75,6 +75,40 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
     }
 }*/
 
+pub fn get_app_directory() -> Result<PathBuf, String> {
+
+
+    let evar: &str;
+
+    if cfg!(target_os="windows") {
+        evar = "APPDATA";
+    }
+        else {
+            evar = "HOME";
+        }
+    let m = format!("failed to get {} environment variable", evar);
+    let path = env::var(evar).expect(&m);
+
+    let mut storage_path = Path::new(&path).to_owned();
+
+    if cfg!(target_os="windows") {
+        storage_path.push("SafeDrive");
+
+    } else if cfg!(target_os="macos") {
+        storage_path.push("Library");
+        storage_path.push("Application Support");
+        storage_path.push("SafeDrive");
+    } else {
+        // probably linux, but either way not one of the others so use home dir
+        storage_path.push(".safedrive");
+    }
+    if let Err(e) = fs::create_dir_all(&storage_path) {
+        panic!("Failed to create local directories: {}", e);
+    }
+
+    return Ok(storage_path)
+}
+
 
 pub fn get_local_user() -> Result<String, String> {
     let evar: &str;
