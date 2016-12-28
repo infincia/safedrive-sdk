@@ -46,9 +46,12 @@ before_deploy:
   # Generate artifacts for release
   - release.cmd
   - mkdir dist-win-vs2015
+  - mkdir dist-win-vs2015\dep
   # TODO update this part to copy the artifacts that make sense for your project
   - copy target\release\libsdsync.lib dist-win-vs2015
   - copy target\release\safedrive dist-win-vs2015
+  - robocopy %CD%\dep-win-%BIT%-vs2015\ %CD%\dist-win-vs2015\dep\ /COPYALL /E
+  - copy "C:\Users\appveyor\lib%BIT%\z.lib" %CD%\dist-win-vs2015\dep\lib
   - cd dist-win-vs2015
     # release zipfile will look like 'rust-everywhere-v1.2.3-x86_64-pc-windows-msvc'
   - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip *
