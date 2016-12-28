@@ -183,3 +183,19 @@ fn key_wrap_test() {
         Err(e) => { assert!(true == false); return }
     };
 }
+
+#[test]
+fn app_directory_test() {
+    let path = match get_app_directory() {
+        Ok(p) => p,
+        Err(e) => { assert!(true == false); return }
+    };
+}
+
+#[test]
+fn local_username_test() {
+    let path = match get_local_user() {
+        Ok(u) => u,
+        Err(e) => { assert!(true == false); return }
+    };
+}
