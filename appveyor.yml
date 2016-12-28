@@ -31,7 +31,7 @@ install:
   - copy /y sqlite3.dll C:\Users\appveyor\libx64
   - copy /y sqlite3.def C:\Users\appveyor\libx64
   - mkdir deps
-  - nuget install zlib-msvc14-%BIT%-master -Source https://ci.appveyor.com/nuget/zlib-94hmpf3q011d
+  - nuget install zlib-msvc14-%BIT%-master -Source https://ci.appveyor.com/nuget/zlib-shallow-x0n34b3pfq1b
   - ps: move zlib*\* deps -force
   - move deps\zlibstatic.lib C:\Users\appveyor\lib%BIT%\z.lib
 
