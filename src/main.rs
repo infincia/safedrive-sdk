@@ -53,7 +53,7 @@ fn main() {
 
 
     // prompt for account
-    let username = rpassword::prompt_password_stdout("Username").unwrap();
+    let username = rpassword::prompt_password_stdout("Username: ").unwrap();
     let password = rpassword::prompt_password_stdout("Password: ").unwrap();
 
     let uid = match unique_client_hash(&username) {
@@ -66,7 +66,7 @@ fn main() {
     let token = match client_register(&username, &password) {
         Ok(t) => t,
         Err(e) => {
-            println!("login error: {}", e);
+            println!("Login error: {}", e);
             return
         }
     };
