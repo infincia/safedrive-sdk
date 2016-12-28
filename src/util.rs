@@ -1,5 +1,7 @@
 use std::path::{Path, PathBuf};
-use std::process::Command;
+use std::fs;
+use std::env;
+
 
 #[cfg(not(target_os = "windows"))]
 extern crate interfaces;
@@ -75,21 +77,16 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
 
 
 pub fn get_local_user() -> Result<String, String> {
-
-
-    let username: String;
+    let evar: &str;
 
     if cfg!(target_os="windows") {
-        let output = match Command::new("echo").arg(r"%USERNAME%").output() {
-            Ok(out) => { let u = String::from_utf8_lossy(&out.stdout); username = u.to_string() },
-            Err(e) => return Err(format!("Failed to get local username: {}", e)),
-        };
+        evar = "USERNAME";
     } else {
-        let output = match Command::new("whoami").output() {
-            Ok(out) => { let u = String::from_utf8_lossy(&out.stdout); username = u.to_string()  },
-            Err(e) => return Err(format!("Failed to get local username: {}", e)),
-        };
+        evar = "USER";
     }
+
+    let m = format!("failed to get {} environment variable", evar);
+    let username = env::var(evar).expect(&m);
 
     return Ok(username)
 }
