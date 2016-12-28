@@ -45,16 +45,19 @@ use error::CryptoError;
 
 // internal functions
 
-pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf, PathBuf, PathBuf, String) {
+pub fn initialize<S, T>(local_directory: S, unique_client_id: T) -> (PathBuf, PathBuf, PathBuf, String) where S: Into<String>, T: Into<String>{
+
+    let ldir = local_directory.into();
+    let uid = unique_client_id.into();
 
     if !sodiumoxide::init() == true {
         panic!("Rust<sdsync_initialize>: sodium initialization failed, cannot continue");
     }
 
-    let storage_path = Path::new(&local_directory).to_owned();
+    let storage_path = Path::new(&ldir).to_owned();
 
-    let mut unique_client_path = Path::new(&local_directory).to_owned();
-    unique_client_path.push(&unique_client_id);
+    let mut unique_client_path = Path::new(&ldir).to_owned();
+    unique_client_path.push(&uid);
     if let Err(e) = fs::create_dir_all(&unique_client_path) {
         panic!("Rust<sdsync_initialize>: failed to create local directories: {}", e);
     }
@@ -76,7 +79,7 @@ pub fn initialize(local_directory: String, unique_client_id: String) -> (PathBuf
 
     println!("Rust<sdsync_initialize>: sdsync ready <libsodium {}, sqlite {}, {}>", sodium_version, sqlite3_version, ssl_version);
 
-    (db_path, storage_path, unique_client_path, unique_client_id)
+    (db_path, storage_path, unique_client_path, uid)
 }
 
 pub fn setup_tables(db: &PathBuf) -> Result<(), String> {
