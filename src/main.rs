@@ -1,12 +1,10 @@
 use std::str;
-use std::path::{Path};
 use std::{thread, time};
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
 extern crate rpassword;
-use rpassword::read_password;
 
 extern crate pbr;
 use self::pbr::ProgressBar;
@@ -80,8 +78,6 @@ fn main() {
         pb.format("╢▌▌░╟");
 
         let mill = time::Duration::from_millis(100);
-        let now = time::Instant::now();
-
 
         for entry in 1..entry_count {
             pb.inc();
