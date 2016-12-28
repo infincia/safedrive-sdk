@@ -28,8 +28,11 @@ fn main() {
     println!("cargo:rustc-link-search=native=dep-win-{}-vs2015\\lib", bit);
     println!("cargo:rustc-link-search=native=C:\\Users\\appveyor\\lib{}", bit);
 
-    println!("cargo:rustc-link-lib=z");
+    //dynamic
     println!("cargo:rustc-link-lib=sqlite3");
+
+    //static
+    println!("cargo:rustc-link-lib=static=z");
     println!("cargo:rustc-link-lib=static=sodium");
     println!("cargo:rustc-link-lib=static=libcrypto");
     println!("cargo:rustc-link-lib=static=libssl");

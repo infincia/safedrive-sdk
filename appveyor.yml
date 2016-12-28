@@ -30,6 +30,10 @@ install:
   - 7z x sqlite-dll-win64-x64-3150200.zip -y
   - copy /y sqlite3.dll C:\Users\appveyor\libx64
   - copy /y sqlite3.def C:\Users\appveyor\libx64
+  - mkdir deps
+  - nuget install zlib-msvc14-%BIT%-master -Source https://ci.appveyor.com/nuget/zlib-94hmpf3q011d
+  - ps: move zlib*\* deps -force
+  - move deps\zlibstatic.lib C:\Users\appveyor\lib%BIT%\z.lib
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
