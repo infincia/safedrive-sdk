@@ -3,16 +3,14 @@ use std::env;
 extern crate cheddar;
 
 fn main() {
-    let dist: &str;
+    let dist: String;
+    let target = env::var("TARGET").expect("failed to get target");
 
-    if cfg!(target_os = "macos") {
-        dist = "../dist/include/sdsync.h";
-    }
-    else if cfg!(target_os = "windows") {
-        dist = "..\\dist\\include\\sdsync.h";
+    if cfg!(target_os = "windows") {
+        dist = format!("..\\dist-{}\\include\\sdsync.h", target);
     }
     else {
-        dist = "../dist/include/sdsync.h";
+        dist = format!("../dist-{}/include/sdsync.h", target);
     }
 
     if cfg!(target_os = "macos") {

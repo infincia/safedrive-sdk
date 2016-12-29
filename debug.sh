@@ -2,15 +2,18 @@
 
 set -e
 
-rm -rf dist
+TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 
-export SODIUM_LIB_DIR=dep-osx/lib
+
+rm -rf dist-$TARGET
+
+export SODIUM_LIB_DIR=dep-$TARGET/lib
 export SODIUM_STATIC
 
-export SQLITE3_LIB_DIR=dep-osx/lib
+export SQLITE3_LIB_DIR=dep-$TARGET/lib
 
 
-export OPENSSL_DIR=$PWD/dep-osx
+export OPENSSL_DIR=$PWD/dep-$TARGET
 export OPENSSL_STATIC
 
 export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
@@ -22,11 +25,11 @@ pushd safedrive
 cargo build --verbose
 popd
 
-mkdir -p dist/lib
-mkdir -p dist/bin
-mkdir -p dist/dep
+mkdir -p dist-$TARGET/lib
+mkdir -p dist-$TARGET/bin
+mkdir -p dist-$TARGET/dep
 
-cp -a dep-osx/* dist/dep/
+cp -a dep-$TARGET/* dist-$TARGET/dep/
 
-cp -a target/debug/libsafedrive.a dist/lib/libsafedrive.a
-cp -a target/debug/safedrive dist/bin/
+cp -a target/debug/libsafedrive.a dist-$TARGET/lib/
+cp -a target/debug/safedrive dist-$TARGET/bin/
