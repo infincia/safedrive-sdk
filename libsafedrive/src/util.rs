@@ -82,10 +82,9 @@ pub fn get_app_directory() -> Result<PathBuf, String> {
 
     if cfg!(target_os="windows") {
         evar = "APPDATA";
+    } else {
+        evar = "HOME";
     }
-        else {
-            evar = "HOME";
-        }
     let m = format!("failed to get {} environment variable", evar);
     let path = match env::var(evar) {
         Ok(e) => e,
