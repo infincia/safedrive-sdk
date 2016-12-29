@@ -1,9 +1,9 @@
-ECHO testing SafeDrive for Windows-%BIT%
+ECHO testing SafeDrive for Windows-%ARCH%
 
-set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-vs2015\lib
+set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
 set SODIUM_STATIC=""
 
-set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-vs2015\lib
+set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
 
 pushd libsafedrive
 cargo.exe test --release --verbose

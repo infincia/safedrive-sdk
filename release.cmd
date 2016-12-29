@@ -1,14 +1,14 @@
-ECHO building SafeDrive for Windows-%BIT%
+ECHO building SafeDrive for Windows-%ARCH%
 
-mkdir dist-%TARGET%
-mkdir dist-%TARGET%\lib
-mkdir dist-%TARGET%\dep
-mkdir dist-%TARGET%\bin
+mkdir dist-%TARGET%-%TOOLSET%
+mkdir dist-%TARGET%-%TOOLSET%\lib
+mkdir dist-%TARGET%-%TOOLSET%\dep
+mkdir dist-%TARGET%-%TOOLSET%\bin
 
-set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-vs2015\lib
+set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
 set SODIUM_STATIC=""
 
-set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-vs2015\lib
+set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
 
 pushd libsafedrive
 cargo.exe build --release --verbose
@@ -17,8 +17,8 @@ pushd safedrive
 cargo.exe build --release --verbose
 popd
 
-robocopy %CD%\dep-%TARGET%-vs2015\ %CD%\dist-%TARGET%\dep\ /COPYALL /E
+robocopy %CD%\dep-%TARGET%-%TOOLSET%\ %CD%\dist-%TARGET%-%TOOLSET%\dep\ /COPYALL /E
 
-copy target\release\safedrive.lib dist-%TARGET%\lib\
-copy target\release\safedrive.exe dist-%TARGET%\bin\
+copy target\release\safedrive.lib dist-%TARGET%-%TOOLSET%\lib\
+copy target\release\safedrive.exe dist-%TARGET%-%TOOLSET%\bin\
 

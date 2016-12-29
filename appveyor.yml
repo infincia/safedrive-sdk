@@ -5,18 +5,18 @@ environment:
     # Stable channel
     - TARGET: i686-pc-windows-msvc
       CHANNEL: stable
-      BIT: x86
-      WIDTH: 32
-    - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: stable
-      BIT: x64
-      WIDTH: 64
+      ARCH: x86
+      VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
+      TOOLSET: v120
+      ESCRIPT: v120_xp.bat
 
 os: Visual Studio 2013
 
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
 install:
+  - if defined VS call "%VS%" %ARCH%
+  - if defined ESCRIPT call "%ESCRIPT%"
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
   - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
@@ -37,8 +37,8 @@ build_script:
 before_deploy:
   - cd dist-%TARGET%
     # release zipfile will look like 'rust-everywhere-v1.2.3-x86_64-pc-windows-msvc'
-  - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip *
-  - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip
+  - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%-%TOOLSET%.zip *
+  - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%-%TOOLSET%.zip
 
 deploy:
   description: 'SafeDrive SDK Windows'
