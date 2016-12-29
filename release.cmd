@@ -1,23 +1,24 @@
 ECHO building SafeDrive for Windows-%BIT%
 
-mkdir dist-win-%BIT%-vs2015
-mkdir dist-win-%BIT%-vs2015\lib
-mkdir dist-win-%BIT%-vs2015\include
+mkdir dist
+mkdir dist\lib
+mkdir dist\dep
+mkdir dist\bin
 
 set SODIUM_LIB_DIR=%CD%\dep-win-%BIT%-vs2015\lib
 set SODIUM_STATIC=""
 
-set OPENSSL_DIR=%CD%\dep-win-%BIT%-vs2015
-set OPENSSL_STATIC=""
-
 set SQLITE3_LIB_DIR=%CD%\dep-win-%BIT%-vs2015\lib
 
-
-set
-
+pushd libsafedrive
 cargo.exe build --release --verbose
+popd
+pushd safedrive
+cargo.exe build --release --verbose
+popd
 
-copy target\release\libsdsync.lib dist-win-%BIT%-vs2015\lib\
+robocopy %CD%\dep-win-%BIT%-vs2015\ %CD%\dist\dep\ /COPYALL /E
 
-copy dep-win-%BIT%-vs2015\lib\* dist-win-%BIT%-vs2015\lib\
-copy dep-win-%BIT%-vs2015\include\* dist-win-%BIT%-vs2015\include\
+copy target\release\safedrive.lib dist\lib\
+copy target\release\safedrive.exe dist\bin\
+

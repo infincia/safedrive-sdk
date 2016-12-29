@@ -19,6 +19,8 @@ extern crate sodiumoxide;
 extern crate tar;
 extern crate rusqlite;
 extern crate libsqlite3_sys;
+
+#[cfg(unix)]
 extern crate openssl;
 
 extern crate walkdir;
@@ -71,13 +73,18 @@ pub fn initialize<S, T>(local_directory: S, unique_client_id: T) -> (PathBuf, Pa
     };
 
     let sodium_version = sodiumoxide::version::version_string();
+    println!("Rust<sdsync_initialize>: libsodium {}", sodium_version);
 
     let sqlite3_version_c: &CStr = unsafe { CStr::from_ptr(libsqlite3_sys::sqlite3_libversion()) };
     let sqlite3_version: String = str::from_utf8(sqlite3_version_c.to_bytes()).unwrap().to_owned();
+    println!("Rust<sdsync_initialize>: sqlite {}", sqlite3_version);
 
+    #[cfg(unix)]
     let ssl_version = openssl::version::version();
+    #[cfg(unix)]
+    println!("Rust<sdsync_initialize>: {}>", ssl_version);
 
-    println!("Rust<sdsync_initialize>: sdsync ready <libsodium {}, sqlite {}, {}>", sodium_version, sqlite3_version, ssl_version);
+    println!("Rust<sdsync_initialize>: ready");
 
     (db_path, storage_path, unique_client_path, uid)
 }

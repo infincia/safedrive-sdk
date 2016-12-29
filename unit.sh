@@ -11,4 +11,6 @@ export OPENSSL_STATIC
 
 export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
 
-cargo test --verbose
+pushd libsafedrive
+cargo test --release --verbose
+popd

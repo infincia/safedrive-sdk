@@ -5,6 +5,7 @@
 
 static CContext *context = NULL;
 
+
 int add(int32_t folder_id, const char * name, const char * path) {
 	return sdsync_add_sync_folder(context, folder_id, name, path);
 }
@@ -12,7 +13,12 @@ int add(int32_t folder_id, const char * name, const char * path) {
 int main ( int argc, char **argv ) {
     char * unique_client_id = malloc((64 * sizeof(char)) + 1);
 
-    int ret = sdsync_get_unique_client_id("stephen@safedrive.io", &unique_client_id);
+    char[] username = "user";
+    char[] password = "password";
+
+    char[] ssh_user = "user";
+
+    int ret = sdsync_get_unique_client_id(username, &unique_client_id);
     int l = strlen(unique_client_id);
     printf("C<test/main>: got unique id: ");
 
@@ -25,11 +31,15 @@ int main ( int argc, char **argv ) {
 
     free(unique_client_id);
 
+    if (0 != sdsync_login(context, username, password)) {
+        printf("C<test/main>: Failed to login");
+    }
+
     uint8_t * main_key = "ab03c34f1ece08211fe2a8039fd6424199b3f5d7b55ff13b1134b364776c45c5";
     uint8_t * hmac_key = "63d6ff853569a0aadec5f247bba51786bb73494d1a06bdc036ebac5034a2920b";
     sdsync_load_keys(context, main_key, hmac_key);
 
-    sdsync_load_credentials(context, "username", "password", "sftp-client.safedrive.io", "22");
+    sdsync_load_credentials(context, ssh_user, password, "sftp-client.safedrive.io", "22");
 
     int result = add(3, "Documents", "/Users/steve/Documents");
     if (result != 0) {

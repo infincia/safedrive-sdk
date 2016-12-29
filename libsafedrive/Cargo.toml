@@ -1,0 +1,34 @@
+[package]
+name = "libsafedrive"
+version = "0.1.0"
+authors = ["Stephen Oliver <steve@infincia.com>"]
+build = "build.rs"
+workspace = ".."
+
+[dependencies]
+sodiumoxide = "*"
+rusqlite = "*"
+libsqlite3-sys = "*"
+time = "*"
+libc = "*"
+walkdir = "*"
+cdc = "*"
+tar = "*"
+rustc-serialize = "*"
+ssh2 = "*"
+reqwest = "*"
+serde = "0.8"
+serde_json = "0.8"
+bip39 = "*"
+
+[target."cfg(not(windows))".dependencies]
+interfaces = "*"
+openssl = "*"
+
+[build-dependencies]
+rusty-cheddar = "0.3.3"
+
+[lib]
+name = "safedrive"
+crate-type = ["rlib", "staticlib"]
+doctest = false

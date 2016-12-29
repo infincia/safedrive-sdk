@@ -3,7 +3,7 @@ use std::fs;
 use std::env;
 
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(unix)]
 extern crate interfaces;
 
 

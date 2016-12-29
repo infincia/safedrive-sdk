@@ -12,47 +12,30 @@ environment:
       BIT: x64
       WIDTH: 64
 
+os: Visual Studio 2013
+
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
 install:
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
   - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
-  - mkdir C:\Users\appveyor\libx86
-  - mkdir C:\Users\appveyor\libx64
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
   - rustc -Vv
   - cargo -V
-  - mkdir deps
-  - nuget install zlib-msvc14-x86-master -Source https://ci.appveyor.com/nuget/zlib-shallow-x0n34b3pfq1b
-  - ps: move zlib*\* deps -force
-  - copy /y deps\zlibstatic.lib "C:\Users\appveyor\libx86"
-  - ren C:\Users\appveyor\libx86\zlibstatic.lib z.lib
-  - nuget install zlib-msvc14-x64-master -Source https://ci.appveyor.com/nuget/zlib-shallow-x0n34b3pfq1b
-  - ps: move zlib*\* deps -force
-  - copy /y deps\zlibstatic.lib "C:\Users\appveyor\libx64"
-  - ren C:\Users\appveyor\libx64\zlibstatic.lib z.lib
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
 # source: https://github.com/starkat99/appveyor-rust/blob/master/appveyor.yml#L113
 build: false
 
-# Equivalent to Travis' `script` phase
-# TODO modify this phase as you see fit
 test_script:
   - unit.cmd
 
-before_deploy:
-  # Generate artifacts for release
+build_script:
   - release.cmd
-  - mkdir dist-win-vs2015
-  - mkdir dist-win-vs2015\dep
-  # TODO update this part to copy the artifacts that make sense for your project
-  - copy target\release\libsdsync.lib dist-win-vs2015
-  - copy target\release\safedrive dist-win-vs2015
-  - robocopy %CD%\dep-win-%BIT%-vs2015\ %CD%\dist-win-vs2015\dep\ /COPYALL /E
-  - copy "C:\Users\appveyor\lib%BIT%\z.lib" %CD%\dist-win-vs2015\dep\lib
-  - cd dist-win-vs2015
+
+before_deploy:
+  - cd dist
     # release zipfile will look like 'rust-everywhere-v1.2.3-x86_64-pc-windows-msvc'
   - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip *
   - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%.zip

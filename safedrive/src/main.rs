@@ -9,11 +9,11 @@ extern crate rpassword;
 extern crate pbr;
 use self::pbr::ProgressBar;
 
-extern crate sdsync;
-use sdsync::core::initialize;
-use sdsync::util::unique_client_hash;
-use sdsync::util::get_app_directory;
-use sdsync::sdapi::client_register;
+extern crate safedrive;
+use safedrive::core::initialize;
+use safedrive::util::unique_client_hash;
+use safedrive::util::get_app_directory;
+use safedrive::sdapi::client_register;
 
 
 fn main() {
