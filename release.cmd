@@ -19,6 +19,7 @@ popd
 
 robocopy %CD%\dep-%TARGET%-%TOOLSET%\ %CD%\dist-%TARGET%-%TOOLSET%\dep\ /COPYALL /E
 
-copy target\release\safedrive.lib dist-%TARGET%-%TOOLSET%\lib\
+copy target\release\deps\safedrive.lib dist-%TARGET%-%TOOLSET%\lib\
+copy target\release\deps\safedrive.dll dist-%TARGET%-%TOOLSET%\lib\
 copy target\release\safedrive.exe dist-%TARGET%-%TOOLSET%\bin\
 
