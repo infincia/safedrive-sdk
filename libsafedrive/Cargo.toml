@@ -32,5 +32,5 @@ rusty-cheddar = "0.3.3"
 
 [lib]
 name = "safedrive"
-crate-type = ["rlib", "staticlib", "cdylib"]
+crate-type = ["rlib", "staticlib"]
 doctest = false
