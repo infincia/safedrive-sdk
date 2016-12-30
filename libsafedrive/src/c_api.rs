@@ -641,7 +641,7 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
             progress(c_percent);
         }) {
         Ok(_) => return 0,
-        Err(_) => return 0
+        Err(_) => return 1
     }
 }
 
