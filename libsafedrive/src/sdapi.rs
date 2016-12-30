@@ -109,3 +109,46 @@ pub fn account_key(master: String, main: String, hmac: String) -> Result<(String
 
     Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac))
 }
+
+pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> {
+    let client = reqwest::Client::new().unwrap();
+    let request = client.get("https://safedrive.io/api/1/folder")
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    let folders: Vec<RegisteredFolder> = match serde_json::from_str(&response) {
+        Ok(f) => f,
+        Err(_) => return Err(SDAPIError::RequestFailed)
+    };
+
+    Ok(folders)
+}
+
+pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> Result<u64, SDAPIError> where S: Into<String>, T: Into<String> {
+
+    let pa = path.into();
+    let na = name.into();
+
+    let map_req = CreateFolderRequest { folderName: na, folderPath: pa, encrypted: encrypted };
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.post("https://safedrive.io/api/1/folder")
+        .json(&map_req)
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    let folder_response: CreateFolderResponse = match serde_json::from_str(&response) {
+        Ok(r) => r,
+        Err(_) => return Err(SDAPIError::RequestFailed)
+    };
+
+    Ok(folder_response.id)
+}

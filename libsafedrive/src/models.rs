@@ -39,6 +39,21 @@ pub struct UniqueClientID {
     pub id: String,
 }
 
+//private final int id
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CreateFolderResponse {
+    pub id: u64,
+}
+
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CreateFolderRequest {
+    pub folderName: String,
+    pub folderPath: String,
+    pub encrypted: bool
+}
+
+
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ClientRegisterRequest {
@@ -94,5 +109,24 @@ pub struct AccountDetails {
 pub struct Notification {
     pub title: String,
     pub message: String
+}
+
+/*
+Current sync folder model:
+
+"id" : 1,
+"folderName" : "Music",
+"folderPath" : /Volumes/MacOS/Music,
+"addedDate"  : 1435864769463,
+"encrypted"  : false
+*/
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RegisteredFolder {
+    pub id: u64,
+    pub folderName: String,
+    pub folderPath: String,
+    pub addedDate: u64,
+    pub encrypted: bool
 }
 
