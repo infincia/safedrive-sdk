@@ -1,3 +1,6 @@
+use std;
+
+
 extern crate bip39;
 
 use self::bip39::{Bip39Error};
@@ -5,6 +8,10 @@ use self::bip39::{Bip39Error};
 extern crate rustc_serialize;
 
 use self::rustc_serialize::hex::{FromHexError};
+
+extern crate reqwest;
+
+extern crate serde_json;
 
 
 #[derive(Debug)]
@@ -31,6 +38,36 @@ impl From<Bip39Error> for CryptoError {
             Bip39Error::InvalidKeysize => CryptoError::InvalidKey,
             Bip39Error::InvalidWordLength => CryptoError::InvalidKey,
             Bip39Error::LanguageUnavailable => CryptoError::DecryptFailed
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub enum SDAPIError {
+    RequestFailed
+}
+
+impl From<std::io::Error> for SDAPIError {
+    fn from(err: std::io::Error) -> SDAPIError {
+        match err {
+            _ => SDAPIError::RequestFailed
+        }
+    }
+}
+
+impl From<self::reqwest::Error> for SDAPIError {
+    fn from(err: self::reqwest::Error) -> SDAPIError {
+        match err {
+            _ => SDAPIError::RequestFailed
+        }
+    }
+}
+
+impl From<self::serde_json::Error> for SDAPIError {
+    fn from(err: self::serde_json::Error) -> SDAPIError {
+        match err {
+            _ => SDAPIError::RequestFailed
         }
     }
 }

@@ -26,3 +26,54 @@ pub struct Block {
     pub refcount: i32,
     pub hmac: Option<Vec<u8>>,
 }
+
+//private final String token
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Token {
+    pub token: String,
+}
+
+//private final String uniqueClientId
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UniqueClientID {
+    pub id: String,
+}
+//private final String status;
+//private final String host;
+//private final int port;
+//private final String userName;
+//private final Long time;
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AccountStatus {
+    pub status: Option<String>,
+    pub host: String,
+    pub port: u16,
+    pub userName: String,
+    pub time: Option<u64>
+}
+
+
+
+//private final long assignedStorage;
+//private final long usedStorage;
+//private final int lowFreeStorageThreshold;
+//private final long expirationDate;
+//private final Set<NotificationTO> notifications;
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AccountDetails {
+    pub assignedStorage: u64,
+    pub usedStorage: u64,
+    pub lowFreeStorageThreshold: i64,
+    pub expirationDate: u64,
+    pub notifications: Option<Vec<Notification>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Notification {
+    pub title: String,
+    pub message: String
+}
+
