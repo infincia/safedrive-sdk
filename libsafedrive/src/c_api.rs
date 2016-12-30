@@ -22,10 +22,9 @@ use ::core::sync_folders;
 use ::core::sync_sessions;
 use ::core::create_archive;
 use ::core::load_keys;
+use ::core::login;
 
 use ::util::unique_client_hash;
-
-use ::sdapi::client_register;
 
 // exports
 
@@ -151,10 +150,11 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
     let c_password: &CStr = unsafe { CStr::from_ptr(password) };
     let pa: String = str::from_utf8(c_password.to_bytes()).unwrap().to_owned();
 
-    match client_register(&un, &pa) {
-        Ok(t) => {
-            c.0.set_account(un, pa);
-            c.0.set_api_token(t);
+    match login(&un, &pa) {
+        Ok((token, account_status, unique_client_id)) => {
+            c.0.set_account(un.to_owned(), pa.to_owned());
+            c.0.set_ssh_credentials(account_status.userName.to_owned(), pa.to_owned(), account_status.host, account_status.port);
+            c.0.set_api_token(token.token);
             0
         },
         Err(_) => {

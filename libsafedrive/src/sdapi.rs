@@ -6,7 +6,61 @@ extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
 
+header! { (SDAuthToken, "SD-Auth-Token") => [String] }
+
 use util::*;
+
+//private final String token
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Token {
+    pub token: String,
+}
+
+//private final String uniqueClientId
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UniqueClientID {
+    pub id: String,
+}
+
+
+//private final String status;
+//private final String host;
+//private final int port;
+//private final String userName;
+//private final Long time;
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AccountStatus {
+    pub status: String,
+    pub host: String,
+    pub port: u16,
+    pub userName: String,
+    pub time: Option<u64>
+}
+
+
+
+//private final long assignedStorage;
+//private final long usedStorage;
+//private final int lowFreeStorageThreshold;
+//private final long expirationDate;
+//private final Set<NotificationTO> notifications;
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AccountDetails {
+    pub assignedStorage: u64,
+    pub usedStorage: u64,
+    pub lowFreeStorageThreshold: i64,
+    pub expirationDate: u64,
+    pub notifications: Option<Vec<Notification>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Notification {
+    pub title: String,
+    pub message: String
+}
 
 #[derive(Debug)]
 pub enum SDAPIError {
@@ -45,9 +99,12 @@ impl From<self::serde_json::Error> for SDAPIError {
 
 // SD API
 
-pub fn client_register(email: &String, password: &String) -> Result<String, String> {
+pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClientID), String> where S: Into<String>, T: Into<String> {
 
-    let uid = match unique_client_hash(&email) {
+    let em = email.into();
+    let pa = password.into();
+
+    let uid = match unique_client_hash(&em) {
         Ok(hash) => hash,
         Err(e) => e,
     };
@@ -60,8 +117,8 @@ pub fn client_register(email: &String, password: &String) -> Result<String, Stri
     } else {
         map.insert("operatingSystem", "OS X");
     }
-    map.insert("email", email);
-    map.insert("password", password);
+    map.insert("email", &em);
+    map.insert("password", &pa);
     map.insert("language", "en-US");
 
 
@@ -72,12 +129,46 @@ pub fn client_register(email: &String, password: &String) -> Result<String, Stri
     let mut response = String::new();
 
     let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
-    let response_map: self::serde_json::Map<String, String> = serde_json::from_str(&response).unwrap();
-    match response_map.get("token") {
-        Some(token) => Ok(token.clone()),
-        None => Err(format!("failed to get token"))
-    }
+    let token: Token = match serde_json::from_str(&response) {
+        Ok(token) => token,
+        Err(e) => return Err(format!("failed to get token: {}", e))
+    };
 
+    let u = UniqueClientID { id: uid.to_owned() };
+
+    Ok((token, u))
+}
+
+pub fn account_status(token: &Token) -> Result<AccountStatus, String> {
+    let client = reqwest::Client::new().unwrap();
+    let result = client.post("https://safedrive.io/api/1/account/status")
+        .header(SDAuthToken(token.token.to_owned()))
+        .send();
+    let mut response = String::new();
+
+    let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
+    let account_status: AccountStatus = match serde_json::from_str(&response) {
+        Ok(a) => a,
+        Err(e) => return Err(format!("failed to get account status: {}", e))
+    };
+
+    Ok(account_status)
+}
+
+pub fn account_details(token: &Token) -> Result<AccountDetails, String> {
+    let client = reqwest::Client::new().unwrap();
+    let result = client.post("https://safedrive.io/api/1/account/details")
+        .header(SDAuthToken(token.token.to_owned()))
+        .send();
+    let mut response = String::new();
+
+    let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
+    let account_details: AccountDetails = match serde_json::from_str(&response) {
+        Ok(a) => a,
+        Err(e) => return Err(format!("failed to get account details: {}", e))
+    };
+
+    Ok(account_details)
 }
 
 pub fn account_key(master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {

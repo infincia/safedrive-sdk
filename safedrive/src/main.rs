@@ -11,9 +11,10 @@ use self::pbr::ProgressBar;
 
 extern crate safedrive;
 use safedrive::core::initialize;
+use safedrive::core::login;
+
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
-use safedrive::sdapi::client_register;
 
 
 fn main() {
@@ -61,8 +62,8 @@ fn main() {
 
     let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(a, uid);
 
-    let token = match client_register(&username, &password) {
-        Ok(t) => t,
+    let (token, account_status, _) = match login(&username, &password) {
+        Ok((t, a, ucid)) => (t, a, ucid),
         Err(e) => {
             println!("Login error: {}", e);
             return

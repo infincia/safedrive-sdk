@@ -121,6 +121,20 @@ pub fn setup_tables(db: &PathBuf) -> Result<(), String> {
     Ok(())
 }
 
+pub fn login(username: &str,
+             password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), String> {
+
+    match client_register(username, password) {
+        Ok((t, ucid)) => {
+            match account_status(&t) {
+                Ok(s) => return Ok((t, s, ucid)),
+                Err(e) => return Err(format!("failed to register client: {}", e))
+            }
+        },
+        Err(e) => return Err(format!("failed to register client: {}", e))
+    }
+}
+
 pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key), CryptoError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
