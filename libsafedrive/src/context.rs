@@ -1,6 +1,7 @@
 use std::path::{PathBuf};
 
 use keys::Key;
+use models::Token;
 
 #[derive(Debug)]
 pub struct Context {
@@ -10,7 +11,7 @@ pub struct Context {
     pub unique_client_id: String,
     pub username: Option<String>,
     pub password: Option<String>,
-    pub api_token: Option<String>,
+    pub api_token: Option<Token>,
     pub ssh_username: Option<String>,
     pub ssh_password: Option<String>,
     pub safedrive_sftp_client_ip: Option<String>,
@@ -43,7 +44,7 @@ impl Context {
         self.hmac_key = Some(hmac_key);
     }
 
-    pub fn get_api_token(&self) -> &String {
+    pub fn get_api_token(&self) -> &Token {
         let tok = match self.api_token {
             Some(ref t) => t,
             None => panic!("attempt to use api token before setting")
@@ -52,7 +53,7 @@ impl Context {
         tok
     }
 
-    pub fn set_api_token(&mut self, token: String) {
+    pub fn set_api_token(&mut self, token: Token) {
         self.api_token = Some(token);
     }
 
