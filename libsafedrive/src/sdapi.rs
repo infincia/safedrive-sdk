@@ -99,7 +99,7 @@ impl From<self::serde_json::Error> for SDAPIError {
 
 // SD API
 
-pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClientID), String> where S: Into<String>, T: Into<String> {
+pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClientID), SDAPIError> where S: Into<String>, T: Into<String> {
 
     let em = email.into();
     let pa = password.into();
@@ -125,13 +125,14 @@ pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
     map.insert("uniqueClientId", &uid);
 
     let client = reqwest::Client::new().unwrap();
-    let result = client.post("https://safedrive.io/api/1/client/register").json(&map).send();
+    let mut result = try!(client.post("https://safedrive.io/api/1/client/register").json(&map).send());
     let mut response = String::new();
 
-    let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
+    try!(result.read_to_string(&mut response));
+
     let token: Token = match serde_json::from_str(&response) {
         Ok(token) => token,
-        Err(e) => return Err(format!("failed to get token: {}", e))
+        Err(_) => return Err(SDAPIError::RequestFailed)
     };
 
     let u = UniqueClientID { id: uid.to_owned() };
@@ -139,33 +140,37 @@ pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
     Ok((token, u))
 }
 
-pub fn account_status(token: &Token) -> Result<AccountStatus, String> {
+pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let client = reqwest::Client::new().unwrap();
-    let result = client.post("https://safedrive.io/api/1/account/status")
-        .header(SDAuthToken(token.token.to_owned()))
-        .send();
+    let request = client.get("https://safedrive.io/api/1/account/status")
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
     let mut response = String::new();
 
-    let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
+    try!(result.read_to_string(&mut response));
+
     let account_status: AccountStatus = match serde_json::from_str(&response) {
         Ok(a) => a,
-        Err(e) => return Err(format!("failed to get account status: {}", e))
+        Err(_) => return Err(SDAPIError::RequestFailed)
     };
 
     Ok(account_status)
 }
 
-pub fn account_details(token: &Token) -> Result<AccountDetails, String> {
+pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let client = reqwest::Client::new().unwrap();
-    let result = client.post("https://safedrive.io/api/1/account/details")
-        .header(SDAuthToken(token.token.to_owned()))
-        .send();
+    let request = client.get("https://safedrive.io/api/1/account/details")
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
     let mut response = String::new();
 
-    let _ = result.expect("didn't get response object").read_to_string(&mut response).expect("couldn't read response");
+    try!(result.read_to_string(&mut response));
+
     let account_details: AccountDetails = match serde_json::from_str(&response) {
         Ok(a) => a,
-        Err(e) => return Err(format!("failed to get account details: {}", e))
+        Err(_) => return Err(SDAPIError::RequestFailed)
     };
 
     Ok(account_details)
@@ -180,11 +185,14 @@ pub fn account_key(master: String, main: String, hmac: String) -> Result<(String
     map.insert("hmac", hmac);
 
     let client = reqwest::Client::new().unwrap();
-    let result = client.post("https://safedrive.io/api/1/account/key").json(&map).send();
+    let request = client.post("https://safedrive.io/api/1/account/key")
+        .json(&map);
+        //.header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
     let mut response = String::new();
 
-    let mut r = try!(result);
-    try!(r.read_to_string(&mut response));
+    try!(result.read_to_string(&mut response));
 
     let response_map: self::serde_json::Map<String, String> = try!(serde_json::from_str(&response));
     let real_master = match response_map.get("master") {
