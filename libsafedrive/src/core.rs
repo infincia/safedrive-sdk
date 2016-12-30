@@ -385,7 +385,8 @@ pub fn create_archive(name: &str,
                       safedrive_sftp_client_port: u16,
                       unique_client_id: &str,
                       db: PathBuf,
-                      folder_id: i32) -> Result<(), String> {
+                      folder_id: i32,
+                      progress: &Fn(f64)) -> Result<(), String> {
 
     let archive_file = Vec::new();
 
@@ -419,13 +420,19 @@ pub fn create_archive(name: &str,
 
         let mut failed = 0;
 
-        let mut progress = 0.0;
+        let mut completed_count = 0.0;
         for item in WalkDir::new(&folder.path).into_iter().filter_map(|e| e.ok()) {
             if DEBUG_STATISTICS {
                 println!("Rust<sdsync_create_archive>: examining {}", item.path().display());
             }
-            progress = progress + 1.0;
-            let percent_completed: f64 = (progress / entry_count as f64) * 100.0;
+            let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
+
+            // call out to the library user with progress
+            progress(percent_completed);
+
+            completed_count = completed_count + 1.0;
+
+
             let p = item.path();
             let p_relative = p.strip_prefix(&folder.path).expect("failed to unwrap relative path");
 
@@ -657,6 +664,8 @@ pub fn create_archive(name: &str,
             };
         }
     }
+    progress(100.0);
+
     Ok(())
 }
 
