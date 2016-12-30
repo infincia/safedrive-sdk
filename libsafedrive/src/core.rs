@@ -128,10 +128,10 @@ pub fn login(username: &str,
         Ok((t, ucid)) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s, ucid)),
-                Err(e) => return Err(format!("failed to register client: {}", e))
+                Err(e) => return Err(format!("failed to register client: {:?}", e))
             }
         },
-        Err(e) => return Err(format!("failed to register client: {}", e))
+        Err(e) => return Err(format!("failed to register client: {:?}", e))
     }
 }
 
