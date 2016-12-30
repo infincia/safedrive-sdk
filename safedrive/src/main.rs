@@ -16,6 +16,8 @@ use safedrive::core::login;
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
 
+use safedrive::sdapi::read_folders;
+
 
 fn main() {
     let matches = App::new("safedrive")
@@ -69,6 +71,17 @@ fn main() {
             return
         }
     };
+
+    let folder_list = match read_folders(&token) {
+        Ok(fl) => fl,
+        Err(e) => {
+            println!("Read folders error: {:?}", e);
+            return
+        }
+    };
+    for folder in folder_list {
+        println!("Registered folder: {:?}", folder);
+    }
 
     if let Some(matches) = matches.subcommand_matches("add") {
 
