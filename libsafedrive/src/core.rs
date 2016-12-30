@@ -38,7 +38,7 @@ use self::time::Timespec;
 
 // internal imports
 
-use models::{Folder, Block, SyncSession};
+use models::*;
 use constants::*;
 use util::*;
 use sdapi::*;
@@ -135,7 +135,7 @@ pub fn login(username: &str,
     }
 }
 
-pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key), CryptoError> {
+pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key), CryptoError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
     //
@@ -160,7 +160,7 @@ pub fn load_keys(recovery_phrase: Option<String>, store_recovery_key: &Fn(&str))
     };
 
 
-    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped)) = account_key(master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()) {
+    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped)) = account_key(token, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()) {
         // now we check to see if the keys returned by the server match the existing phrase or not
 
         // if we were given an existing phrase try it, otherwise try the new one

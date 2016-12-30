@@ -154,7 +154,7 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
         Ok((token, account_status, unique_client_id)) => {
             c.0.set_account(un.to_owned(), pa.to_owned());
             c.0.set_ssh_credentials(account_status.userName.to_owned(), pa.to_owned(), account_status.host, account_status.port);
-            c.0.set_api_token(token.token);
+            c.0.set_api_token(token);
             0
         },
         Err(_) => {
@@ -223,17 +223,17 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *con
             None
         }
     };
-    match load_keys(phrase, &|new_phrase| {
+
+    let (_, main_key, hmac_key) = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         // call back to C to store phrase
         let c_new_phrase = CString::new(new_phrase).unwrap();
         store_recovery_key(c_new_phrase.into_raw());
     }) {
-        Ok((_, main_key, hmac_key)) => {
-            c.0.set_keys(main_key, hmac_key);
-        },
+        Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
         Err(_) => { return 1 }
-    }
+    };
 
+    c.0.set_keys(main_key, hmac_key);
     0
 }
 

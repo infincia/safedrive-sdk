@@ -90,15 +90,15 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     Ok(account_details)
 }
 
-pub fn account_key(master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
+pub fn account_key(token: &Token, master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
 
 
     let map_req = WrappedKeyset { master: master, main: main, hmac: hmac };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.post("https://safedrive.io/api/1/account/key")
-        //.header(SDAuthToken(token.token.to_owned()));
         .json(&map_req)
+        .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
     let mut response = String::new();
