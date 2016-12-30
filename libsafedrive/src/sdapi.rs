@@ -1,5 +1,3 @@
-use std;
-use std::collections::hash_map::HashMap;
 use std::io::Read;
 
 extern crate reqwest;
@@ -24,23 +22,24 @@ pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
         Err(e) => e,
     };
 
-
-    let mut map = HashMap::new();
+    let os: &str;
 
     if cfg!(target_os="windows") {
-        map.insert("operatingSystem", "Windows");
+        os = "Windows";
+    } else if cfg!(target_os="macos") {
+        os = "OS X";
+    } else if cfg!(target_os="linux") {
+        os = "Linux";
     } else {
-        map.insert("operatingSystem", "OS X");
+        os = "Unknown";
     }
-    map.insert("email", &em);
-    map.insert("password", &pa);
-    map.insert("language", "en-US");
-
-
-    map.insert("uniqueClientId", &uid);
+    let map_req = ClientRegisterRequest { operatingSystem: os.to_string(), email: em, password: pa, language: "en-US".to_string(), uniqueClientId: uid.clone() };
 
     let client = reqwest::Client::new().unwrap();
-    let mut result = try!(client.post("https://safedrive.io/api/1/client/register").json(&map).send());
+    let request = client.post("https://safedrive.io/api/1/client/register")
+        .json(&map_req);
+
+    let mut result = try!(request.send());
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -94,35 +93,19 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 pub fn account_key(master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
 
 
-    let mut map = HashMap::new();
-    map.insert("master", master);
-    map.insert("main", main);
-    map.insert("hmac", hmac);
+    let map_req = WrappedKeyset { master: master, main: main, hmac: hmac };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.post("https://safedrive.io/api/1/account/key")
-        .json(&map);
         //.header(SDAuthToken(token.token.to_owned()));
+        .json(&map_req)
 
     let mut result = try!(request.send());
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
 
-    let response_map: self::serde_json::Map<String, String> = try!(serde_json::from_str(&response));
-    let real_master = match response_map.get("master") {
-        Some(k) => k.clone(),
-        None => return Err(SDAPIError::RequestFailed)
-    };
-    let real_main = match response_map.get("main") {
-        Some(k) => k.clone(),
-        None => return Err(SDAPIError::RequestFailed)
-    };
-    let real_hmac = match response_map.get("hmac") {
-        Some(k) => k.clone(),
-        None => return Err(SDAPIError::RequestFailed)
-    };
+    let wrapped_keyset: WrappedKeyset = try!(serde_json::from_str(&response));
 
-
-    Ok((real_master, real_main, real_hmac))
+    Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac))
 }

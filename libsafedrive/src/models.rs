@@ -38,6 +38,25 @@ pub struct Token {
 pub struct UniqueClientID {
     pub id: String,
 }
+
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ClientRegisterRequest {
+    pub operatingSystem: String,
+    pub email: String,
+    pub password: String,
+    pub language: String,
+    pub uniqueClientId: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct WrappedKeyset {
+    pub master: String,
+    pub main: String,
+    pub hmac: String
+}
+
 //private final String status;
 //private final String host;
 //private final int port;
