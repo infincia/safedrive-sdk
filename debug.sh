@@ -7,6 +7,7 @@ TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = 
 
 rm -rf dist-$TARGET
 mkdir -p dist-$TARGET/lib
+mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
 mkdir -p dist-$TARGET/dep
 

@@ -2,6 +2,7 @@ ECHO building SafeDrive for Windows-%ARCH%
 
 mkdir dist-%TARGET%-%TOOLSET%
 mkdir dist-%TARGET%-%TOOLSET%\lib
+mkdir dist-%TARGET%-%TOOLSET%\include
 mkdir dist-%TARGET%-%TOOLSET%\dep
 mkdir dist-%TARGET%-%TOOLSET%\bin
 
