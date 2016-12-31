@@ -10,6 +10,8 @@ workspace = ".."
 clap = "*"
 pbr = "*"
 rpassword = "*"
+uuid = { version = "0.3", features = ["v4"] }
+
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"
