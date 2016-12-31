@@ -42,6 +42,9 @@ fn main() {
                 .help("folder path")
             )
         )
+        .subcommand(SubCommand::with_name("list")
+            .about("list all registered folders")
+        )
         .subcommand(SubCommand::with_name("sync")
             .about("sync all registered folder")
         )
@@ -89,5 +92,16 @@ fn main() {
         }
 
         pb.finish();
+    } else if let Some(matches) = matches.subcommand_matches("list") {
+        let folder_list = match read_folders(&token) {
+            Ok(fl) => fl,
+            Err(e) => {
+                println!("Read folders error: {:?}", e);
+                return 1
+            }
+        };
+        for folder in folder_list {
+            println!("Name: {} ({})", folder.folderName, folder.folderPath);
+        }
     }
 }
