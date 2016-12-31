@@ -12,6 +12,7 @@ use self::pbr::ProgressBar;
 extern crate safedrive;
 use safedrive::core::initialize;
 use safedrive::core::login;
+use safedrive::core::load_keys;
 
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
@@ -74,6 +75,27 @@ fn main() {
             return
         }
     };
+
+    let phrase = "safedrive".to_owned();
+
+    let (_, main_key, hmac_key) = match load_keys(&token, phrase, &|new_phrase| {
+        // store phrase in keychain and display
+        println!("NOTE: a recovery phrase has been generated for your account, please write it down somewhere safe");
+        println!();
+        println!("If you lose your recovery phrase you will lose access to your data!!!");
+        println!("---------------------------------------------------------------------");
+        println!("Recovery phrase: {}", new_phrase);
+        println!("---------------------------------------------------------------------");
+    }) {
+        Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
+        Err(e) => {
+            println!("Key error: {}", e);
+            return 1
+        }
+    };
+
+
+
 
 
     if let Some(matches) = matches.subcommand_matches("add") {
