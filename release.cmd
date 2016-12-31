@@ -13,6 +13,8 @@ set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
 
 set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 
+rustup default %CHANNEL%-%TARGET%
+
 pushd libsafedrive
 cargo.exe build --release --verbose
 popd
