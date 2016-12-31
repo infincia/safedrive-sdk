@@ -72,16 +72,6 @@ fn main() {
         }
     };
 
-    let folder_list = match read_folders(&token) {
-        Ok(fl) => fl,
-        Err(e) => {
-            println!("Read folders error: {:?}", e);
-            return
-        }
-    };
-    for folder in folder_list {
-        println!("Registered folder: {:?}", folder);
-    }
 
     if let Some(matches) = matches.subcommand_matches("add") {
 
