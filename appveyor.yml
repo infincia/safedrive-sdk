@@ -15,13 +15,13 @@ environment:
     #  VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
     #  TOOLSET: v120
     #  ESCRIPT: v120_xp.bat
-    - TARGET: i686-pc-windows-msvc
-      CHANNEL: nightly
-      ARCH: x86
-      VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
-      TOOLSET: v120
-      ESCRIPT: v120_xp.bat
-      LINKTYPE: mt
+    #- TARGET: i686-pc-windows-msvc
+    #  CHANNEL: nightly
+    #  ARCH: x86
+    #  VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
+    #  TOOLSET: v120
+    #  ESCRIPT: v120_xp.bat
+    #  LINKTYPE: mt
     - TARGET: i686-pc-windows-msvc
       CHANNEL: nightly
       ARCH: x86
