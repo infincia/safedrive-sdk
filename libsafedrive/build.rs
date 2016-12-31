@@ -7,7 +7,9 @@ fn main() {
     let target = env::var("TARGET").expect("failed to get target");
 
     if cfg!(target_os = "windows") {
-        dist = format!("..\\dist-{}\\include\\sdsync.h", target);
+        let toolset = env::var("TOOLSET").expect("failed to get toolset");
+        let linktype = env::var("LINKTYPE").expect("failed to get link type");
+        dist = format!("..\\dist-{}-{}-{}\\include\\sdsync.h", target, toolset, linktype);
     }
     else {
         dist = format!("../dist-{}/include/sdsync.h", target);

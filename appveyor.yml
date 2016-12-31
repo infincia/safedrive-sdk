@@ -21,6 +21,7 @@ environment:
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
       ESCRIPT: v120_xp.bat
+      LINKTYPE: mt
 
 os: Visual Studio 2013
 

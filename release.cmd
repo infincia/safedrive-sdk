@@ -1,17 +1,18 @@
 ECHO building SafeDrive for Windows-%ARCH%
 
-mkdir dist-%TARGET%-%TOOLSET%
-mkdir dist-%TARGET%-%TOOLSET%\lib
-mkdir dist-%TARGET%-%TOOLSET%\include
-mkdir dist-%TARGET%-%TOOLSET%\dep
-mkdir dist-%TARGET%-%TOOLSET%\bin
+mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%
+mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
+mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include
+mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\dep
+mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin
 
-set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
-set SODIUM_STATIC=""
+set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
+set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
 
-set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
-
-set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
+IF "%LINKTYPE%"=="mt" (
+    set SODIUM_STATIC=""
+    set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
+)
 
 rustup default %CHANNEL%-%TARGET%
 
@@ -22,8 +23,9 @@ pushd safedrive
 cargo.exe build --release --verbose
 popd
 
-robocopy %CD%\dep-%TARGET%-%TOOLSET%\ %CD%\dist-%TARGET%-%TOOLSET%\dep\ /COPYALL /E
+robocopy %CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\ %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\dep\ /COPYALL /E
 
-copy target\release\deps\safedrive.lib dist-%TARGET%-%TOOLSET%\lib\
-copy target\release\safedrive.exe dist-%TARGET%-%TOOLSET%\bin\
+
+copy target\release\deps\safedrive.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\
+copy target\release\safedrive.exe dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\
 
