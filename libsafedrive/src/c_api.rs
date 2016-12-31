@@ -70,8 +70,6 @@ pub struct CSyncSession {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-#[link(name = "sqlite3", kind = "static")]
-#[link(name = "sodium", kind = "static")]
 pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut CContext {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
