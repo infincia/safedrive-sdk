@@ -1,11 +1,12 @@
 ECHO testing SafeDrive for Windows-%ARCH%
 
-set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
-set SODIUM_STATIC=""
+set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
+set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
 
-set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%\lib
-
-set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
+IF "%LINKTYPE%"=="mt" (
+    set SODIUM_STATIC=""
+    set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
+)
 
 pushd libsafedrive
 cargo.exe test --release --verbose
