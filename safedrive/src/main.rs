@@ -122,7 +122,10 @@ fn main() {
 
     let uid = match unique_client_hash(&username) {
         Ok(hash) => hash,
-        Err(e) => return,
+        Err(e) => {
+            println!("Error getting client ID: {}", e);
+            std::process::exit(1);
+        },
     };
 
     let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(a, uid);
