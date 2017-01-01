@@ -1,5 +1,16 @@
+#![feature(proc_macro)]
+
+#[macro_use]
+extern crate serde_derive;
+extern crate serde;
+extern crate serde_json;
+
 use std::str;
 use std::{thread, time};
+use std::fs::File;
+
+use std::path::{PathBuf};
+use std::io::{Read};
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
@@ -22,6 +33,14 @@ use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
 
 use safedrive::sdapi::read_folders;
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Credentials {
+    pub email: Option<String>,
+    pub password: Option<String>,
+    pub phrase: Option<String>,
+}
 
 
 fn main() {
@@ -56,14 +75,51 @@ fn main() {
         .get_matches();
 
     let app_directory = get_app_directory().expect("Error: could not determine local storage directory");
+    let mut credential_file_path = PathBuf::from(&app_directory);
+    credential_file_path.push("credentials.json");
+
     let a = app_directory.to_str().expect("Error: could not determine local storage directory");
 
     println!("Using local dir: {}", &a);
 
 
-    // prompt for account
-    let username = rpassword::prompt_password_stdout("Username: ").unwrap();
-    let password = rpassword::prompt_password_stdout("Password: ").unwrap();
+
+    let mut credential_file = match File::open(credential_file_path) {
+        Ok(file) => file,
+        Err(e) => {
+            println!("Error reading account info in credentials.json: {}", e);
+            std::process::exit(1);
+        }
+    };
+    let mut cs = String::new();
+    match credential_file.read_to_string(&mut cs) {
+        Ok(file) => file,
+        Err(e) => {
+            println!("Error reading account info in credentials.json: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let credentials: Credentials = match serde_json::from_str(&cs) {
+        Ok(c) => c,
+        Err(e) => Credentials { email: None, password: None, phrase: None }
+    };
+
+    let username = match credentials.email {
+        Some(email) => email,
+        None => {
+            println!("No username/email found in credentials.json");
+            std::process::exit(1);
+        }
+    };
+
+    let password = match credentials.password {
+        Some(pass) => pass,
+        None => {
+            println!("No password found in credentials.json");
+            std::process::exit(1);
+        }
+    };
 
     let uid = match unique_client_hash(&username) {
         Ok(hash) => hash,
@@ -81,12 +137,11 @@ fn main() {
         }
     };
 
-    let phrase = "safedrive".to_owned();
     let ssh_username = account_status.userName;
     let ssh_host = account_status.host;
     let ssh_port = account_status.port;
 
-    let (_, main_key, hmac_key) = match load_keys(&token, Some(phrase), &|new_phrase| {
+    let (_, main_key, hmac_key) = match load_keys(&token, credentials.phrase, &|new_phrase| {
         // store phrase in keychain and display
         println!("NOTE: a recovery phrase has been generated for your account, please write it down somewhere safe");
         println!();
