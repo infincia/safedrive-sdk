@@ -92,20 +92,27 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
 pub fn account_key(token: &Token, master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
 
+    println!("Rust<account_key>: submitting new keyset to check validity");
 
     let map_req = WrappedKeyset { master: master, main: main, hmac: hmac };
+    println!("Rust<account_key>: WrappedKey to send: {:?}", map_req);
 
     let client = reqwest::Client::new().unwrap();
     let request = client.post("https://safedrive.io/api/1/account/key")
         .json(&map_req)
         .header(SDAuthToken(token.token.to_owned()));
+    println!("Rust<account_key>: sending: {:?}", request);
 
     let mut result = try!(request.send());
+    println!("Rust<account_key>: sent request");
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
+    println!("Rust<account_key>: read response: {}", response);
 
     let wrapped_keyset: WrappedKeyset = try!(serde_json::from_str(&response));
+    println!("Rust<account_key>: got keyset: {:?}", wrapped_keyset);
 
     Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac))
 }

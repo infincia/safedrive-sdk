@@ -164,13 +164,17 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
         // now we check to see if the keys returned by the server match the existing phrase or not
 
         // if we were given an existing phrase try it, otherwise try the new one
+        println!("Rust<load_keys>: got key set back from server, checking");
+
         let phrase_to_check = match recovery_phrase {
             Some(p) => p,
             None => new_phrase
         };
+
         let wrapped_master_key = try!(WrappedKey::from_hex(real_master_wrapped, KeyType::KeyTypeMaster));
         let wrapped_main_key = try!(WrappedKey::from_hex(real_main_wrapped, KeyType::KeyTypeMain));
         let wrapped_hmac_key = try!(WrappedKey::from_hex(real_hmac_wrapped, KeyType::KeyTypeHMAC));
+        println!("Rust<load_keys>: loaded wrapped keys");
 
         match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key) {
             Ok((master_key, main_key, hmac_key)) => {
@@ -178,7 +182,11 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                 store_recovery_key(&phrase_to_check);
                 return Ok((master_key, main_key, hmac_key))
             },
-            Err(_) => return Err(CryptoError::DecryptFailed)
+            Err(e) => {
+                println!("Rust<load_keys>: failed to decrypt keys: {:?}", e);
+
+                return Err(CryptoError::DecryptFailed)
+            }
         };
     };
     return Err(CryptoError::DecryptFailed)
