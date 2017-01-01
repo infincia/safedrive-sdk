@@ -5,9 +5,6 @@ TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = 
 export SODIUM_LIB_DIR=dep-$TARGET/lib
 export SODIUM_STATIC
 
-export SQLITE3_LIB_DIR=dep-$TARGET/lib
-
-
 export OPENSSL_DIR=$PWD/dep-$TARGET
 export OPENSSL_STATIC
 

@@ -14,9 +14,6 @@ mkdir -p dist-$TARGET/dep
 export SODIUM_LIB_DIR=dep-$TARGET/lib
 export SODIUM_STATIC
 
-export SQLITE3_LIB_DIR=dep-$TARGET/lib
-
-
 export OPENSSL_DIR=$PWD/dep-$TARGET
 export OPENSSL_STATIC
 
