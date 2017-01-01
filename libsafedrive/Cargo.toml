@@ -7,7 +7,7 @@ workspace = ".."
 
 [dependencies]
 sodiumoxide = "*"
-rusqlite = "*"
+rusqlite = { version = "*", features = ["bundled"] }
 libsqlite3-sys = "*"
 time = "*"
 libc = "*"
