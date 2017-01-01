@@ -7,7 +7,6 @@ mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\dep
 mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin
 
 set SODIUM_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
-set SQLITE3_LIB_DIR=%CD%\dep-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
 
 IF "%LINKTYPE%"=="mt" (
     set SODIUM_STATIC=""
