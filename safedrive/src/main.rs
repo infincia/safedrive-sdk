@@ -76,6 +76,7 @@ fn main() {
         Ok((t, a, ucid)) => (t, a, ucid),
         Err(e) => {
             println!("Login error: {}", e);
+            std::process::exit(1);
             return
         }
     };
@@ -96,8 +97,9 @@ fn main() {
     }) {
         Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
         Err(e) => {
-            println!("Key error: {}", e);
-            return 1
+            println!("Key error: {:?}", e);
+            std::process::exit(1);
+            return
         }
     };
 
@@ -112,6 +114,7 @@ fn main() {
             Ok(fl) => fl,
             Err(e) => {
                 println!("Read folders error: {:?}", e);
+                std::process::exit(1);
                 return
             }
         };
@@ -137,6 +140,7 @@ fn main() {
                 Ok(_) => { pb.finish(); return },
                 Err(e) => {
                     println!("Sync error: {:?}", e);
+                    std::process::exit(1);
                     return
                 }
             }
@@ -146,7 +150,8 @@ fn main() {
             Ok(fl) => fl,
             Err(e) => {
                 println!("Read folders error: {:?}", e);
-                return 1
+                std::process::exit(1);
+                return
             }
         };
         for folder in folder_list {
