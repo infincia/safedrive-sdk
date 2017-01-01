@@ -9,10 +9,14 @@ extern crate rpassword;
 extern crate pbr;
 use self::pbr::ProgressBar;
 
+extern crate uuid;
+use uuid::Uuid;
+
 extern crate safedrive;
 use safedrive::core::initialize;
 use safedrive::core::login;
 use safedrive::core::load_keys;
+use safedrive::core::create_archive;
 
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
@@ -77,6 +81,9 @@ fn main() {
     };
 
     let phrase = "safedrive".to_owned();
+    let ssh_username = account_status.userName;
+    let ssh_host = account_status.host;
+    let ssh_port = account_status.port;
 
     let (_, main_key, hmac_key) = match load_keys(&token, Some(phrase), &|new_phrase| {
         // store phrase in keychain and display
@@ -101,19 +108,39 @@ fn main() {
     if let Some(matches) = matches.subcommand_matches("add") {
 
     } else if let Some(matches) = matches.subcommand_matches("sync") {
+        let folder_list = match read_folders(&token) {
+            Ok(fl) => fl,
+            Err(e) => {
+                println!("Read folders error: {:?}", e);
+                return
+            }
+        };
+        for folder in folder_list {
+            println!("syncing {}", folder.folderName);
+            let entry_count = 100;
+            let mut pb = ProgressBar::new(entry_count);
+            pb.format("╢▌▌░╟");
+            let sync_uuid = Uuid::new_v4().hyphenated().to_string();
 
-        let entry_count = 5000;
-        let mut pb = ProgressBar::new(entry_count);
-        pb.format("╢▌▌░╟");
-
-        let mill = time::Duration::from_millis(100);
-
-        for entry in 1..entry_count {
-            pb.inc();
-            thread::sleep(mill);
+            match create_archive(&sync_uuid,
+                                 &main_key,
+                                 &hmac_key,
+                                 &ssh_username,
+                                 &password,
+                                 &ssh_host,
+                                 ssh_port,
+                                 &unique_client_id,
+                                 db_path,
+                                 folder.id as i32, &mut |progress_percent| {
+                    pb.inc();
+                }) {
+                Ok(_) => { pb.finish(); return },
+                Err(e) => {
+                    println!("Sync error: {:?}", e);
+                    return
+                }
+            }
         }
-
-        pb.finish();
     } else if let Some(matches) = matches.subcommand_matches("list") {
         let folder_list = match read_folders(&token) {
             Ok(fl) => fl,
