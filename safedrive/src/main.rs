@@ -132,7 +132,6 @@ fn main() {
         Err(e) => {
             println!("Login error: {}", e);
             std::process::exit(1);
-            return
         }
     };
 
@@ -153,7 +152,6 @@ fn main() {
         Err(e) => {
             println!("Key error: {:?}", e);
             std::process::exit(1);
-            return
         }
     };
 
@@ -169,7 +167,6 @@ fn main() {
             Err(e) => {
                 println!("Read folders error: {:?}", e);
                 std::process::exit(1);
-                return
             }
         };
         for folder in folder_list {
@@ -195,7 +192,6 @@ fn main() {
                 Err(e) => {
                     println!("Sync error: {:?}", e);
                     std::process::exit(1);
-                    return
                 }
             }
         }
@@ -205,7 +201,6 @@ fn main() {
             Err(e) => {
                 println!("Read folders error: {:?}", e);
                 std::process::exit(1);
-                return
             }
         };
         for folder in folder_list {
