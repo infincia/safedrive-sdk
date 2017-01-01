@@ -78,7 +78,7 @@ fn main() {
 
     let phrase = "safedrive".to_owned();
 
-    let (_, main_key, hmac_key) = match load_keys(&token, phrase, &|new_phrase| {
+    let (_, main_key, hmac_key) = match load_keys(&token, Some(phrase), &|new_phrase| {
         // store phrase in keychain and display
         println!("NOTE: a recovery phrase has been generated for your account, please write it down somewhere safe");
         println!();
