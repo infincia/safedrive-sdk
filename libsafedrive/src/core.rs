@@ -386,7 +386,7 @@ pub fn create_archive(name: &str,
                       unique_client_id: &str,
                       db: PathBuf,
                       folder_id: i32,
-                      progress: &Fn(f64)) -> Result<(), String> {
+                      progress: &mut FnMut(f64)) -> Result<(), String> {
 
     let archive_file = Vec::new();
 

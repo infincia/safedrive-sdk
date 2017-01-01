@@ -633,7 +633,7 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
                          safedrive_sftp_client_port,
                          unique_client_id,
                          db,
-                         id, &|progress_percent| {
+                         id, &mut |progress_percent| {
             let c_percent: std::os::raw::c_double = progress_percent;
 
             progress(c_percent);
