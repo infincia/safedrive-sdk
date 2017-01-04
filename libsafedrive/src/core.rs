@@ -189,7 +189,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
             }
         };
     };
-    return Err(CryptoError::DecryptFailed)
+    return Err(CryptoError::RetrieveFailed)
 }
 
 pub fn get_sync_folder(db: &PathBuf,
