@@ -158,14 +158,14 @@ pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey),
     Ok((mnemonic.mnemonic, master_key_wrapped, main_key_wrapped, hmac_key_wrapped))
 }
 
-pub fn decrypt_keyset(phrase: &String, master: WrappedKey, main: WrappedKey, hmac: WrappedKey) -> Result<(Key, Key, Key), CryptoError> {
-    let mnemonic = try!(Bip39::from_mnemonic(phrase.clone(), Language::English, "".to_string()));
+pub fn decrypt_keyset(phrase: &str, master: WrappedKey, main: WrappedKey, hmac: WrappedKey) -> Result<(&str, Key, Key, Key), CryptoError> {
+    let mnemonic = try!(Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()));
     let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
     let master_key = try!(master.to_key(recovery_key.as_ref()));
     let main_key = try!(main.to_key(master_key.as_ref()));
     let hmac_key = try!(hmac.to_key(master_key.as_ref()));
 
-    Ok((master_key, main_key, hmac_key))
+    Ok((phrase, master_key, main_key, hmac_key))
 }
 
 

@@ -177,10 +177,14 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
         println!("Rust<load_keys>: loaded wrapped keys");
 
         match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key) {
-            Ok((master_key, main_key, hmac_key)) => {
-                // this is the right phrase so tell the caller to store it
-                store_recovery_key(&phrase_to_check);
-                return Ok((master_key, main_key, hmac_key))
+            Ok((real_phrase, real_master_key, real_main_key, real_hmac_key)) => {
+                if real_phrase != phrase_to_check {
+                    // we got a working recovery phrase that was NOT passed to the library as an
+                    // argument, so it's a new phrase and we must return it to the caller so it
+                    // can be stored and displayed
+                    store_recovery_key(&phrase_to_check);
+                }
+                return Ok((real_master_key, real_main_key, real_hmac_key))
             },
             Err(e) => {
                 println!("Rust<load_keys>: failed to decrypt keys: {:?}", e);
