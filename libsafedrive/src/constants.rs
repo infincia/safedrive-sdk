@@ -3,3 +3,7 @@ pub static BLOCK_DIRECTORIES: &'static[&'static str] = &["0", "1", "2", "3", "4"
 pub static DEFAULT_PERMISSIONS: i32 = 493;
 
 pub static DEBUG_STATISTICS: bool = false;
+
+
+pub static SDAPIDOMAIN_STAGING: &'static str = "staging.safedrive.io";
+pub static SDAPIDOMAIN_PRODUCTION: &'static str = "safedrive.io";
