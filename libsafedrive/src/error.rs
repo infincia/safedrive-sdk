@@ -45,7 +45,9 @@ impl From<Bip39Error> for CryptoError {
 
 #[derive(Debug)]
 pub enum SDAPIError {
-    RequestFailed
+    RequestFailed,
+    RetryUpload,
+    Conflict
 }
 
 impl From<std::io::Error> for SDAPIError {
