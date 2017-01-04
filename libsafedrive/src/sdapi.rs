@@ -5,6 +5,8 @@ extern crate serde;
 extern crate serde_json;
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
+header! { (ContentType, "Content-Type: multipart/form-data; boundary=") => [String] }
+header! { (ContentLength, "Content-Length: ") => [usize] }
 
 use util::*;
 use error::*;
