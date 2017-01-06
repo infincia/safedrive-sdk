@@ -1,8 +1,11 @@
+#![allow(non_snake_case)]
+
 use std::io::Read;
 
 extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
+extern crate hyper;
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type: multipart/form-data; boundary=") => [String] }
@@ -11,6 +14,201 @@ header! { (ContentLength, "Content-Length: ") => [usize] }
 use util::*;
 use error::*;
 use models::*;
+use constants::*;
+
+#[derive(Serialize, Debug)]
+pub enum APIRequestBody<'a> {
+    RegisterClient { operatingSystem: &'a str,
+                               email: &'a str,
+                            password: &'a str,
+                            language: &'a str,
+                      uniqueClientId: &'a str },
+    AccountKey { master: &'a str,
+                   main: &'a str,
+                   hmac: &'a str },
+    CreateFolder { folderName: &'a str,
+                   folderPath: &'a str,
+                    encrypted: bool },
+    RegisterSyncSession { folder_id: i32,
+                             name: &'a str,
+                        encrypted: bool },
+    FinishSyncSession { session_data: &'a [u8] },
+    AddBlock { chunk_data: &'a Option<Vec<u8>> }
+}
+
+pub enum APIEndpoint<'a> {
+    RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
+    AccountStatus { token: &'a Token },
+    AccountDetails { token: &'a Token },
+    AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str },
+    ReadFolders { token: &'a Token },
+    CreateFolder { token: &'a Token, path: &'a str, name: &'a str, encrypted: bool },
+    RegisterSyncSession { token: &'a Token, folder_id: i32, name: &'a str, encrypted: bool },
+    FinishSyncSession { token: &'a Token, folder_id: i32, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
+    ReadSyncSession { token: &'a Token, name: &'a str, encrypted: bool },
+    ReadSyncSessions { token: &'a Token, encrypted: bool },
+    CheckBlock { token: &'a Token, name: &'a str },
+    WriteBlock { token: &'a Token, session: &'a str, name: &'a str, chunk_data: &'a Option<Vec<u8>> },
+    ReadBlock { token: &'a Token, name: &'a str },
+
+}
+
+impl<'a> APIEndpoint<'a> {
+
+    pub fn url(&self) -> String {
+        let mut url = String::new();
+        url += &self.protocol();
+        url += &self.domain();
+        url += &self.path();
+
+        url
+    }
+
+    pub fn domain(&self) -> String {
+        SDAPIDOMAIN_PRODUCTION.to_string()
+    }
+
+    pub fn protocol(&self) -> String {
+        "https://".to_string()
+    }
+
+    pub fn method(&self) -> self::hyper::method::Method {
+        match *self {
+            APIEndpoint::RegisterClient { .. } => {
+                self::hyper::method::Method::Post
+            },
+            APIEndpoint::AccountStatus { .. } => {
+                self::hyper::method::Method::Get
+            },
+            APIEndpoint::AccountDetails { .. } => {
+                self::hyper::method::Method::Get
+            },
+            APIEndpoint::AccountKey { .. } => {
+                self::hyper::method::Method::Post
+            },
+            APIEndpoint::ReadFolders { .. } => {
+                self::hyper::method::Method::Get
+            },
+            APIEndpoint::CreateFolder { .. } => {
+                self::hyper::method::Method::Post
+            },
+            APIEndpoint::RegisterSyncSession { .. } => {
+                self::hyper::method::Method::Post
+            },
+            APIEndpoint::FinishSyncSession { .. } => {
+                self::hyper::method::Method::Post
+            },
+            APIEndpoint::ReadSyncSession { .. } => {
+                self::hyper::method::Method::Get
+            },
+            APIEndpoint::ReadSyncSessions { .. } => {
+                self::hyper::method::Method::Get
+            },
+            APIEndpoint::CheckBlock { .. } => {
+                self::hyper::method::Method::Head
+            },
+            APIEndpoint::WriteBlock { .. } => {
+                self::hyper::method::Method::Post
+            },
+            APIEndpoint::ReadBlock { .. } => {
+                self::hyper::method::Method::Get
+            },
+        }
+    }
+
+    pub fn path(&self) -> String {
+        let path = match *self {
+            APIEndpoint::RegisterClient { .. } => {
+                format!("/api/1/client/register")
+            },
+            APIEndpoint::AccountStatus { .. } => {
+                format!("/api/1/account/status")
+            },
+            APIEndpoint::AccountDetails { .. } => {
+                format!("/api/1/account/details")
+            },
+            APIEndpoint::AccountKey { .. } => {
+                format!("/api/1/account/key")
+            },
+            APIEndpoint::ReadFolders { .. } => {
+                format!("/api/1/folder")
+            },
+            APIEndpoint::CreateFolder { .. } => {
+                format!("/api/1/folder")
+            },
+            APIEndpoint::RegisterSyncSession { folder_id, name, .. } => {
+                format!("/api/1/sync/session/register/{}/{}", folder_id, name)
+            },
+            APIEndpoint::FinishSyncSession { name, size, .. } => {
+                format!("/api/1/sync/session/{}/{}", name, size)
+            },
+            APIEndpoint::ReadSyncSession { name, .. } => {
+                format!("/api/1/sync/session/{}", name)
+            },
+            APIEndpoint::ReadSyncSessions { .. } => {
+                format!("/api/1/sync/session")
+            },
+            APIEndpoint::CheckBlock { name, .. } => {
+                format!("/api/1/sync/block/{}", name)
+            },
+            APIEndpoint::WriteBlock { session, name, .. } => {
+                format!("/api/1/sync/block/{}/{}", name, session)
+            },
+            APIEndpoint::ReadBlock { name, .. } => {
+                format!("/api/1/sync/block/{}", name)
+            },
+
+        };
+
+        path
+    }
+
+    pub fn body(&self) -> Option<APIRequestBody> {
+        match *self {
+            APIEndpoint::RegisterClient { operatingSystem, email, password, language, uniqueClientId } => {
+                Some(APIRequestBody::RegisterClient { operatingSystem: operatingSystem, email: email, password: password, language: language, uniqueClientId: uniqueClientId })
+            },
+            APIEndpoint::AccountStatus { .. } => {
+                None
+            },
+            APIEndpoint::AccountDetails { .. } => {
+                None
+            },
+            APIEndpoint::AccountKey { master, main, hmac, .. } => {
+                Some(APIRequestBody::AccountKey { master: master, main: main, hmac: hmac })
+            },
+            APIEndpoint::ReadFolders { .. } => {
+                None
+            },
+            APIEndpoint::CreateFolder { path, name, encrypted, .. } => {
+                Some(APIRequestBody::CreateFolder { folderName: name, folderPath: path, encrypted: encrypted })
+            },
+            APIEndpoint::RegisterSyncSession { .. } => {
+                None
+            },
+            APIEndpoint::FinishSyncSession { session_data, .. } => {
+                Some(APIRequestBody::FinishSyncSession { session_data: session_data })
+            },
+            APIEndpoint::ReadSyncSession { .. } => {
+                None
+            },
+            APIEndpoint::ReadSyncSessions { .. } => {
+                None
+            },
+            APIEndpoint::CheckBlock { .. } => {
+                None
+            },
+            APIEndpoint::WriteBlock { chunk_data, .. } => {
+                Some(APIRequestBody::AddBlock { chunk_data: chunk_data })
+
+            },
+            APIEndpoint::ReadBlock { .. } => {
+                None
+            },
+
+        }
+    }
+}
 
 // SD API
 
