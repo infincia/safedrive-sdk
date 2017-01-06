@@ -19,6 +19,7 @@ pub struct SyncSession {
     pub folder_id: i32,
 }
 
+// responses
 
 //private final String token
 #[derive(Serialize, Deserialize, Debug)]
@@ -42,15 +43,6 @@ pub struct Block<'a> {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
     pub id: u64,
-}
-
-
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct WrappedKeyset {
-    pub master: String,
-    pub main: String,
-    pub hmac: String
 }
 
 //private final String status;
@@ -91,6 +83,14 @@ pub struct Notification {
     pub title: String,
     pub message: String
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct WrappedKeyset {
+    pub master: String,
+    pub main: String,
+    pub hmac: String
+}
+
 
 /*
 Current sync folder model:
