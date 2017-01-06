@@ -378,25 +378,16 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
         }
     }).collect::<Vec<CFolder>>();;
 
-    f.shrink_to_fit();
-    let len = f.len() as u64;
+    let mut b = f.into_boxed_slice();
+    let ptr = b.as_mut_ptr();
+    let len = b.len();
+    std::mem::forget(b);
+
     unsafe {
-        // `folders` must be passed back to sdsync_free_folders() after use
-        // as the C code does not own the data, the caller must copy it before returning it to Rust
-        // stack version, not safe at all
-        *folders = f.as_ptr() as *mut CFolder;
-        mem::forget(f);
-        // malloc version
-        //*folders = libc::malloc(f.len() * std::mem::size_of::<CFolder>()) as *mut models::CFolder;
-        //ptr::copy_nonoverlapping(f.as_ptr(), *folders, f.len());
-
-        // box version
-        //let bf = Box::new(f);
-        //mem::forget(bf);
-        //*folders = bf as *mut CFolder;
-
+        *folders = ptr;
     }
-    len
+    
+    len as u64
 }
 
 
@@ -466,28 +457,16 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
         }
     }).collect::<Vec<CSyncSession>>();
 
+    let mut b = s.into_boxed_slice();
+    let ptr = b.as_mut_ptr();
+    let len = b.len();
+    std::mem::forget(b);
 
-
-    s.shrink_to_fit();
-    let len = s.len() as u64;
     unsafe {
-        // `sessions` must be passed back to sdsync_free_sessions() after use
-        // as the C code does not own the data, the caller must copy it before returning it to Rust
-
-        // stack version, not safe at all
-        *sessions = s.as_ptr() as *mut CSyncSession;
-        mem::forget(s);
-
-        // malloc version
-        //*sessions = libc::malloc(s.len() * std::mem::size_of::<CSyncSession>()) as *mut models::CSyncSession;
-        //ptr::copy_nonoverlapping(s.as_ptr(), *sessions, s.len());
-
-        // box version
-        //let bs = Box::new(s);
-        //mem::forget(bs);
-        //*sessions = bs as *mut CSyncSession;
+        *sessions = ptr;
     }
-    len
+
+    len as u64
 }
 
 
