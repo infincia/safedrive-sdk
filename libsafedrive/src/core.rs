@@ -166,7 +166,7 @@ pub fn sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
     }
 }
 
-pub fn sync_sessions(token: &Token, folder_id: i32) -> Result<Vec<SyncSession>, String> {
+pub fn sync_sessions(token: &Token) -> Result<Vec<SyncSession>, String> {
     let m = match read_sessions(token) {
         Ok(sessions) => sessions,
         Err(e) => return Err(format!("Rust<sync_sessions>: getting sessions failed: {:?}", e))

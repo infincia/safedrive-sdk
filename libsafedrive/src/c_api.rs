@@ -404,8 +404,6 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 ///
 ///     context: an opaque pointer obtained from calling sdsync_initialize()
 ///
-///     folder_id: a stack-allocated integer for an existing registered folder name
-///
 ///     sessions: an uninitialized pointer that will be allocated and initialized when the function returns
 ///
 ///
@@ -421,18 +419,16 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 ///
 /// ```c
 /// sdsync_session_t * sessions = NULL;
-/// int length = sdsync_get_sync_sessions(&context, 5, &sessions);
+/// int length = sdsync_get_sync_sessions(&context, &sessions);
 /// // do something with sessions here
 /// sdsync_free_sync_sessions(&sessions, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: std::os::raw::c_int, mut sessions: *mut *mut CSyncSession) -> u64 {
+pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions: *mut *mut CSyncSession) -> u64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
-    let id: i32 = folder_id;
 
-
-    let result = match sync_sessions(c.0.get_api_token(), id) {
+    let result = match sync_sessions(c.0.get_api_token()) {
         Ok(ses) => ses,
         Err(e) => panic!("Rust<sdsync_get_sync_sessions> failed to get list of sync sessions: {}", e),
     };
