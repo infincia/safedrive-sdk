@@ -1,2 +1,61 @@
 language: rust
 script: bash unit.sh
+
+env:
+  global:
+    # This will be part of the release tarball
+    - PROJECT_NAME=safedrive-sync-sdk
+    - MAKE_DEB=no
+    - DEB_MAINTAINER="Stephen Oliver <steve@infincia.com>"
+    - DEB_DESCRIPTION="SafeDrive SDK for Linux"
+
+
+    matrix:
+      include:
+        - os: osx
+          rust: stable
+          env: TARGET=x86_64-apple-darwin
+        - os: osx
+          rust: nightly
+          env: TARGET=x86_64-apple-darwin
+
+
+before_install:
+  - export PATH="$PATH:$HOME/.cargo/bin"
+
+install:
+  - bash ci/install.sh
+
+script:
+  - bash ci/script.sh
+
+before_deploy:
+  - bash ci/before_deploy.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: uBQS6bf7gVRgC1RxsiRc8KraU5DhKar4JQkErrDc1K70XJm2FY8pfEXIj/kDbzbYmJ/PR5a+jNT3iW9WzBJx5azf1RvB82gHqVcTjsoH9o7udWlY2sMp7xnxKMumeWN+0bur75kVlWqm5C9jo8i26NjOKFRA1Dn3PTDHHqLlVPI32sTNOC7Q3aGEHss6QXvIAfBrjgwA3YRA2A8omrgJ2KUXstN6XRzV4g3U2BNg0Lb+X0MeunLORzY9Rj9gxqCeZART9XGGyt4JDfNKumhsV5BWJs5mhPFLF8XklaiqTFiIaNiQuVocyGWxdPVUQ7EECzzGw2MsBLBrWbAd6GVnuYyQMkJ/feBAd8cEbc4/itNcD1vwdGTgnOUT7Ii60nDOifKOX8WyrKAqsD2OuSvljylzzH7slUrwPIwhGOZLoqlYSHzZj4qXYwKBnq0SlXy0PLH9ruEYsz7yd/f6hOdHjtoSEQz+fJ/WiwRGLGOJ5kM+QsqZpJvOEKumWbkVgi+llXPSKHMlSuKgVHjXb/W641imT9uKL5igJceRIYRVPthpzj1FMuw/GqI/oCXj5fbIBHlXg5VmsJoSH62tIah94jjbz3f8IZNdECSY12UinCFO5uJ/olBN3HsZP8ZdR0P1g9BxE7m5PzvnmDpI1nif3/qdv250OjBJ7XnyIZGNZoQ=
+  file_glob: true
+  file: ${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.*
+  # don't delete the artifacts from previous phases
+  skip_cleanup: true
+  # deploy when a new tag is pushed
+  on:
+    # channel to use to produce the release artifacts
+    # NOTE make sure you only release *once* per target
+    # TODO you may want to pick a different channel
+    condition: $TRAVIS_RUST_VERSION = nightly
+    tags: true
+
+branches:
+  only:
+    # Pushes and PR to the master branch
+    - master
+    # IMPORTANT Ruby regex to match tags. Required, or travis won't trigger deploys when a new tag
+    # is pushed. This regex matches semantic versions like v1.2.3-rc4+2016.02.22
+    - /^v\d+\.\d+\.\d+.*$/
+
+notifications:
+  email:
+    on_success: never
