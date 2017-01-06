@@ -6,6 +6,8 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
+use std::collections::HashMap;
+
 
 // external imports
 
@@ -148,22 +150,27 @@ pub fn get_sync_folder(folder_id: i32) -> Option<Folder> {
     return None
 }
 
-pub fn add_sync_folder(name: &str,
-                       path: &str) -> Result<(), String> {
-
-    Ok(())
+pub fn add_sync_folder(token: &Token,
+                       name: &str,
+                       path: &str) -> Result<i32, String> {
+    match create_folder(token, path, name, true) {
+        Ok(folder_id) => Ok(folder_id),
+        Err(e) => return Err(format!("Rust<add_sync_folder>: creating folder failed: {:?}", e))
+    }
 }
 
-pub fn sync_folders() -> Result<Vec<Folder>, String> {
-    let mut folder_list: Vec<Folder> = Vec::new();
-
-    return Ok(folder_list)
+pub fn sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
+    match read_folders(token) {
+        Ok(folders) => Ok(folders),
+        Err(e) => return Err(format!("Rust<sync_folders>: getting folder failed: {:?}", e))
+    }
 }
 
-pub fn sync_sessions(folder_id: i32) -> Result<Vec<SyncSession>, String> {
-    let mut session_list: Vec<SyncSession> = Vec::new();
-
-    Ok(session_list)
+pub fn sync_sessions(token: &Token, folder_id: i32) -> Result<HashMap<i32, Vec<SyncSession>>, String> {
+    match read_sessions(token) {
+        Ok(sessions) => Ok(sessions),
+        Err(e) => return Err(format!("Rust<sync_sessions>: getting sessions failed: {:?}", e))
+    }
 }
 
 pub fn create_archive(token: &Token,
