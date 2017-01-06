@@ -44,24 +44,6 @@ pub struct CreateFolderResponse {
     pub id: u64,
 }
 
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct CreateFolderRequest {
-    pub folderName: String,
-    pub folderPath: String,
-    pub encrypted: bool
-}
-
-
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ClientRegisterRequest {
-    pub operatingSystem: String,
-    pub email: String,
-    pub password: String,
-    pub language: String,
-    pub uniqueClientId: String,
-}
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
