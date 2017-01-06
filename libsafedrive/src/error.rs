@@ -24,6 +24,7 @@ pub enum CryptoError {
     RetrieveFailed
 }
 
+#[allow(unused_variables)]
 impl From<FromHexError> for CryptoError {
     fn from(err: FromHexError) -> CryptoError {
         CryptoError::InvalidKey
