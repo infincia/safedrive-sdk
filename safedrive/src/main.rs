@@ -128,19 +128,15 @@ fn main() {
         },
     };
 
-    let (db_path, storage_path, unique_client_path, unique_client_id) = initialize(a, uid);
+    let (_, _) = initialize(a, uid);
 
-    let (token, account_status, _) = match login(&username, &password) {
+    let (token, _, _) = match login(&username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
         Err(e) => {
             println!("Login error: {}", e);
             std::process::exit(1);
         }
     };
-
-    let ssh_username = account_status.userName;
-    let ssh_host = account_status.host;
-    let ssh_port = account_status.port;
 
     let (_, main_key, hmac_key) = match load_keys(&token, credentials.phrase, &|new_phrase| {
         // store phrase in keychain and display
@@ -178,17 +174,15 @@ fn main() {
             let mut pb = ProgressBar::new(entry_count);
             pb.format("╢▌▌░╟");
             let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+            let folder_path = PathBuf::from(&folder.folderPath);
 
-            match create_archive(&sync_uuid,
+            match create_archive(&token,
+                                 &sync_uuid,
                                  &main_key,
                                  &hmac_key,
-                                 &ssh_username,
-                                 &password,
-                                 &ssh_host,
-                                 ssh_port,
-                                 &unique_client_id,
-                                 db_path,
-                                 folder.id as i32, &mut |progress_percent| {
+                                 folder.id as i32,
+                                 folder_path,
+                                 &mut |progress_percent| {
                     pb.inc();
                 }) {
                 Ok(_) => { pb.finish(); return },
