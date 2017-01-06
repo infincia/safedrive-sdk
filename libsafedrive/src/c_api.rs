@@ -638,11 +638,11 @@ pub extern "C" fn sdsync_free_folders(folders: *mut *mut CFolder, length: u64) {
 /// # Examples
 ///
 /// ```c
-///sdsync_free_sessions(&sessions, length);
+///sdsync_free_sync_sessions(&sessions, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_free_sessions(sessions: *mut *mut CSyncSession, length: u64) {
+pub extern "C" fn sdsync_free_sync_sessions(sessions: *mut *mut CSyncSession, length: u64) {
     assert!(!sessions.is_null());
     let l = length as usize;
     let _: Vec<CSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
