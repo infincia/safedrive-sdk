@@ -233,11 +233,11 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
     } else {
         os = "Unknown";
     }
-    let map_req = ClientRegisterRequest { operatingSystem: os.to_string(), email: em, password: pa, language: "en-US".to_string(), uniqueClientId: uid.clone() };
+    let endpoint = APIEndpoint::RegisterClient{ operatingSystem: os, email: &em, password: &pa, language: "en-US", uniqueClientId: &uid };
 
     let client = reqwest::Client::new().unwrap();
-    let request = client.post("https://safedrive.io/api/1/client/register")
-        .json(&map_req);
+    let request = client.post(&endpoint.url())
+        .json(&endpoint.body().unwrap());
 
     let mut result = try!(request.send());
     let mut response = String::new();
@@ -255,8 +255,10 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
 }
 
 pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
+    let endpoint = APIEndpoint::AccountStatus { token: token };
+
     let client = reqwest::Client::new().unwrap();
-    let request = client.get("https://safedrive.io/api/1/account/status")
+    let request = client.get(&endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -273,8 +275,10 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 }
 
 pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
+    let endpoint = APIEndpoint::AccountDetails { token: token };
+
     let client = reqwest::Client::new().unwrap();
-    let request = client.get("https://safedrive.io/api/1/account/details")
+    let request = client.get(&endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -292,11 +296,11 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
 pub fn account_key(token: &Token, master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
 
-    let map_req = WrappedKeyset { master: master, main: main, hmac: hmac };
+    let endpoint = APIEndpoint::AccountKey { token: token, master: &master, main: &main, hmac: &hmac };
 
     let client = reqwest::Client::new().unwrap();
-    let request = client.post("https://safedrive.io/api/1/account/key")
-        .json(&map_req)
+    let request = client.get(&endpoint.url())
+        .json(&endpoint.body().unwrap())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -311,8 +315,11 @@ pub fn account_key(token: &Token, master: String, main: String, hmac: String) ->
 }
 
 pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> {
+
+    let endpoint = APIEndpoint::ReadFolders { token: token };
+
     let client = reqwest::Client::new().unwrap();
-    let request = client.get("https://safedrive.io/api/1/folder")
+    let request = client.get(&endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -333,11 +340,11 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
     let pa = path.into();
     let na = name.into();
 
-    let map_req = CreateFolderRequest { folderName: na, folderPath: pa, encrypted: encrypted };
+    let endpoint = APIEndpoint::CreateFolder { token: token, path: &pa, name: &na, encrypted: encrypted };
 
     let client = reqwest::Client::new().unwrap();
-    let request = client.post("https://safedrive.io/api/1/folder")
-        .json(&map_req)
+    let request = client.post(&endpoint.url())
+        .json(&endpoint.body().unwrap())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
