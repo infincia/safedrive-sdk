@@ -327,9 +327,11 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 
 /// Get a list of all sync folders from the SafeDive server
 ///
-/// The caller does not own the memory allocated by the library, it must be returned and freed by
-/// the library after use. As a result, any data that the caller wishes to retain must be copied out
-/// of the buffer before it is freed.
+/// The caller does not own the memory pointed to by `folders` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
 ///
 ///
 /// Parameters:
@@ -399,11 +401,13 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 
 
 
-/// Get a list of all sync sessions in the local database
+/// Get a list of all sync sessions from the SafeDive server
 ///
-/// The caller does not own the memory allocated by the library, it must be returned and freed by
-/// the library after use. As a result, any data that the caller wishes to retain must be copied out
-/// of the buffer before it is freed.
+/// The caller does not own the memory pointed to by `sessions` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
 ///
 ///
 /// Parameters:
@@ -419,9 +423,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 ///
 ///     -1: failure
 ///
-///      0: no sessions
-///
-///     1+: number of sessions found, and number of CSyncSession structs allocated in sessions
+///      0+: number of sessions found, and number of CSyncSession structs allocated in sessions
 ///
 /// Return codes will be expanded in the future to provide more specific information on the failure
 ///
