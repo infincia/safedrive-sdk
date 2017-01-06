@@ -6,7 +6,6 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
-use std::collections::HashMap;
 
 
 // external imports
