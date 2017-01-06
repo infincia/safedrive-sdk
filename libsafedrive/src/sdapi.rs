@@ -2,6 +2,8 @@
 
 use std::io::Read;
 
+use std::collections::HashMap;
+
 extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
@@ -360,7 +362,28 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
     Ok(folder_response.id)
 }
 
-// sync handling
+// sync session handling
+
+pub fn read_sessions(token: &Token) -> Result<HashMap<i32, Vec<SyncSession>>, SDAPIError> {
+
+    let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.get(&endpoint.url())
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    let sessions: HashMap<i32, Vec<SyncSession>> = match serde_json::from_str(&response) {
+        Ok(s) => s,
+        Err(_) => return Err(SDAPIError::RequestFailed)
+    };
+
+    Ok(sessions)
+}
 
 pub fn register_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted: bool) -> Result<(), SDAPIError> where S: Into<String> {
 
