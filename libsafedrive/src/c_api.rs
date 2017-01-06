@@ -388,6 +388,12 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
         // malloc version
         //*folders = libc::malloc(f.len() * std::mem::size_of::<CFolder>()) as *mut models::CFolder;
         //ptr::copy_nonoverlapping(f.as_ptr(), *folders, f.len());
+
+        // box version
+        //let bf = Box::new(f);
+        //mem::forget(bf);
+        //*folders = bf as *mut CFolder;
+
     }
     len
 }
