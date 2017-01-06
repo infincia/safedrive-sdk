@@ -2,6 +2,31 @@
 
 extern crate libc;
 
+// request bodies
+
+#[derive(Serialize, Debug)]
+pub struct RegisterClient<'a> {
+    pub operatingSystem: &'a str,
+    pub email: &'a str,
+    pub password: &'a str,
+    pub language: &'a str,
+    pub uniqueClientId: &'a str
+}
+
+#[derive(Serialize, Debug)]
+pub struct AccountKey<'a> {
+    pub master: &'a str,
+    pub main: &'a str,
+    pub hmac: &'a str
+}
+
+#[derive(Serialize, Debug)]
+pub struct CreateFolder<'a> {
+    pub folderName: &'a str,
+    pub folderPath: &'a str,
+    pub encrypted: bool
+}
+
 // responses
 
 //private final String token

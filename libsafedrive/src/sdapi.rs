@@ -18,26 +18,6 @@ use error::*;
 use models::*;
 use constants::*;
 
-#[derive(Serialize, Debug)]
-pub enum APIRequestBody<'a> {
-    RegisterClient { operatingSystem: &'a str,
-                               email: &'a str,
-                            password: &'a str,
-                            language: &'a str,
-                      uniqueClientId: &'a str },
-    AccountKey { master: &'a str,
-                   main: &'a str,
-                   hmac: &'a str },
-    CreateFolder { folderName: &'a str,
-                   folderPath: &'a str,
-                    encrypted: bool },
-    RegisterSyncSession { folder_id: i32,
-                             name: &'a str,
-                        encrypted: bool },
-    FinishSyncSession { session_data: &'a [u8] },
-    AddBlock { chunk_data: &'a Option<Vec<u8>> }
-}
-
 pub enum APIEndpoint<'a> {
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
     AccountStatus { token: &'a Token },
@@ -164,52 +144,6 @@ impl<'a> APIEndpoint<'a> {
 
         path
     }
-
-    pub fn body(&self) -> Option<APIRequestBody> {
-        match *self {
-            APIEndpoint::RegisterClient { operatingSystem, email, password, language, uniqueClientId } => {
-                Some(APIRequestBody::RegisterClient { operatingSystem: operatingSystem, email: email, password: password, language: language, uniqueClientId: uniqueClientId })
-            },
-            APIEndpoint::AccountStatus { .. } => {
-                None
-            },
-            APIEndpoint::AccountDetails { .. } => {
-                None
-            },
-            APIEndpoint::AccountKey { master, main, hmac, .. } => {
-                Some(APIRequestBody::AccountKey { master: master, main: main, hmac: hmac })
-            },
-            APIEndpoint::ReadFolders { .. } => {
-                None
-            },
-            APIEndpoint::CreateFolder { path, name, encrypted, .. } => {
-                Some(APIRequestBody::CreateFolder { folderName: name, folderPath: path, encrypted: encrypted })
-            },
-            APIEndpoint::RegisterSyncSession { .. } => {
-                None
-            },
-            APIEndpoint::FinishSyncSession { session_data, .. } => {
-                Some(APIRequestBody::FinishSyncSession { session_data: session_data })
-            },
-            APIEndpoint::ReadSyncSession { .. } => {
-                None
-            },
-            APIEndpoint::ReadSyncSessions { .. } => {
-                None
-            },
-            APIEndpoint::CheckBlock { .. } => {
-                None
-            },
-            APIEndpoint::WriteBlock { chunk_data, .. } => {
-                Some(APIRequestBody::AddBlock { chunk_data: chunk_data })
-
-            },
-            APIEndpoint::ReadBlock { .. } => {
-                None
-            },
-
-        }
-    }
 }
 
 // SD API
@@ -236,10 +170,11 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
         os = "Unknown";
     }
     let endpoint = APIEndpoint::RegisterClient{ operatingSystem: os, email: &em, password: &pa, language: "en-US", uniqueClientId: &uid };
+    let body = RegisterClient { operatingSystem: os, email: &em, password: &pa, language: "en", uniqueClientId: &uid };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.post(&endpoint.url())
-        .json(&endpoint.body().unwrap());
+        .json(&body);
 
     let mut result = try!(request.send());
     let mut response = String::new();
@@ -299,10 +234,11 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 pub fn account_key(token: &Token, master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
 
     let endpoint = APIEndpoint::AccountKey { token: token, master: &master, main: &main, hmac: &hmac };
+    let body = AccountKey { master: &master, main: &main, hmac: &hmac };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.get(&endpoint.url())
-        .json(&endpoint.body().unwrap())
+        .json(&body)
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -343,10 +279,11 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
     let na = name.into();
 
     let endpoint = APIEndpoint::CreateFolder { token: token, path: &pa, name: &na, encrypted: encrypted };
+    let body = CreateFolder { folderName: &na, folderPath: &pa, encrypted: encrypted };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.post(&endpoint.url())
-        .json(&endpoint.body().unwrap())
+        .json(&body)
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
