@@ -35,7 +35,7 @@ use constants::*;
 use util::*;
 use sdapi::*;
 use keys::*;
-use error::CryptoError;
+use error::{CryptoError, SDAPIError};
 
 // internal functions
 
@@ -173,6 +173,11 @@ pub fn create_archive(token: &Token,
                       folder_id: i32,
                       folder_path: PathBuf,
                       progress: &mut FnMut(f64)) -> Result<(), String> {
+    match register_sync_session(token, folder_id, session_name, true) {
+        Ok(()) => {},
+        Err(e) => return Err(format!("Rust<sdsync_create_archive>: registering sync session failed: {:?}", e))
+    };
+
 
     let archive_file = Vec::new();
 
@@ -280,44 +285,73 @@ pub fn create_archive(token: &Token,
                         let block_hmac = sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
                         chunks.extend_from_slice(block_hmac.as_ref());
 
+                        let mut should_retry = true;
+                        let mut retries_left = 15;
+                        let mut potentially_uploaded_data: Option<Vec<u8>> = None;
 
-                        // check if we've stored this chunk before
+                        while should_retry {
+                            // tell the server to mark this block without the data first, if that fails we try uploading
 
-                        if !have_stored_block(&db, &block_hmac.as_ref()) {
-                            // generate a new chunk key
-                            let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
-                            let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+                            match write_block(&token, session_name, block_hmac.as_ref().to_hex(), &potentially_uploaded_data) {
+                                Ok(()) => {
+                                    skipped_blocks = skipped_blocks + 1;
+                                    should_retry = false
+                                },
+                                Err(SDAPIError::RequestFailed) => {
+                                    retries_left = retries_left -1;
+                                },
+                                Err(SDAPIError::RetryUpload) => {
+                                    // generate a new chunk key
+                                    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+                                    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+                                    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
 
-                            let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
-                            let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
-                                .expect("failed to get block key struct");
+                                    let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
+                                    let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
+                                    .expect("failed to get block key struct");
 
-                            // We use the first 24 bytes of the block hmac value as nonce for wrapping
-                            // the block key and encrypting the block itself.
-                            //
-                            // This is cryptographically safe but still deterministic: encrypting
-                            // the same block twice with a specific key will always produce the same
-                            // output block, which is critical for versioning and deduplication
-                            // across all backups of all sync folders
-                            let nonce_slice = block_hmac.as_ref();
-                            let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
-                                .expect("Rust<sdsync_create_archive>: failed to get nonce");
+                                    // We use the first 24 bytes of the block hmac value as nonce for wrapping
+                                    // the block key and encrypting the block itself.
+                                    //
+                                    // This is cryptographically safe but still deterministic: encrypting
+                                    // the same block twice with a specific key will always produce the same
+                                    // output block, which is critical for versioning and deduplication
+                                    // across all backups of all sync folders
+                                    let nonce_slice = block_hmac.as_ref();
+                                    let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
+                                    .expect("Rust<sdsync_create_archive>: failed to get nonce");
 
-                            // we use the same nonce both while wrapping the block key, and the block itself
-                            // this is safe because using the same nonce with 2 different keys is not nonce reuse
+                                    // we use the same nonce both while wrapping the block key, and the block itself
+                                    // this is safe because using the same nonce with 2 different keys is not nonce reuse
 
-                            // encrypt the chunk data using the block key
-                            let encrypted_chunk = sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
+                                    // encrypt the chunk data using the block key
+                                    let encrypted_chunk = sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
 
-                            // wrap the block key with the main encryption key
-                            let wrapped_block_key = sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
+                                    // wrap the block key with the main encryption key
+                                    let wrapped_block_key = sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
 
-                            // pass the hmac, wrapped key, and encrypted block out to storage code
-                            if !add_block(&db, &sftp_session, &unique_client_id, &block_hmac.as_ref(), &wrapped_block_key, &encrypted_chunk) {
-                                return Err(format!("Rust<sdsync_create_archive>: failed to add block!!!"))
+                                    assert!(wrapped_block_key.len() == key_size + mac_size);
+
+
+                                    // prepend the key to the actual encrypted chunk data so they can be written to the file together
+                                    let mut block_data = Vec::new();
+
+                                    // bytes 0-47 will be the wrapped key
+                                    block_data.extend(wrapped_block_key);
+
+                                    // bytes 48-71 will be the nonce/hmac
+                                    block_data.extend(&block_hmac[0..nonce_size as usize]);
+                                    assert!(block_data.len() == key_size + mac_size + nonce_size);
+
+                                    // byte 72+ will be the the chunk data
+                                    block_data.extend(encrypted_chunk);
+
+                                    // set the local variable to trigger a data upload next time
+                                    // we go through the loop
+                                    potentially_uploaded_data = Some(block_data);
+                                },
+                                _ => {}
                             }
-                        } else {
-                            skipped_blocks = skipped_blocks + 1;
                         }
                     }
                     let hmac_tag_size = sodiumoxide::crypto::auth::TAGBYTES;
@@ -409,6 +443,12 @@ pub fn create_archive(token: &Token,
             println!("Rust<sdsync_create_archive>: finishing sync session");
         }
 
+
+
+        match finish_sync_session(&token, folder_id, archive_name, true, &complete_archive, archive_size as usize) {
+            Ok(()) => {},
+            Err(e) => return Err(format!("Rust<sdsync_create_archive>: finishing session failed: {:?}", e))
+        };
     }
     progress(100.0);
 
