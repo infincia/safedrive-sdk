@@ -7,15 +7,12 @@ workspace = ".."
 
 [dependencies]
 sodiumoxide = "*"
-rusqlite = { version = "*", features = ["bundled"] }
-libsqlite3-sys = "*"
 time = "*"
 libc = "*"
 walkdir = "*"
 cdc = "*"
 tar = "*"
 rustc-serialize = "*"
-ssh2 = "*"
 reqwest = "*"
 hyper = { version = "0.9.14" , default-features = false }
 serde = "0.8"

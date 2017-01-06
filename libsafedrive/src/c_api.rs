@@ -86,20 +86,14 @@ pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_c
     let uid: String = str::from_utf8(uids.to_bytes()).unwrap().to_owned();
 
 
-    let (db_path, storage_path, client_path, client_id) = initialize(storage_directory, uid);
+    let (storage_path, client_id) = initialize(storage_directory, uid);
 
     let context = Context {
-        db_path: db_path,
         storage_path: storage_path,
-        unique_client_path: client_path,
         unique_client_id: client_id,
         api_token: None,
         username: None,
         password: None,
-        ssh_username: None,
-        ssh_password: None,
-        safedrive_sftp_client_ip: None,
-        safedrive_sftp_client_port: None,
         main_key: None,
         hmac_key: None
     };
@@ -151,7 +145,6 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
     match login(&un, &pa) {
         Ok((token, account_status, unique_client_id)) => {
             c.0.set_account(un.to_owned(), pa.to_owned());
-            c.0.set_ssh_credentials(account_status.userName.to_owned(), pa.to_owned(), account_status.host, account_status.port);
             c.0.set_api_token(token);
             0
         },
@@ -232,63 +225,6 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *con
     };
 
     c.0.set_keys(main_key, hmac_key);
-    0
-}
-
-
-/// Load SSH credentials, must be called before any other function that operates on archives
-///
-/// Will assert non-null on each parameter
-///
-///
-/// Parameters:
-///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
-///
-///     username: a stack-allocated pointer to a username for SafeDrive sftp endpoint
-///
-///     password: a stack-allocated pointer to a password for SafeDrive sftp endpoint
-///
-///     ip_address: a stack-allocated pointer to ip for SafeDrive sftp endpoint
-///
-///     port: a stack-allocated pointer to TCP port for SafeDrive sftp endpoint
-///
-///
-/// Return:
-///
-///     0: success
-///
-///     1+: failure
-///
-///
-/// # Examples
-///
-/// ```
-/// int ret = sdsync_load_credentials(&context, "Wx534lkj3lk2h423kl4hlkj", "password", "sftp-client.safedrive.io", "22");
-/// ```
-#[no_mangle]
-#[allow(dead_code)]
-pub extern "C" fn sdsync_load_credentials(context: *mut CContext,
-                                      username: *const std::os::raw::c_char,
-                                      password:  *const std::os::raw::c_char,
-                                      ip_address:  *const std::os::raw::c_char,
-                                      port: *const std::os::raw::c_char) -> std::os::raw::c_int {
-    let c = unsafe{ assert!(!context.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); assert!(!ip_address.is_null()); assert!(!port.is_null()); &mut * context };
-
-    let c_username: &CStr = unsafe { CStr::from_ptr(username) };
-    let un: String = str::from_utf8(c_username.to_bytes()).unwrap().to_owned();
-
-    let c_password: &CStr = unsafe { CStr::from_ptr(password) };
-    let pa: String = str::from_utf8(c_password.to_bytes()).unwrap().to_owned();
-
-    let c_ip: &CStr = unsafe { CStr::from_ptr(ip_address) };
-    let ip: String = str::from_utf8(c_ip.to_bytes()).unwrap().to_owned();
-
-    let c_port: &CStr = unsafe { CStr::from_ptr(port) };
-    let p: String = str::from_utf8(c_port.to_bytes()).unwrap().to_owned();
-    let po: u16 = u16::from_str(&p).unwrap();
-
-    c.0.set_ssh_credentials(un, pa, ip, po);
     0
 }
 
@@ -373,9 +309,8 @@ pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
-                                     folder_id: std::os::raw::c_int,
-                                     name: *const std::os::raw::c_char,
-                                     path: *const std::os::raw::c_char) -> std::os::raw::c_int {
+                                         name: *const std::os::raw::c_char,
+                                         path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
@@ -383,11 +318,8 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = str::from_utf8(c_path.to_bytes()).unwrap().to_owned();
-    let db = Path::new(&c.0.db_path).to_owned();
 
-    let id: i32 = folder_id;
-
-    match add_sync_folder(db, id, &n, &p) {
+    match add_sync_folder(&n, &p) {
         Ok(_) => return 0,
         Err(_) => return 1,
     }
@@ -429,9 +361,8 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 #[allow(dead_code)]
 pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> u64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
-    let db = &(c.0.db_path);
 
-    let result = match sync_folders(db) {
+    let result = match sync_folders() {
         Ok(folders) => folders,
         Err(e) => panic!("Rust<sdsync_get_sync_folders> failed to get list of sync folders: {}", e),
     };
@@ -503,11 +434,10 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 #[allow(dead_code)]
 pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: std::os::raw::c_int, mut sessions: *mut *mut CSyncSession) -> u64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
-    let db = &(c.0.db_path);
     let id: i32 = folder_id;
 
 
-    let result = match sync_sessions(db, id) {
+    let result = match sync_sessions(id) {
         Ok(ses) => ses,
         Err(e) => panic!("Rust<sdsync_get_sync_sessions> failed to get list of sync sessions: {}", e),
     };
@@ -607,6 +537,7 @@ pub extern "C" fn sdsync_gc(context: *mut CContext) -> std::os::raw::c_int {
 #[allow(dead_code)]
 pub extern "C" fn sdsync_create_archive(context: *mut CContext,
                                         name: *const std::os::raw::c_char,
+                                        folder_path: *const std::os::raw::c_char,
                                         folder_id: std::os::raw::c_int,
                                         progress: extern fn(percent: std::os::raw::c_double)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
@@ -615,25 +546,20 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
-    let ssh_username = (*c).0.get_ssh_username();
-    let ssh_password = (*c).0.get_ssh_password();
-    let safedrive_sftp_client_ip = (*c).0.get_safedrive_sftp_client_ip();
-    let safedrive_sftp_client_port = (*c).0.get_safedrive_sftp_client_port();
-    let unique_client_id = &c.0.unique_client_id;
-    let db = Path::new(&c.0.db_path).to_owned();
-    //let uid = &c.unique_client_id;
     let id: i32 = folder_id;
 
-    match create_archive(&n,
+    let c_fpath: &CStr = unsafe { CStr::from_ptr(folder_path) };
+    let fp: String = str::from_utf8(c_fpath.to_bytes()).unwrap().to_owned();
+
+    let folder_path = Path::new(&fp).to_owned();
+
+    match create_archive(c.0.get_api_token(),
+                         &n,
                          main_key,
                          hmac_key,
-                         ssh_username,
-                         ssh_password,
-                         safedrive_sftp_client_ip,
-                         safedrive_sftp_client_port,
-                         unique_client_id,
-                         db,
-                         id, &mut |progress_percent| {
+                         id,
+                         folder_path,
+                         &mut |progress_percent| {
             let c_percent: std::os::raw::c_double = progress_percent;
 
             progress(c_percent);
