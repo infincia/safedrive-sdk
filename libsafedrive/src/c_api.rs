@@ -480,6 +480,11 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
         // malloc version
         //*sessions = libc::malloc(s.len() * std::mem::size_of::<CSyncSession>()) as *mut models::CSyncSession;
         //ptr::copy_nonoverlapping(s.as_ptr(), *sessions, s.len());
+
+        // box version
+        //let bs = Box::new(s);
+        //mem::forget(bs);
+        //*sessions = bs as *mut CSyncSession;
     }
     len
 }
