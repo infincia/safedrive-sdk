@@ -2,6 +2,12 @@
 
 extern crate libc;
 
+#[derive(Debug)]
+pub enum Configuration {
+    Staging,
+    Production
+}
+
 // request bodies
 
 #[derive(Serialize, Debug)]

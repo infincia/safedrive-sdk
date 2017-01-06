@@ -23,6 +23,8 @@ use ::core::create_archive;
 use ::core::load_keys;
 use ::core::login;
 
+use ::models::Configuration;
+
 use ::util::unique_client_hash;
 
 // exports
@@ -93,7 +95,8 @@ pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_c
         username: None,
         password: None,
         main_key: None,
-        hmac_key: None
+        hmac_key: None,
+        config: Configuration::Production
     };
     let ccontext = CContext(context);
     Box::into_raw(Box::new(ccontext))

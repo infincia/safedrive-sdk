@@ -1,7 +1,7 @@
 use std::path::{PathBuf};
 
 use keys::Key;
-use models::Token;
+use models::{Token, Configuration};
 
 #[derive(Debug)]
 pub struct Context {
@@ -12,10 +12,11 @@ pub struct Context {
     pub api_token: Option<Token>,
     pub main_key: Option<Key>,
     pub hmac_key: Option<Key>,
+    pub config: Configuration
 }
 
 impl Context {
-    pub fn new(storage_path: PathBuf, unique_client_id: String) -> Context {
+    pub fn new(storage_path: PathBuf, unique_client_id: String, config: Configuration) -> Context {
         Context {
             storage_path: storage_path,
             unique_client_id: unique_client_id,
@@ -23,8 +24,13 @@ impl Context {
             password: None,
             api_token: None,
             main_key: None,
-            hmac_key: None
+            hmac_key: None,
+            config: config
         }
+    }
+
+    pub fn get_config(&self) -> &Configuration {
+        &self.config
     }
 
     pub fn set_keys(&mut self, main_key: Key, hmac_key: Key) {
