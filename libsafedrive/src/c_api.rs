@@ -367,12 +367,12 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
     };
 
     let f = result.into_iter().map(|folder| {
-        let s_name = CString::new(folder.name.as_str()).unwrap();
-        let s_path = CString::new(folder.path.as_str()).unwrap();
+        let s_name = CString::new(folder.folderName.as_str()).unwrap();
+        let s_path = CString::new(folder.folderPath.as_str()).unwrap();
         forget(&s_name);
         forget(&s_path);
         CFolder {
-            id: folder.id,
+            id: folder.id as i64,
             name: s_name.into_raw(),
             path: s_path.into_raw(),
         }
