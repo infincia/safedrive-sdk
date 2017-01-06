@@ -101,7 +101,7 @@ fn main() {
 
     let credentials: Credentials = match serde_json::from_str(&cs) {
         Ok(c) => c,
-        Err(e) => Credentials { email: None, password: None, phrase: None }
+        Err(_) => Credentials { email: None, password: None, phrase: None }
     };
 
     let username = match credentials.email {
