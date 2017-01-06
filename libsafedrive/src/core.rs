@@ -404,7 +404,7 @@ pub fn create_archive(token: &Token,
         // byte 72+ will be the encrypted archive data
         complete_archive.extend(encrypted_archive);
 
-        let mut archive_name: String;
+        let mut archive_name: String = String::new();
         archive_name += session_name;
         archive_name += ".sdsyncv1";
 
