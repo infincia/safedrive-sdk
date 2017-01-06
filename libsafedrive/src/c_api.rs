@@ -44,10 +44,9 @@ pub struct CFolder {
 #[derive(Debug)]
 #[repr(C)]
 pub struct CSyncSession {
-    pub id: i64,
-    pub filename: *const std::os::raw::c_char,
-    pub size: i64,
-    pub date: f64,
+    pub name: *const std::os::raw::c_char,
+    pub size: u64,
+    pub date: u64,
     pub folder_id: i32,
 }
 
@@ -439,21 +438,11 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
     };
 
     let s = result.into_iter().map(|ses| {
-        let s_id = ses.id;
-        let folder_id = ses.folder_id;
-        let s_filename = CString::new(ses.filename.as_str()).unwrap();
-
-        let s_date = ses.date.sec as f64 + (ses.date.nsec as f64 / 1000.0 / 1000.0 / 1000.0 );
-
-        forget(&folder_id);
-        forget(&s_filename);
-        forget(&s_id);
         CSyncSession {
-            id: s_id,
-            folder_id: folder_id,
-            size: 0,
-            filename: s_filename.into_raw(),
-            date: s_date
+            folder_id: ses.folder_id,
+            size: ses.size,
+            name: CString::new(ses.name.as_str()).unwrap().into_raw(),
+            date: ses.time
         }
     }).collect::<Vec<CSyncSession>>();
 

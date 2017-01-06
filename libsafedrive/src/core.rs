@@ -166,11 +166,22 @@ pub fn sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
     }
 }
 
-pub fn sync_sessions(token: &Token, folder_id: i32) -> Result<HashMap<i32, Vec<SyncSession>>, String> {
-    match read_sessions(token) {
-        Ok(sessions) => Ok(sessions),
+pub fn sync_sessions(token: &Token, folder_id: i32) -> Result<Vec<SyncSession>, String> {
+    let m = match read_sessions(token) {
+        Ok(sessions) => sessions,
         Err(e) => return Err(format!("Rust<sync_sessions>: getting sessions failed: {:?}", e))
+    };
+    let mut v: Vec<SyncSession> = Vec::new();
+
+    for (folder_id, sessions) in &m {
+        for session in sessions {
+            let mut s = session.clone();
+            s.folder_id = *folder_id;
+            v.push(s);
+        }
     }
+
+    Ok(v)
 }
 
 pub fn create_archive(token: &Token,

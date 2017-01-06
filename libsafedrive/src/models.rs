@@ -72,10 +72,11 @@ pub struct WrappedKeyset {
     pub hmac: String
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SyncSession {
-    pub name: i64,
-    pub size: i64,
+    pub folder_id: i32,
+    pub name: String,
+    pub size: u64,
     pub time: u64,
 }
 
