@@ -279,9 +279,9 @@ pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char
     }
 }
 
-/// Add a sync folder to the local database
+/// Add a sync folder
 ///
-/// Will return a failure code if for any reason the folder cannot be added to the database
+/// Will return a failure code if for any reason the folder cannot be added
 ///
 /// Return codes will be expanded in the future to provide more specific information on the failure
 ///
@@ -326,7 +326,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 }
 
 
-/// Get a list of all sync folders from the local database
+/// Get a list of all sync folders from the SafeDive server
 ///
 /// The caller does not own the memory allocated by the library, it must be returned and freed by
 /// the library after use. As a result, any data that the caller wishes to retain must be copied out
@@ -343,9 +343,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 ///
 ///     -1: failure
 ///
-///      0: no folders
-///
-///     1+: number of registered folders found, and number of CFolder structs allocated in folders
+///     0+: number of registered folders found, and number of CFolder structs allocated in folders
 ///
 /// Return codes will be expanded in the future to provide more specific information on the failure
 ///
