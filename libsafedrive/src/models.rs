@@ -1,19 +1,6 @@
 #![allow(non_snake_case)]
 
-
 extern crate libc;
-
-extern crate time;
-use self::time::Timespec;
-
-#[derive(Debug)]
-pub struct SyncSession {
-    pub id: i64,
-    pub filename: String,
-    pub size: i64,
-    pub date: Timespec,
-    pub folder_id: i32,
-}
 
 // responses
 
@@ -83,6 +70,13 @@ pub struct WrappedKeyset {
     pub master: String,
     pub main: String,
     pub hmac: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SyncSession {
+    pub name: i64,
+    pub size: i64,
+    pub time: u64,
 }
 
 
