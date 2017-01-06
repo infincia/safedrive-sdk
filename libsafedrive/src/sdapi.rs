@@ -359,3 +359,157 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
 
     Ok(folder_response.id)
 }
+
+// sync handling
+
+pub fn register_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted: bool) -> Result<(), SDAPIError> where S: Into<String> {
+
+    let na = name.into();
+
+    let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: &na, encrypted: encrypted };
+
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.post(&endpoint.url())
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Created => {},
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
+    Ok(())
+}
+
+pub fn finish_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> where S: Into<String> {
+
+    let na = name.into();
+
+    let endpoint = APIEndpoint::FinishSyncSession { token: token, folder_id: folder_id, name: &na, encrypted: encrypted, size: size, session_data: session_data };
+
+    let (body, content_length, boundary) = multipart_for_bytes(session_data, &na);
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.post(&endpoint.url())
+        .body(body)
+        .header(SDAuthToken(token.token.to_owned()))
+        .header(ContentType(boundary.to_owned()))
+        .header(ContentLength(content_length));
+
+    let result = try!(request.send());
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => Ok(()),
+        &reqwest::StatusCode::Created => Ok(()),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+}
+
+
+// block handling
+
+pub fn check_block<S>(token: &Token, name: S) -> Result<bool, SDAPIError> where S: Into<String> {
+
+    let na = name.into();
+
+    let endpoint = APIEndpoint::CheckBlock { token: token, name: &na };
+
+    let client = reqwest::Client::new().unwrap();
+
+    let request = client.head(&endpoint.url()).header(SDAuthToken(token.token.to_owned()));
+
+    let result = try!(request.send());
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => Ok(true),
+        &reqwest::StatusCode::NotFound => Ok(false),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+}
+
+pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option<Vec<u8>>) -> Result<(), SDAPIError> where S: Into<String>, T: Into<String> {
+
+    let na = name.into();
+    let ses = session.into();
+
+    let endpoint = APIEndpoint::WriteBlock { token: token, name: &na, session: &ses, chunk_data: chunk_data };
+
+
+    let client = reqwest::Client::new().unwrap();
+    let mut request = client.post(&endpoint.url())
+        .header(SDAuthToken(token.token.to_owned()));
+    if let Some(ref data) = *chunk_data {
+        let (body, content_length, boundary) = multipart_for_bytes(data, &na);
+
+        request = request.body(body)
+        .header(ContentType(boundary.to_owned()))
+        .header(ContentLength(content_length));
+    }
+    let result = try!(request.send());
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => Ok(()),
+        &reqwest::StatusCode::Created => Ok(()),
+        &reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+}
+
+pub fn read_block<'a, S>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIError> where S: Into<String> {
+    let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.post(&endpoint.url())
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::NotFound => return Err(SDAPIError::BlockMissing),
+        _ => return Err(SDAPIError::RequestFailed)
+    };
+    let mut buffer = Vec::new();
+
+    try!(result.read_to_end(&mut buffer));
+    Ok(Block { name: name, chunk_data: buffer })
+}
+
+fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'static str) {
+
+    let mut body: Vec<u8> = Vec::new();
+
+    // these are compile time optimizations
+    let header_boundary: &'static str = "SAFEDRIVEBINARY";
+    let rn: &'static [u8; 4] = br"\r\n";
+    let body_boundary: &'static [u8; 17] = br"--SAFEDRIVEBINARY";
+    let end_boundary: &'static [u8; 19] =  br"--SAFEDRIVEBINARY--";
+    let content_type: &'static [u8; 38] = br"Content-Type: application/octet-stream";
+
+
+    let disp = format!("Content-Disposition: form-data; name=\"{}\";", name);
+
+
+    body.extend(body_boundary.as_ref());
+    body.extend(rn);
+    body.extend(disp.as_bytes());
+    body.extend(rn);
+    body.extend(content_type.as_ref());
+    body.extend(rn);
+    body.extend(rn);
+
+    body.extend(chunk_data);
+    body.extend(rn);
+    body.extend(end_boundary.as_ref());
+
+    let content_length = body.len();
+
+    (body, content_length, header_boundary)
+}
+
