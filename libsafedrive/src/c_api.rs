@@ -318,7 +318,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = str::from_utf8(c_path.to_bytes()).unwrap().to_owned();
 
-    match add_sync_folder(&n, &p) {
+    match add_sync_folder(c.0.get_api_token(), &n, &p) {
         Ok(_) => return 0,
         Err(_) => return 1,
     }
@@ -361,7 +361,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> u64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
-    let result = match sync_folders() {
+    let result = match sync_folders(c.0.get_api_token()) {
         Ok(folders) => folders,
         Err(e) => panic!("Rust<sdsync_get_sync_folders> failed to get list of sync folders: {}", e),
     };
@@ -433,7 +433,7 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
     let id: i32 = folder_id;
 
 
-    let result = match sync_sessions(id) {
+    let result = match sync_sessions(c.0.get_api_token(), id) {
         Ok(ses) => ses,
         Err(e) => panic!("Rust<sdsync_get_sync_sessions> failed to get list of sync sessions: {}", e),
     };
