@@ -1,3 +1,6 @@
+#![allow(non_snake_case)]
+
+
 extern crate libc;
 
 extern crate time;
@@ -50,7 +53,6 @@ pub struct CreateFolderResponse {
 //private final int port;
 //private final String userName;
 //private final Long time;
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountStatus {
     pub status: Option<String>,
@@ -67,7 +69,6 @@ pub struct AccountStatus {
 //private final int lowFreeStorageThreshold;
 //private final long expirationDate;
 //private final Set<NotificationTO> notifications;
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountDetails {
     pub assignedStorage: u64,
@@ -101,7 +102,6 @@ Current sync folder model:
 "addedDate"  : 1435864769463,
 "encrypted"  : false
 */
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegisteredFolder {
     pub id: u64,
