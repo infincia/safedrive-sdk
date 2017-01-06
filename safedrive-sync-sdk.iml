@@ -4,7 +4,7 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Cargo &lt;safedrive-sync-sdk&gt;" level="project" />
     <orderEntry type="library" name="Rust &lt;safedrive-sync-sdk&gt;" level="project" />
+    <orderEntry type="library" name="Cargo &lt;safedrive-sync-sdk&gt;" level="project" />
   </component>
 </module>
