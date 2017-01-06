@@ -382,10 +382,10 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
     unsafe {
         // `folders` must be passed back to sdsync_free_folders() after use
         // as the C code does not own the data, the caller must copy it before returning it to Rust
-        // stack version
+        // stack version, not safe at all
         *folders = f.as_ptr() as *mut CFolder;
         mem::forget(f);
-        // heap version
+        // malloc version
         //*folders = libc::malloc(f.len() * std::mem::size_of::<CFolder>()) as *mut models::CFolder;
         //ptr::copy_nonoverlapping(f.as_ptr(), *folders, f.len());
     }
