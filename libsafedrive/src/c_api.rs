@@ -366,7 +366,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
         Err(e) => panic!("Rust<sdsync_get_sync_folders> failed to get list of sync folders: {}", e),
     };
 
-    let mut f = result.into_iter().map(|folder| {
+    let f = result.into_iter().map(|folder| {
         let s_name = CString::new(folder.name.as_str()).unwrap();
         let s_path = CString::new(folder.path.as_str()).unwrap();
         forget(&s_name);
@@ -438,7 +438,7 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
         Err(e) => panic!("Rust<sdsync_get_sync_sessions> failed to get list of sync sessions: {}", e),
     };
 
-    let mut s = result.into_iter().map(|ses| {
+    let s = result.into_iter().map(|ses| {
         let s_id = ses.id;
         let folder_id = ses.folder_id;
         let s_filename = CString::new(ses.filename.as_str()).unwrap();
