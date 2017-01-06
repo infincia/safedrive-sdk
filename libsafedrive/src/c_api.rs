@@ -473,11 +473,11 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, folder_id: st
         // `sessions` must be passed back to sdsync_free_sessions() after use
         // as the C code does not own the data, the caller must copy it before returning it to Rust
 
-        // stack version
+        // stack version, not safe at all
         *sessions = s.as_ptr() as *mut CSyncSession;
         mem::forget(s);
 
-        // heap version
+        // malloc version
         //*sessions = libc::malloc(s.len() * std::mem::size_of::<CSyncSession>()) as *mut models::CSyncSession;
         //ptr::copy_nonoverlapping(s.as_ptr(), *sessions, s.len());
     }
