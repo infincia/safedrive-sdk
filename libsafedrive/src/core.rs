@@ -16,7 +16,7 @@ extern crate time;
 extern crate sodiumoxide;
 extern crate tar;
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 extern crate openssl;
 
 extern crate walkdir;
@@ -59,9 +59,9 @@ pub fn initialize<S, T>(local_directory: S, unique_client_id: T) -> (PathBuf, St
     let sodium_version = sodiumoxide::version::version_string();
     println!("Rust<sdsync_initialize>: libsodium {}", sodium_version);
 
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     let ssl_version = openssl::version::version();
-    #[cfg(unix)]
+    #[cfg(target_os = "linux")]
     println!("Rust<sdsync_initialize>: {}>", ssl_version);
 
     println!("Rust<sdsync_initialize>: ready");
