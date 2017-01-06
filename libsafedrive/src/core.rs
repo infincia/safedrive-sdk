@@ -145,7 +145,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     return Err(CryptoError::RetrieveFailed)
 }
 
-pub fn get_sync_folder(folder_id: i32) -> Option<Folder> {
+pub fn get_sync_folder(folder_id: i32) -> Option<RegisteredFolder> {
 
     return None
 }

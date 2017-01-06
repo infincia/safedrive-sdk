@@ -7,13 +7,6 @@ extern crate time;
 use self::time::Timespec;
 
 #[derive(Debug)]
-pub struct Folder {
-    pub id: i64,
-    pub name: String,
-    pub path: String,
-}
-
-#[derive(Debug)]
 pub struct SyncSession {
     pub id: i64,
     pub filename: String,
