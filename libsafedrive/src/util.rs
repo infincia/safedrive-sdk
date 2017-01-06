@@ -88,7 +88,7 @@ pub fn get_app_directory() -> Result<PathBuf, String> {
     let m = format!("failed to get {} environment variable", evar);
     let path = match env::var(evar) {
         Ok(e) => e,
-        Err(e) => { return Err(m) }
+        Err(_) => { return Err(m) }
     };
 
     let mut storage_path = Path::new(&path).to_owned();
@@ -124,7 +124,7 @@ pub fn get_local_user() -> Result<String, String> {
     let m = format!("failed to get {} environment variable", evar);
     let username = match env::var(evar) {
         Ok(e) => e,
-        Err(e) => { return Err(m) }
+        Err(_) => { return Err(m) }
     };
 
     return Ok(username)

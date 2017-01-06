@@ -142,7 +142,7 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
     let pa: String = str::from_utf8(c_password.to_bytes()).unwrap().to_owned();
 
     match login(&un, &pa) {
-        Ok((token, account_status, unique_client_id)) => {
+        Ok((token, _, _)) => {
             c.0.set_account(un.to_owned(), pa.to_owned());
             c.0.set_api_token(token);
             0
