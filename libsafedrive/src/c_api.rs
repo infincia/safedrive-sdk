@@ -6,7 +6,6 @@ use std::mem;
 use std::mem::forget;
 
 use std::u64;
-use std::str::FromStr;
 
 // external imports
 

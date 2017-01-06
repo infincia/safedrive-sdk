@@ -1,12 +1,10 @@
 use std;
 use std::str;
-use std::ffi::{CStr};
 
 use std::path::{Path, PathBuf};
 use std::fs;
-use std::net::{TcpStream};
 use std::fs::File;
-use std::io::{BufReader, Read, Write, Seek, SeekFrom};
+use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
 
 // external imports
@@ -29,7 +27,6 @@ use self::rustc_serialize::hex::{ToHex};
 use self::tar::{Builder, Header};
 use self::walkdir::WalkDir;
 use self::cdc::*;
-use self::time::Timespec;
 
 // internal imports
 
