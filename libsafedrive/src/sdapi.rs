@@ -335,7 +335,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     Ok(folders)
 }
 
-pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> Result<u64, SDAPIError> where S: Into<String>, T: Into<String> {
+pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> Result<i32, SDAPIError> where S: Into<String>, T: Into<String> {
 
     let pa = path.into();
     let na = name.into();

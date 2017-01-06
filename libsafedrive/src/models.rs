@@ -45,7 +45,7 @@ pub struct Block<'a> {
 //private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
-    pub id: u64,
+    pub id: i32,
 }
 
 //private final String status;
