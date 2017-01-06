@@ -71,7 +71,7 @@ pub fn initialize<S, T>(local_directory: S, unique_client_id: T) -> (PathBuf, St
 pub fn login(username: &str,
              password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), String> {
 
-    match client_register(username, password) {
+    match register_client(username, password) {
         Ok((t, ucid)) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s, ucid)),

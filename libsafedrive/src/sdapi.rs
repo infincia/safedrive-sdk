@@ -212,7 +212,7 @@ impl<'a> APIEndpoint<'a> {
 
 // SD API
 
-pub fn client_register<S, T>(email: S, password: T) -> Result<(Token, UniqueClientID), SDAPIError> where S: Into<String>, T: Into<String> {
+pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClientID), SDAPIError> where S: Into<String>, T: Into<String> {
 
     let em = email.into();
     let pa = password.into();
