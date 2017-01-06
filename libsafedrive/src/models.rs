@@ -19,13 +19,6 @@ pub struct SyncSession {
     pub folder_id: i32,
 }
 
-#[derive(Debug)]
-pub struct Block {
-    pub id: i64,
-    pub synced: i32,
-    pub refcount: i32,
-    pub hmac: Option<Vec<u8>>,
-}
 
 //private final String token
 #[derive(Serialize, Deserialize, Debug)]
@@ -37,6 +30,12 @@ pub struct Token {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UniqueClientID {
     pub id: String,
+}
+
+#[derive(Debug)]
+pub struct Block<'a> {
+    pub chunk_data: Vec<u8>,
+    pub name: &'a str
 }
 
 //private final int id
