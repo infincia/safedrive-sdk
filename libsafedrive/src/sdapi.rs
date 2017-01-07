@@ -417,6 +417,7 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(()),
         &reqwest::StatusCode::Created => Ok(()),
+        &reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
         &reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
         _ => return Err(SDAPIError::RequestFailed)
     }
