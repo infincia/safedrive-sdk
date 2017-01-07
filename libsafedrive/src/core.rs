@@ -12,7 +12,6 @@ use std::cmp::{min, max};
 
 extern crate rustc_serialize;
 extern crate libc;
-extern crate time;
 extern crate sodiumoxide;
 extern crate tar;
 
