@@ -1,5 +1,11 @@
 #![feature(proc_macro)]
 
+#[macro_use] extern crate log;
+extern crate env_logger;
+
+use log::LogLevel;
+
+
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
@@ -43,6 +49,8 @@ pub struct Credentials {
 
 
 fn main() {
+    env_logger::init().unwrap();
+
     let matches = App::new("safedrive")
         .version("0.1")
         .about("SafeDrive")
