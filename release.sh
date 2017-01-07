@@ -11,7 +11,7 @@ mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
 mkdir -p dist-$TARGET/dep
 
-export SODIUM_LIB_DIR=dep-$TARGET/lib
+export SODIUM_LIB_DIR=$PWD/dep-$TARGET/lib
 export SODIUM_STATIC
 
 export OPENSSL_DIR=$PWD/dep-$TARGET
