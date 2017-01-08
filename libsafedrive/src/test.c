@@ -1,24 +1,39 @@
 #import "stdio.h"
 #import <stdlib.h>
 #import <string.h>
-#import "sdsync.h"
+#import "sddk.h"
 
 static CContext *context = NULL;
 
 
-int add(int32_t folder_id, const char * name, const char * path) {
-	return sdsync_add_sync_folder(context, folder_id, name, path);
+int add(const char * name, const char * path) {
+	return sddk_add_sync_folder(context, name, path);
+}
+
+void store_recovery_key_cb(char const* new_phrase) {
+    printf("C<test/store_recovery_key_cb>: ");
+    int l = strlen(new_phrase);
+
+    for (int i = 0; i < l; ++i) {
+        printf("%c", new_phrase[i]);
+    }
+    printf("\n");
+
+}
+
+void progress(double percent) {
+    printf("C<test/progress>: %f\n", percent);
 }
 
 int main ( int argc, char **argv ) {
     char * unique_client_id = malloc((64 * sizeof(char)) + 1);
 
-    char[] username = "user";
-    char[] password = "password";
+    char username[] = "user";
+    char password[] = "password";
 
-    char[] ssh_user = "user";
+    char recovery_phrase[] = "phrase";
 
-    int ret = sdsync_get_unique_client_id(username, &unique_client_id);
+    int ret = sddk_get_unique_client_id(username, &unique_client_id);
     int l = strlen(unique_client_id);
     printf("C<test/main>: got unique id: ");
 
@@ -27,37 +42,33 @@ int main ( int argc, char **argv ) {
     }
     printf("\n");
 
-    context = sdsync_initialize("/Users/steve/Library/Application Support/SafeDrive", unique_client_id);
+    context = sddk_initialize("/Users/steve/Library/Application Support/SafeDrive", unique_client_id);
 
     free(unique_client_id);
 
-    if (0 != sdsync_login(context, username, password)) {
-        printf("C<test/main>: Failed to login");
+    if (0 != sddk_login(context, username, password)) {
+        printf("C<test/main>: Failed to login\n");
     }
 
-    uint8_t * main_key = "ab03c34f1ece08211fe2a8039fd6424199b3f5d7b55ff13b1134b364776c45c5";
-    uint8_t * hmac_key = "63d6ff853569a0aadec5f247bba51786bb73494d1a06bdc036ebac5034a2920b";
-    sdsync_load_keys(context, main_key, hmac_key);
+    sddk_load_keys(context, recovery_phrase, &store_recovery_key_cb);
 
-    sdsync_load_credentials(context, ssh_user, password, "sftp-client.safedrive.io", "22");
-
-    int result = add(3, "Documents", "/Users/steve/Documents");
+    int result = add("Documents", "/Users/steve/Documents");
     if (result != 0) {
         printf("C<test/main>: Failed to add folder: %d\n", result);
     }
 
     CFolder * folder_ptr;
-    int64_t length = sdsync_get_sync_folders(context, &folder_ptr);
+    int64_t length = sddk_get_sync_folders(context, &folder_ptr);
     CFolder * head = folder_ptr;
     printf("C<test/main>: found %lld folders\n", length);
     for (int i = 0; i < length; i++, folder_ptr++) {
         CFolder folder = *folder_ptr;
         printf("C<test/main>: folder <%s, %s>\n", folder.name, folder.path);
-        sdsync_free_string(&folder.name);
-        sdsync_free_string(&folder.path);
-        sdsync_create_archive(context, folder.id);
+        if (0 != sddk_create_archive(context, folder.name, folder.path, folder.id, &progress)) {
+            printf("C<test/main>: Failed to sync folder\n");
+        }
     }
-    sdsync_free_folders(&head, length);
-    sdsync_free_context(&context);
+    sddk_free_folders(&head, length);
+    sddk_free_context(&context);
     return 0;
 }
