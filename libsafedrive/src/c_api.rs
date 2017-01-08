@@ -3,7 +3,6 @@ use std::ffi::{CStr, CString};
 use std::str;
 use std::path::{Path};
 use std::mem;
-use std::mem::forget;
 
 use std::u64;
 
