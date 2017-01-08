@@ -647,7 +647,7 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession, l
     let _: Vec<SDDKSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
 }
 
-/// Free an opaque pointer to an sddk_context_t
+/// Free an opaque pointer to an SDDKContext
 ///
 /// Note: This is *not* the same as calling free() in C, they are not interchangeable
 ///
