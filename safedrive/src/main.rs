@@ -41,6 +41,7 @@ use safedrive::sdapi::read_folders;
 
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const COPYRIGHT: &'static str = "(C) 2013-2017 SafeData Net S.R.L.";
 
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -56,7 +57,7 @@ fn main() {
 
     let matches = App::new("safedrive")
         .version("0.1")
-        .about("SafeDrive")
+        .about(COPYRIGHT)
         .arg(Arg::with_name("config")
             .short("c")
             .long("config")
@@ -84,7 +85,7 @@ fn main() {
         )
         .get_matches();
     println!("SafeDrive {}", VERSION);
-    println!("(C) 2013-2017 SafeData Net S.R.L.");
+    println!("{}", COPYRIGHT);
     println!();
 
     let app_directory = get_app_directory().expect("Error: could not determine local storage directory");
