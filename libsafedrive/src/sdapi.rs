@@ -10,8 +10,8 @@ extern crate serde_json;
 extern crate hyper;
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
-header! { (ContentType, "Content-Type: multipart/form-data; boundary=") => [String] }
 header! { (ContentLength, "Content-Length: ") => [usize] }
+header! { (ContentType, "Content-Type") => [String] }
 
 use util::*;
 use error::*;
@@ -359,7 +359,7 @@ pub fn finish_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted:
     let request = client.request(endpoint.method(), &endpoint.url())
         .body(body)
         .header(SDAuthToken(token.token.to_owned()))
-        .header(ContentType(boundary.to_owned()))
+        .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
         .header(ContentLength(content_length));
 
     let result = try!(request.send());
@@ -409,7 +409,7 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
         let (body, content_length, boundary) = multipart_for_bytes(data, &na);
 
         request = request.body(body)
-        .header(ContentType(boundary.to_owned()))
+        .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
         .header(ContentLength(content_length));
     }
     let result = try!(request.send());
