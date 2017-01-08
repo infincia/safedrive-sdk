@@ -59,14 +59,14 @@ pub fn initialize<S, T>(local_directory: S, unique_client_id: T) -> (PathBuf, St
 
 
     let sodium_version = sodiumoxide::version::version_string();
-    println!("Rust<sdsync_initialize>: libsodium {}", sodium_version);
+    debug!("libsodium {}", sodium_version);
 
     #[cfg(target_os = "linux")]
     let ssl_version = openssl::version::version();
     #[cfg(target_os = "linux")]
-    println!("Rust<sdsync_initialize>: {}>", ssl_version);
+    debug!("{}>", ssl_version);
 
-    println!("Rust<sdsync_initialize>: ready");
+    debug!("ready");
 
     (storage_path, uid)
 }
@@ -114,7 +114,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
         // now we check to see if the keys returned by the server match the existing phrase or not
 
         // if we were given an existing phrase try it, otherwise try the new one
-        println!("Rust<load_keys>: got key set back from server, checking");
+        debug!("got key set back from server, checking");
 
         let phrase_to_check = match recovery_phrase {
             Some(p) => p,
@@ -124,7 +124,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
         let wrapped_master_key = try!(WrappedKey::from_hex(real_master_wrapped, KeyType::KeyTypeMaster));
         let wrapped_main_key = try!(WrappedKey::from_hex(real_main_wrapped, KeyType::KeyTypeMain));
         let wrapped_hmac_key = try!(WrappedKey::from_hex(real_hmac_wrapped, KeyType::KeyTypeHMAC));
-        println!("Rust<load_keys>: loaded wrapped keys");
+        debug!("loaded wrapped keys");
 
         match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key) {
             Ok((real_phrase, real_master_key, real_main_key, real_hmac_key)) => {
@@ -137,7 +137,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                 return Ok((real_master_key, real_main_key, real_hmac_key))
             },
             Err(e) => {
-                println!("Rust<load_keys>: failed to decrypt keys: {:?}", e);
+                debug!("failed to decrypt keys: {:?}", e);
 
                 return Err(CryptoError::DecryptFailed)
             }
@@ -203,7 +203,7 @@ pub fn create_archive(token: &Token,
 
     if true {
         if DEBUG_STATISTICS {
-            println!("Rust<sdsync_create_archive>: creating archive for: {}", folder_id);
+            debug!("creating archive for: {}", folder_id);
         }
         let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
         let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
@@ -219,7 +219,7 @@ pub fn create_archive(token: &Token,
         let mut completed_count = 0.0;
         for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
             if DEBUG_STATISTICS {
-                println!("Rust<sdsync_create_archive>: examining {}", item.path().display());
+                debug!("examining {}", item.path().display());
             }
             let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
 
@@ -249,7 +249,7 @@ pub fn create_archive(token: &Token,
             let mut header = Header::new_ustar();
             if let Err(err) = header.set_path(p_relative) {
                 if DEBUG_STATISTICS {
-                    println!("Rust<sdsync_create_archive>: NOTICE - not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
+                    debug!("not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
                 }
                 failed + failed + 1;
                 continue // we don't care about errors here, they'll only happen for truly invalid paths
@@ -292,7 +292,7 @@ pub fn create_archive(token: &Token,
                         let mut data: Vec<u8> = Vec::with_capacity(100000); //expected size of largest block
 
                         if let Err(e) = buffer.read_to_end(&mut data) {
-                            return Err(format!("Rust<sdsync_create_archive>: could not read from file: {}", e))
+                            return Err(format!("could not read from file: {}", e))
                         }
 
                         let raw_chunk = data.as_slice();
@@ -399,14 +399,14 @@ pub fn create_archive(token: &Token,
                     ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append chunk archive header");
 
                     if nb_chunk != skipped_blocks && DEBUG_STATISTICS {
-                        println!("Rust<sdsync_create_archive>: {} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
+                        debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
                     }
                     if DEBUG_STATISTICS {
-                        println!("Rust<sdsync_create_archive>: hmac list has {} ids <{}>", chunks.len() / 32, nb_chunk * 32);
-                        println!("Rust<sdsync_create_archive>: Expected chunk size: {} bytes", expected_size);
-                        println!("Rust<sdsync_create_archive>: Smallest chunk: {} bytes.", smallest_size);
-                        println!("Rust<sdsync_create_archive>: Largest chunk: {} bytes.", largest_size);
-                        println!("Rust<sdsync_create_archive>: Standard size deviation: {} bytes.", (size_variance as f64 / nb_chunk as f64).sqrt() as u64);
+                        debug!("hmac list has {} ids <{}>", chunks.len() / 32, nb_chunk * 32);
+                        debug!("expected chunk size: {} bytes", expected_size);
+                        debug!("smallest chunk: {} bytes.", smallest_size);
+                        debug!("largest chunk: {} bytes.", largest_size);
+                        debug!("standard size deviation: {} bytes.", (size_variance as f64 / nb_chunk as f64).sqrt() as u64);
                     }
                 } else {
                     header.set_size(0); // hmac list size is zero when file has no actual data
@@ -427,7 +427,7 @@ pub fn create_archive(token: &Token,
         }
 
         if let Err(e) = ar.finish() {
-            return Err(format!("Rust<sdsync_create_archive>: error finalizing archive: {}", e))
+            return Err(format!("error finalizing archive: {}", e))
         }
 
         let raw_archive = &ar.into_inner().unwrap();
@@ -476,9 +476,8 @@ pub fn create_archive(token: &Token,
         archive_name += session_name;
         archive_name += ".sdsyncv1";
 
-        if DEBUG_STATISTICS {
-            println!("Rust<sdsync_create_archive>: finishing sync session");
-        }
+
+        debug!("finishing sync session");
 
 
 

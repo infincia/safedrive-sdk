@@ -181,6 +181,8 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
 
     try!(result.read_to_string(&mut response));
 
+    debug!("response: {}", response);
+
     let token: Token = match serde_json::from_str(&response) {
         Ok(token) => token,
         Err(_) => return Err(SDAPIError::RequestFailed)
@@ -203,6 +205,8 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 
     try!(result.read_to_string(&mut response));
 
+    debug!("response: {}", response);
+
     let account_status: AccountStatus = match serde_json::from_str(&response) {
         Ok(a) => a,
         Err(_) => return Err(SDAPIError::RequestFailed)
@@ -222,6 +226,8 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     let account_details: AccountDetails = match serde_json::from_str(&response) {
         Ok(a) => a,
@@ -247,6 +253,8 @@ pub fn account_key(token: &Token, master: String, main: String, hmac: String) ->
 
     try!(result.read_to_string(&mut response));
 
+    debug!("response: {}", response);
+
     let wrapped_keyset: WrappedKeyset = try!(serde_json::from_str(&response));
 
     Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac))
@@ -264,6 +272,8 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     let folders: Vec<RegisteredFolder> = match serde_json::from_str(&response) {
         Ok(f) => f,
@@ -291,6 +301,8 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
 
     try!(result.read_to_string(&mut response));
 
+    debug!("response: {}", response);
+
     let folder_response: CreateFolderResponse = match serde_json::from_str(&response) {
         Ok(r) => r,
         Err(_) => return Err(SDAPIError::RequestFailed)
@@ -313,6 +325,8 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<i32, Vec<SyncSession>>, SD
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     let sessions: HashMap<i32, Vec<SyncSession>> = match serde_json::from_str(&response) {
         Ok(s) => s,
@@ -337,6 +351,11 @@ pub fn register_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypte
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     match result.status() {
         &reqwest::StatusCode::Ok => {},
@@ -355,6 +374,8 @@ pub fn finish_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted:
 
     let (body, content_length, boundary) = multipart_for_bytes(session_data, &na);
 
+    debug!("body: {}", String::from_utf8_lossy(&body));
+
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .body(body)
@@ -362,7 +383,13 @@ pub fn finish_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted:
         .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
         .header(ContentLength(content_length));
 
-    let result = try!(request.send());
+    let mut result = try!(request.send());
+
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(()),
@@ -385,7 +412,13 @@ pub fn check_block<S>(token: &Token, name: S) -> Result<bool, SDAPIError> where 
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
-    let result = try!(request.send());
+    let mut result = try!(request.send());
+
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(true),
@@ -407,12 +440,19 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
         .header(SDAuthToken(token.token.to_owned()));
     if let Some(ref data) = *chunk_data {
         let (body, content_length, boundary) = multipart_for_bytes(data, &na);
+        debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
         .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
         .header(ContentLength(content_length));
     }
-    let result = try!(request.send());
+    let mut result = try!(request.send());
+
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
 
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(()),
@@ -440,6 +480,7 @@ pub fn read_block<'a, S>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAP
     let mut buffer = Vec::new();
 
     try!(result.read_to_end(&mut buffer));
+
     Ok(Block { name: name, chunk_data: buffer })
 }
 

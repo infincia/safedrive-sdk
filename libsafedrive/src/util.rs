@@ -57,7 +57,7 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
             }
         }
     } else {
-        println!("Could not find en0 interface");
+        error!("could not find en0 interface");
     }
     Err("failed to get mac address".to_string())
 }
@@ -136,7 +136,7 @@ pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey),
     let mnemonic_keytype = self::bip39::KeyType::Key128;
     let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
     let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-    println!("Rust<generate_keyset>: phrase: {}", mnemonic.mnemonic);
+    debug!("phrase: {}", mnemonic.mnemonic);
 
     // generate a master key and encrypt it with the recovery phrase and static nonce
     // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
@@ -153,7 +153,7 @@ pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey),
     let hmac_key_type = KeyType::KeyTypeHMAC;
     let hmac_key = Key::new(hmac_key_type);
     let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key.as_ref()));
-    println!("Rust<generate_keyset>: generated key set");
+    debug!("generated key set");
 
     Ok((mnemonic.mnemonic, master_key_wrapped, main_key_wrapped, hmac_key_wrapped))
 }

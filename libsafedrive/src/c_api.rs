@@ -588,7 +588,7 @@ pub extern "C" fn sdsync_restore_archive(context: *mut CContext,
     let c_destination: &CStr = unsafe { CStr::from_ptr(destination) };
     let d: String = str::from_utf8(c_destination.to_bytes()).unwrap().to_owned();
 
-    println!("Rust<sdsync_restore_archive>: unpacking archive to {} for: {}", d, n);
+    debug!("unpacking archive to {} for: {}", d, n);
     0
 }
 
