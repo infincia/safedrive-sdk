@@ -38,6 +38,7 @@ use safedrive::core::sync_folders;
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
 
+use safedrive::models::RegisteredFolder;
 
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -182,7 +183,9 @@ fn main() {
                 std::process::exit(1);
             }
         };
-        for folder in folder_list {
+        let encrypted_folders: Vec<RegisteredFolder> = folder_list.into_iter().filter(|f| f.encrypted).collect();
+
+        for folder in encrypted_folders {
             println!("Syncing {}", folder.folderName);
             let entry_count = 100;
             let mut pb = ProgressBar::new(entry_count);
