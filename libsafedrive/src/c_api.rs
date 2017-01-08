@@ -651,28 +651,6 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut CSyncSession, leng
     let _: Vec<CSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
 }
 
-/// Free a pointer to a key
-///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
-///
-/// Parameters:
-///
-///     key: a pointer obtained from calling sddk_generate_symmetric_key()
-///
-///
-/// # Examples
-///
-/// ```c
-///sddk_free_symmetric_key(&key);
-/// ```
-#[no_mangle]
-#[allow(dead_code)]
-pub extern "C" fn sddk_free_symmetric_key(key: *mut *mut u8) {
-    assert!(!key.is_null());
-    let length = 32usize;
-    let _: Vec<u8> = unsafe { Vec::from_raw_parts(*key, length, length) };
-}
-
 /// Free an opaque pointer to an sddk_context_t
 ///
 /// Note: This is *not* the same as calling free() in C, they are not interchangeable
