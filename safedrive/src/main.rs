@@ -33,11 +33,11 @@ use safedrive::core::initialize;
 use safedrive::core::login;
 use safedrive::core::load_keys;
 use safedrive::core::create_archive;
+use safedrive::core::sync_folders;
 
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
 
-use safedrive::sdapi::read_folders;
 
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -175,7 +175,7 @@ fn main() {
     if let Some(matches) = matches.subcommand_matches("add") {
 
     } else if let Some(matches) = matches.subcommand_matches("sync") {
-        let folder_list = match read_folders(&token) {
+        let folder_list = match sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
                 error!("Read folders error: {:?}", e);
@@ -212,7 +212,7 @@ fn main() {
         // Add a row
         table.add_row(row!["Name", "Path", "Encrypted"]);
 
-        let folder_list = match read_folders(&token) {
+        let folder_list = match sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
                 error!("Read folders error: {:?}", e);
