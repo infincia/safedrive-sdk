@@ -457,12 +457,16 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'stat
 
     let disp = format!("Content-Disposition: form-data; name=\"{}\";", name);
 
+    let enc: &'static [u8; 33] = br"Content-Transfer-Encoding: binary";
 
     body.extend(body_boundary.as_ref());
     body.extend(rn);
     body.extend(disp.as_bytes());
     body.extend(rn);
     body.extend(content_type.as_ref());
+    body.extend(rn);
+
+    body.extend(enc.as_ref());
     body.extend(rn);
     body.extend(rn);
 
