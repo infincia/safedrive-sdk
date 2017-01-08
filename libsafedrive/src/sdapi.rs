@@ -474,6 +474,8 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'stat
     body.extend(chunk_data);
     body.extend(rn);
     body.extend(end_boundary.as_ref());
+    body.extend(rn);
+    body.extend(rn);
 
     let content_length = body.len();
 
