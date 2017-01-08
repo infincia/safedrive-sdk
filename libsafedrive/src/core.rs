@@ -205,6 +205,9 @@ pub fn create_archive(token: &Token,
         if DEBUG_STATISTICS {
             println!("Rust<sdsync_create_archive>: creating archive for: {}", folder_id);
         }
+        let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+        let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+        let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
 
         let mut ar = Builder::new(archive_file);
         let mut archive_size: i64 = 0;
@@ -339,9 +342,6 @@ pub fn create_archive(token: &Token,
                                 },
                                 Err(SDAPIError::RetryUpload) => {
                                     // generate a new chunk key
-                                    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
-                                    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
-                                    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
 
                                     let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
                                     let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
