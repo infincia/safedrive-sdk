@@ -33,11 +33,11 @@ use ::util::unique_client_hash;
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct CContext(Context);
+pub struct SDDKContext(Context);
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct CFolder {
+pub struct SDDKFolder {
     pub id: i64,
     pub name: *mut std::os::raw::c_char,
     pub path: *mut std::os::raw::c_char,
@@ -45,7 +45,7 @@ pub struct CFolder {
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct CSyncSession {
+pub struct SDDKSyncSession {
     pub name: *const std::os::raw::c_char,
     pub size: u64,
     pub date: u64,
@@ -70,7 +70,7 @@ pub struct CSyncSession {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut CContext {
+pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut SDDKContext {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
@@ -98,7 +98,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         hmac_key: None,
         config: Configuration::Production
     };
-    let ccontext = CContext(context);
+    let ccontext = SDDKContext(context);
     Box::into_raw(Box::new(ccontext))
 }
 
@@ -132,7 +132,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_login(context: *mut CContext,
+pub extern "C" fn sddk_login(context: *mut SDDKContext,
                                username: *const std::os::raw::c_char,
                                password:  *const std::os::raw::c_char) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!context.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * context };
@@ -200,7 +200,7 @@ pub extern "C" fn sddk_login(context: *mut CContext,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_load_keys(context: *mut CContext, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_load_keys(context: *mut SDDKContext, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let phrase: Option<String> = unsafe {
@@ -309,7 +309,7 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_add_sync_folder(context: *mut CContext,
+pub extern "C" fn sddk_add_sync_folder(context: *mut SDDKContext,
                                          name: *const std::os::raw::c_char,
                                          path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
@@ -346,7 +346,7 @@ pub extern "C" fn sddk_add_sync_folder(context: *mut CContext,
 ///
 ///     -1: failure
 ///
-///     0+: number of registered folders found, and number of CFolder structs allocated in folders
+///     0+: number of registered folders found, and number of SDDKFolder structs allocated in folders
 ///
 /// Return codes will be expanded in the future to provide more specific information on the failure
 ///
@@ -360,7 +360,7 @@ pub extern "C" fn sddk_add_sync_folder(context: *mut CContext,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> i64 {
+pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: *mut *mut SDDKFolder) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let result = match sync_folders(c.0.get_api_token()) {
@@ -373,12 +373,12 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut CContext, mut folders: *mu
         let s_path = CString::new(folder.folderPath.as_str()).unwrap();
         forget(&s_name);
         forget(&s_path);
-        CFolder {
+        SDDKFolder {
             id: folder.id as i64,
             name: s_name.into_raw(),
             path: s_path.into_raw(),
         }
-    }).collect::<Vec<CFolder>>();;
+    }).collect::<Vec<SDDKFolder>>();;
 
     let mut b = f.into_boxed_slice();
     let ptr = b.as_mut_ptr();
@@ -414,7 +414,7 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut CContext, mut folders: *mu
 ///
 ///     -1: failure
 ///
-///      0+: number of sessions found, and number of CSyncSession structs allocated in sessions
+///      0+: number of sessions found, and number of SDDKSyncSession structs allocated in sessions
 ///
 /// Return codes will be expanded in the future to provide more specific information on the failure
 ///
@@ -428,7 +428,7 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut CContext, mut folders: *mu
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_sync_sessions(context: *mut CContext, mut sessions: *mut *mut CSyncSession) -> i64 {
+pub extern "C" fn sddk_get_sync_sessions(context: *mut SDDKContext, mut sessions: *mut *mut SDDKSyncSession) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let result = match sync_sessions(c.0.get_api_token()) {
@@ -437,13 +437,13 @@ pub extern "C" fn sddk_get_sync_sessions(context: *mut CContext, mut sessions: *
     };
 
     let s = result.into_iter().map(|ses| {
-        CSyncSession {
+        SDDKSyncSession {
             folder_id: ses.folder_id,
             size: ses.size,
             name: CString::new(ses.name.as_str()).unwrap().into_raw(),
             date: ses.time
         }
-    }).collect::<Vec<CSyncSession>>();
+    }).collect::<Vec<SDDKSyncSession>>();
 
     let mut b = s.into_boxed_slice();
     let ptr = b.as_mut_ptr();
@@ -482,7 +482,7 @@ pub extern "C" fn sddk_get_sync_sessions(context: *mut CContext, mut sessions: *
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_gc(context: *mut CContext) -> std::os::raw::c_int {
+pub extern "C" fn sddk_gc(context: *mut SDDKContext) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!context.is_null()); &mut * context };
     0
 }
@@ -512,7 +512,7 @@ pub extern "C" fn sddk_gc(context: *mut CContext) -> std::os::raw::c_int {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_create_archive(context: *mut CContext,
+pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
                                         name: *const std::os::raw::c_char,
                                         folder_path: *const std::os::raw::c_char,
                                         folder_id: std::os::raw::c_int,
@@ -571,7 +571,7 @@ pub extern "C" fn sddk_create_archive(context: *mut CContext,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_restore_archive(context: *mut CContext,
+pub extern "C" fn sddk_restore_archive(context: *mut SDDKContext,
                                          name: *const std::os::raw::c_char,
                                          destination: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!context.is_null()); &mut * context };
@@ -611,7 +611,7 @@ pub extern "C" fn sddk_restore_archive(context: *mut CContext,
 ///
 ///     folders: a pointer obtained from calling sddk_get_sync_folders()
 ///
-///     length: number of CFolder structs that were allocated in the pointer
+///     length: number of SDDKFolder structs that were allocated in the pointer
 ///
 ///
 /// # Examples
@@ -621,10 +621,10 @@ pub extern "C" fn sddk_restore_archive(context: *mut CContext,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_free_folders(folders: *mut *mut CFolder, length: u64) {
+pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder, length: u64) {
     assert!(!folders.is_null());
     let l = length as usize;
-    let _: Vec<CFolder> = unsafe { Vec::from_raw_parts(*folders, l, l) };
+    let _: Vec<SDDKFolder> = unsafe { Vec::from_raw_parts(*folders, l, l) };
 }
 
 /// Free a pointer to a list of sync sessions
@@ -635,7 +635,7 @@ pub extern "C" fn sddk_free_folders(folders: *mut *mut CFolder, length: u64) {
 ///
 ///     sessions: a pointer obtained from calling sddk_get_sync_sessions()
 ///
-///     length: number of CSyncSession structs that were allocated in the pointer
+///     length: number of SDDKSyncSession structs that were allocated in the pointer
 ///
 ///
 /// # Examples
@@ -645,10 +645,10 @@ pub extern "C" fn sddk_free_folders(folders: *mut *mut CFolder, length: u64) {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut CSyncSession, length: u64) {
+pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession, length: u64) {
     assert!(!sessions.is_null());
     let l = length as usize;
-    let _: Vec<CSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
+    let _: Vec<SDDKSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
 }
 
 /// Free an opaque pointer to an sddk_context_t
@@ -666,10 +666,10 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut CSyncSession, leng
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_free_context(context: *mut *mut CContext) {
+pub extern "C" fn sddk_free_context(context: *mut *mut SDDKContext) {
     assert!(!context.is_null());
 
-    let _: Box<CContext> = unsafe { Box::from_raw((*context)) };
+    let _: Box<SDDKContext> = unsafe { Box::from_raw((*context)) };
 }
 
 /// Free a pointer to a string
@@ -679,7 +679,7 @@ pub extern "C" fn sddk_free_context(context: *mut *mut CContext) {
 ///
 /// Parameters:
 ///
-///     string: a pointer obtained from calling a function that returns CFolders
+///     string: a pointer obtained from calling a function that returns SDDKFolders
 ///
 /// # Examples
 ///
