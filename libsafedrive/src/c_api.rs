@@ -327,7 +327,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 }
 
 
-/// Get a list of all sync folders from the SafeDive server
+/// Get a list of all sync folders from the SafeDrive server
 ///
 /// The caller does not own the memory pointed to by `folders` after this function returns, it must
 /// be returned and freed by the library.
@@ -394,7 +394,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 
 
 
-/// Get a list of all sync sessions from the SafeDive server
+/// Get a list of all sync sessions from the SafeDrive server
 ///
 /// The caller does not own the memory pointed to by `sessions` after this function returns, it must
 /// be returned and freed by the library.
