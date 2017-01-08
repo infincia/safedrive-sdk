@@ -40,6 +40,9 @@ use safedrive::util::get_app_directory;
 use safedrive::sdapi::read_folders;
 
 
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Credentials {
     pub email: Option<String>,
@@ -80,6 +83,9 @@ fn main() {
             .about("sync all registered folder")
         )
         .get_matches();
+    println!("SafeDrive {}", VERSION);
+    println!("(C) 2013-2017 SafeData Net S.R.L.");
+    println!();
 
     let app_directory = get_app_directory().expect("Error: could not determine local storage directory");
     let mut credential_file_path = PathBuf::from(&app_directory);
