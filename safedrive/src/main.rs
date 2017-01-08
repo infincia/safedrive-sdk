@@ -1,6 +1,11 @@
 #[macro_use] extern crate log;
 extern crate env_logger;
 
+#[macro_use] extern crate prettytable;
+use prettytable::Table;
+use prettytable::row::Row;
+use prettytable::cell::Cell;
+
 #[macro_use]
 extern crate serde_derive;
 extern crate serde;
@@ -194,6 +199,11 @@ fn main() {
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("list") {
+        let mut table = Table::new();
+
+        // Add a row
+        table.add_row(row!["Name", "Path", "Encrypted"]);
+
         let folder_list = match read_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
@@ -202,7 +212,13 @@ fn main() {
             }
         };
         for folder in folder_list {
-            println!("{} | ({})", folder.folderName, folder.folderPath);
+            table.add_row(Row::new(vec![
+                Cell::new(&folder.folderName),
+                Cell::new(&folder.folderPath),
+                Cell::new(if folder.encrypted { "Yes" } else { "No" })])
+            );
         }
+        table.printstd();
+
     }
 }
