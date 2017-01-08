@@ -10,8 +10,8 @@ extern crate serde_json;
 extern crate hyper;
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
-header! { (ContentLength, "Content-Length: ") => [usize] }
 header! { (ContentType, "Content-Type") => [String] }
+header! { (ContentLength, "Content-Length") => [usize] }
 
 use util::*;
 use error::*;
