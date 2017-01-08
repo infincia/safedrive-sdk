@@ -365,7 +365,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 
     let result = match sync_folders(c.0.get_api_token()) {
         Ok(folders) => folders,
-        Err(e) => panic!("Rust<sdsync_get_sync_folders> failed to get list of sync folders: {}", e),
+        Err(e) => { error!("failed to get list of sync folders: {}", e); return -1 },
     };
 
     let f = result.into_iter().map(|folder| {
@@ -433,7 +433,7 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions:
 
     let result = match sync_sessions(c.0.get_api_token()) {
         Ok(ses) => ses,
-        Err(e) => panic!("Rust<sdsync_get_sync_sessions> failed to get list of sync sessions: {}", e),
+        Err(e) => { error!("failed to get list of sync sessions: {}", e); return -1 },
     };
 
     let s = result.into_iter().map(|ses| {
