@@ -39,8 +39,8 @@ pub struct SDDKContext(Context);
 #[repr(C)]
 pub struct SDDKFolder {
     pub id: i64,
-    pub name: *mut std::os::raw::c_char,
-    pub path: *mut std::os::raw::c_char,
+    pub name: *const std::os::raw::c_char,
+    pub path: *const std::os::raw::c_char,
 }
 
 #[derive(Debug)]
