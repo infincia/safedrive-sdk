@@ -41,6 +41,7 @@ use safedrive::sdapi::read_folders;
 
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const NAME: &'static str = env!("CARGO_PKG_NAME");
 const COPYRIGHT: &'static str = "(C) 2013-2017 SafeData Net S.R.L.";
 
 
@@ -55,8 +56,8 @@ pub struct Credentials {
 fn main() {
     env_logger::init().unwrap();
 
-    let matches = App::new("safedrive")
-        .version("0.1")
+    let matches = App::new(NAME)
+        .version(VERSION)
         .about(COPYRIGHT)
         .arg(Arg::with_name("config")
             .short("c")
@@ -84,7 +85,7 @@ fn main() {
             .about("sync all registered folder")
         )
         .get_matches();
-    println!("SafeDrive {}", VERSION);
+    println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
     println!();
 
