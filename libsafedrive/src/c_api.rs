@@ -369,14 +369,10 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: 
     };
 
     let f = result.into_iter().map(|folder| {
-        let s_name = CString::new(folder.folderName.as_str()).unwrap();
-        let s_path = CString::new(folder.folderPath.as_str()).unwrap();
-        forget(&s_name);
-        forget(&s_path);
         SDDKFolder {
             id: folder.id as i64,
-            name: s_name.into_raw(),
-            path: s_path.into_raw(),
+            name: CString::new(folder.folderName.as_str()).unwrap().into_raw(),
+            path: CString::new(folder.folderPath.as_str()).unwrap().into_raw(),
         }
     }).collect::<Vec<SDDKFolder>>();;
 
