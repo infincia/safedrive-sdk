@@ -19,6 +19,7 @@ serde_json = "0.8"
 serde_derive = "0.8"
 bip39 = "*"
 rand = "*"
+log = "*"
 
 [target."cfg(not(windows))".dependencies]
 interfaces = "*"
