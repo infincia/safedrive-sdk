@@ -619,7 +619,8 @@ pub extern "C" fn sddk_restore_archive(context: *mut SDDKContext,
 pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder, length: u64) {
     assert!(!folders.is_null());
     let l = length as usize;
-    let _: Vec<SDDKFolder> = unsafe { Vec::from_raw_parts(*folders, l, l) };
+
+    let folders: Vec<SDDKFolder> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*folders, l)).into_vec() };
 }
 
 /// Free a pointer to a list of sync sessions
@@ -643,7 +644,7 @@ pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder, length: u64) 
 pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession, length: u64) {
     assert!(!sessions.is_null());
     let l = length as usize;
-    let _: Vec<SDDKSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
+    let sessions: Vec<SDDKSyncSession> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*sessions, l)).into_vec() };
 }
 
 /// Free an opaque pointer to an SDDKContext
