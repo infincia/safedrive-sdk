@@ -87,14 +87,12 @@ fn main() {
 
     let a = app_directory.to_str().expect("Error: could not determine local storage directory");
 
-    println!("Using local dir: {}", &a);
-
-
+    debug!("Using local dir: {}", &a);
 
     let mut credential_file = match File::open(credential_file_path) {
         Ok(file) => file,
         Err(e) => {
-            println!("Error reading account info in credentials.json: {}", e);
+            error!("Error reading account info in credentials.json: {}", e);
             std::process::exit(1);
         }
     };
@@ -102,7 +100,7 @@ fn main() {
     match credential_file.read_to_string(&mut cs) {
         Ok(file) => file,
         Err(e) => {
-            println!("Error reading account info in credentials.json: {}", e);
+            error!("Error reading account info in credentials.json: {}", e);
             std::process::exit(1);
         }
     };
@@ -115,7 +113,7 @@ fn main() {
     let username = match credentials.email {
         Some(email) => email,
         None => {
-            println!("No username/email found in credentials.json");
+            error!("No username/email found in credentials.json");
             std::process::exit(1);
         }
     };
@@ -123,7 +121,7 @@ fn main() {
     let password = match credentials.password {
         Some(pass) => pass,
         None => {
-            println!("No password found in credentials.json");
+            error!("No password found in credentials.json");
             std::process::exit(1);
         }
     };
@@ -131,7 +129,7 @@ fn main() {
     let uid = match unique_client_hash(&username) {
         Ok(hash) => hash,
         Err(e) => {
-            println!("Error getting client ID: {}", e);
+            error!("Error getting client ID: {}", e);
             std::process::exit(1);
         },
     };
@@ -141,7 +139,7 @@ fn main() {
     let (token, _, _) = match login(&username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
         Err(e) => {
-            println!("Login error: {}", e);
+            error!("Login error: {}", e);
             std::process::exit(1);
         }
     };
@@ -157,7 +155,7 @@ fn main() {
     }) {
         Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
         Err(e) => {
-            println!("Key error: {:?}", e);
+            error!("Key error: {:?}", e);
             std::process::exit(1);
         }
     };
@@ -172,12 +170,12 @@ fn main() {
         let folder_list = match read_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
-                println!("Read folders error: {:?}", e);
+                error!("Read folders error: {:?}", e);
                 std::process::exit(1);
             }
         };
         for folder in folder_list {
-            println!("syncing {}", folder.folderName);
+            println!("Syncing {}", folder.folderName);
             let entry_count = 100;
             let mut pb = ProgressBar::new(entry_count);
             pb.format("╢▌▌░╟");
@@ -195,7 +193,7 @@ fn main() {
                 }) {
                 Ok(_) => { pb.finish(); return },
                 Err(e) => {
-                    println!("Sync error: {:?}", e);
+                    error!("Sync error: {:?}", e);
                     std::process::exit(1);
                 }
             }
@@ -204,12 +202,12 @@ fn main() {
         let folder_list = match read_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
-                println!("Read folders error: {:?}", e);
+                error!("Read folders error: {:?}", e);
                 std::process::exit(1);
             }
         };
         for folder in folder_list {
-            println!("Name: {} ({})", folder.folderName, folder.folderPath);
+            println!("{} | ({})", folder.folderName, folder.folderPath);
         }
     }
 }
