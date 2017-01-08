@@ -187,9 +187,10 @@ fn main() {
 
         for folder in encrypted_folders {
             println!("Syncing {}", folder.folderName);
-            let entry_count = 100;
-            let mut pb = ProgressBar::new(entry_count);
+
+            let mut pb = ProgressBar::new(0);
             pb.format("╢▌▌░╟");
+
             let sync_uuid = Uuid::new_v4().hyphenated().to_string();
             let folder_path = PathBuf::from(&folder.folderPath);
 
@@ -199,8 +200,10 @@ fn main() {
                                  &hmac_key,
                                  folder.id as i32,
                                  folder_path,
-                                 &mut |progress_percent| {
-                    pb.inc();
+                                 &mut |total, current, progress_percent| {
+                                     pb.total = total;
+                                     pb.inc();
+
                 }) {
                 Ok(_) => { pb.finish(); return },
                 Err(e) => {
