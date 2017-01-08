@@ -315,6 +315,9 @@ pub fn create_archive(token: &Token,
                         let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
 
                         while should_retry {
+                            if retries_left <= 0.0 {
+                                return Err(format!("could not sync: {:?}", &folder_path.to_str()))
+                            }
                             let failed_count = 15.0 - retries_left;
                             let mut rng = rand::thread_rng();
 
