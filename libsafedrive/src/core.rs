@@ -312,6 +312,9 @@ pub fn create_archive(token: &Token,
                         let mut retries_left = 15.0;
                         let mut potentially_uploaded_data: Option<Vec<u8>> = None;
 
+                        // generate a new chunk key once in case we need it later. this is cheap to do
+                        let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
+
                         while should_retry {
                             let failed_count = 15.0 - retries_left;
                             let mut rng = rand::thread_rng();
@@ -341,9 +344,6 @@ pub fn create_archive(token: &Token,
                                     retries_left = retries_left - 1.0;
                                 },
                                 Err(SDAPIError::RetryUpload) => {
-                                    // generate a new chunk key
-
-                                    let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
                                     let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
                                     .expect("failed to get block key struct");
 
