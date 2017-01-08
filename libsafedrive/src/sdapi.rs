@@ -448,10 +448,10 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'stat
     let mut body: Vec<u8> = Vec::new();
 
     // these are compile time optimizations
-    let header_boundary: &'static str = "SAFEDRIVEBINARY";
-    let rn: &'static [u8; 4] = br"\r\n";
-    let body_boundary: &'static [u8; 17] = br"--SAFEDRIVEBINARY";
-    let end_boundary: &'static [u8; 19] =  br"--SAFEDRIVEBINARY--";
+    let header_boundary: &'static str = "-----SAFEDRIVEBINARY";
+    let rn: &'static [u8; 2] = b"\r\n";
+    let body_boundary: &'static [u8; 22] = br"-------SAFEDRIVEBINARY";
+    let end_boundary: &'static [u8; 24] =  br"-------SAFEDRIVEBINARY--";
     let content_type: &'static [u8; 38] = br"Content-Type: application/octet-stream";
 
 
