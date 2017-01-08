@@ -346,6 +346,8 @@ pub fn create_archive(token: &Token,
                                     retries_left = retries_left - 1.0;
                                 },
                                 Err(SDAPIError::RetryUpload) => {
+                                    retries_left = retries_left - 1.0;
+
                                     let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
                                     .expect("failed to get block key struct");
 
