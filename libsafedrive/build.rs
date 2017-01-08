@@ -9,10 +9,10 @@ fn main() {
     if cfg!(target_os = "windows") {
         let toolset = env::var("TOOLSET").expect("failed to get toolset");
         let linktype = env::var("LINKTYPE").expect("failed to get link type");
-        dist = format!("..\\dist-{}-{}-{}\\include\\sdsync.h", target, toolset, linktype);
+        dist = format!("..\\dist-{}-{}-{}\\include\\sddk.h", target, toolset, linktype);
     }
     else {
-        dist = format!("../dist-{}/include/sdsync.h", target);
+        dist = format!("../dist-{}/include/sddk.h", target);
     }
 
     if cfg!(target_os = "macos") {

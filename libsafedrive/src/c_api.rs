@@ -70,7 +70,7 @@ pub struct CSyncSession {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut CContext {
+pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut CContext {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
@@ -109,7 +109,7 @@ pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_c
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     account_username: a stack-allocated pointer to a username for a SafeDrive account
 ///
@@ -126,13 +126,13 @@ pub extern "C" fn sdsync_initialize(local_storage_path: *const std::os::raw::c_c
 /// # Examples
 ///
 /// ```c
-/// if (0 != sdsync_login(&context, "user@safedrive.io", "password")) {
+/// if (0 != sddk_login(&context, "user@safedrive.io", "password")) {
 ///     printf("Login failed");
 /// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_login(context: *mut CContext,
+pub extern "C" fn sddk_login(context: *mut CContext,
                                username: *const std::os::raw::c_char,
                                password:  *const std::os::raw::c_char) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!context.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * context };
@@ -169,7 +169,7 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     recovery_phrase: a stack-allocated pointer to a recovery phrase obtained by previous calls.
 ///                      can be null if no phrase is available
@@ -196,11 +196,11 @@ pub extern "C" fn sdsync_login(context: *mut CContext,
 /// void store_recovery_key_cb(char const* new_phrase) {
 ///     // do something with new_phrase, pointer becomes invalid after return
 /// }
-/// sdsync_load_keys(&context, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb);
+/// sddk_load_keys(&context, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_load_keys(context: *mut CContext, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let phrase: Option<String> = unsafe {
@@ -255,12 +255,12 @@ pub extern "C" fn sdsync_load_keys(context: *mut CContext, recovery_phrase: *con
 ///
 /// ```c
 /// char * unique_client_id = malloc((64 * sizeof(char)) + 1);
-/// int success = sdsync_get_unique_client_id("user@example.com");
+/// int success = sddk_get_unique_client_id("user@example.com");
 /// free(unique_client_id);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char,
+pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
                                               mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_int {
 
     let c_email: &CStr = unsafe { CStr::from_ptr(email) };
@@ -289,7 +289,7 @@ pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     name: a stack-allocated, NULL terminated string representing the folder name
 ///
@@ -305,11 +305,11 @@ pub extern "C" fn sdsync_get_unique_client_id(email: *const std::os::raw::c_char
 /// # Examples
 ///
 /// ```c
-/// int success = sdsync_add_sync_folder(&context, "Documents", "/Users/name/Documents");
+/// int success = sddk_add_sync_folder(&context, "Documents", "/Users/name/Documents");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
+pub extern "C" fn sddk_add_sync_folder(context: *mut CContext,
                                          name: *const std::os::raw::c_char,
                                          path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
@@ -338,7 +338,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     folders: an uninitialized pointer that will be allocated and initialized when the function returns
 ///
@@ -353,14 +353,14 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 /// # Examples
 ///
 /// ```c
-/// sdsync_folders_t * folders = NULL;
-/// int length = sdsync_get_sync_folders(&context, &folders);
+/// sddk_folders_t * folders = NULL;
+/// int length = sddk_get_sync_folders(&context, &folders);
 /// // do something with folders here
-/// sdsync_free_sync_folders(&folders, length);
+/// sddk_free_sync_folders(&folders, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> i64 {
+pub extern "C" fn sddk_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let result = match sync_folders(c.0.get_api_token()) {
@@ -405,7 +405,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     sessions: an uninitialized pointer that will be allocated and initialized when the function returns
 ///
@@ -421,14 +421,14 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 /// # Examples
 ///
 /// ```c
-/// sdsync_session_t * sessions = NULL;
-/// int length = sdsync_get_sync_sessions(&context, &sessions);
+/// sddk_session_t * sessions = NULL;
+/// int length = sddk_get_sync_sessions(&context, &sessions);
 /// // do something with sessions here
-/// sdsync_free_sync_sessions(&sessions, length);
+/// sddk_free_sync_sessions(&sessions, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions: *mut *mut CSyncSession) -> i64 {
+pub extern "C" fn sddk_get_sync_sessions(context: *mut CContext, mut sessions: *mut *mut CSyncSession) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let result = match sync_sessions(c.0.get_api_token()) {
@@ -465,7 +465,7 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions:
 ///
 /// Parameters:
 ///
-///     context:  an opaque pointer obtained from calling sdsync_initialize()
+///     context:  an opaque pointer obtained from calling sddk_initialize()
 ///
 /// Return:
 ///
@@ -478,11 +478,11 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions:
 /// # Examples
 ///
 /// ```c
-/// int result = sdsync_gc(&context);
+/// int result = sddk_gc(&context);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_gc(context: *mut CContext) -> std::os::raw::c_int {
+pub extern "C" fn sddk_gc(context: *mut CContext) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!context.is_null()); &mut * context };
     0
 }
@@ -493,7 +493,7 @@ pub extern "C" fn sdsync_gc(context: *mut CContext) -> std::os::raw::c_int {
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     folder_id: a stack-allocated integer for an existing registered folder name
 ///
@@ -508,11 +508,11 @@ pub extern "C" fn sdsync_gc(context: *mut CContext) -> std::os::raw::c_int {
 /// # Examples
 ///
 /// ```c
-/// int success = sdsync_create_archive(&context, "Documents");
+/// int success = sddk_create_archive(&context, "Documents");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_create_archive(context: *mut CContext,
+pub extern "C" fn sddk_create_archive(context: *mut CContext,
                                         name: *const std::os::raw::c_char,
                                         folder_path: *const std::os::raw::c_char,
                                         folder_id: std::os::raw::c_int,
@@ -550,7 +550,7 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sdsync_initialize()
+///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     name: a stack-allocated, NULL-terminated string representing the registered folder name
 ///
@@ -567,11 +567,11 @@ pub extern "C" fn sdsync_create_archive(context: *mut CContext,
 /// # Examples
 ///
 /// ```c
-/// int success = sdsync_restore_archive(&context, "Documents");
+/// int success = sddk_restore_archive(&context, "Documents");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_restore_archive(context: *mut CContext,
+pub extern "C" fn sddk_restore_archive(context: *mut CContext,
                                          name: *const std::os::raw::c_char,
                                          destination: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!context.is_null()); &mut * context };
@@ -609,7 +609,7 @@ pub extern "C" fn sdsync_restore_archive(context: *mut CContext,
 ///
 /// Parameters:
 ///
-///     folders: a pointer obtained from calling sdsync_get_sync_folders()
+///     folders: a pointer obtained from calling sddk_get_sync_folders()
 ///
 ///     length: number of CFolder structs that were allocated in the pointer
 ///
@@ -617,11 +617,11 @@ pub extern "C" fn sdsync_restore_archive(context: *mut CContext,
 /// # Examples
 ///
 /// ```c
-///sdsync_free_folders(&folders, length);
+///sddk_free_folders(&folders, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_free_folders(folders: *mut *mut CFolder, length: u64) {
+pub extern "C" fn sddk_free_folders(folders: *mut *mut CFolder, length: u64) {
     assert!(!folders.is_null());
     let l = length as usize;
     let _: Vec<CFolder> = unsafe { Vec::from_raw_parts(*folders, l, l) };
@@ -633,7 +633,7 @@ pub extern "C" fn sdsync_free_folders(folders: *mut *mut CFolder, length: u64) {
 ///
 /// Parameters:
 ///
-///     sessions: a pointer obtained from calling sdsync_get_sync_sessions()
+///     sessions: a pointer obtained from calling sddk_get_sync_sessions()
 ///
 ///     length: number of CSyncSession structs that were allocated in the pointer
 ///
@@ -641,11 +641,11 @@ pub extern "C" fn sdsync_free_folders(folders: *mut *mut CFolder, length: u64) {
 /// # Examples
 ///
 /// ```c
-///sdsync_free_sync_sessions(&sessions, length);
+///sddk_free_sync_sessions(&sessions, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_free_sync_sessions(sessions: *mut *mut CSyncSession, length: u64) {
+pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut CSyncSession, length: u64) {
     assert!(!sessions.is_null());
     let l = length as usize;
     let _: Vec<CSyncSession> = unsafe { Vec::from_raw_parts(*sessions, l, l) };
@@ -657,38 +657,38 @@ pub extern "C" fn sdsync_free_sync_sessions(sessions: *mut *mut CSyncSession, le
 ///
 /// Parameters:
 ///
-///     key: a pointer obtained from calling sdsync_generate_symmetric_key()
+///     key: a pointer obtained from calling sddk_generate_symmetric_key()
 ///
 ///
 /// # Examples
 ///
 /// ```c
-///sdsync_free_symmetric_key(&key);
+///sddk_free_symmetric_key(&key);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_free_symmetric_key(key: *mut *mut u8) {
+pub extern "C" fn sddk_free_symmetric_key(key: *mut *mut u8) {
     assert!(!key.is_null());
     let length = 32usize;
     let _: Vec<u8> = unsafe { Vec::from_raw_parts(*key, length, length) };
 }
 
-/// Free an opaque pointer to an sdsync_context_t
+/// Free an opaque pointer to an sddk_context_t
 ///
 /// Note: This is *not* the same as calling free() in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     context: a pointer obtained from calling sdsync_initialize()
+///     context: a pointer obtained from calling sddk_initialize()
 ///
 /// # Examples
 ///
 /// ```c
-///sdsync_free_context(&context);
+///sddk_free_context(&context);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_free_context(context: *mut *mut CContext) {
+pub extern "C" fn sddk_free_context(context: *mut *mut CContext) {
     assert!(!context.is_null());
 
     let _: Box<CContext> = unsafe { Box::from_raw((*context)) };
@@ -706,11 +706,11 @@ pub extern "C" fn sdsync_free_context(context: *mut *mut CContext) {
 /// # Examples
 ///
 /// ```c
-///sdsync_free_string(&string);
+///sddk_free_string(&string);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_free_string(string: *mut *mut std::os::raw::c_char) {
+pub extern "C" fn sddk_free_string(string: *mut *mut std::os::raw::c_char) {
     assert!(!string.is_null());
     let _: CString = unsafe { CString::from_raw(*string) };
 }
