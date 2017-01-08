@@ -6,7 +6,8 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
-
+use std::{thread, time};
+use std::io::prelude::*;
 
 // external imports
 
@@ -14,6 +15,7 @@ extern crate rustc_serialize;
 extern crate libc;
 extern crate sodiumoxide;
 extern crate tar;
+extern crate rand;
 
 #[cfg(target_os = "linux")]
 extern crate openssl;
@@ -23,6 +25,7 @@ extern crate cdc;
 
 use self::rustc_serialize::hex::{ToHex};
 
+use self::rand::distributions::{IndependentSample, Range};
 
 use self::tar::{Builder, Header};
 use self::walkdir::WalkDir;
@@ -303,10 +306,27 @@ pub fn create_archive(token: &Token,
                         chunks.extend_from_slice(block_hmac.as_ref());
 
                         let mut should_retry = true;
-                        let mut retries_left = 15;
+                        let mut retries_left = 15.0;
                         let mut potentially_uploaded_data: Option<Vec<u8>> = None;
 
                         while should_retry {
+                            let failed_count = 15.0 - retries_left;
+                            let mut rng = rand::thread_rng();
+
+                            // we pick a multiplier randomly to avoid a bunch of clients trying again
+                            // at the same 2/4/8/16 backoff times time over and over if the server
+                            // is overloaded or down
+                            let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+                            if failed_count >= 2.0 {
+                                // back off significantly every time a call fails but only after the
+                                // second try, the first failure could be us not including the data
+                                // when we should have
+                                let backoff_time = backoff_multiplier * (failed_count * failed_count);
+                                let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+                                thread::sleep(delay);
+                            }
+
                             // tell the server to mark this block without the data first, if that fails we try uploading
 
                             match write_block(&token, session_name, block_hmac.as_ref().to_hex(), &potentially_uploaded_data) {
@@ -315,7 +335,7 @@ pub fn create_archive(token: &Token,
                                     should_retry = false
                                 },
                                 Err(SDAPIError::RequestFailed) => {
-                                    retries_left = retries_left -1;
+                                    retries_left = retries_left - 1.0;
                                 },
                                 Err(SDAPIError::RetryUpload) => {
                                     // generate a new chunk key
