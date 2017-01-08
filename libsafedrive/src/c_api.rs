@@ -360,7 +360,7 @@ pub extern "C" fn sdsync_add_sync_folder(context: *mut CContext,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> u64 {
+pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *mut *mut CFolder) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let result = match sync_folders(c.0.get_api_token()) {
@@ -389,7 +389,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
         *folders = ptr;
     }
     
-    len as u64
+    len as i64
 }
 
 
@@ -428,7 +428,7 @@ pub extern "C" fn sdsync_get_sync_folders(context: *mut CContext, mut folders: *
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions: *mut *mut CSyncSession) -> u64 {
+pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions: *mut *mut CSyncSession) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
     let result = match sync_sessions(c.0.get_api_token()) {
@@ -454,7 +454,7 @@ pub extern "C" fn sdsync_get_sync_sessions(context: *mut CContext, mut sessions:
         *sessions = ptr;
     }
 
-    len as u64
+    len as i64
 }
 
 
