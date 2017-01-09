@@ -316,7 +316,7 @@ pub fn create_archive(token: &Token,
 
                         while should_retry {
                             if retries_left <= 0.0 {
-                                return Err(format!("could not sync: {:?}", &folder_path.to_str()))
+                                return Err(format!("could not sync: {}", &folder_path.to_str().unwrap()))
                             }
                             let failed_count = 15.0 - retries_left;
                             let mut rng = rand::thread_rng();
