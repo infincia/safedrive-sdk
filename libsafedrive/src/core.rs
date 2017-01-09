@@ -348,48 +348,55 @@ pub fn create_archive(token: &Token,
                                 Err(SDAPIError::RetryUpload) => {
                                     retries_left = retries_left - 1.0;
 
-                                    let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
-                                    .expect("failed to get block key struct");
+                                    match potentially_uploaded_data {
+                                        Some(_) => {},
+                                        None => {
 
-                                    // We use the first 24 bytes of the block hmac value as nonce for wrapping
-                                    // the block key and encrypting the block itself.
-                                    //
-                                    // This is cryptographically safe but still deterministic: encrypting
-                                    // the same block twice with a specific key will always produce the same
-                                    // output block, which is critical for versioning and deduplication
-                                    // across all backups of all sync folders
-                                    let nonce_slice = block_hmac.as_ref();
-                                    let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
-                                    .expect("Rust<sdsync_create_archive>: failed to get nonce");
+                                            let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
+                                            .expect("failed to get block key struct");
 
-                                    // we use the same nonce both while wrapping the block key, and the block itself
-                                    // this is safe because using the same nonce with 2 different keys is not nonce reuse
+                                            // We use the first 24 bytes of the block hmac value as nonce for wrapping
+                                            // the block key and encrypting the block itself.
+                                            //
+                                            // This is cryptographically safe but still deterministic: encrypting
+                                            // the same block twice with a specific key will always produce the same
+                                            // output block, which is critical for versioning and deduplication
+                                            // across all backups of all sync folders
+                                            let nonce_slice = block_hmac.as_ref();
+                                            let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
+                                            .expect("Rust<sdsync_create_archive>: failed to get nonce");
 
-                                    // encrypt the chunk data using the block key
-                                    let encrypted_chunk = sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
+                                            // we use the same nonce both while wrapping the block key, and the block itself
+                                            // this is safe because using the same nonce with 2 different keys is not nonce reuse
 
-                                    // wrap the block key with the main encryption key
-                                    let wrapped_block_key = sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
+                                            // encrypt the chunk data using the block key
+                                            let encrypted_chunk = sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
 
-                                    assert!(wrapped_block_key.len() == key_size + mac_size);
+                                            // wrap the block key with the main encryption key
+                                            let wrapped_block_key = sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
+
+                                            assert!(wrapped_block_key.len() == key_size + mac_size);
 
 
-                                    // prepend the key to the actual encrypted chunk data so they can be written to the file together
-                                    let mut block_data = Vec::new();
+                                            // prepend the key to the actual encrypted chunk data so they can be written to the file together
+                                            let mut block_data = Vec::new();
 
-                                    // bytes 0-47 will be the wrapped key
-                                    block_data.extend(wrapped_block_key);
+                                            // bytes 0-47 will be the wrapped key
+                                            block_data.extend(wrapped_block_key);
 
-                                    // bytes 48-71 will be the nonce/hmac
-                                    block_data.extend(&block_hmac[0..nonce_size as usize]);
-                                    assert!(block_data.len() == key_size + mac_size + nonce_size);
+                                            // bytes 48-71 will be the nonce/hmac
+                                            block_data.extend(&block_hmac[0..nonce_size as usize]);
+                                            assert!(block_data.len() == key_size + mac_size + nonce_size);
 
-                                    // byte 72+ will be the the chunk data
-                                    block_data.extend(encrypted_chunk);
+                                            // byte 72+ will be the the chunk data
+                                            block_data.extend(encrypted_chunk);
 
-                                    // set the local variable to trigger a data upload next time
-                                    // we go through the loop
-                                    potentially_uploaded_data = Some(block_data);
+                                            // set the local variable to trigger a data upload next time
+                                            // we go through the loop
+                                            potentially_uploaded_data = Some(block_data);
+
+                                        }
+                                    }
                                 },
                                 _ => {}
                             }
