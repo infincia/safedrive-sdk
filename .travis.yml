@@ -7,7 +7,7 @@ env:
     - PROJECT_NAME=safedrive-sync-sdk
     - MAKE_DEB=no
     - DEB_MAINTAINER="Stephen Oliver <steve@infincia.com>"
-    - DEB_DESCRIPTION="SafeDrive SDK for Linux"
+    - DEB_DESCRIPTION="SafeDrive SDK"
 
 
     matrix:
