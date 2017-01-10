@@ -440,7 +440,7 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
         .header(SDAuthToken(token.token.to_owned()));
     if let Some(ref data) = *chunk_data {
         let (body, content_length, boundary) = multipart_for_bytes(data, &na);
-        debug!("body: {}", String::from_utf8_lossy(&body));
+        //debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
         .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
