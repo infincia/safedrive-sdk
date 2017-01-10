@@ -201,7 +201,7 @@ fn main() {
                                  folder.id as i32,
                                  folder_path,
                                  &mut |total, current, progress_percent| {
-                                     pb.total = total;
+                                     pb.total = total as u64;
                                      pb.inc();
 
                 }) {
