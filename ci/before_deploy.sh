@@ -4,27 +4,11 @@ set -ex
 
 . $(dirname $0)/utils.sh
 
-# Generate artifacts for release
-mk_artifacts() {
-    cargo build --target $TARGET --release
-}
-
 mk_tarball() {
-    # create a "staging" directory
-    local td=$(mktempd)
-    local out_dir=$(pwd)
-
-    # TODO update this part to copy the artifacts that make sense for your project
-    # NOTE All Cargo build artifacts will be under the 'target/$TARGET/{debug,release}'
-    cp target/$TARGET/release/hello $td
-
-    pushd $td
-
     # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
-    tar czf $out_dir/${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz *
-
+    pushd dist-$TARGET/
+    tar ../${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz *
     popd
-    rm -r $td
 }
 
 # Package your artifacts in a .deb file
@@ -35,7 +19,7 @@ mk_tarball() {
 # fully conform to Debian packaging guideliens (`lintian` raises a few warnings/errors)
 mk_deb() {
     # TODO update this part to package the artifacts that make sense for your project
-    dobin target/$TARGET/release/hello
+    dobin dist-$TARGET/bin/safedrive
 }
 
 main() {
