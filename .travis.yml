@@ -29,8 +29,8 @@ install:
   - bash ci/install.sh
 
 script:
-  - bash release.sh
   - bash unit.sh
+  - bash release.sh
 
 before_deploy:
   - bash ci/before_deploy.sh
