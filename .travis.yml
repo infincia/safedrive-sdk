@@ -3,7 +3,7 @@ language: rust
 env:
   global:
     # This will be part of the release tarball
-    - PROJECT_NAME="safedrive-sync-sdk"
+    - PROJECT_NAME="safedrive-sdk"
     - MAKE_DEB=no
     - DEB_MAINTAINER="Stephen Oliver <steve@infincia.com>"
     - DEB_DESCRIPTION="SafeDrive SDK"

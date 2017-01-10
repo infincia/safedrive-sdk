@@ -1,6 +1,6 @@
 environment:
   global:
-    PROJECT_NAME: safedrive-sync-sdk
+    PROJECT_NAME: safedrive-sdk
   matrix:
     # Stable channel
     #- TARGET: i686-pc-windows-msvc
