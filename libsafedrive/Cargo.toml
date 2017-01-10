@@ -24,7 +24,7 @@ log = "*"
 [target."cfg(not(windows))".dependencies]
 interfaces = "*"
 
-[target."cfg(linux)".dependencies]
+[target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
 
 [build-dependencies]
