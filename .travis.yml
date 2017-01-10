@@ -18,6 +18,7 @@ matrix:
       rust: nightly
       env: TARGET=i686-unknown-linux-gnu
     - os: osx
+      osx_image: xcode8.2
       rust: nightly
       env: TARGET=x86_64-apple-darwin
 
