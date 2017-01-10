@@ -56,5 +56,5 @@ popd
 
 cp -a dep-$TARGET/* dist-$TARGET/dep/
 
-cp -a target/debug/deps/libsafedrive.a dist-$TARGET/lib/
+cp -a target/debug/deps/libsafedrive*.a dist-$TARGET/lib/libsafedrive.a
 cp -a target/debug/safedrive dist-$TARGET/bin/
