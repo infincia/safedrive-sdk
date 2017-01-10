@@ -7,7 +7,7 @@ set -ex
 mk_tarball() {
     # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
     pushd dist-$TARGET/
-    tar ../${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz *
+    tar -zcf ../${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz *
     popd
 }
 
