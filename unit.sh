@@ -12,6 +12,9 @@ case $TARGET in
     arm*-unknown-linux-gnueabihf)
         export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
         ;;
+    x86_64-apple-darwin)
+        export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
+        ;;
     *)
         ;;
 esac
@@ -23,8 +26,6 @@ fi
 
 export SODIUM_LIB_DIR=$PWD/dep-$TARGET/lib
 export SODIUM_STATIC
-
-export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
 
 pushd libsafedrive
 cargo test --release --verbose
