@@ -23,7 +23,6 @@ mk_deb() {
 }
 
 main() {
-    mk_artifacts
     mk_tarball
 
     if [ $TRAVIS_OS_NAME = linux ]; then
