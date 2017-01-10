@@ -30,9 +30,6 @@ mkdir -p dist-$TARGET/dep
 export SODIUM_LIB_DIR=$PWD/dep-$TARGET/lib
 export SODIUM_STATIC
 
-export OPENSSL_DIR=$PWD/dep-$TARGET
-export OPENSSL_STATIC
-
 export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
 
 pushd libsafedrive
