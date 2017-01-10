@@ -191,7 +191,7 @@ pub fn create_archive(token: &Token,
                       hmac_key: &Key,
                       folder_id: i32,
                       folder_path: PathBuf,
-                      progress: &mut FnMut(u64, u64, f64)) -> Result<(), String> {
+                      progress: &mut FnMut(u32, u32, f64)) -> Result<(), String> {
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
         Err(e) => return Err(format!("Rust<sdsync_create_archive>: registering sync session failed: {:?}", e))
@@ -222,7 +222,7 @@ pub fn create_archive(token: &Token,
         let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(entry_count, completed_count as u64, percent_completed);
+        progress(entry_count as u32, completed_count as u32, percent_completed);
 
         completed_count = completed_count + 1.0;
 
@@ -494,7 +494,7 @@ pub fn create_archive(token: &Token,
         Ok(()) => {},
         Err(e) => return Err(format!("Rust<sdsync_create_archive>: finishing session failed: {:?}", e))
     };
-    progress(entry_count, completed_count as u64, 100.0);
+    progress(entry_count as u32, completed_count as u32, 100.0);
 
     Ok(())
 }

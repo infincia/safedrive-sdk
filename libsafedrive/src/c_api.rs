@@ -511,7 +511,7 @@ pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
                                         name: *const std::os::raw::c_char,
                                         folder_path: *const std::os::raw::c_char,
                                         folder_id: std::os::raw::c_int,
-                                        progress: extern fn(total: std::os::raw::c_ulong, current: std::os::raw::c_ulong, percent: std::os::raw::c_double)) -> std::os::raw::c_int {
+                                        progress: extern fn(total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
@@ -532,8 +532,8 @@ pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
                          id,
                          folder_path,
                          &mut |total, current, progress_percent| {
-                             let c_total: std::os::raw::c_ulong = total;
-                             let c_current: std::os::raw::c_ulong = current;
+                             let c_total: std::os::raw::c_uint = total;
+                             let c_current: std::os::raw::c_uint = current;
                              let c_percent: std::os::raw::c_double = progress_percent;
                              progress(c_total, c_current, c_percent);
         }) {
