@@ -17,6 +17,16 @@ case $TARGET in
     x86_64-apple-darwin)
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         ;;
+    *-linux-unknown)
+        wget https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
+        tar xvfz libsodium-1.0.11.tar.gz
+        SODIUM_PREFIX=$PWD/dep-$TARGET
+        pushd libsodium-1.0.11
+        ./configure --prefix=$SODIUM_PREFIX
+        make
+        make install
+        popd
+        ;;
     *)
         ;;
 esac
