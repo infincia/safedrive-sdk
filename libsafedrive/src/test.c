@@ -64,9 +64,9 @@ int main ( int argc, char **argv ) {
     for (int i = 0; i < length; i++, folder_ptr++) {
         SDDKFolder folder = *folder_ptr;
         printf("C<test/main>: folder <%s, %s>\n", folder.name, folder.path);
-        if (0 != sddk_create_archive(context, folder.name, folder.path, folder.id, &progress)) {
-            printf("C<test/main>: Failed to sync folder\n");
-        }
+        //if (0 != sddk_create_archive(context, folder.name, folder.path, folder.id, &progress)) {
+        //    printf("C<test/main>: Failed to sync folder\n");
+        //}
     }
     sddk_free_folders(&head, length);
     sddk_free_context(&context);
