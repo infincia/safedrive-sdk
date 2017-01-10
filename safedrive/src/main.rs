@@ -200,9 +200,14 @@ fn main() {
                                  &hmac_key,
                                  folder.id as i32,
                                  folder_path,
-                                 &mut |total, current, progress_percent| {
-                                     pb.total = total as u64;
-                                     pb.inc();
+                                 &mut |total, current, progress_percent, tick| {
+                                     if tick {
+                                         pb.tick();
+                                     }
+                                     else {
+                                        pb.total = total as u64;
+                                        pb.inc();
+                                     }
 
                 }) {
                 Ok(_) => { pb.finish(); return },
