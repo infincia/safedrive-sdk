@@ -30,7 +30,8 @@ install:
   - bash ci/install.sh
 
 script:
-  - bash ci/script.sh
+  - bash release.sh
+  - bash unit.sh
 
 before_deploy:
   - bash ci/before_deploy.sh
