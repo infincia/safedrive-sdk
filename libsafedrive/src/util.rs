@@ -46,8 +46,15 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
 
 #[cfg(not(target_os = "windows"))]
 pub fn unique_client_hash(email: &String) -> Result<String, String> {
-    if let Ok(en0) = interfaces::Interface::get_by_name("en0") {
-        if let Some(interface) = en0 {
+    let interface: &str;
+    if cfg!(target_os = "macos") {
+        interface = "en0";
+    } else {
+        interface = "eth0";
+    }
+
+    if let Ok(hardware) = interfaces::Interface::get_by_name(interface) {
+        if let Some(interface) = hardware {
             if let Ok(mac) = interface.hardware_addr() {
                 let mac_string = mac.as_bare_string();
                 let to_hash = mac_string + &email;
@@ -57,7 +64,7 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
             }
         }
     } else {
-        error!("could not find en0 interface");
+        error!("could not find {} interface", interface);
     }
     Err("failed to get mac address".to_string())
 }
