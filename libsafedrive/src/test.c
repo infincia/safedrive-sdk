@@ -48,6 +48,7 @@ int main ( int argc, char **argv ) {
 
     if (0 != sddk_login(context, username, password)) {
         printf("C<test/main>: Failed to login\n");
+        return 1;
     }
 
     sddk_load_keys(context, recovery_phrase, &store_recovery_key_cb);
