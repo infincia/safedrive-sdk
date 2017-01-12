@@ -13,7 +13,7 @@ mkdir -p dist-$TARGET/lib
 mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
 
-dep.sh
+bash dep.sh
 
 pushd libsafedrive
 cargo build --release --verbose

@@ -8,7 +8,7 @@ fi
 
 echo "Testing for $TARGET"
 
-dep.sh
+bash dep.sh
 
 pushd libsafedrive
 cargo test --release --verbose
