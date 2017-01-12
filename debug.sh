@@ -26,7 +26,7 @@ popd
 
 cp -a dep/$TARGET/* dist-$TARGET/
 
-cp -a target/debug/deps/libsafedrive*.a dist-$TARGET/lib/libsafedrive.a
-cp -a target/debug/deps/libsafedrive*.dylib dist-$TARGET/lib/libsafedrive.dylib || true
-cp -a target/debug/deps/libsafedrive*.so dist-$TARGET/lib/libsafedrive.so || true
+cp -a target/debug/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
+cp -a target/debug/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
+cp -a target/debug/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
 cp -a target/debug/safedrive dist-$TARGET/bin/
