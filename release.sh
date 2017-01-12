@@ -17,17 +17,13 @@ case $TARGET in
         export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
         ;;
     x86_64-apple-darwin)
+        export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
+        export OSX_CPU_ARCH=${OSX_CPU_ARCH-"core2"}
+        export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g -flto"
+        export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         ;;
     x86_64-unknown-linux-gnu|i686-unknown-linux-gnu)
-        wget https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
-        tar xvfz libsodium-1.0.11.tar.gz
-        SODIUM_PREFIX=$PWD/dep-$TARGET
-        pushd libsodium-1.0.11
-        ./configure --prefix=$SODIUM_PREFIX --enable-shared=yes
-        make
-        make install
-        popd
         ;;
     *)
         ;;
@@ -42,9 +38,20 @@ rm -rf dist-$TARGET
 mkdir -p dist-$TARGET/lib
 mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
-mkdir -p dist-$TARGET/dep
 
-export SODIUM_LIB_DIR=$PWD/dep-$TARGET/lib
+if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
+    wget https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
+    tar xvfz libsodium-1.0.11.tar.gz
+    SODIUM_PREFIX=$PWD/dep-$TARGET
+    pushd libsodium-1.0.11
+    ./configure --prefix=$SODIUM_PREFIX --enable-shared=yes
+    make
+    make install
+    popd
+    rm -rf libsodium*
+fi
+
+export SODIUM_LIB_DIR=$PWD/dist-$TARGET/lib
 export SODIUM_STATIC
 
 pushd libsafedrive
