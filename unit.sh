@@ -24,7 +24,7 @@ case $TARGET in
         tar xvfz libsodium-1.0.11.tar.gz
         SODIUM_PREFIX=$PWD/dep-$TARGET
         pushd libsodium-1.0.11
-        ./configure --prefix=$SODIUM_PREFIX --enable-shared=no
+        ./configure --prefix=$SODIUM_PREFIX --enable-shared=yes
         make
         make install
         popd
