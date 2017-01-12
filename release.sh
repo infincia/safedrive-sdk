@@ -42,7 +42,7 @@ mkdir -p dist-$TARGET/bin
 if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     wget https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
     tar xvfz libsodium-1.0.11.tar.gz
-    SODIUM_PREFIX=$PWD/dep-$TARGET
+    SODIUM_PREFIX=$PWD/dep/$TARGET
     pushd libsodium-1.0.11
     ./configure --prefix=$SODIUM_PREFIX --enable-shared=yes
     make
@@ -51,7 +51,7 @@ if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     rm -rf libsodium*
 fi
 
-export SODIUM_LIB_DIR=$PWD/dist-$TARGET/lib
+export SODIUM_LIB_DIR=$PWD/dep/$TARGET/lib
 export SODIUM_STATIC
 
 pushd libsafedrive
@@ -63,7 +63,7 @@ popd
 
 
 
-cp -a dep-$TARGET/* dist-$TARGET/dep/
+cp -a dep/$TARGET/* dist-$TARGET/
 
 cp -a target/release/deps/libsafedrive*.a dist-$TARGET/lib/libsafedrive.a
 cp -a target/release/deps/libsafedrive*.dylib dist-$TARGET/lib/libsafedrive.dylib || true
