@@ -24,6 +24,7 @@ pub enum APIEndpoint<'a> {
     AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str },
     ReadFolders { token: &'a Token },
     CreateFolder { token: &'a Token, path: &'a str, name: &'a str, encrypted: bool },
+    DeleteFolder { token: &'a Token, folder_id: i32 },
     RegisterSyncSession { token: &'a Token, folder_id: i32, name: &'a str, encrypted: bool },
     FinishSyncSession { token: &'a Token, folder_id: i32, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
     ReadSyncSession { token: &'a Token, name: &'a str, encrypted: bool },
@@ -73,6 +74,9 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::CreateFolder { .. } => {
                 self::reqwest::Method::Post
             },
+            APIEndpoint::DeleteFolder { .. } => {
+                self::reqwest::Method::Delete
+            },
             APIEndpoint::RegisterSyncSession { .. } => {
                 self::reqwest::Method::Post
             },
@@ -115,6 +119,9 @@ impl<'a> APIEndpoint<'a> {
                 format!("/api/1/folder")
             },
             APIEndpoint::CreateFolder { .. } => {
+                format!("/api/1/folder")
+            },
+            APIEndpoint::DeleteFolder { .. } => {
                 format!("/api/1/folder")
             },
             APIEndpoint::RegisterSyncSession { folder_id, name, .. } => {
@@ -308,6 +315,28 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
     };
 
     Ok(folder_response.id)
+}
+
+pub fn delete_folder(token: &Token, folder_id: i32) -> Result<(), SDAPIError> {
+    let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.request(endpoint.method(), &endpoint.url())
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
+    Ok(())
 }
 
 // sync session handling
