@@ -146,8 +146,17 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 }
 
 #[allow(unused_variables)]
-pub fn get_sync_folder(folder_id: i32) -> Option<RegisteredFolder> {
-
+pub fn get_sync_folder(token: &Token,
+                       folder_id: i32) -> Option<RegisteredFolder> {
+    let folders = match read_folders(token) {
+        Ok(folders) => folders,
+        Err(e) => return None
+    };
+    for folder in folders {
+        if folder.id == folder_id as u64 {
+            return Some(folder)
+        }
+    }
     return None
 }
 
