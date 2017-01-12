@@ -46,7 +46,6 @@ install:
   - if defined ESCRIPT call "%ESCRIPT%"
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
   - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
-  - rustup update
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
   - rustc -Vv
   - cargo -V
