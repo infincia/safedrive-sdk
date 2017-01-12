@@ -181,28 +181,28 @@ pub fn decrypt_keyset(phrase: &str, master: WrappedKey, main: WrappedKey, hmac: 
 fn key_wrap_test() {
     let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) = match generate_keyset() {
         Ok((p, mas, main, hmac)) => (p, mas, main, hmac),
-        Err(e) => { assert!(true == false); return }
+        Err(_) => { assert!(true == false); return }
     };
 
 
     match decrypt_keyset(&new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) {
         Ok(_) => {},
-        Err(e) => { assert!(true == false); return }
+        Err(_) => { assert!(true == false); return }
     };
 }
 
 #[test]
 fn app_directory_test() {
-    let path = match get_app_directory() {
+    match get_app_directory() {
         Ok(p) => p,
-        Err(e) => { assert!(true == false); return }
+        Err(_) => { assert!(true == false); return }
     };
 }
 
 #[test]
 fn local_username_test() {
-    let path = match get_local_user() {
+    match get_local_user() {
         Ok(u) => u,
-        Err(e) => { assert!(true == false); return }
+        Err(_) => { assert!(true == false); return }
     };
 }
