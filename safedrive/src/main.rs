@@ -34,6 +34,8 @@ use safedrive::core::login;
 use safedrive::core::load_keys;
 use safedrive::core::create_archive;
 use safedrive::core::get_sync_folders;
+use safedrive::core::get_sync_folder;
+
 use safedrive::core::add_sync_folder;
 use safedrive::core::remove_sync_folder;
 
@@ -86,11 +88,11 @@ fn main() {
         )
         .subcommand(SubCommand::with_name("remove")
             .about("remove sync folder")
-            .arg(Arg::with_name("path")
-                .short("p")
-                .long("path")
-                .value_name("PATH")
-                .help("folder path")
+            .arg(Arg::with_name("id")
+                .short("i")
+                .long("id")
+                .value_name("ID")
+                .help("folder id")
                 .takes_value(true)
             )
         )
@@ -194,14 +196,31 @@ fn main() {
         //TODO: this is not portable to windows, must be fixed before use there
         println!("Adding new sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
 
-        add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p);
-    } else if let Some(matches) = matches.subcommand_matches("add") {
-        let p = matches.value_of("path").unwrap();
-        let pa = PathBuf::from(&p);
-        //TODO: this is not portable to windows, must be fixed before use there
-        println!("Removing sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+        match add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p) {
+            Ok(_) => {},
+            Err(e) => {
+                error!("failed to add new sync folder: {}", e);
+            }
+        }
+    } else if let Some(matches) = matches.subcommand_matches("remove") {
+        let id: i32 = matches.value_of("id").unwrap()
+            .trim()
+            .parse()
+            .expect("Expected a number");
+        if let Some(folder) = get_sync_folder(&token, id) {
+            println!("Removing sync folder {} ({})",  &folder.folderName, &folder.folderPath);
 
-        remove_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p);
+            match remove_sync_folder(&token, id) {
+                Ok(_) => {},
+                Err(e) => {
+                    error!("failed to remove sync folder: {}", e);
+                }
+            }
+        }
+        else {
+            println!("Could not find a registered folder for ID {}", id);
+        }
+
 
     } else if let Some(matches) = matches.subcommand_matches("sync") {
         let folder_list = match get_sync_folders(&token) {
