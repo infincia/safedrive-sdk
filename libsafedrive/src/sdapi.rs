@@ -7,7 +7,6 @@ use std::collections::HashMap;
 extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
-extern crate hyper;
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type") => [String] }
@@ -54,46 +53,46 @@ impl<'a> APIEndpoint<'a> {
         "https://".to_string()
     }
 
-    pub fn method(&self) -> self::hyper::method::Method {
+    pub fn method(&self) -> self::reqwest::Method {
         match *self {
             APIEndpoint::RegisterClient { .. } => {
-                self::hyper::method::Method::Post
+                self::reqwest::Method::Post
             },
             APIEndpoint::AccountStatus { .. } => {
-                self::hyper::method::Method::Get
+                self::reqwest::Method::Get
             },
             APIEndpoint::AccountDetails { .. } => {
-                self::hyper::method::Method::Get
+                self::reqwest::Method::Get
             },
             APIEndpoint::AccountKey { .. } => {
-                self::hyper::method::Method::Post
+                self::reqwest::Method::Post
             },
             APIEndpoint::ReadFolders { .. } => {
-                self::hyper::method::Method::Get
+                self::reqwest::Method::Get
             },
             APIEndpoint::CreateFolder { .. } => {
-                self::hyper::method::Method::Post
+                self::reqwest::Method::Post
             },
             APIEndpoint::RegisterSyncSession { .. } => {
-                self::hyper::method::Method::Post
+                self::reqwest::Method::Post
             },
             APIEndpoint::FinishSyncSession { .. } => {
-                self::hyper::method::Method::Post
+                self::reqwest::Method::Post
             },
             APIEndpoint::ReadSyncSession { .. } => {
-                self::hyper::method::Method::Get
+                self::reqwest::Method::Get
             },
             APIEndpoint::ReadSyncSessions { .. } => {
-                self::hyper::method::Method::Get
+                self::reqwest::Method::Get
             },
             APIEndpoint::CheckBlock { .. } => {
-                self::hyper::method::Method::Head
+                self::reqwest::Method::Head
             },
             APIEndpoint::WriteBlock { .. } => {
-                self::hyper::method::Method::Post
+                self::reqwest::Method::Post
             },
             APIEndpoint::ReadBlock { .. } => {
-                self::hyper::method::Method::Get
+                self::reqwest::Method::Get
             },
         }
     }
