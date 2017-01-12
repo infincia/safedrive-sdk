@@ -6,9 +6,9 @@ mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include
 mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin
 
 set SODIUM_LIB_DIR=%CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib
+set SODIUM_STATIC=""
 
 IF "%LINKTYPE%"=="mt" (
-    set SODIUM_STATIC=""
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
