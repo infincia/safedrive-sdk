@@ -249,7 +249,7 @@ fn main() {
         let mut table = Table::new();
 
         // Add a row
-        table.add_row(row!["Name", "Path", "Encrypted"]);
+        table.add_row(row!["Name", "Path", "Encrypted", "ID"]);
 
         let folder_list = match sync_folders(&token) {
             Ok(fl) => fl,
@@ -262,7 +262,8 @@ fn main() {
             table.add_row(Row::new(vec![
                 Cell::new(&folder.folderName),
                 Cell::new(&folder.folderPath),
-                Cell::new(if folder.encrypted { "Yes" } else { "No" })])
+                Cell::new(if folder.encrypted { "Yes" } else { "No" }),
+                Cell::new(&format!("{}", &folder.id))])
             );
         }
         table.printstd();
