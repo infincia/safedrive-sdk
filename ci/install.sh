@@ -24,6 +24,7 @@ install_rustup() {
     rustup update
     rustc -V
     cargo -V
+    cargo install rusty-cheddar
 }
 
 install_standard_crates() {
