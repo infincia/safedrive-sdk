@@ -28,7 +28,7 @@ interfaces = "*"
 openssl = "*"
 
 [build-dependencies]
-rusty-cheddar = "0.3.3"
+rusty-cheddar = "*"
 
 [lib]
 name = "safedrive"
