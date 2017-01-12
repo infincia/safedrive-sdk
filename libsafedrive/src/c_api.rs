@@ -15,8 +15,11 @@ extern crate libc;
 use ::context::Context;
 
 use ::core::initialize;
+
 use ::core::add_sync_folder;
+use ::core::remove_sync_folder;
 use ::core::get_sync_folders;
+
 use ::core::get_sync_sessions;
 use ::core::create_archive;
 use ::core::load_keys;
@@ -320,6 +323,47 @@ pub extern "C" fn sddk_add_sync_folder(context: *mut SDDKContext,
     let p: String = str::from_utf8(c_path.to_bytes()).unwrap().to_owned();
 
     match add_sync_folder(c.0.get_api_token(), &n, &p) {
+        Ok(_) => return 0,
+        Err(_) => return 1,
+    }
+}
+
+/// Remove a sync folder
+///
+/// Will return a failure code if for any reason the folder cannot be removed
+///
+/// Return codes will be expanded in the future to provide more specific information on the failure
+///
+///
+/// Parameters:
+///
+///     context: an opaque pointer obtained from calling sddk_initialize()
+///
+///     folder_id: a stack-allocated, unsigned 32-bit integer representing the registered folder ID
+///
+///
+/// Return:
+///
+///     0: success
+///
+///     1+: failure
+///
+///
+/// # Examples
+///
+/// ```c
+/// int success = sddk_remove_sync_folder(&context, 7);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remove_sync_folder(context: *mut SDDKContext,
+                                          folder_id: std::os::raw::c_uint) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!context.is_null()); &mut * context };
+
+    let id: i32 = folder_id as i32;
+
+
+    match remove_sync_folder(c.0.get_api_token(), id) {
         Ok(_) => return 0,
         Err(_) => return 1,
     }
