@@ -33,7 +33,7 @@ use safedrive::core::initialize;
 use safedrive::core::login;
 use safedrive::core::load_keys;
 use safedrive::core::create_archive;
-use safedrive::core::sync_folders;
+use safedrive::core::get_sync_folders;
 use safedrive::core::add_sync_folder;
 use safedrive::core::remove_sync_folder;
 
@@ -204,7 +204,7 @@ fn main() {
         remove_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p);
 
     } else if let Some(matches) = matches.subcommand_matches("sync") {
-        let folder_list = match sync_folders(&token) {
+        let folder_list = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
                 error!("Read folders error: {:?}", e);
@@ -251,7 +251,7 @@ fn main() {
         // Add a row
         table.add_row(row!["Name", "Path", "Encrypted", "ID"]);
 
-        let folder_list = match sync_folders(&token) {
+        let folder_list = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
                 error!("Read folders error: {:?}", e);
