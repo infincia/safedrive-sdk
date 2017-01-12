@@ -21,7 +21,7 @@ pushd safedrive
 cargo.exe build --release --verbose
 popd
 
-robocopy %CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\ %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\ /COPYALL /E
+robocopy %CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\ %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\ /COPYALL /E
 
 copy /y target\release\safedrive.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.lib
 copy /y target\release\safedrive.dll.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll.lib

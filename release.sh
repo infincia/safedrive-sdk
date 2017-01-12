@@ -24,7 +24,7 @@ popd
 
 
 
-cp -a dep/$TARGET/* dist-$TARGET/
+cp -a dep/$TARGET/lib/* dist-$TARGET/lib/
 
 cp -a target/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
 cp -a target/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
