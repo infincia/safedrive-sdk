@@ -16,6 +16,7 @@ rustup default %CHANNEL%-%TARGET%
 
 pushd libsafedrive
 cargo.exe build --release --verbose
+cheddar -f src\c_api.rs ..\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h
 popd
 pushd safedrive
 cargo.exe build --release --verbose
