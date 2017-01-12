@@ -7,3 +7,6 @@ test
 SyncEngine
 SyncEngineTests
 test-osx
+libsodium-*
+dep/x86_64-apple-darwin/include
+dep/x86_64-apple-darwin/lib
