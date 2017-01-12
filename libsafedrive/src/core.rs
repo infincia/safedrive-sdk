@@ -166,17 +166,17 @@ pub fn remove_sync_folder(token: &Token,
     Err(format!("Rust<remove_sync_folder>: not implemented"))
 }
 
-pub fn sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
+pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
     match read_folders(token) {
         Ok(folders) => Ok(folders),
-        Err(e) => return Err(format!("Rust<sync_folders>: getting folder failed: {:?}", e))
+        Err(e) => return Err(format!("Rust<get_sync_folders>: getting folder failed: {:?}", e))
     }
 }
 
-pub fn sync_sessions(token: &Token) -> Result<Vec<SyncSession>, String> {
+pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, String> {
     let m = match read_sessions(token) {
         Ok(sessions) => sessions,
-        Err(e) => return Err(format!("Rust<sync_sessions>: getting sessions failed: {:?}", e))
+        Err(e) => return Err(format!("Rust<get_sync_sessions>: getting sessions failed: {:?}", e))
     };
     let mut v: Vec<SyncSession> = Vec::new();
 

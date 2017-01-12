@@ -16,8 +16,8 @@ use ::context::Context;
 
 use ::core::initialize;
 use ::core::add_sync_folder;
-use ::core::sync_folders;
-use ::core::sync_sessions;
+use ::core::get_sync_folders;
+use ::core::get_sync_sessions;
 use ::core::create_archive;
 use ::core::load_keys;
 use ::core::login;
@@ -362,7 +362,7 @@ pub extern "C" fn sddk_add_sync_folder(context: *mut SDDKContext,
 pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: *mut *mut SDDKFolder) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
-    let result = match sync_folders(c.0.get_api_token()) {
+    let result = match get_sync_folders(c.0.get_api_token()) {
         Ok(folders) => folders,
         Err(e) => { error!("failed to get list of sync folders: {}", e); return -1 },
     };
@@ -426,7 +426,7 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: 
 pub extern "C" fn sddk_get_sync_sessions(context: *mut SDDKContext, mut sessions: *mut *mut SDDKSyncSession) -> i64 {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
 
-    let result = match sync_sessions(c.0.get_api_token()) {
+    let result = match get_sync_sessions(c.0.get_api_token()) {
         Ok(ses) => ses,
         Err(e) => { error!("failed to get list of sync sessions: {}", e); return -1 },
     };
