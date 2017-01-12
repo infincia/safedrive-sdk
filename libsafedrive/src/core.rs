@@ -160,6 +160,12 @@ pub fn add_sync_folder(token: &Token,
     }
 }
 
+pub fn remove_sync_folder(token: &Token,
+                          name: &str,
+                          path: &str) -> Result<i32, String> {
+    Err(format!("Rust<remove_sync_folder>: not implemented"))
+}
+
 pub fn sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
     match read_folders(token) {
         Ok(folders) => Ok(folders),
