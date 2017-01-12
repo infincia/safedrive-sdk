@@ -29,6 +29,6 @@ cp -a dep/$TARGET/lib/* dist-$TARGET/lib/
 
 cp -a target/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
 cp -a target/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
-install_name_tool -id "@executable_path/../Frameworks/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib || true
+install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib || true
 cp -a target/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
 cp -a target/release/safedrive dist-$TARGET/bin/
