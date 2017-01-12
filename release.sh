@@ -51,9 +51,6 @@ if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     rm -rf libsodium*
 fi
 
-export SODIUM_LIB_DIR=$PWD/dep/$TARGET/lib
-export SODIUM_STATIC
-
 pushd libsafedrive
 cargo build --release --verbose
 popd
