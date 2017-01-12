@@ -25,6 +25,9 @@ robocopy %CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\ %CD%\dist-%TARGET%-%TOOLSET%-%L
 
 copy /y target\release\deps\safedrive*.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.lib
 copy /y target\release\deps\safedrive*.dll.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll.lib
+copy /y target\release\deps\safedrive*.dll.exp dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll.exp
+copy /y target\release\deps\safedrive*.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll
+copy /y target\release\deps\safedrive*.pdb dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.pdb
 
 copy /y target\release\safedrive.exe dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\
 
