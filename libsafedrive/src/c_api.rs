@@ -534,7 +534,7 @@ pub extern "C" fn sddk_gc(context: *mut SDDKContext) -> std::os::raw::c_int {
 ///
 ///     context: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     folder_id: a stack-allocated integer for an existing registered folder name
+///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
 ///
 /// Return:
 ///
@@ -554,7 +554,7 @@ pub extern "C" fn sddk_gc(context: *mut SDDKContext) -> std::os::raw::c_int {
 pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
                                         name: *const std::os::raw::c_char,
                                         folder_path: *const std::os::raw::c_char,
-                                        folder_id: std::os::raw::c_int,
+                                        folder_id: std::os::raw::c_uint,
                                         progress: extern fn(total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!context.is_null()); &mut * context };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
@@ -562,7 +562,7 @@ pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
-    let id: i32 = folder_id;
+    let id: i32 = folder_id as i32;
 
     let c_fpath: &CStr = unsafe { CStr::from_ptr(folder_path) };
     let fp: String = str::from_utf8(c_fpath.to_bytes()).unwrap().to_owned();
