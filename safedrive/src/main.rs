@@ -34,6 +34,8 @@ use safedrive::core::login;
 use safedrive::core::load_keys;
 use safedrive::core::create_archive;
 use safedrive::core::sync_folders;
+use safedrive::core::add_sync_folder;
+use safedrive::core::remove_sync_folder;
 
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
@@ -76,7 +78,20 @@ fn main() {
             .about("add sync folder")
             .arg(Arg::with_name("path")
                 .short("p")
+                .long("path")
+                .value_name("PATH")
                 .help("folder path")
+                .takes_value(true)
+            )
+        )
+        .subcommand(SubCommand::with_name("remove")
+            .about("remove sync folder")
+            .arg(Arg::with_name("path")
+                .short("p")
+                .long("path")
+                .value_name("PATH")
+                .help("folder path")
+                .takes_value(true)
             )
         )
         .subcommand(SubCommand::with_name("list")
@@ -174,6 +189,19 @@ fn main() {
 
 
     if let Some(matches) = matches.subcommand_matches("add") {
+        let p = matches.value_of("path").unwrap();
+        let pa = PathBuf::from(&p);
+        //TODO: this is not portable to windows, must be fixed before use there
+        println!("Adding new sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+
+        add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p);
+    } else if let Some(matches) = matches.subcommand_matches("add") {
+        let p = matches.value_of("path").unwrap();
+        let pa = PathBuf::from(&p);
+        //TODO: this is not portable to windows, must be fixed before use there
+        println!("Removing sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+
+        remove_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p);
 
     } else if let Some(matches) = matches.subcommand_matches("sync") {
         let folder_list = match sync_folders(&token) {
