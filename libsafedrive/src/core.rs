@@ -147,17 +147,17 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 
 #[allow(unused_variables)]
 pub fn get_sync_folder(token: &Token,
-                       folder_id: u32) -> Option<RegisteredFolder> {
+                       folder_id: u32) -> Result<RegisteredFolder, String> {
     let folders = match read_folders(token) {
         Ok(folders) => folders,
-        Err(e) => return None
+        Err(e) => return Err(format!("Rust<get_sync_folder>: getting folder failed: {:?}", e))
     };
     for folder in folders {
         if folder.id == folder_id {
-            return Some(folder)
+            return Ok(folder)
         }
     }
-    return None
+    return Err(format!("Rust<get_sync_folder>: getting folder failed"))
 }
 
 pub fn add_sync_folder(token: &Token,
