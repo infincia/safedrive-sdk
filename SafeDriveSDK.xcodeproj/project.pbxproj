@@ -7,18 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA80B0BE1D6F963200512FC7 /* libsdsync.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9D8AFE1D6F77F10011DE1F /* libsdsync.a */; };
-		AA80B0C01D6F963900512FC7 /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9D8B011D6F78000011DE1F /* libsodium.a */; };
-		AA80B0C11D6F963900512FC7 /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9D8B021D6F78000011DE1F /* libsqlite3.a */; };
 		AA80B0C21D6F963F00512FC7 /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
+		AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
+		AA8CCDCD1E2947B90002B1FF /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
+		AA8CCDCF1E2948170002B1FF /* libsafedrive.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AA8CCDD01E2948170002B1FF /* libsodium.18.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AA9D8AFD1D6F69F60011DE1F /* SafeDriveSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AED1D6E9B460011DE1F /* SafeDriveSDKTests.swift */; };
-		AA9D8AFF1D6F77F10011DE1F /* libsdsync.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9D8AFE1D6F77F10011DE1F /* libsdsync.a */; };
-		AA9D8B041D6F78000011DE1F /* libsodium.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9D8B011D6F78000011DE1F /* libsodium.a */; };
-		AA9D8B051D6F78000011DE1F /* libsqlite3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9D8B021D6F78000011DE1F /* libsqlite3.a */; };
-		AA9D8B071D6F780D0011DE1F /* sdsync.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9D8B061D6F780D0011DE1F /* sdsync.h */; };
 		AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFDD561DC4E91000B4EAC7 /* libz.tbd */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA8CCDCE1E2948030002B1FF /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				AA8CCDCF1E2948170002B1FF /* libsafedrive.dylib in CopyFiles */,
+				AA8CCDD01E2948170002B1FF /* libsodium.18.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		AA47B6351D7BCD60005C134D /* SafeDriveSDK.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SafeDriveSDK.cpp; path = "Wrappers/C++/SafeDriveSDK.cpp"; sourceTree = "<group>"; };
@@ -29,19 +40,15 @@
 		AA47B63C1D7D3366005C134D /* SDEncryptionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDEncryptionHandler.m; path = SyncEngine/SDEncryptionHandler.m; sourceTree = "<group>"; };
 		AA47B63F1D7D3366005C134D /* SyncEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyncEngine.h; path = SyncEngine/SyncEngine.h; sourceTree = "<group>"; };
 		AA47B6401D7D3366005C134D /* SyncEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncEngine.swift; path = SyncEngine/SyncEngine.swift; sourceTree = "<group>"; };
-		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SafeDriveSDK.framework; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist-x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
+		AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsafedrive.dylib; path = "dist-x86_64-apple-darwin/lib/libsafedrive.dylib"; sourceTree = "<group>"; };
+		AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = "dist-x86_64-apple-darwin/lib/libsodium.18.dylib"; sourceTree = "<group>"; };
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Wrappers/Swift/SafeDriveSDK.swift; sourceTree = "<group>"; };
 		AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafeDriveSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9D8AEC1D6E9B460011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA9D8AED1D6E9B460011DE1F /* SafeDriveSDKTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeDriveSDKTests.swift; sourceTree = "<group>"; };
 		AA9D8AF01D6E9BCC0011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Wrappers/Swift/Info.plist; sourceTree = "<group>"; };
-		AA9D8AFE1D6F77F10011DE1F /* libsdsync.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsdsync.a; path = dist/lib/libsdsync.a; sourceTree = SOURCE_ROOT; };
-		AA9D8B011D6F78000011DE1F /* libsodium.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsodium.a; path = dist/lib/libsodium.a; sourceTree = SOURCE_ROOT; };
-		AA9D8B021D6F78000011DE1F /* libsqlite3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsqlite3.a; path = dist/lib/libsqlite3.a; sourceTree = SOURCE_ROOT; };
-		AA9D8B061D6F780D0011DE1F /* sdsync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sdsync.h; path = dist/include/sdsync.h; sourceTree = SOURCE_ROOT; };
-		AABFDD4F1DC4E49F00B4EAC7 /* libssh2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssh2.a; path = dist/lib/libssh2.a; sourceTree = SOURCE_ROOT; };
-		AABFDD511DC4E61400B4EAC7 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = dist/lib/libcrypto.a; sourceTree = SOURCE_ROOT; };
-		AABFDD521DC4E61400B4EAC7 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = dist/lib/libssl.a; sourceTree = SOURCE_ROOT; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -50,10 +57,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */,
+				AA8CCDCD1E2947B90002B1FF /* libsodium.18.dylib in Frameworks */,
 				AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */,
-				AA9D8B041D6F78000011DE1F /* libsodium.a in Frameworks */,
-				AA9D8AFF1D6F77F10011DE1F /* libsdsync.a in Frameworks */,
-				AA9D8B051D6F78000011DE1F /* libsqlite3.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,9 +67,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA80B0C01D6F963900512FC7 /* libsodium.a in Frameworks */,
-				AA80B0BE1D6F963200512FC7 /* libsdsync.a in Frameworks */,
-				AA80B0C11D6F963900512FC7 /* libsqlite3.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,29 +104,6 @@
 			name = Old;
 			sourceTree = "<group>";
 		};
-		AA80B0BC1D6F95D400512FC7 /* libsdsync */ = {
-			isa = PBXGroup;
-			children = (
-				AA9D8B061D6F780D0011DE1F /* sdsync.h */,
-				AA9D8AFE1D6F77F10011DE1F /* libsdsync.a */,
-			);
-			name = libsdsync;
-			path = ../sdsync/dist/lib;
-			sourceTree = "<group>";
-		};
-		AA80B0BD1D6F95E000512FC7 /* dependencies */ = {
-			isa = PBXGroup;
-			children = (
-				AABFDD511DC4E61400B4EAC7 /* libcrypto.a */,
-				AABFDD521DC4E61400B4EAC7 /* libssl.a */,
-				AABFDD4F1DC4E49F00B4EAC7 /* libssh2.a */,
-				AA9D8B011D6F78000011DE1F /* libsodium.a */,
-				AA9D8B021D6F78000011DE1F /* libsqlite3.a */,
-			);
-			name = dependencies;
-			path = ../sdsync/dist/lib;
-			sourceTree = "<group>";
-		};
 		AA9D8AD31D6E96890011DE1F /* Swift */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,13 +119,15 @@
 				AA9D8AEC1D6E9B460011DE1F /* Info.plist */,
 				AA9D8AED1D6E9B460011DE1F /* SafeDriveSDKTests.swift */,
 			);
-			name = SafeDriveSDKTests;
 			path = SafeDriveSDKTests;
 			sourceTree = "<group>";
 		};
 		AABFDD551DC4E91000B4EAC7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AA8CCDC81E2947B90002B1FF /* sddk.h */,
+				AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */,
+				AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */,
 				AABFDD561DC4E91000B4EAC7 /* libz.tbd */,
 			);
 			name = Frameworks;
@@ -156,8 +138,6 @@
 			children = (
 				AA47B6491D7D336E005C134D /* Old */,
 				AA47B6331D7BCD0D005C134D /* Wrappers */,
-				AA80B0BD1D6F95E000512FC7 /* dependencies */,
-				AA80B0BC1D6F95D400512FC7 /* libsdsync */,
 				AA9D8AEB1D6E9B460011DE1F /* SafeDriveSDKTests */,
 				AAE34C831CF8EAAA0067B401 /* Products */,
 				AABFDD551DC4E91000B4EAC7 /* Frameworks */,
@@ -180,7 +160,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA9D8B071D6F780D0011DE1F /* sdsync.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,6 +174,7 @@
 				AA5DCF6F1D6CFFDA00FEDAFB /* Frameworks */,
 				AA5DCF751D6CFFDA00FEDAFB /* Headers */,
 				AA5DCFB91D6CFFDA00FEDAFB /* Resources */,
+				AA8CCDCE1E2948030002B1FF /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -324,6 +304,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Wrappers/Swift",
 					"$(PROJECT_DIR)/dist-osx/lib",
+					"$(PROJECT_DIR)/dist-x86_64-apple-darwin/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULEMAP_FILE = "";
@@ -361,6 +342,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Wrappers/Swift",
 					"$(PROJECT_DIR)/dist-osx/lib",
+					"$(PROJECT_DIR)/dist-x86_64-apple-darwin/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULEMAP_FILE = "";
