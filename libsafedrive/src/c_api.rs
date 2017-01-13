@@ -18,6 +18,7 @@ use ::core::initialize;
 
 use ::core::add_sync_folder;
 use ::core::remove_sync_folder;
+use ::core::get_sync_folder;
 use ::core::get_sync_folders;
 
 use ::core::get_sync_sessions;
@@ -371,6 +372,66 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
     }
 }
 
+/// Get a sync folder from the SafeDrive server
+///
+/// The caller does not own the memory pointed to by `folder` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
+///
+///     folders: an uninitialized pointer that will be allocated and initialized when the function returns
+///
+/// Return:
+///
+///     -1: failure
+///
+///     0+: number of registered folders found, and number of SDDKFolder structs allocated in folders
+///
+/// Return codes will be expanded in the future to provide more specific information on the failure
+///
+/// # Examples
+///
+/// ```c
+/// SDDKFolder * folder = NULL;
+/// int res = sddk_get_sync_folder(&state, &folder);
+/// // do something with folder here
+/// sddk_free_sync_folder(&folder);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState, folder_id: std::os::raw::c_uint, mut folder: *mut *mut SDDKFolder) -> i8 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+    let id: u32 = folder_id as u32;
+
+    let nf = match get_sync_folder(c.0.get_api_token(), id) {
+        Ok(folder) => folder,
+        Err(e) => { error!("failed to get sync folder: {}", e); return -1 },
+    };
+
+    let f = SDDKFolder {
+        id: nf.id,
+        name: CString::new(nf.folderName.as_str()).unwrap().into_raw(),
+        path: CString::new(nf.folderPath.as_str()).unwrap().into_raw(),
+    };
+
+    let b = Box::new(f);
+    let ptr = Box::into_raw(b);
+
+    unsafe {
+        *folder = ptr;
+    }
+
+    0
+}
+
 
 /// Get a list of all sync folders from the SafeDrive server
 ///
@@ -651,6 +712,29 @@ pub extern "C" fn sddk_restore_archive(state: *mut SDDKState,
 
 
 
+/// Free a pointer to a sync folder
+///
+/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+///
+/// Parameters:
+///
+///     folder: a pointer obtained from calling sddk_get_sync_folder()
+///
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_folder(&folder);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_free_folder(folder: *mut *mut SDDKFolder) {
+    assert!(!folder.is_null());
+    let folder: Box<SDDKFolder> = unsafe { Box::from_raw(*folder) };
+    let _ = unsafe { CString::from_raw(folder.name as *mut i8) };
+    let _ = unsafe { CString::from_raw(folder.path as *mut i8) };
+}
 
 
 /// Free a pointer to a list of sync folders
