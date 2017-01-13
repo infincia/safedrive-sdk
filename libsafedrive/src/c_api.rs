@@ -398,7 +398,7 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 /// # Examples
 ///
 /// ```c
-/// sddk_folders_t * folders = NULL;
+/// SDDKFolder * folders = NULL;
 /// int length = sddk_get_sync_folders(&state, &folders);
 /// // do something with folders here
 /// sddk_free_sync_folders(&folders, length);
@@ -462,7 +462,7 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState, mut folders: *mut
 /// # Examples
 ///
 /// ```c
-/// sddk_session_t * sessions = NULL;
+/// SDDKSession * sessions = NULL;
 /// int length = sddk_get_sync_sessions(&state, &sessions);
 /// // do something with sessions here
 /// sddk_free_sync_sessions(&sessions, length);
@@ -538,7 +538,11 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
+///     name: a stack-allocated, NULL-terminated UUIDv4 string representing the name of the sync session
+///
 ///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
+///
+///     progress: a C function pointer that will be called periodically to report progress
 ///
 /// Return:
 ///
@@ -551,7 +555,7 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_create_archive(&state, "Documents");
+/// int success = sddk_create_archive(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, &fp);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -589,11 +593,18 @@ pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
 ///
 /// Parameters:
 ///
+///     context: an opaque pointer the caller can pass in and get access to in the progress callback
+///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     name: a stack-allocated, NULL-terminated string representing the registered folder name
+///     name: a stack-allocated, NULL-terminated UTF-8 string representing the UUIDv4 name of the sync session
 ///
-///     destination: a stack-allocated, NULL-terminated string representing the path the archive will be unpacked to
+///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
+///
+///     destination: a stack-allocated, NULL-terminated UTF-8 string representing the path the sync session will be restored to
+///
+///     progress: a C function pointer that will be called periodically to report progress
+///
 ///
 /// Return:
 ///
@@ -606,7 +617,7 @@ pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_restore_archive(&state, "Documents");
+/// int success = sddk_restore_archive(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, "/path/to/destination", &fp);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
