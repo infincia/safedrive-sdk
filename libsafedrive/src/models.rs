@@ -56,7 +56,7 @@ pub struct Block<'a> {
 //private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
-    pub id: i32,
+    pub id: u32,
 }
 
 //private final String status;
@@ -105,7 +105,7 @@ pub struct WrappedKeyset {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SyncSession {
-    pub folder_id: i32,
+    pub folder_id: u32,
     pub name: String,
     pub size: u64,
     pub time: u64,
@@ -123,7 +123,7 @@ Current sync folder model:
 */
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegisteredFolder {
-    pub id: u64,
+    pub id: u32,
     pub folderName: String,
     pub folderPath: String,
     pub addedDate: u64,

@@ -24,9 +24,9 @@ pub enum APIEndpoint<'a> {
     AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str },
     ReadFolders { token: &'a Token },
     CreateFolder { token: &'a Token, path: &'a str, name: &'a str, encrypted: bool },
-    DeleteFolder { token: &'a Token, folder_id: i32 },
-    RegisterSyncSession { token: &'a Token, folder_id: i32, name: &'a str, encrypted: bool },
-    FinishSyncSession { token: &'a Token, folder_id: i32, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
+    DeleteFolder { token: &'a Token, folder_id: u32 },
+    RegisterSyncSession { token: &'a Token, folder_id: u32, name: &'a str, encrypted: bool },
+    FinishSyncSession { token: &'a Token, folder_id: u32, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
     ReadSyncSession { token: &'a Token, name: &'a str, encrypted: bool },
     ReadSyncSessions { token: &'a Token, encrypted: bool },
     CheckBlock { token: &'a Token, name: &'a str },
@@ -289,7 +289,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     Ok(folders)
 }
 
-pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> Result<i32, SDAPIError> where S: Into<String>, T: Into<String> {
+pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> Result<u32, SDAPIError> where S: Into<String>, T: Into<String> {
 
     let pa = path.into();
     let na = name.into();
@@ -317,7 +317,7 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
     Ok(folder_response.id)
 }
 
-pub fn delete_folder(token: &Token, folder_id: i32) -> Result<(), SDAPIError> {
+pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
 
     let client = reqwest::Client::new().unwrap();
@@ -341,7 +341,7 @@ pub fn delete_folder(token: &Token, folder_id: i32) -> Result<(), SDAPIError> {
 
 // sync session handling
 
-pub fn read_sessions(token: &Token) -> Result<HashMap<i32, Vec<SyncSession>>, SDAPIError> {
+pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SDAPIError> {
 
     let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
 
@@ -356,7 +356,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<i32, Vec<SyncSession>>, SD
 
     debug!("response: {}", response);
 
-    let sessions: HashMap<i32, Vec<SyncSession>> = match serde_json::from_str(&response) {
+    let sessions: HashMap<u32, Vec<SyncSession>> = match serde_json::from_str(&response) {
         Ok(s) => s,
         Err(_) => return Err(SDAPIError::RequestFailed)
     };
@@ -364,7 +364,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<i32, Vec<SyncSession>>, SD
     Ok(sessions)
 }
 
-pub fn register_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted: bool) -> Result<(), SDAPIError> where S: Into<String> {
+pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted: bool) -> Result<(), SDAPIError> where S: Into<String> {
 
     let na = name.into();
 
@@ -394,7 +394,7 @@ pub fn register_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypte
     Ok(())
 }
 
-pub fn finish_sync_session<S>(token: &Token, folder_id: i32, name: S, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> where S: Into<String> {
+pub fn finish_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> where S: Into<String> {
 
     let na = name.into();
 

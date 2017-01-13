@@ -40,7 +40,7 @@ pub struct SDDKState(State);
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKFolder {
-    pub id: i64,
+    pub id: u32,
     pub name: *const std::os::raw::c_char,
     pub path: *const std::os::raw::c_char,
 }
@@ -51,7 +51,7 @@ pub struct SDDKSyncSession {
     pub name: *const std::os::raw::c_char,
     pub size: u64,
     pub date: u64,
-    pub folder_id: i32,
+    pub folder_id: u32,
 }
 
 
@@ -360,7 +360,7 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
                                           folder_id: std::os::raw::c_uint) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let id: i32 = folder_id as i32;
+    let id: u32 = folder_id as u32;
 
 
     match remove_sync_folder(c.0.get_api_token(), id) {
@@ -413,7 +413,7 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState, mut folders: *mut
 
     let f = result.into_iter().map(|folder| {
         SDDKFolder {
-            id: folder.id as i64,
+            id: folder.id,
             name: CString::new(folder.folderName.as_str()).unwrap().into_raw(),
             path: CString::new(folder.folderPath.as_str()).unwrap().into_raw(),
         }
@@ -562,12 +562,12 @@ pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
-    let id: i32 = folder_id as i32;
 
     let c_fpath: &CStr = unsafe { CStr::from_ptr(folder_path) };
     let fp: String = str::from_utf8(c_fpath.to_bytes()).unwrap().to_owned();
 
     let folder_path = Path::new(&fp).to_owned();
+    let id: u32 = folder_id as u32;
 
     match create_archive(c.0.get_api_token(),
                          &n,

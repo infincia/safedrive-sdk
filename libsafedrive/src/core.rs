@@ -147,13 +147,13 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 
 #[allow(unused_variables)]
 pub fn get_sync_folder(token: &Token,
-                       folder_id: i32) -> Option<RegisteredFolder> {
+                       folder_id: u32) -> Option<RegisteredFolder> {
     let folders = match read_folders(token) {
         Ok(folders) => folders,
         Err(e) => return None
     };
     for folder in folders {
-        if folder.id == folder_id as u64 {
+        if folder.id == folder_id {
             return Some(folder)
         }
     }
@@ -162,7 +162,7 @@ pub fn get_sync_folder(token: &Token,
 
 pub fn add_sync_folder(token: &Token,
                        name: &str,
-                       path: &str) -> Result<i32, String> {
+                       path: &str) -> Result<u32, String> {
     match create_folder(token, path, name, true) {
         Ok(folder_id) => Ok(folder_id),
         Err(e) => return Err(format!("Rust<add_sync_folder>: creating folder failed: {:?}", e))
@@ -170,7 +170,7 @@ pub fn add_sync_folder(token: &Token,
 }
 
 pub fn remove_sync_folder(token: &Token,
-                          folder_id: i32) -> Result<(), String> {
+                          folder_id: u32) -> Result<(), String> {
     match delete_folder(token, folder_id) {
         Ok(()) => Ok(()),
         Err(e) => return Err(format!("Rust<remove_sync_folder>: deleting folder failed: {:?}", e))
@@ -206,7 +206,7 @@ pub fn create_archive(token: &Token,
                       session_name: &str,
                       main_key: &Key,
                       hmac_key: &Key,
-                      folder_id: i32,
+                      folder_id: u32,
                       folder_path: PathBuf,
                       progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
     match register_sync_session(token, folder_id, session_name, true) {
