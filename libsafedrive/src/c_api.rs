@@ -682,24 +682,27 @@ pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_restore_archive(state: *mut SDDKState,
-                                         name: *const std::os::raw::c_char,
-                                         destination: *const std::os::raw::c_char) -> std::os::raw::c_int {
-    let _ = unsafe{ assert!(!state.is_null()); &mut * state };
-
-    //let size = sodiumoxide::crypto::secretbox::KEYBYTES;
-
-    //let main_key = (*c).main_key;
-
-    //let hmac_key = (*c).hmac_key;
-
+pub extern "C" fn sddk_restore_archive(context: *mut std::os::raw::c_void,
+                                       state: *mut SDDKState,
+                                       name: *const std::os::raw::c_char,
+                                       folder_id: std::os::raw::c_uint,
+                                       destination: *const std::os::raw::c_char,
+                                       progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
+
 
     let c_destination: &CStr = unsafe { CStr::from_ptr(destination) };
     let d: String = str::from_utf8(c_destination.to_bytes()).unwrap().to_owned();
 
-    debug!("unpacking archive to {} for: {}", d, n);
+
+    let main_key = (*c).0.get_main_key();
+    let hmac_key = (*c).0.get_hmac_key();
+    let id: u32 = folder_id as u32;
+
+
+    debug!("unpacking archive {} to {}", n, d);
     0
 }
 
