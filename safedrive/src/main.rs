@@ -203,11 +203,11 @@ fn main() {
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("remove") {
-        let id: i32 = matches.value_of("id").unwrap()
+        let id: u32 = matches.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
-        if let Some(folder) = get_sync_folder(&token, id) {
+        if let Ok(folder) = get_sync_folder(&token, id) {
             println!("Removing sync folder {} ({})",  &folder.folderName, &folder.folderPath);
 
             match remove_sync_folder(&token, id) {
@@ -239,14 +239,12 @@ fn main() {
             pb.format("╢▌▌░╟");
 
             let sync_uuid = Uuid::new_v4().hyphenated().to_string();
-            let folder_path = PathBuf::from(&folder.folderPath);
 
             match create_archive(&token,
                                  &sync_uuid,
                                  &main_key,
                                  &hmac_key,
-                                 folder.id as i32,
-                                 folder_path,
+                                 folder.id,
                                  &mut |total, current, progress_percent, tick| {
                                      if tick {
                                          pb.tick();
