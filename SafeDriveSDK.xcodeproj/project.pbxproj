@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA498ABA1E29927000DAA1C8 /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
+		AA498ABB1E29927000DAA1C8 /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
 		AA80B0C21D6F963F00512FC7 /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
 		AA8CCDCD1E2947B90002B1FF /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
@@ -67,6 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA498ABA1E29927000DAA1C8 /* libsafedrive.dylib in Frameworks */,
+				AA498ABB1E29927000DAA1C8 /* libsodium.18.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,14 +300,12 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-osx/include";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = Wrappers/Swift/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Wrappers/Swift",
-					"$(PROJECT_DIR)/dist-osx/lib",
 					"$(PROJECT_DIR)/dist-x86_64-apple-darwin/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -334,14 +336,12 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-osx/include";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = Wrappers/Swift/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/Wrappers/Swift",
-					"$(PROJECT_DIR)/dist-osx/lib",
 					"$(PROJECT_DIR)/dist-x86_64-apple-darwin/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -363,12 +363,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G738Z89QKM;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist/include";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = SafeDriveSDKTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/dist/lib",
+					"$(PROJECT_DIR)/dist-x86_64-apple-darwin/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.SafeDriveSDKTests;
@@ -387,12 +387,12 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G738Z89QKM;
-				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist/include";
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = SafeDriveSDKTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/dist/lib",
+					"$(PROJECT_DIR)/dist-x86_64-apple-darwin/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.SafeDriveSDKTests;
