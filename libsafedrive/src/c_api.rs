@@ -1,7 +1,7 @@
 use std;
 use std::ffi::{CStr, CString};
 use std::str;
-use std::path::{Path};
+use std::path::{Path, PathBuf};
 use std::mem;
 
 use std::u64;
@@ -553,7 +553,6 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 #[allow(dead_code)]
 pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
                                         name: *const std::os::raw::c_char,
-                                        folder_path: *const std::os::raw::c_char,
                                         folder_id: std::os::raw::c_uint,
                                         progress: extern fn(total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
@@ -562,11 +561,6 @@ pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
-
-    let c_fpath: &CStr = unsafe { CStr::from_ptr(folder_path) };
-    let fp: String = str::from_utf8(c_fpath.to_bytes()).unwrap().to_owned();
-
-    let folder_path = Path::new(&fp).to_owned();
     let id: u32 = folder_id as u32;
 
     match create_archive(c.0.get_api_token(),
@@ -574,7 +568,6 @@ pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
                          main_key,
                          hmac_key,
                          id,
-                         folder_path,
                          &mut |total, current, progress_percent, tick| {
                              let c_total: std::os::raw::c_uint = total;
                              let c_current: std::os::raw::c_uint = current;

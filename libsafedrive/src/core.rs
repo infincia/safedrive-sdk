@@ -207,13 +207,19 @@ pub fn create_archive(token: &Token,
                       main_key: &Key,
                       hmac_key: &Key,
                       folder_id: u32,
-                      folder_path: PathBuf,
                       progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
+
+    let folder = match get_sync_folder(token, folder_id) {
+        Ok(folder) => folder,
+        Err(e) => return Err(format!("Rust<sdsync_create_archive>: failed to get sync folder info from server: {:?}", e))
+    };
+
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
         Err(e) => return Err(format!("Rust<sdsync_create_archive>: registering sync session failed: {:?}", e))
     };
 
+    let folder_path = PathBuf::from(&folder.folderPath);
 
     let archive_file = Vec::new();
 
