@@ -6,7 +6,7 @@ pub mod util;
 pub mod sdapi;
 pub mod keys;
 pub mod error;
-pub mod context;
+pub mod state;
 
 pub mod models;
 pub mod c_api;

@@ -12,7 +12,7 @@ extern crate libc;
 
 //internal imports
 
-use ::context::Context;
+use ::state::State;
 
 use ::core::initialize;
 
@@ -35,7 +35,7 @@ use ::util::unique_client_hash;
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct SDDKContext(Context);
+pub struct SDDKState(State);
 
 #[derive(Debug)]
 #[repr(C)]
@@ -72,7 +72,7 @@ pub struct SDDKSyncSession {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut SDDKContext {
+pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut SDDKState {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
@@ -90,7 +90,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 
     let (storage_path, client_id) = initialize(storage_directory, uid);
 
-    let context = Context {
+    let state = State {
         storage_path: storage_path,
         unique_client_id: client_id,
         api_token: None,
@@ -100,8 +100,8 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         hmac_key: None,
         config: Configuration::Production
     };
-    let ccontext = SDDKContext(context);
-    Box::into_raw(Box::new(ccontext))
+    let cstate = SDDKState(state);
+    Box::into_raw(Box::new(cstate))
 }
 
 /// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
@@ -111,7 +111,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     account_username: a stack-allocated pointer to a username for a SafeDrive account
 ///
@@ -128,16 +128,16 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 /// # Examples
 ///
 /// ```c
-/// if (0 != sddk_login(&context, "user@safedrive.io", "password")) {
+/// if (0 != sddk_login(&state, "user@safedrive.io", "password")) {
 ///     printf("Login failed");
 /// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_login(context: *mut SDDKContext,
+pub extern "C" fn sddk_login(state: *mut SDDKState,
                                username: *const std::os::raw::c_char,
                                password:  *const std::os::raw::c_char) -> std::os::raw::c_int {
-    let mut c = unsafe{ assert!(!context.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * context };
+    let mut c = unsafe{ assert!(!state.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * state };
 
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
     let un: String = str::from_utf8(c_username.to_bytes()).unwrap().to_owned();
@@ -166,12 +166,12 @@ pub extern "C" fn sddk_login(context: *mut SDDKContext,
 
 /// Load keys, must be called before any other function that operates on archives
 ///
-/// Will assert non-null on the context parameter only, the others will cause a crash if null
+/// Will assert non-null on the state parameter only, the others will cause a crash if null
 ///
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     recovery_phrase: a stack-allocated pointer to a recovery phrase obtained by previous calls.
 ///                      can be null if no phrase is available
@@ -198,15 +198,15 @@ pub extern "C" fn sddk_login(context: *mut SDDKContext,
 /// void store_recovery_key_cb(char const* new_phrase) {
 ///     // do something with new_phrase, pointer becomes invalid after return
 /// }
-/// sddk_load_keys(&context, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb);
+/// sddk_load_keys(&state, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_load_keys(context: *mut SDDKContext, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
-    let mut c = unsafe{ assert!(!context.is_null()); &mut * context };
+pub extern "C" fn sddk_load_keys(state: *mut SDDKState, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
+    let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let phrase: Option<String> = unsafe {
-        if !context.is_null() {
+        if !state.is_null() {
             let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
             match str::from_utf8(c_recovery.to_bytes()) {
                 Ok(s) => Some(s.to_owned()),
@@ -291,7 +291,7 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     name: a stack-allocated, NULL terminated string representing the folder name
 ///
@@ -307,14 +307,14 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_add_sync_folder(&context, "Documents", "/Users/name/Documents");
+/// int success = sddk_add_sync_folder(&state, "Documents", "/Users/name/Documents");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_add_sync_folder(context: *mut SDDKContext,
+pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
                                          name: *const std::os::raw::c_char,
                                          path: *const std::os::raw::c_char) -> std::os::raw::c_int {
-    let c = unsafe{ assert!(!context.is_null()); &mut * context };
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
@@ -337,7 +337,7 @@ pub extern "C" fn sddk_add_sync_folder(context: *mut SDDKContext,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     folder_id: a stack-allocated, unsigned 32-bit integer representing the registered folder ID
 ///
@@ -352,13 +352,13 @@ pub extern "C" fn sddk_add_sync_folder(context: *mut SDDKContext,
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_remove_sync_folder(&context, 7);
+/// int success = sddk_remove_sync_folder(&state, 7);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_remove_sync_folder(context: *mut SDDKContext,
+pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
                                           folder_id: std::os::raw::c_uint) -> std::os::raw::c_int {
-    let c = unsafe{ assert!(!context.is_null()); &mut * context };
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let id: i32 = folder_id as i32;
 
@@ -381,7 +381,7 @@ pub extern "C" fn sddk_remove_sync_folder(context: *mut SDDKContext,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     folders: an uninitialized pointer that will be allocated and initialized when the function returns
 ///
@@ -397,14 +397,14 @@ pub extern "C" fn sddk_remove_sync_folder(context: *mut SDDKContext,
 ///
 /// ```c
 /// sddk_folders_t * folders = NULL;
-/// int length = sddk_get_sync_folders(&context, &folders);
+/// int length = sddk_get_sync_folders(&state, &folders);
 /// // do something with folders here
 /// sddk_free_sync_folders(&folders, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: *mut *mut SDDKFolder) -> i64 {
-    let c = unsafe{ assert!(!context.is_null()); &mut * context };
+pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState, mut folders: *mut *mut SDDKFolder) -> i64 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let result = match get_sync_folders(c.0.get_api_token()) {
         Ok(folders) => folders,
@@ -444,7 +444,7 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: 
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     sessions: an uninitialized pointer that will be allocated and initialized when the function returns
 ///
@@ -461,14 +461,14 @@ pub extern "C" fn sddk_get_sync_folders(context: *mut SDDKContext, mut folders: 
 ///
 /// ```c
 /// sddk_session_t * sessions = NULL;
-/// int length = sddk_get_sync_sessions(&context, &sessions);
+/// int length = sddk_get_sync_sessions(&state, &sessions);
 /// // do something with sessions here
 /// sddk_free_sync_sessions(&sessions, length);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_sync_sessions(context: *mut SDDKContext, mut sessions: *mut *mut SDDKSyncSession) -> i64 {
-    let c = unsafe{ assert!(!context.is_null()); &mut * context };
+pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState, mut sessions: *mut *mut SDDKSyncSession) -> i64 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let result = match get_sync_sessions(c.0.get_api_token()) {
         Ok(ses) => ses,
@@ -504,7 +504,7 @@ pub extern "C" fn sddk_get_sync_sessions(context: *mut SDDKContext, mut sessions
 ///
 /// Parameters:
 ///
-///     context:  an opaque pointer obtained from calling sddk_initialize()
+///     state:  an opaque pointer obtained from calling sddk_initialize()
 ///
 /// Return:
 ///
@@ -517,12 +517,12 @@ pub extern "C" fn sddk_get_sync_sessions(context: *mut SDDKContext, mut sessions
 /// # Examples
 ///
 /// ```c
-/// int result = sddk_gc(&context);
+/// int result = sddk_gc(&state);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_gc(context: *mut SDDKContext) -> std::os::raw::c_int {
-    let _ = unsafe{ assert!(!context.is_null()); &mut * context };
+pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
+    let _ = unsafe{ assert!(!state.is_null()); &mut * state };
     0
 }
 
@@ -532,7 +532,7 @@ pub extern "C" fn sddk_gc(context: *mut SDDKContext) -> std::os::raw::c_int {
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
 ///
@@ -547,16 +547,16 @@ pub extern "C" fn sddk_gc(context: *mut SDDKContext) -> std::os::raw::c_int {
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_create_archive(&context, "Documents");
+/// int success = sddk_create_archive(&state, "Documents");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
+pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
                                         name: *const std::os::raw::c_char,
                                         folder_path: *const std::os::raw::c_char,
                                         folder_id: std::os::raw::c_uint,
                                         progress: extern fn(total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
-    let c = unsafe{ assert!(!context.is_null()); &mut * context };
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
 
@@ -591,7 +591,7 @@ pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     name: a stack-allocated, NULL-terminated string representing the registered folder name
 ///
@@ -608,14 +608,14 @@ pub extern "C" fn sddk_create_archive(context: *mut SDDKContext,
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_restore_archive(&context, "Documents");
+/// int success = sddk_restore_archive(&state, "Documents");
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_restore_archive(context: *mut SDDKContext,
+pub extern "C" fn sddk_restore_archive(state: *mut SDDKState,
                                          name: *const std::os::raw::c_char,
                                          destination: *const std::os::raw::c_char) -> std::os::raw::c_int {
-    let _ = unsafe{ assert!(!context.is_null()); &mut * context };
+    let _ = unsafe{ assert!(!state.is_null()); &mut * state };
 
     //let size = sodiumoxide::crypto::secretbox::KEYBYTES;
 
@@ -700,25 +700,25 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession, l
     }
 }
 
-/// Free an opaque pointer to an SDDKContext
+/// Free an opaque pointer to an SDDKState
 ///
 /// Note: This is *not* the same as calling free() in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     context: a pointer obtained from calling sddk_initialize()
+///     state: a pointer obtained from calling sddk_initialize()
 ///
 /// # Examples
 ///
 /// ```c
-///sddk_free_context(&context);
+///sddk_free_state(&state);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_free_context(context: *mut *mut SDDKContext) {
-    assert!(!context.is_null());
+pub extern "C" fn sddk_free_state(state: *mut *mut SDDKState) {
+    assert!(!state.is_null());
 
-    let _: Box<SDDKContext> = unsafe { Box::from_raw((*context)) };
+    let _: Box<SDDKState> = unsafe { Box::from_raw((*state)) };
 }
 
 /// Free a pointer to a string

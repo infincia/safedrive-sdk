@@ -4,7 +4,7 @@ use keys::Key;
 use models::{Token, Configuration};
 
 #[derive(Debug)]
-pub struct Context {
+pub struct State {
     pub storage_path: PathBuf,
     pub unique_client_id: String,
     pub username: Option<String>,
@@ -15,9 +15,9 @@ pub struct Context {
     pub config: Configuration
 }
 
-impl Context {
-    pub fn new(storage_path: PathBuf, unique_client_id: String, config: Configuration) -> Context {
-        Context {
+impl State {
+    pub fn new(storage_path: PathBuf, unique_client_id: String, config: Configuration) -> State {
+        State {
             storage_path: storage_path,
             unique_client_id: unique_client_id,
             username: None,
