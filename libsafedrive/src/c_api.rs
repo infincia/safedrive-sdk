@@ -171,6 +171,8 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
+///     context: an opaque pointer the caller can pass in and get access to in the callback
+///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     recovery_phrase: a stack-allocated pointer to a recovery phrase obtained by previous calls.
@@ -202,7 +204,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_load_keys(state: *mut SDDKState, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut SDDKState, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(context: *mut std::os::raw::c_void, new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let phrase: Option<String> = unsafe {
@@ -221,7 +223,7 @@ pub extern "C" fn sddk_load_keys(state: *mut SDDKState, recovery_phrase: *const 
     let (_, main_key, hmac_key) = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         // call back to C to store phrase
         let c_new_phrase = CString::new(new_phrase).unwrap();
-        store_recovery_key(c_new_phrase.into_raw());
+        store_recovery_key(context, c_new_phrase.into_raw());
     }) {
         Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
         Err(_) => { return 1 }
@@ -532,6 +534,8 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 ///
 /// Parameters:
 ///
+///     context: an opaque pointer the caller can pass in and get access to in the progress callback
+///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
 ///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
@@ -551,10 +555,11 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
-                                        name: *const std::os::raw::c_char,
-                                        folder_id: std::os::raw::c_uint,
-                                        progress: extern fn(total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
+                                      state: *mut SDDKState,
+                                      name: *const std::os::raw::c_char,
+                                      folder_id: std::os::raw::c_uint,
+                                      progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
@@ -573,7 +578,7 @@ pub extern "C" fn sddk_create_archive(state: *mut SDDKState,
                              let c_current: std::os::raw::c_uint = current;
                              let c_percent: std::os::raw::c_double = progress_percent;
                              let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                             progress(c_total, c_current, c_percent, c_tick);
+                             progress(context, c_total, c_current, c_percent, c_tick);
         }) {
         Ok(_) => return 0,
         Err(_) => return 1
