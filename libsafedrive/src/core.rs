@@ -220,11 +220,13 @@ pub fn create_archive(token: &Token,
     };
 
     let folder_path = PathBuf::from(&folder.folderPath);
+    let folder_name = &folder.folderName;
+
 
     let archive_file = Vec::new();
 
     if DEBUG_STATISTICS {
-        debug!("creating archive for: {}", folder_id);
+        debug!("creating archive for: {} (folder id {})", folder_name, folder_id);
     }
     let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
     let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
