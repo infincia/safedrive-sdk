@@ -286,7 +286,16 @@ pub fn create_archive(token: &Token,
 
                 let reader: BufReader<File> = BufReader::new(f);
                 let byte_iter = reader.bytes().map(|b| b.expect("Rust<sdsync_create_archive>: failed to unwrap block data"));
-                let separator_iter = SeparatorIter::new(byte_iter);
+
+                let separator_size_nb_bits: u32 = 6;
+
+                #[inline]
+                fn chunk_predicate(x: u64) -> bool {
+                    const BITMASK: u64 = (1u64 << 13) - 1;
+                    x & BITMASK == BITMASK
+                }
+
+                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, chunk_predicate);
                 let chunk_iter = ChunkIter::new(separator_iter, stream_length);
                 let mut nb_chunk = 0;
                 let mut total_size = 0;
