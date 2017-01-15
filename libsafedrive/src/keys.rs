@@ -20,6 +20,10 @@ pub enum KeyType {
 impl KeyType {
     pub fn nonce(&self) -> sodiumoxide::crypto::secretbox::Nonce {
         let nonce_value = match *self {
+            /// these are static for all accounts and must never change once in use
+            ///
+            /// they're static because they're only ever used for a single encryption operation
+            /// which is inherently safe as far as nonce reuse is concerned
             KeyType::KeyTypeMaster => [1u8; 24],
             KeyType::KeyTypeMain => [2u8; 24],
             KeyType::KeyTypeHMAC => [3u8; 24],
