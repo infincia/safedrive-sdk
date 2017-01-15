@@ -17,6 +17,8 @@ extern crate serde_json;
 #[derive(Debug)]
 pub enum CryptoError {
     InvalidKey,
+    MissingKey,
+    MissingRecovery,
     KeyGenerationFailed,
     DecryptFailed,
     EncryptFailed,
