@@ -222,7 +222,15 @@ impl AsRef<[u8]> for Key {
 }
 
 #[test]
-fn key_wrap_test() {
+fn key_generate_test() {
+    let wrapped_keyset = match WrappedKeyset::new() {
+        Ok(wks) => wks,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
+#[test]
+fn key_unwrap_test() {
     let wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
         Err(_) => { assert!(true == false); return }
