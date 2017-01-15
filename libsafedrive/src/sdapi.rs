@@ -261,7 +261,7 @@ pub fn account_key(token: &Token, master: String, main: String, hmac: String, tw
 
     debug!("response: {}", response);
 
-    let wrapped_keyset: WrappedKeyset = try!(serde_json::from_str(&response));
+    let wrapped_keyset: WrappedKeysetBody = try!(serde_json::from_str(&response));
 
     Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac, wrapped_keyset.tweak))
 }

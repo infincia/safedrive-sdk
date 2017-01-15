@@ -98,7 +98,7 @@ pub struct Notification {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct WrappedKeyset {
+pub struct WrappedKeysetBody {
     pub master: String,
     pub main: String,
     pub hmac: String,
