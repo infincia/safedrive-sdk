@@ -296,7 +296,7 @@ pub fn create_archive(token: &Token,
 
                 #[inline]
                 fn chunk_predicate(x: u64) -> bool {
-                    const BITMASK: u64 = (1u64 << 13) - 1;
+                    const BITMASK: u64 = (1u64 << 18) - 1;
                     x & BITMASK == BITMASK
                 }
 
