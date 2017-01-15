@@ -170,7 +170,7 @@ fn main() {
         }
     };
 
-    let (_, main_key, hmac_key) = match load_keys(&token, credentials.phrase, &|new_phrase| {
+    let (_, main_key, hmac_key, tweak_key) = match load_keys(&token, credentials.phrase, &|new_phrase| {
         // store phrase in keychain and display
         println!("NOTE: a recovery phrase has been generated for your account, please write it down somewhere safe");
         println!();
@@ -179,7 +179,7 @@ fn main() {
         println!("Recovery phrase: {}", new_phrase);
         println!("---------------------------------------------------------------------");
     }) {
-        Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
+        Ok((master_key, main_key, hmac_key, tweak_key)) => (master_key, main_key, hmac_key, tweak_key),
         Err(e) => {
             error!("Key error: {:?}", e);
             std::process::exit(1);
@@ -244,6 +244,7 @@ fn main() {
                                  &sync_uuid,
                                  &main_key,
                                  &hmac_key,
+                                 &tweak_key,
                                  folder.id,
                                  &mut |total, current, progress_percent, tick| {
                                      if tick {
