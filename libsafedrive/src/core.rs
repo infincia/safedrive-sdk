@@ -34,7 +34,6 @@ use self::cdc::*;
 
 use models::*;
 use constants::*;
-use util::*;
 use sdapi::*;
 use keys::*;
 use error::{CryptoError, SDAPIError};
