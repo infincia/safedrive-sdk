@@ -13,13 +13,6 @@ extern crate rustc_serialize;
 
 use self::rustc_serialize::hex::{ToHex};
 
-extern crate bip39;
-
-use self::bip39::{Bip39, Language};
-
-use keys::{KeyType, Key, WrappedKey};
-use error::CryptoError;
-
 pub fn block_directory(unique_client_id: &str, hmac: &[u8]) -> PathBuf {
 
     let shard_identifier = hmac[0..1].to_hex().chars().next().unwrap(); //unwrap is safe here, they're always going to be 0-9 or a-f
@@ -135,66 +128,6 @@ pub fn get_local_user() -> Result<String, String> {
     };
 
     return Ok(username)
-}
-
-
-pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey, WrappedKey), CryptoError> {
-    // generate a recovery phrase that will be used to encrypt the master key
-    let mnemonic_keytype = self::bip39::KeyType::Key128;
-    let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
-    let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-    debug!("phrase: {}", mnemonic.mnemonic);
-
-    // generate a master key and encrypt it with the recovery phrase and static nonce
-    // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
-    let master_key_type = KeyType::KeyTypeMaster;
-    let master_key = Key::new(master_key_type);
-    let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key.as_ref()));
-
-    // generate a main key and encrypt it with the master key and static nonce
-    let main_key_type = KeyType::KeyTypeMain;
-    let main_key = Key::new(main_key_type);
-    let main_key_wrapped = try!(main_key.to_wrapped(&master_key.as_ref()));
-
-    // generate an hmac key and encrypt it with the master key and static nonce
-    let hmac_key_type = KeyType::KeyTypeHMAC;
-    let hmac_key = Key::new(hmac_key_type);
-    let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key.as_ref()));
-
-    // generate a tweak key and encrypt it with the master key and static nonce
-    let tweak_key_type = KeyType::KeyTypeTweak;
-    let tweak_key = Key::new(tweak_key_type);
-    let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key.as_ref()));
-    debug!("generated key set");
-
-    Ok((mnemonic.mnemonic, master_key_wrapped, main_key_wrapped, hmac_key_wrapped, tweak_key_wrapped))
-}
-
-pub fn decrypt_keyset(phrase: &str, master: WrappedKey, main: WrappedKey, hmac: WrappedKey, tweak: WrappedKey) -> Result<(&str, Key, Key, Key, Key), CryptoError> {
-    let mnemonic = try!(Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()));
-    let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-    let master_key = try!(master.to_key(recovery_key.as_ref()));
-    let main_key = try!(main.to_key(master_key.as_ref()));
-    let hmac_key = try!(hmac.to_key(master_key.as_ref()));
-    let tweak_key = try!(tweak.to_key(master_key.as_ref()));
-
-    Ok((phrase, master_key, main_key, hmac_key, tweak_key))
-}
-
-
-
-#[test]
-fn key_wrap_test() {
-    let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) = match generate_keyset() {
-        Ok((p, mas, main, hmac)) => (p, mas, main, hmac),
-        Err(_) => { assert!(true == false); return }
-    };
-
-
-    match decrypt_keyset(&new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) {
-        Ok(_) => {},
-        Err(_) => { assert!(true == false); return }
-    };
 }
 
 #[test]

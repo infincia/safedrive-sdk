@@ -84,7 +84,7 @@ pub fn login(username: &str,
     }
 }
 
-pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key, Key), CryptoError> {
+pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<Keyset, CryptoError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
     //
@@ -103,46 +103,44 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     // in all cases, the library will only use keys that have been returned by the server, this
     // guarantees that the keys we actually use are correct as long as the server is correct
     //
-    let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped, tweak_key_wrapped) = match generate_keyset() {
-        Ok((p, mas, main, hmac, tweak)) => (p, mas, main, hmac, tweak),
+    let new_wrapped_keyset = match WrappedKeyset::new() {
+        Ok(wks) => wks,
         Err(_) => return Err(CryptoError::KeyGenerationFailed)
     };
 
 
-    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped, real_tweak_wrapped)) = account_key(token, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex(), tweak_key_wrapped.to_hex()) {
+    if let Ok(real_wrapped_keyset) = account_key(token, &new_wrapped_keyset) {
         // now we check to see if the keys returned by the server match the existing phrase or not
 
         // if we were given an existing phrase try it, otherwise try the new one
         debug!("got key set back from server, checking");
 
-        let phrase_to_check = match recovery_phrase {
-            Some(p) => p,
-            None => new_phrase
-        };
+        if let Some(p) = recovery_phrase {
+            match real_wrapped_keyset.to_keyset(&p) {
+                Ok(ks) => {
+                    return Ok(ks)
+                },
+                Err(e) => {
+                    debug!("failed to decrypt keys: {:?}", e);
 
-        let wrapped_master_key = try!(WrappedKey::from_hex(real_master_wrapped, KeyType::KeyTypeMaster));
-        let wrapped_main_key = try!(WrappedKey::from_hex(real_main_wrapped, KeyType::KeyTypeMain));
-        let wrapped_hmac_key = try!(WrappedKey::from_hex(real_hmac_wrapped, KeyType::KeyTypeHMAC));
-        let wrapped_tweak_key = try!(WrappedKey::from_hex(real_tweak_wrapped, KeyType::KeyTypeTweak));
-
-        debug!("loaded wrapped keys");
-
-        match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key, wrapped_tweak_key) {
-            Ok((real_phrase, real_master_key, real_main_key, real_hmac_key, real_tweak_key)) => {
-                if real_phrase != phrase_to_check {
-                    // we got a working recovery phrase that was NOT passed to the library as an
-                    // argument, so it's a new phrase and we must return it to the caller so it
-                    // can be stored and displayed
-                    store_recovery_key(&phrase_to_check);
+                    return Err(CryptoError::DecryptFailed)
                 }
-                return Ok((real_master_key, real_main_key, real_hmac_key, real_tweak_key))
-            },
-            Err(e) => {
-                debug!("failed to decrypt keys: {:?}", e);
+            };
+        } else if let Some(p) = new_wrapped_keyset.recovery {
+            match real_wrapped_keyset.to_keyset(&p) {
+                Ok(ks) => {
+                    // a new keyset was generated so we must return the phrase to the caller so it
+                    // can be stored and displayed
+                    store_recovery_key(&p);
+                    return Ok(ks)
+                },
+                Err(e) => {
+                    debug!("failed to decrypt keys: {:?}", e);
 
-                return Err(CryptoError::DecryptFailed)
-            }
-        };
+                    return Err(CryptoError::DecryptFailed)
+                }
+            };
+        }
     };
     return Err(CryptoError::RetrieveFailed)
 }

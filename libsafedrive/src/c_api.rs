@@ -243,16 +243,16 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
         }
     };
 
-    let (_, main_key, hmac_key, tweak_key) = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
+    let keyset = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         // call back to C to store phrase
         let c_new_phrase = CString::new(new_phrase).unwrap();
         store_recovery_key(context, c_new_phrase.into_raw());
     }) {
-        Ok((master_key, main_key, hmac_key, tweak_key)) => (master_key, main_key, hmac_key, tweak_key),
+        Ok(ks) => ks,
         Err(_) => { return 1 }
     };
 
-    c.0.set_keys(main_key, hmac_key, tweak_key);
+    c.0.set_keys(keyset.main, keyset.hmac, keyset.tweak);
     0
 }
 

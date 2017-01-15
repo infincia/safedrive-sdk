@@ -4,6 +4,10 @@ use std::io::Read;
 
 use std::collections::HashMap;
 
+extern crate rustc_serialize;
+
+use self::rustc_serialize::hex::{ToHex, FromHex};
+
 extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
@@ -15,6 +19,7 @@ header! { (ContentLength, "Content-Length") => [usize] }
 use util::*;
 use error::*;
 use models::*;
+use keys::*;
 use constants::*;
 
 pub enum APIEndpoint<'a> {
@@ -243,10 +248,10 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     Ok(account_details)
 }
 
-pub fn account_key(token: &Token, master: String, main: String, hmac: String, tweak: String) -> Result<(String, String, String, String), SDAPIError> {
+pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<WrappedKeyset, SDAPIError> {
 
-    let endpoint = APIEndpoint::AccountKey { token: token, master: &master, main: &main, hmac: &hmac, tweak: &tweak };
-    let body = AccountKey { master: &master, main: &main, hmac: &hmac, tweak: &tweak };
+    let endpoint = APIEndpoint::AccountKey { token: token, master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
+    let body = AccountKey { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
@@ -261,9 +266,9 @@ pub fn account_key(token: &Token, master: String, main: String, hmac: String, tw
 
     debug!("response: {}", response);
 
-    let wrapped_keyset: WrappedKeysetBody = try!(serde_json::from_str(&response));
+    let wrapped_keyset_b: WrappedKeysetBody = try!(serde_json::from_str(&response));
 
-    Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac, wrapped_keyset.tweak))
+    Ok(WrappedKeyset::from(wrapped_keyset_b))
 }
 
 pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> {
