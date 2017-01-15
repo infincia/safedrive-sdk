@@ -84,7 +84,7 @@ pub fn login(username: &str,
     }
 }
 
-pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key), CryptoError> {
+pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<(Key, Key, Key, Key), CryptoError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
     //
@@ -103,13 +103,13 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     // in all cases, the library will only use keys that have been returned by the server, this
     // guarantees that the keys we actually use are correct as long as the server is correct
     //
-    let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped) = match generate_keyset() {
-        Ok((p, mas, main, hmac)) => (p, mas, main, hmac),
+    let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped, tweak_key_wrapped) = match generate_keyset() {
+        Ok((p, mas, main, hmac, tweak)) => (p, mas, main, hmac, tweak),
         Err(_) => return Err(CryptoError::GenerateFailed)
     };
 
 
-    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped)) = account_key(token, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex()) {
+    if let Ok((real_master_wrapped, real_main_wrapped, real_hmac_wrapped, real_tweak_wrapped)) = account_key(token, master_key_wrapped.to_hex(), main_key_wrapped.to_hex(), hmac_key_wrapped.to_hex(), tweak_key_wrapped.to_hex()) {
         // now we check to see if the keys returned by the server match the existing phrase or not
 
         // if we were given an existing phrase try it, otherwise try the new one
@@ -123,17 +123,19 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
         let wrapped_master_key = try!(WrappedKey::from_hex(real_master_wrapped, KeyType::KeyTypeMaster));
         let wrapped_main_key = try!(WrappedKey::from_hex(real_main_wrapped, KeyType::KeyTypeMain));
         let wrapped_hmac_key = try!(WrappedKey::from_hex(real_hmac_wrapped, KeyType::KeyTypeHMAC));
+        let wrapped_tweak_key = try!(WrappedKey::from_hex(real_tweak_wrapped, KeyType::KeyTypeTweak));
+
         debug!("loaded wrapped keys");
 
-        match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key) {
-            Ok((real_phrase, real_master_key, real_main_key, real_hmac_key)) => {
+        match decrypt_keyset(&phrase_to_check, wrapped_master_key, wrapped_main_key, wrapped_hmac_key, wrapped_tweak_key) {
+            Ok((real_phrase, real_master_key, real_main_key, real_hmac_key, real_tweak_key)) => {
                 if real_phrase != phrase_to_check {
                     // we got a working recovery phrase that was NOT passed to the library as an
                     // argument, so it's a new phrase and we must return it to the caller so it
                     // can be stored and displayed
                     store_recovery_key(&phrase_to_check);
                 }
-                return Ok((real_master_key, real_main_key, real_hmac_key))
+                return Ok((real_master_key, real_main_key, real_hmac_key, real_tweak_key))
             },
             Err(e) => {
                 debug!("failed to decrypt keys: {:?}", e);
@@ -206,6 +208,7 @@ pub fn create_archive(token: &Token,
                       session_name: &str,
                       main_key: &Key,
                       hmac_key: &Key,
+                      tweak_key: &Key,
                       folder_id: u32,
                       progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
 
@@ -288,6 +291,8 @@ pub fn create_archive(token: &Token,
                 let byte_iter = reader.bytes().map(|b| b.expect("Rust<sdsync_create_archive>: failed to unwrap block data"));
 
                 let separator_size_nb_bits: u32 = 6;
+
+                let t = tweak_key.as_ref();
 
                 #[inline]
                 fn chunk_predicate(x: u64) -> bool {

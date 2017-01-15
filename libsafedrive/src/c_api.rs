@@ -99,6 +99,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         password: None,
         main_key: None,
         hmac_key: None,
+        tweak_key: None,
         config: Configuration::Production
     };
     let cstate = SDDKState(state);
@@ -221,16 +222,16 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
         }
     };
 
-    let (_, main_key, hmac_key) = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
+    let (_, main_key, hmac_key, tweak_key) = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         // call back to C to store phrase
         let c_new_phrase = CString::new(new_phrase).unwrap();
         store_recovery_key(context, c_new_phrase.into_raw());
     }) {
-        Ok((master_key, main_key, hmac_key)) => (master_key, main_key, hmac_key),
+        Ok((master_key, main_key, hmac_key, tweak_key)) => (master_key, main_key, hmac_key, tweak_key),
         Err(_) => { return 1 }
     };
 
-    c.0.set_keys(main_key, hmac_key);
+    c.0.set_keys(main_key, hmac_key, tweak_key);
     0
 }
 
@@ -631,12 +632,15 @@ pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
+    let tweak_key = (*c).0.get_tweak_key();
+
     let id: u32 = folder_id as u32;
 
     match create_archive(c.0.get_api_token(),
                          &n,
                          main_key,
                          hmac_key,
+                         tweak_key,
                          id,
                          &mut |total, current, progress_percent, tick| {
                              let c_total: std::os::raw::c_uint = total;

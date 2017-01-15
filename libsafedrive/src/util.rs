@@ -138,7 +138,7 @@ pub fn get_local_user() -> Result<String, String> {
 }
 
 
-pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey), CryptoError> {
+pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey, WrappedKey), CryptoError> {
     // generate a recovery phrase that will be used to encrypt the master key
     let mnemonic_keytype = self::bip39::KeyType::Key128;
     let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
@@ -160,19 +160,25 @@ pub fn generate_keyset() -> Result<(String, WrappedKey, WrappedKey, WrappedKey),
     let hmac_key_type = KeyType::KeyTypeHMAC;
     let hmac_key = Key::new(hmac_key_type);
     let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key.as_ref()));
+
+    // generate a tweak key and encrypt it with the master key and static nonce
+    let tweak_key_type = KeyType::KeyTypeTweak;
+    let tweak_key = Key::new(tweak_key_type);
+    let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key.as_ref()));
     debug!("generated key set");
 
-    Ok((mnemonic.mnemonic, master_key_wrapped, main_key_wrapped, hmac_key_wrapped))
+    Ok((mnemonic.mnemonic, master_key_wrapped, main_key_wrapped, hmac_key_wrapped, tweak_key_wrapped))
 }
 
-pub fn decrypt_keyset(phrase: &str, master: WrappedKey, main: WrappedKey, hmac: WrappedKey) -> Result<(&str, Key, Key, Key), CryptoError> {
+pub fn decrypt_keyset(phrase: &str, master: WrappedKey, main: WrappedKey, hmac: WrappedKey, tweak: WrappedKey) -> Result<(&str, Key, Key, Key, Key), CryptoError> {
     let mnemonic = try!(Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()));
     let recovery_key = sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
     let master_key = try!(master.to_key(recovery_key.as_ref()));
     let main_key = try!(main.to_key(master_key.as_ref()));
     let hmac_key = try!(hmac.to_key(master_key.as_ref()));
+    let tweak_key = try!(tweak.to_key(master_key.as_ref()));
 
-    Ok((phrase, master_key, main_key, hmac_key))
+    Ok((phrase, master_key, main_key, hmac_key, tweak_key))
 }
 
 

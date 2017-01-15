@@ -21,7 +21,7 @@ pub enum APIEndpoint<'a> {
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
     AccountStatus { token: &'a Token },
     AccountDetails { token: &'a Token },
-    AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str },
+    AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
     ReadFolders { token: &'a Token },
     CreateFolder { token: &'a Token, path: &'a str, name: &'a str, encrypted: bool },
     DeleteFolder { token: &'a Token, folder_id: u32 },
@@ -243,10 +243,10 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     Ok(account_details)
 }
 
-pub fn account_key(token: &Token, master: String, main: String, hmac: String) -> Result<(String, String, String), SDAPIError> {
+pub fn account_key(token: &Token, master: String, main: String, hmac: String, tweak: String) -> Result<(String, String, String, String), SDAPIError> {
 
-    let endpoint = APIEndpoint::AccountKey { token: token, master: &master, main: &main, hmac: &hmac };
-    let body = AccountKey { master: &master, main: &main, hmac: &hmac };
+    let endpoint = APIEndpoint::AccountKey { token: token, master: &master, main: &main, hmac: &hmac, tweak: &tweak };
+    let body = AccountKey { master: &master, main: &main, hmac: &hmac, tweak: &tweak };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
@@ -263,7 +263,7 @@ pub fn account_key(token: &Token, master: String, main: String, hmac: String) ->
 
     let wrapped_keyset: WrappedKeyset = try!(serde_json::from_str(&response));
 
-    Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac))
+    Ok((wrapped_keyset.master, wrapped_keyset.main, wrapped_keyset.hmac, wrapped_keyset.tweak))
 }
 
 pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> {

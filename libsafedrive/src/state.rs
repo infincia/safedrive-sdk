@@ -12,6 +12,7 @@ pub struct State {
     pub api_token: Option<Token>,
     pub main_key: Option<Key>,
     pub hmac_key: Option<Key>,
+    pub tweak_key: Option<Key>,
     pub config: Configuration
 }
 
@@ -25,6 +26,7 @@ impl State {
             api_token: None,
             main_key: None,
             hmac_key: None,
+            tweak_key: None,
             config: config
         }
     }
@@ -33,9 +35,10 @@ impl State {
         &self.config
     }
 
-    pub fn set_keys(&mut self, main_key: Key, hmac_key: Key) {
+    pub fn set_keys(&mut self, main_key: Key, hmac_key: Key, tweak_key: Key) {
         self.main_key = Some(main_key);
         self.hmac_key = Some(hmac_key);
+        self.tweak_key = Some(tweak_key);
     }
 
     pub fn get_api_token(&self) -> &Token {
@@ -91,6 +94,14 @@ impl State {
         let key = match self.hmac_key {
             Some(ref key) => key,
             None => panic!("Attempted to use hmac key before it was set")
+        };
+        key
+    }
+
+    pub fn get_tweak_key(&self) -> &Key {
+        let key = match self.tweak_key {
+            Some(ref key) => key,
+            None => panic!("Attempted to use tweak key before it was set")
         };
         key
     }

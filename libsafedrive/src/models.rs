@@ -23,7 +23,8 @@ pub struct RegisterClient<'a> {
 pub struct AccountKey<'a> {
     pub master: &'a str,
     pub main: &'a str,
-    pub hmac: &'a str
+    pub hmac: &'a str,
+    pub tweak: &'a str
 }
 
 #[derive(Serialize, Debug)]
@@ -100,7 +101,8 @@ pub struct Notification {
 pub struct WrappedKeyset {
     pub master: String,
     pub main: String,
-    pub hmac: String
+    pub hmac: String,
+    pub tweak: String
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
