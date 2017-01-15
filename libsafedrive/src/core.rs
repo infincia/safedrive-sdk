@@ -105,7 +105,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     //
     let (new_phrase, master_key_wrapped, main_key_wrapped, hmac_key_wrapped, tweak_key_wrapped) = match generate_keyset() {
         Ok((p, mas, main, hmac, tweak)) => (p, mas, main, hmac, tweak),
-        Err(_) => return Err(CryptoError::GenerateFailed)
+        Err(_) => return Err(CryptoError::KeyGenerationFailed)
     };
 
 
