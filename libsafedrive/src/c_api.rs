@@ -26,7 +26,7 @@ use ::core::create_archive;
 use ::core::load_keys;
 use ::core::login;
 
-use ::models::Configuration;
+use ::models::{Configuration, RegisteredFolder, SyncSession};
 
 use ::util::unique_client_hash;
 
@@ -46,6 +46,16 @@ pub struct SDDKFolder {
     pub path: *const std::os::raw::c_char,
 }
 
+impl From<RegisteredFolder> for SDDKFolder {
+    fn from(folder: RegisteredFolder) -> SDDKFolder {
+        SDDKFolder {
+            id: folder.id,
+            name: CString::new(folder.folderName.as_str()).unwrap().into_raw(),
+            path: CString::new(folder.folderPath.as_str()).unwrap().into_raw(),
+        }
+    }
+}
+
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKSyncSession {
@@ -53,6 +63,17 @@ pub struct SDDKSyncSession {
     pub size: u64,
     pub date: u64,
     pub folder_id: u32,
+}
+
+impl From<SyncSession> for SDDKSyncSession {
+    fn from(session: SyncSession) -> SDDKSyncSession {
+        SDDKSyncSession {
+            folder_id: session.folder_id,
+            size: session.size,
+            name: CString::new(session.name.as_str()).unwrap().into_raw(),
+            date: session.time
+        }
+    }
 }
 
 
@@ -417,11 +438,7 @@ pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState, folder_id: std::os
         Err(e) => { error!("failed to get sync folder: {}", e); return -1 },
     };
 
-    let f = SDDKFolder {
-        id: nf.id,
-        name: CString::new(nf.folderName.as_str()).unwrap().into_raw(),
-        path: CString::new(nf.folderPath.as_str()).unwrap().into_raw(),
-    };
+    let f = SDDKFolder::from(nf);
 
     let b = Box::new(f);
     let ptr = Box::into_raw(b);
@@ -476,11 +493,7 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState, mut folders: *mut
     };
 
     let f = result.into_iter().map(|folder| {
-        SDDKFolder {
-            id: folder.id,
-            name: CString::new(folder.folderName.as_str()).unwrap().into_raw(),
-            path: CString::new(folder.folderPath.as_str()).unwrap().into_raw(),
-        }
+        SDDKFolder::from(folder)
     }).collect::<Vec<SDDKFolder>>();;
 
     let mut b = f.into_boxed_slice();
@@ -539,13 +552,8 @@ pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState, mut sessions: *m
         Err(e) => { error!("failed to get list of sync sessions: {}", e); return -1 },
     };
 
-    let s = result.into_iter().map(|ses| {
-        SDDKSyncSession {
-            folder_id: ses.folder_id,
-            size: ses.size,
-            name: CString::new(ses.name.as_str()).unwrap().into_raw(),
-            date: ses.time
-        }
+    let s = result.into_iter().map(|session| {
+        SDDKSyncSession::from(session)
     }).collect::<Vec<SDDKSyncSession>>();
 
     let mut b = s.into_boxed_slice();
