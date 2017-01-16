@@ -431,6 +431,29 @@ pub fn finish_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted:
     }
 }
 
+pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result<SyncSessionData<'a>, SDAPIError> {
+    let endpoint = APIEndpoint::ReadSyncSession { token: token, name: name, encrypted: encrypted };
+
+
+    let client = reqwest::Client::new().unwrap();
+
+    let request = client.request(endpoint.method(), &endpoint.url())
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
+        _ => return Err(SDAPIError::RequestFailed)
+    };
+    let mut buffer = Vec::new();
+
+    try!(result.read_to_end(&mut buffer));
+
+    Ok(SyncSessionData { name: name, chunk_data: buffer })
+}
+
 
 // block handling
 
