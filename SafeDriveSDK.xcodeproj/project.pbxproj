@@ -310,7 +310,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULEMAP_FILE = "";
-				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.Sync;
+				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.sdk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = $SRCROOT/Wrappers/Swift;
@@ -346,7 +346,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MODULEMAP_FILE = "";
-				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.Sync;
+				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.sdk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_INCLUDE_PATHS = $SRCROOT/Wrappers/Swift;
