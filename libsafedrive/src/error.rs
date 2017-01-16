@@ -50,7 +50,8 @@ pub enum SDAPIError {
     RequestFailed,
     RetryUpload,
     Conflict,
-    BlockMissing
+    BlockMissing,
+    SessionMissing,
 }
 
 impl From<std::io::Error> for SDAPIError {
