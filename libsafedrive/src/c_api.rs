@@ -244,7 +244,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let phrase: Option<String> = unsafe {
-        if !state.is_null() {
+        if !recovery_phrase.is_null() {
             let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
             match c_recovery.to_str() {
                 Ok(s) => Some(s.to_owned()),
