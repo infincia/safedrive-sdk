@@ -217,16 +217,14 @@ public class SafeDriveSDK: NSObject {
         return sessions
     }
     
-    public func syncFolder(folderID: UInt32, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
+    public func syncFolder(folderID: UInt32, sessionName: String, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
         guard let state = self.state else {
             let e = NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
             failure(e)
             return
         }
         DispatchQueue.global(priority: .default).async {
-            let uuid = NSUUID.init().uuidString
-
-            let result = sddk_create_archive(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, uuid, folderID, { (context, total, current, percent, tick) in
+            let result = sddk_create_archive(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
