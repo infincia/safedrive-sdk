@@ -20,6 +20,8 @@ serde_derive = "*"
 bip39 = "*"
 rand = "*"
 log = "*"
+nom = "*"
+
 
 [target."cfg(not(windows))".dependencies]
 interfaces = "*"
