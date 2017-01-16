@@ -52,7 +52,7 @@ impl<'a> APIEndpoint<'a> {
     }
 
     pub fn domain(&self) -> String {
-        SDAPIDOMAIN_PRODUCTION.to_string()
+        SDAPIDOMAIN_STAGING.to_string()
     }
 
     pub fn protocol(&self) -> String {
