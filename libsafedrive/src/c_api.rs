@@ -240,7 +240,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut SDDKState, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(context: *mut std::os::raw::c_void, new_phrase: *const std::os::raw::c_char)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut SDDKState, recovery_phrase: *const std::os::raw::c_char, store_recovery_key: extern fn(context: *mut std::os::raw::c_void, new_phrase: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let phrase: Option<String> = unsafe {
@@ -258,7 +258,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
 
     let keyset = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         // call back to C to store phrase
-        let c_new_phrase = CString::new(new_phrase).unwrap();
+        let mut c_new_phrase = CString::new(new_phrase).unwrap();
         store_recovery_key(context, c_new_phrase.into_raw());
     }) {
         Ok(ks) => ks,
