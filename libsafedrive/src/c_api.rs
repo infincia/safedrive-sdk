@@ -22,7 +22,7 @@ use ::core::get_sync_folder;
 use ::core::get_sync_folders;
 
 use ::core::get_sync_sessions;
-use ::core::create_archive;
+use ::core::sync;
 use ::core::load_keys;
 use ::core::login;
 
@@ -649,15 +649,15 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_create_archive(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, &fp);
+/// int success = sddk_sync(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, &fp);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
-                                      state: *mut SDDKState,
-                                      name: *const std::os::raw::c_char,
-                                      folder_id: std::os::raw::c_uint,
-                                      progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
+                            state: *mut SDDKState,
+                            name: *const std::os::raw::c_char,
+                            folder_id: std::os::raw::c_uint,
+                            progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
@@ -672,19 +672,19 @@ pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
 
     let id: u32 = folder_id as u32;
 
-    match create_archive(c.0.get_api_token(),
-                         &n,
-                         main_key,
-                         hmac_key,
-                         tweak_key,
-                         id,
-                         &mut |total, current, progress_percent, tick| {
-                             let c_total: std::os::raw::c_uint = total;
-                             let c_current: std::os::raw::c_uint = current;
-                             let c_percent: std::os::raw::c_double = progress_percent;
-                             let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                             progress(context, c_total, c_current, c_percent, c_tick);
-        }) {
+    match sync(c.0.get_api_token(),
+               &n,
+               main_key,
+               hmac_key,
+               tweak_key,
+               id,
+               &mut |total, current, progress_percent, tick| {
+                   let c_total: std::os::raw::c_uint = total;
+                   let c_current: std::os::raw::c_uint = current;
+                   let c_percent: std::os::raw::c_double = progress_percent;
+                   let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
+                   progress(context, c_total, c_current, c_percent, c_tick);
+               }) {
         Ok(_) => return 0,
         Err(_) => return 1
     }

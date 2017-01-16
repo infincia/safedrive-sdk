@@ -201,13 +201,13 @@ pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, String> {
     Ok(v)
 }
 
-pub fn create_archive(token: &Token,
-                      session_name: &str,
-                      main_key: &Key,
-                      hmac_key: &Key,
-                      tweak_key: &Key,
-                      folder_id: u32,
-                      progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
+pub fn sync(token: &Token,
+            session_name: &str,
+            main_key: &Key,
+            hmac_key: &Key,
+            tweak_key: &Key,
+            folder_id: u32,
+            progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
