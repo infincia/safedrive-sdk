@@ -422,14 +422,19 @@ pub fn sync(token: &Token,
                                         // prepend the key to the actual encrypted chunk data so they can be written to the file together
                                         let mut block_data = Vec::new();
 
-                                        // bytes 0-47 will be the wrapped key
+                                        // first 8 bytes are the file ID, version, and reserved area
+                                        let block_ver: &'static [u8; 8] = br"sdb01000";
+
+                                        block_data.extend(block_ver.as_ref());
+
+                                        // next 48 bytes will be the wrapped key
                                         block_data.extend(wrapped_block_key);
 
-                                        // bytes 48-71 will be the nonce/hmac
+                                        // next 24 bytes will be the nonce/hmac
                                         block_data.extend(&block_hmac[0..nonce_size as usize]);
-                                        assert!(block_data.len() == key_size + mac_size + nonce_size);
+                                        assert!(block_data.len() == block_ver.len() + (key_size + mac_size) + nonce_size);
 
-                                        // byte 72+ will be the the chunk data
+                                        // remainder will be the the chunk data
                                         block_data.extend(encrypted_chunk);
 
                                         // set the local variable to trigger a data upload next time
@@ -514,16 +519,21 @@ pub fn sync(token: &Token,
 
     let mut complete_archive = Vec::new();
 
-    // bytes 0-47 will be the wrapped archive key
+    // first 8 bytes are the file ID, version, and reserved area
+    let session_ver: &'static [u8; 8] = br"sds01000";
+
+    complete_archive.extend(session_ver.as_ref());
+
+    // next 48 bytes will be the wrapped session key
     complete_archive.extend(wrapped_archive_key);
 
-    // bytes 48-71 will be the nonce
+    // next 24 bytes will be the nonce
     complete_archive.extend(nonce_raw);
+    assert!(complete_archive.len() == session_ver.len() + (key_size + mac_size) + nonce_size);
 
-    // byte 72+ will be the encrypted archive data
+
+    // remainder will be the encrypted session data
     complete_archive.extend(encrypted_archive);
-
-
 
     debug!("finishing sync session");
 
