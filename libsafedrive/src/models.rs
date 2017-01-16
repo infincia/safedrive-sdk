@@ -113,6 +113,11 @@ pub struct SyncSession {
     pub time: u64,
 }
 
+pub struct SyncSessionData<'a> {
+    pub name: &'a str,
+    pub chunk_data: Vec<u8>
+}
+
 
 /*
 Current sync folder model:
