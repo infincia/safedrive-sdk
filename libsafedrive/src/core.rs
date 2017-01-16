@@ -547,3 +547,48 @@ pub fn sync(token: &Token,
 
     Ok(())
 }
+
+
+pub fn restore(token: &Token,
+               session_name: &str,
+               main_key: &Key,
+               hmac_key: &Key,
+               tweak_key: &Key,
+               folder_id: u32,
+               destination: PathBuf,
+               progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
+
+    let folder = match get_sync_folder(token, folder_id) {
+        Ok(folder) => folder,
+        Err(e) => return Err(format!("failed to get sync folder info from server: {:?}", e))
+    };
+
+    let session_data = match read_session(token, folder_id, session_name, true) {
+        Ok(session_data) => session_data,
+        Err(e) => return Err(format!("failed to get sync session data from server: {:?}", e))
+    };
+
+    let folder_name = &folder.folderName;
+
+    if DEBUG_STATISTICS {
+        debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
+    }
+    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
+    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
+    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
+
+
+
+    let main_key_s = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
+        .expect("failed to get main key struct");
+
+
+    let mut failed = 0;
+
+    let mut completed_count = 0.0;
+    debug!("restoring session finished");
+
+    progress(entry_count as u32, completed_count as u32, 100.0, false);
+
+    Ok(())
+}
