@@ -243,7 +243,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func restoreFolder(folderID: UInt32, sessionName: String, destination: NSURL, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
+    public func restoreFolder(folderID: UInt32, sessionName: String, destination: URL, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
         guard let state = self.state else {
             let e = NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
             failure(e)
