@@ -211,12 +211,12 @@ pub fn sync(token: &Token,
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(format!("Rust<sdsync_create_archive>: failed to get sync folder info from server: {:?}", e))
+        Err(e) => return Err(format!("failed to get sync folder info from server: {:?}", e))
     };
 
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
-        Err(e) => return Err(format!("Rust<sdsync_create_archive>: registering sync session failed: {:?}", e))
+        Err(e) => return Err(format!("registering sync session failed: {:?}", e))
     };
 
     let folder_path = PathBuf::from(&folder.folderPath);
@@ -285,7 +285,7 @@ pub fn sync(token: &Token,
                 let mut f_chunk = File::open(p).expect("failed to open file to retrieve chunk");
 
                 let reader: BufReader<File> = BufReader::new(f);
-                let byte_iter = reader.bytes().map(|b| b.expect("Rust<sdsync_create_archive>: failed to unwrap block data"));
+                let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap block data"));
 
                 let separator_size_nb_bits: u32 = 6;
 
@@ -405,7 +405,7 @@ pub fn sync(token: &Token,
                                         // across all backups of all sync folders
                                         let nonce_slice = block_hmac.as_ref();
                                         let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
-                                        .expect("Rust<sdsync_create_archive>: failed to get nonce");
+                                        .expect("failed to get nonce");
 
                                         // we use the same nonce both while wrapping the block key, and the block itself
                                         // this is safe because using the same nonce with 2 different keys is not nonce reuse
@@ -448,7 +448,7 @@ pub fn sync(token: &Token,
                 let chunklist = BufReader::new(chunks.as_slice());
                 header.set_size(nb_chunk * hmac_tag_size as u64); // hmac list size
                 header.set_cksum();
-                ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append chunk archive header");
+                ar.append(&header, chunklist).expect("failed to append chunk archive header");
 
                 if nb_chunk != skipped_blocks && DEBUG_STATISTICS {
                     debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
@@ -465,7 +465,7 @@ pub fn sync(token: &Token,
                 let chunks: Vec<u8> = Vec::new();
                 let chunklist = BufReader::new(chunks.as_slice());
                 header.set_cksum();
-                ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append zero length archive header");
+                ar.append(&header, chunklist).expect("failed to append zero length archive header");
             }
         } else if is_dir {
             // folder
@@ -473,7 +473,7 @@ pub fn sync(token: &Token,
             let chunks: Vec<u8> = Vec::new();
             let chunklist = BufReader::new(chunks.as_slice());
             header.set_cksum();
-            ar.append(&header, chunklist).expect("Rust<sdsync_create_archive>: failed to append folder to archive header");
+            ar.append(&header, chunklist).expect("failed to append folder to archive header");
         }
     }
 
@@ -486,7 +486,7 @@ pub fn sync(token: &Token,
     // get the main key
 
     let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
-        .expect("Rust<sdsync_create_archive>: failed to get main key struct");
+        .expect("failed to get main key struct");
 
     // generate a new archive key
     let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
@@ -495,12 +495,12 @@ pub fn sync(token: &Token,
 
     let archive_key_raw = sodiumoxide::randombytes::randombytes(key_size);
     let archive_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&archive_key_raw)
-        .expect("Rust<sdsync_create_archive>: failed to get archive key struct");
+        .expect("failed to get archive key struct");
 
     // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
     let nonce_raw = sodiumoxide::randombytes::randombytes(nonce_size);
     let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw[0..24])
-        .expect("Rust<sdsync_create_archive>: failed to get nonce");
+        .expect("failed to get nonce");
 
     // we use the same nonce both while wrapping the archive key, and the archive itself
     // this is safe because using the same nonce with 2 different keys is not nonce reuse
@@ -534,7 +534,7 @@ pub fn sync(token: &Token,
 
     match finish_sync_session(&token, folder_id, archive_name, true, &complete_archive, archive_size as usize) {
         Ok(()) => {},
-        Err(e) => return Err(format!("Rust<sdsync_create_archive>: finishing session failed: {:?}", e))
+        Err(e) => return Err(format!("finishing session failed: {:?}", e))
     };
     progress(entry_count as u32, completed_count as u32, 100.0, false);
 
