@@ -718,16 +718,16 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_restore_archive(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, "/path/to/destination", &fp);
+/// int success = sddk_restore(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, "/path/to/destination", &fp);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_restore_archive(context: *mut std::os::raw::c_void,
-                                       state: *mut SDDKState,
-                                       name: *const std::os::raw::c_char,
-                                       folder_id: std::os::raw::c_uint,
-                                       destination: *const std::os::raw::c_char,
-                                       progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
+pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
+                               state: *mut SDDKState,
+                               name: *const std::os::raw::c_char,
+                               folder_id: std::os::raw::c_uint,
+                               destination: *const std::os::raw::c_char,
+                               progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
