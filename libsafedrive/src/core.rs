@@ -523,16 +523,13 @@ pub fn sync(token: &Token,
     // byte 72+ will be the encrypted archive data
     complete_archive.extend(encrypted_archive);
 
-    let mut archive_name: String = String::new();
-    archive_name += session_name;
-    archive_name += ".sdsyncv1";
 
 
     debug!("finishing sync session");
 
 
 
-    match finish_sync_session(&token, folder_id, archive_name, true, &complete_archive, archive_size as usize) {
+    match finish_sync_session(&token, folder_id, session_name, true, &complete_archive, archive_size as usize) {
         Ok(()) => {},
         Err(e) => return Err(format!("finishing session failed: {:?}", e))
     };
