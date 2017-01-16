@@ -100,15 +100,20 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         CStr::from_ptr(local_storage_path)
     };
 
-    let storage_directory: String = str::from_utf8(lstorage.to_bytes()).unwrap().to_owned();
+    let storage_directory: String = match lstorage.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
 
     let uids: &CStr = unsafe {
         assert!(!unique_client_id.is_null());
         CStr::from_ptr(unique_client_id)
     };
 
-    let uid: String = str::from_utf8(uids.to_bytes()).unwrap().to_owned();
-
+    let uid: String = match uids.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
 
     let (storage_path, client_id) = initialize(storage_directory, uid);
 
@@ -163,10 +168,18 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
     let mut c = unsafe{ assert!(!state.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * state };
 
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
-    let un: String = str::from_utf8(c_username.to_bytes()).unwrap().to_owned();
+    let un: String =  match c_username.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
 
     let c_password: &CStr = unsafe { CStr::from_ptr(password) };
-    let pa: String = str::from_utf8(c_password.to_bytes()).unwrap().to_owned();
+    let pa: String =  match c_password.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
 
     match login(&un, &pa) {
         Ok((token, _, _)) => {
@@ -233,9 +246,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
     let phrase: Option<String> = unsafe {
         if !state.is_null() {
             let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
-            match str::from_utf8(c_recovery.to_bytes()) {
+            match c_recovery.to_str() {
                 Ok(s) => Some(s.to_owned()),
-                Err(_) => None
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
             }
         }
         else {
@@ -291,7 +304,10 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
                                               mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_int {
 
     let c_email: &CStr = unsafe { CStr::from_ptr(email) };
-    let e: String = str::from_utf8(c_email.to_bytes()).unwrap().to_owned();
+    let e: String =  match c_email.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
 
     match unique_client_hash(&e) {
         Ok(hash) => {
@@ -342,10 +358,18 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
-    let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
+    let n: String = match c_name.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
 
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
-    let p: String = str::from_utf8(c_path.to_bytes()).unwrap().to_owned();
+    let p: String = match c_path.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
 
     match add_sync_folder(c.0.get_api_token(), &n, &p) {
         Ok(_) => return 0,
@@ -636,7 +660,11 @@ pub extern "C" fn sddk_create_archive(context: *mut std::os::raw::c_void,
                                       progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
-    let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
+    let n: String = match c_name.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
@@ -702,12 +730,17 @@ pub extern "C" fn sddk_restore_archive(context: *mut std::os::raw::c_void,
                                        progress: extern fn(context: *mut std::os::raw::c_void, total: std::os::raw::c_uint, current: std::os::raw::c_uint, percent: std::os::raw::c_double, tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
-    let n: String = str::from_utf8(c_name.to_bytes()).unwrap().to_owned();
+    let n: String = match c_name.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
 
 
     let c_destination: &CStr = unsafe { CStr::from_ptr(destination) };
-    let d: String = str::from_utf8(c_destination.to_bytes()).unwrap().to_owned();
-
+    let d: String =  match c_destination.to_str() {
+        Ok(p) => p.to_owned(),
+        Err(e) => { panic!("path is not valid UTF-8: {}", e) },
+    };
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
