@@ -23,6 +23,7 @@ use ::core::get_sync_folders;
 
 use ::core::get_sync_sessions;
 use ::core::sync;
+use ::core::restore;
 use ::core::load_keys;
 use ::core::login;
 
@@ -744,10 +745,29 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
+    let tweak_key = (*c).0.get_tweak_key();
+
     let id: u32 = folder_id as u32;
 
 
     debug!("unpacking archive {} to {}", n, d);
+
+    match restore(c.0.get_api_token(),
+                  &n,
+                  main_key,
+                  hmac_key,
+                  tweak_key,
+                  id,
+                  &mut |total, current, progress_percent, tick| {
+                      let c_total: std::os::raw::c_uint = total;
+                      let c_current: std::os::raw::c_uint = current;
+                      let c_percent: std::os::raw::c_double = progress_percent;
+                      let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
+                      progress(context, c_total, c_current, c_percent, c_tick);
+                  }) {
+        Ok(_) => return 0,
+        Err(_) => return 1
+    }
     0
 }
 
