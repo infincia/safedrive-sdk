@@ -88,18 +88,18 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func uniqueClientID(_ email_address: String) -> Optional<String> {
-
+    public func uniqueClientID(_ email_address: String) throws -> Optional<String> {
         var unique_client_id: UnsafeMutablePointer<CChar>? = nil
-        
-        unique_client_id! = UnsafeMutablePointer<CChar>.allocate(capacity: (64 * MemoryLayout<CChar>.stride + 1))
-
+        let res = sddk_get_unique_client_id(email_address, &unique_client_id)
         defer {
-            free(unique_client_id)
+            if res >= 0 {
+                sddk_free_string(&unique_client_id)
+            }
         }
-
-        let success = sddk_get_unique_client_id(email_address, &unique_client_id)
-        switch success {
+        if res < 0 {
+            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+        }
+        switch res {
         case 0:
             return String(cString: unique_client_id!)
         default:
