@@ -42,7 +42,7 @@ use safedrive::core::remove_sync_folder;
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
 
-use safedrive::models::RegisteredFolder;
+use safedrive::models::{RegisteredFolder, Configuration};
 
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -75,6 +75,16 @@ fn main() {
             .short("v")
             .multiple(true)
             .help("sets the level of verbosity")
+        )
+        .arg(Arg::with_name("production")
+            .short("p")
+            .conflicts_with("staging")
+            .help("use the production environment")
+        )
+        .arg(Arg::with_name("staging")
+            .short("s")
+            .conflicts_with("production")
+            .help("use the staging environment")
         )
         .subcommand(SubCommand::with_name("add")
             .about("add sync folder")
@@ -160,7 +170,16 @@ fn main() {
         },
     };
 
-    let (_, _) = initialize(a, uid);
+    let mut config: Configuration = Configuration::Staging;
+
+    if matches.is_present("production") {
+        println!("Environment: production");
+        config = Configuration::Production;
+    } else {
+        println!("Environment: staging");
+    }
+
+    let (_, _) = initialize(a, uid, config);
 
     let (token, _, _) = match login(&username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
