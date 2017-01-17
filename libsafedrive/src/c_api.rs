@@ -750,9 +750,6 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 
     let id: u32 = folder_id as u32;
 
-
-    debug!("unpacking archive {} to {}", n, d);
-
     match restore(c.0.get_api_token(),
                   &n,
                   main_key,
