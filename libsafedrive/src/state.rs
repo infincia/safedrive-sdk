@@ -1,7 +1,7 @@
 use std::path::{PathBuf};
 
 use keys::Key;
-use models::{Token, Configuration};
+use models::{Token};
 
 #[derive(Debug)]
 pub struct State {
@@ -13,11 +13,10 @@ pub struct State {
     pub main_key: Option<Key>,
     pub hmac_key: Option<Key>,
     pub tweak_key: Option<Key>,
-    pub config: Configuration
 }
 
 impl State {
-    pub fn new(storage_path: PathBuf, unique_client_id: String, config: Configuration) -> State {
+    pub fn new(storage_path: PathBuf, unique_client_id: String) -> State {
         State {
             storage_path: storage_path,
             unique_client_id: unique_client_id,
@@ -27,12 +26,7 @@ impl State {
             main_key: None,
             hmac_key: None,
             tweak_key: None,
-            config: config
         }
-    }
-
-    pub fn get_config(&self) -> &Configuration {
-        &self.config
     }
 
     pub fn set_keys(&mut self, main_key: Key, hmac_key: Key, tweak_key: Key) {

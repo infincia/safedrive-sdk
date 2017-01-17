@@ -193,7 +193,6 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         main_key: None,
         hmac_key: None,
         tweak_key: None,
-        config: Configuration::Production
     };
     let cstate = SDDKState(state);
     Box::into_raw(Box::new(cstate))
