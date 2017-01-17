@@ -1,8 +1,7 @@
 use std;
 use std::ffi::{CStr, CString};
 use std::str;
-use std::path::{Path, PathBuf};
-use std::mem;
+use std::path::{PathBuf};
 
 use std::u64;
 
