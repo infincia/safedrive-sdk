@@ -25,7 +25,7 @@ pub enum CryptoError {
     BlockEncryptFailed,
     SessionDecryptFailed,
     SessionEncryptFailed,
-    KeysetRetrieveFailed
+    KeysetRetrieveFailed { embed: SDAPIError },
 }
 
 impl std::fmt::Display for CryptoError {
@@ -58,8 +58,8 @@ impl std::fmt::Display for CryptoError {
             &CryptoError::SessionEncryptFailed => {
                 write!(f, "Session encrypt failed")
             },
-            &CryptoError::KeysetRetrieveFailed => {
-                write!(f, "Keyset retrieval failed")
+            &CryptoError::KeysetRetrieveFailed { ref embed } => {
+                write!(f, "{}", embed)
             },
         }
     }
