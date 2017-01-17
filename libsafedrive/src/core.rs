@@ -311,7 +311,7 @@ pub fn sync(token: &Token,
                 let mut skipped_blocks = 0;
                 let mut smallest_size = std::u64::MAX;
                 let mut largest_size = 0;
-                let expected_size = 1 << 13;
+                let expected_size = 1 << 18;
                 let mut size_variance = 0;
                 let mut chunks: Vec<u8> = Vec::new();
                 for chunk in chunk_iter {
