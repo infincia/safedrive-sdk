@@ -200,7 +200,7 @@ fn main() {
     }) {
         Ok(keyset) => keyset,
         Err(e) => {
-            error!("Key error: {:?}", e);
+            error!("Key error: {}", e);
             std::process::exit(1);
         }
     };
@@ -245,7 +245,7 @@ fn main() {
         let folder_list = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
-                error!("Read folders error: {:?}", e);
+                error!("Read folders error: {}", e);
                 std::process::exit(1);
             }
         };
@@ -276,7 +276,7 @@ fn main() {
             ) {
                 Ok(_) => { pb.finish(); return },
                 Err(e) => {
-                    error!("Sync error: {:?}", e);
+                    error!("Sync error: {}", e);
                     std::process::exit(1);
                 }
             }
@@ -290,7 +290,7 @@ fn main() {
         let folder_list = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
-                error!("Read folders error: {:?}", e);
+                error!("Read folders error: {}", e);
                 std::process::exit(1);
             }
         };
