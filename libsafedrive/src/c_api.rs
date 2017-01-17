@@ -335,14 +335,20 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
 ///
 /// Return codes will be expanded in the future to provide more specific information on the failure
 ///
+/// The caller does not own the memory pointed to by `unique_client_id` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
 ///
 /// Parameters:
 ///
 ///
 ///     email: a stack-allocated, NULL terminated string representing the user email address
 ///
-///     unique_client_id: an allocated pointer with exactly 64bytes + 1byte NULL terminator storage,
-///                       will be initialized by the library and must be freed by the caller
+///     unique_client_id: an uninitialized pointer that will be allocated and initialized when the function returns
+///
 ///
 /// Return:
 ///
@@ -354,9 +360,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
 /// # Examples
 ///
 /// ```c
-/// char * unique_client_id = malloc((64 * sizeof(char)) + 1);
-/// int success = sddk_get_unique_client_id("user@example.com");
-/// free(unique_client_id);
+/// char * unique_client_id;
+/// int success = sddk_get_unique_client_id("user@example.com", &unique_client_id);
+/// sddk_free_string(&unique_client_id);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
