@@ -371,11 +371,8 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 
     match unique_client_hash(&e) {
         Ok(hash) => {
-            let c_hash = Box::new(CString::new(hash).expect("Failed to get unique client id hash"));
-            mem::forget(&c_hash);
-
             unsafe {
-                *unique_client_id = c_hash.into_raw();
+                *unique_client_id = CString::new(hash).expect("Failed to get unique client id hash").into_raw();
             }
             return 0
         },
