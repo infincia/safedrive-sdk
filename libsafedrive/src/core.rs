@@ -582,6 +582,7 @@ pub fn restore(token: &Token,
     let main_key_s = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
         .expect("failed to get main key struct");
 
+    let entry_count: u64 = 0;
 
     let mut failed = 0;
 
