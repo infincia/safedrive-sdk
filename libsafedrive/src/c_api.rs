@@ -858,8 +858,8 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 pub extern "C" fn sddk_free_folder(folder: *mut *mut SDDKFolder) {
     assert!(!folder.is_null());
     let folder: Box<SDDKFolder> = unsafe { Box::from_raw(*folder) };
-    let _ = unsafe { CString::from_raw(folder.name as *mut i8) };
-    let _ = unsafe { CString::from_raw(folder.path as *mut i8) };
+    let _ = unsafe { CString::from_raw(folder.name as *mut std::os::raw::c_char) };
+    let _ = unsafe { CString::from_raw(folder.path as *mut std::os::raw::c_char) };
 }
 
 
@@ -887,8 +887,8 @@ pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder, length: u64) 
 
     let folders: Vec<SDDKFolder> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*folders, l)).into_vec() };
     for folder in folders {
-        let _ = unsafe { CString::from_raw(folder.name as *mut i8) };
-        let _ = unsafe { CString::from_raw(folder.path as *mut i8) };
+        let _ = unsafe { CString::from_raw(folder.name as *mut std::os::raw::c_char) };
+        let _ = unsafe { CString::from_raw(folder.path as *mut std::os::raw::c_char) };
     }
 }
 
@@ -915,7 +915,7 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession, l
     let l = length as usize;
     let sessions: Vec<SDDKSyncSession> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*sessions, l)).into_vec() };
     for session in sessions {
-        let _ = unsafe { CString::from_raw(session.name as *mut i8) };
+        let _ = unsafe { CString::from_raw(session.name as *mut std::os::raw::c_char) };
     }
 }
 
