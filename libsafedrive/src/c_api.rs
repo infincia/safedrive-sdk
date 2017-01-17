@@ -30,6 +30,8 @@ use ::models::{Configuration, RegisteredFolder, SyncSession};
 
 use ::util::unique_client_hash;
 
+use ::error::*;
+
 // exports
 
 
@@ -75,6 +77,64 @@ impl From<SyncSession> for SDDKSyncSession {
         }
     }
 }
+
+#[derive(Debug)]
+#[repr(C)]
+pub enum SDDKErrorType {
+    Internal = 0x0001,
+    RequestFailure = 0x0002,
+    NetworkFailure = 0x0003,
+    Conflict = 0x0004,
+    BlockMissing = 0x0005,
+    SessionMissing = 0x0006,
+    RecoveryPhraseIncorrect = 0x0007,
+    InsufficientFreeSpace = 0x0008,
+    AuthFailed = 0x0009,
+
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKError {
+    pub message: *const std::os::raw::c_char,
+    pub error_type: SDDKErrorType,
+}
+
+impl From<SDAPIError> for SDDKError {
+    fn from(e: SDAPIError) -> Self {
+        let error_type = match e {
+            SDAPIError::RequestFailed => SDDKErrorType::RequestFailure,
+            SDAPIError::AuthFailed => SDDKErrorType::AuthFailed,
+            SDAPIError::BlockMissing => SDDKErrorType::BlockMissing,
+            SDAPIError::SessionMissing => SDDKErrorType::SessionMissing,
+            SDAPIError::Conflict => SDDKErrorType::Conflict,
+            SDAPIError::RetryUpload => SDDKErrorType::RequestFailure,
+        };
+        SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
+    }
+}
+
+impl From<CryptoError> for SDDKError {
+    fn from(e: CryptoError) -> Self {
+        let error_type = match e {
+            CryptoError::KeyInvalid => SDDKErrorType::Internal,
+            CryptoError::KeyMissing => SDDKErrorType::Internal,
+            CryptoError::RecoveryPhraseIncorrect => SDDKErrorType::RecoveryPhraseIncorrect,
+            CryptoError::KeyGenerationFailed => SDDKErrorType::Internal,
+            CryptoError::KeyWrapFailed => SDDKErrorType::Internal,
+            CryptoError::BlockDecryptFailed => SDDKErrorType::Internal,
+            CryptoError::BlockEncryptFailed => SDDKErrorType::Internal,
+            CryptoError::SessionDecryptFailed => SDDKErrorType::Internal,
+            CryptoError::SessionEncryptFailed => SDDKErrorType::Internal,
+            CryptoError::KeysetRetrieveFailed => SDDKErrorType::RequestFailure,
+
+        };
+
+        SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
+    }
+}
+
+
 
 
 /// Initialize the library, must be called before any other function
@@ -901,3 +961,27 @@ pub extern "C" fn sddk_free_string(string: *mut *mut std::os::raw::c_char) {
     let _: CString = unsafe { CString::from_raw(*string) };
 }
 
+
+
+/// Free a pointer to an SDDKError
+///
+/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+///
+/// Parameters:
+///
+///     error: a pointer to an SDDKError obtained from another call
+///
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_error(&error);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_free_error(error: *mut *mut SDDKError) {
+    assert!(!error.is_null());
+    let e: Box<SDDKError> = unsafe { Box::from_raw(*error) };
+    let _ = unsafe { CString::from_raw(e.message as *mut std::os::raw::c_char) };
+}
