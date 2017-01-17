@@ -224,7 +224,7 @@ public class SafeDriveSDK: NSObject {
             return
         }
         DispatchQueue.global(priority: .default).async {
-            let result = sddk_create_archive(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, { (context, total, current, percent, tick) in
+            let result = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
@@ -248,7 +248,7 @@ public class SafeDriveSDK: NSObject {
             return
         }
         DispatchQueue.global(priority: .default).async {
-            let result = sddk_restore_archive(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
+            let result = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
