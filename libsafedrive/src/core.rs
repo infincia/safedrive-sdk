@@ -108,40 +108,42 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     };
 
 
-    if let Ok(real_wrapped_keyset) = account_key(token, &new_wrapped_keyset) {
-        // now we check to see if the keys returned by the server match the existing phrase or not
+    match account_key(token, &new_wrapped_keyset) {
+        Ok(real_wrapped_keyset) => {
+            // now we check to see if the keys returned by the server match the existing phrase or not
 
-        // if we were given an existing phrase try it, otherwise try the new one
-        debug!("got key set back from server, checking");
+            // if we were given an existing phrase try it, otherwise try the new one
+            debug!("got key set back from server, checking");
 
-        if let Some(p) = recovery_phrase {
-            match real_wrapped_keyset.to_keyset(&p) {
-                Ok(ks) => {
-                    return Ok(ks)
-                },
-                Err(e) => {
-                    debug!("failed to decrypt keys: {:?}", e);
-
-                    return Err(CryptoError::RecoveryPhraseIncorrect)
+            if let Some(p) = recovery_phrase {
+                match real_wrapped_keyset.to_keyset(&p) {
+                    Ok(ks) => {
+                        Ok(ks)
+                    },
+                    Err(e) => {
+                        debug!("failed to decrypt keys: {:?}", e);
+                        Err(CryptoError::RecoveryPhraseIncorrect)
+                    }
                 }
-            };
-        } else if let Some(p) = new_wrapped_keyset.recovery {
-            match real_wrapped_keyset.to_keyset(&p) {
-                Ok(ks) => {
-                    // a new keyset was generated so we must return the phrase to the caller so it
-                    // can be stored and displayed
-                    store_recovery_key(&p);
-                    return Ok(ks)
-                },
-                Err(e) => {
-                    debug!("failed to decrypt keys: {:?}", e);
-
-                    return Err(CryptoError::RecoveryPhraseIncorrect)
+            } else if let Some(p) = new_wrapped_keyset.recovery {
+                match real_wrapped_keyset.to_keyset(&p) {
+                    Ok(ks) => {
+                        // a new keyset was generated so we must return the phrase to the caller so it
+                        // can be stored and displayed
+                        store_recovery_key(&p);
+                        Ok(ks)
+                    },
+                    Err(e) => {
+                        debug!("failed to decrypt keys: {:?}", e);
+                        Err(CryptoError::RecoveryPhraseIncorrect)
+                    }
                 }
-            };
-        }
-    };
-    return Err(CryptoError::KeysetRetrieveFailed)
+            } else {
+                unreachable!("");
+            }
+        },
+        Err(e) => Err(CryptoError::KeysetRetrieveFailed { embed: e })
+    }
 }
 
 #[allow(unused_variables)]
