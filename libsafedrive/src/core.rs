@@ -81,10 +81,10 @@ pub fn login(username: &str,
         Ok((t, ucid)) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s, ucid)),
-                Err(e) => return Err(format!("failed to register client: {:?}", e))
+                Err(e) => return Err(format!("failed to register client: {}", e))
             }
         },
-        Err(e) => return Err(format!("failed to register client: {:?}", e))
+        Err(e) => return Err(format!("failed to register client: {}", e))
     }
 }
 
@@ -126,7 +126,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                         Ok(ks)
                     },
                     Err(e) => {
-                        debug!("failed to decrypt keys: {:?}", e);
+                        debug!("failed to decrypt keys: {}", e);
                         Err(CryptoError::RecoveryPhraseIncorrect)
                     }
                 }
@@ -139,7 +139,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                         Ok(ks)
                     },
                     Err(e) => {
-                        debug!("failed to decrypt keys: {:?}", e);
+                        debug!("failed to decrypt keys: {}", e);
                         Err(CryptoError::RecoveryPhraseIncorrect)
                     }
                 }
@@ -156,14 +156,14 @@ pub fn get_sync_folder(token: &Token,
                        folder_id: u32) -> Result<RegisteredFolder, String> {
     let folders = match read_folders(token) {
         Ok(folders) => folders,
-        Err(e) => return Err(format!("Rust<get_sync_folder>: getting folder failed: {:?}", e))
+        Err(e) => return Err(format!("getting folder failed: {}", e))
     };
     for folder in folders {
         if folder.id == folder_id {
             return Ok(folder)
         }
     }
-    return Err(format!("Rust<get_sync_folder>: getting folder failed"))
+    return Err(format!("getting folder failed"))
 }
 
 pub fn add_sync_folder(token: &Token,
@@ -171,7 +171,7 @@ pub fn add_sync_folder(token: &Token,
                        path: &str) -> Result<u32, String> {
     match create_folder(token, path, name, true) {
         Ok(folder_id) => Ok(folder_id),
-        Err(e) => return Err(format!("Rust<add_sync_folder>: creating folder failed: {:?}", e))
+        Err(e) => return Err(format!("creating folder failed: {}", e))
     }
 }
 
@@ -179,21 +179,21 @@ pub fn remove_sync_folder(token: &Token,
                           folder_id: u32) -> Result<(), String> {
     match delete_folder(token, folder_id) {
         Ok(()) => Ok(()),
-        Err(e) => return Err(format!("Rust<remove_sync_folder>: deleting folder failed: {:?}", e))
+        Err(e) => return Err(format!("removing folder failed: {}", e))
     }
 }
 
 pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
     match read_folders(token) {
         Ok(folders) => Ok(folders),
-        Err(e) => return Err(format!("Rust<get_sync_folders>: getting folder failed: {:?}", e))
+        Err(e) => return Err(format!("getting folders failed: {}", e))
     }
 }
 
 pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, String> {
     let m = match read_sessions(token) {
         Ok(sessions) => sessions,
-        Err(e) => return Err(format!("Rust<get_sync_sessions>: getting sessions failed: {:?}", e))
+        Err(e) => return Err(format!("getting sessions failed: {}", e))
     };
     let mut v: Vec<SyncSession> = Vec::new();
 
@@ -218,12 +218,12 @@ pub fn sync(token: &Token,
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(format!("failed to get sync folder info from server: {:?}", e))
+        Err(e) => return Err(format!("failed to get sync folder info from server: {}", e))
     };
 
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
-        Err(e) => return Err(format!("registering sync session failed: {:?}", e))
+        Err(e) => return Err(format!("registering sync session failed: {}", e))
     };
 
     let folder_path = PathBuf::from(&folder.folderPath);
@@ -548,7 +548,7 @@ pub fn sync(token: &Token,
 
     match finish_sync_session(&token, folder_id, session_name, true, &complete_archive, archive_size as usize) {
         Ok(()) => {},
-        Err(e) => return Err(format!("finishing session failed: {:?}", e))
+        Err(e) => return Err(format!("finishing session failed: {}", e))
     };
     progress(entry_count as u32, completed_count as u32, 100.0, false);
 
@@ -567,12 +567,12 @@ pub fn restore(token: &Token,
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(format!("failed to get sync folder info from server: {:?}", e))
+        Err(e) => return Err(format!("failed to get sync folder info from server: {}", e))
     };
 
     let session_data = match read_session(token, session_name, true) {
         Ok(session_data) => session_data,
-        Err(e) => return Err(format!("failed to get sync session data from server: {:?}", e))
+        Err(e) => return Err(format!("failed to get sync session data from server: {}", e))
     };
 
     let folder_name = &folder.folderName;
