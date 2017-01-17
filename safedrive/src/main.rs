@@ -161,7 +161,7 @@ fn main() {
     let username = match credentials.email {
         Some(email) => email,
         None => {
-            error!("No username/email found in credentials.json");
+            error!("No email found in credentials.json");
             std::process::exit(1);
         }
     };
