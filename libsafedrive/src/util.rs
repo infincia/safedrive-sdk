@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 use std::fs;
 use std::env;
 
+use CONFIGURATION;
 
 #[cfg(unix)]
 extern crate interfaces;
@@ -12,6 +13,8 @@ extern crate sodiumoxide;
 extern crate rustc_serialize;
 
 use self::rustc_serialize::hex::{ToHex};
+
+use ::models::Configuration;
 
 pub fn block_directory(unique_client_id: &str, hmac: &[u8]) -> PathBuf {
 
@@ -103,6 +106,11 @@ pub fn get_app_directory() -> Result<PathBuf, String> {
     } else {
         // probably linux, but either way not one of the others so use home dir
         storage_path.push(".safedrive");
+    }
+    let mut c = CONFIGURATION.read().unwrap();
+    match *c {
+        Configuration::Staging => storage_path.push("staging"),
+        Configuration::Production => {},
     }
     if let Err(e) = fs::create_dir_all(&storage_path) {
         panic!("Failed to create local directories: {}", e);
