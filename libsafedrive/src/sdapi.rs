@@ -21,6 +21,7 @@ use error::*;
 use models::*;
 use keys::*;
 use constants::*;
+use CONFIGURATION;
 
 pub enum APIEndpoint<'a> {
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
@@ -52,7 +53,11 @@ impl<'a> APIEndpoint<'a> {
     }
 
     pub fn domain(&self) -> String {
-        SDAPIDOMAIN_STAGING.to_string()
+        let mut c = CONFIGURATION.read().unwrap();
+        match *c {
+            Configuration::Staging => SDAPIDOMAIN_STAGING.to_string(),
+            Configuration::Production => SDAPIDOMAIN_PRODUCTION.to_string(),
+        }
     }
 
     pub fn protocol(&self) -> String {

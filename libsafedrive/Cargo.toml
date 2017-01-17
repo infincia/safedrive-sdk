@@ -21,7 +21,7 @@ bip39 = "*"
 rand = "*"
 log = "*"
 nom = "*"
-
+lazy_static = "0.1.*"
 
 [target."cfg(not(windows))".dependencies]
 interfaces = "*"

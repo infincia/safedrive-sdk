@@ -7,6 +7,7 @@ use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
 use std::{thread, time};
+use std::sync::RwLock;
 
 // external imports
 
@@ -37,10 +38,14 @@ use constants::*;
 use sdapi::*;
 use keys::*;
 use error::{CryptoError, SDAPIError};
+use CONFIGURATION;
 
 // internal functions
 
-pub fn initialize<S, T>(local_directory: S, unique_client_id: T) -> (PathBuf, String) where S: Into<String>, T: Into<String>{
+pub fn initialize<S, T>(local_directory: S, unique_client_id: T, config: Configuration) -> (PathBuf, String) where S: Into<String>, T: Into<String>{
+    let mut c = CONFIGURATION.write().unwrap();
+    *c = config;
+
 
     let ldir = local_directory.into();
     let uid = unique_client_id.into();

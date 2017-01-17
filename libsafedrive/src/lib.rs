@@ -22,6 +22,15 @@ extern crate hyper;
 #[macro_use]
 extern crate nom;
 
+#[macro_use]
+extern crate lazy_static;
+
+// global config, can only be set once at runtime
+
+lazy_static! {
+    static ref CONFIGURATION: std::sync::RwLock<models::Configuration> = std::sync::RwLock::new(models::Configuration::Production);
+}
+
 
 
 

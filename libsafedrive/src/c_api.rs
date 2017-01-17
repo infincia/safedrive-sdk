@@ -42,6 +42,13 @@ pub struct SDDKState(State);
 
 #[derive(Debug)]
 #[repr(C)]
+pub enum SDDKConfiguration {
+    SDDKConfigurationProduction,
+    SDDKConfigurationStaging,
+}
+
+#[derive(Debug)]
+#[repr(C)]
 pub struct SDDKFolder {
     pub id: u32,
     pub name: *const std::os::raw::c_char,
@@ -178,7 +185,8 @@ impl From<CryptoError> for SDDKError {
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char,
-                                  unique_client_id: *const std::os::raw::c_char) -> *mut SDDKState {
+                                  unique_client_id: *const std::os::raw::c_char,
+                                  config: SDDKConfiguration) -> *mut SDDKState {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
@@ -199,7 +207,12 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
-    let (storage_path, client_id) = initialize(storage_directory, uid);
+    let c = match config {
+        SDDKConfiguration::SDDKConfigurationProduction => Configuration::Production,
+        SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
+    };
+
+    let (storage_path, client_id) = initialize(storage_directory, uid, c);
 
     let state = State {
         storage_path: storage_path,
