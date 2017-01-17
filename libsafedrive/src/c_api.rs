@@ -742,6 +742,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
         Ok(p) => p.to_owned(),
         Err(e) => { panic!("path is not valid UTF-8: {}", e) },
     };
+    let p = PathBuf::from(d);
 
     let main_key = (*c).0.get_main_key();
     let hmac_key = (*c).0.get_hmac_key();
@@ -758,6 +759,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                   hmac_key,
                   tweak_key,
                   id,
+                  p,
                   &mut |total, current, progress_percent, tick| {
                       let c_total: std::os::raw::c_uint = total;
                       let c_current: std::os::raw::c_uint = current;
