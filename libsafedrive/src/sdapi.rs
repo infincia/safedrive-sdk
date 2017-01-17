@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 extern crate rustc_serialize;
 
-use self::rustc_serialize::hex::{ToHex, FromHex};
+use self::rustc_serialize::hex::{ToHex};
 
 extern crate reqwest;
 extern crate serde;
