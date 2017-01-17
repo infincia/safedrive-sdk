@@ -563,7 +563,7 @@ pub fn restore(token: &Token,
         Err(e) => return Err(format!("failed to get sync folder info from server: {:?}", e))
     };
 
-    let session_data = match read_session(token, folder_id, session_name, true) {
+    let session_data = match read_session(token, session_name, true) {
         Ok(session_data) => session_data,
         Err(e) => return Err(format!("failed to get sync session data from server: {:?}", e))
     };
