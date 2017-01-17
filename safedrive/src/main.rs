@@ -126,7 +126,7 @@ fn main() {
     }
     println!();
 
-    let app_directory = get_app_directory().expect("Error: could not determine local storage directory");
+    let app_directory = get_app_directory(&config).expect("Error: could not determine local storage directory");
     let mut credential_file_path = PathBuf::from(&app_directory);
     credential_file_path.push("credentials.json");
 
