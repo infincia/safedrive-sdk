@@ -188,6 +188,12 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
         .json(&body);
 
     let mut result = try!(request.send());
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -212,6 +218,12 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -234,6 +246,12 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -259,6 +277,11 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
 
     let mut response = String::new();
 
@@ -280,6 +303,12 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -308,6 +337,12 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -338,6 +373,7 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
 
     match result.status() {
         &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     }
 
@@ -360,6 +396,12 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
+        _ => return Err(SDAPIError::RequestFailed)
+    }
 
     let sessions: HashMap<u32, Vec<SyncSession>> = match serde_json::from_str(&response) {
         Ok(s) => s,
@@ -390,6 +432,7 @@ pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypte
     match result.status() {
         &reqwest::StatusCode::Ok => {},
         &reqwest::StatusCode::Created => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     }
 
@@ -424,6 +467,7 @@ pub fn finish_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted:
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(()),
         &reqwest::StatusCode::Created => Ok(()),
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     }
 }
@@ -442,6 +486,7 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
     match result.status() {
         &reqwest::StatusCode::Ok => {},
         &reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     };
     let mut buffer = Vec::new();
@@ -476,6 +521,7 @@ pub fn check_block<S>(token: &Token, name: S) -> Result<bool, SDAPIError> where 
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(true),
         &reqwest::StatusCode::NotFound => Ok(false),
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     }
 }
@@ -512,6 +558,7 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
         &reqwest::StatusCode::Created => Ok(()),
         &reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
         &reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     }
 }
@@ -528,6 +575,7 @@ pub fn read_block<'a, S>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAP
     match result.status() {
         &reqwest::StatusCode::Ok => {},
         &reqwest::StatusCode::NotFound => return Err(SDAPIError::BlockMissing),
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
         _ => return Err(SDAPIError::RequestFailed)
     };
     let mut buffer = Vec::new();
