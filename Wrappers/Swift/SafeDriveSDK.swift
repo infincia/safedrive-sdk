@@ -45,7 +45,13 @@ public class SafeDriveSDK: NSObject {
     }
 
     public func setUp(local_storage_path: String, unique_client_id: String) {
-        self.state = sddk_initialize(local_storage_path, unique_client_id)
+        var config: SDDKConfiguration
+        #if DEBUG
+        config = SDDKConfigurationStaging
+        #else
+        config = SDDKConfigurationProduction
+        #endif
+        self.state = sddk_initialize(local_storage_path, unique_client_id, config)
     }
     
     deinit {
