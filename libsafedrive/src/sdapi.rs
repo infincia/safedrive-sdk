@@ -384,9 +384,6 @@ pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypte
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
-    let mut response = String::new();
-
-    try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
 
