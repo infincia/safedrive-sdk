@@ -32,7 +32,7 @@ extern crate safedrive;
 use safedrive::core::initialize;
 use safedrive::core::login;
 use safedrive::core::load_keys;
-use safedrive::core::create_archive;
+use safedrive::core::sync;
 use safedrive::core::get_sync_folders;
 use safedrive::core::get_sync_folder;
 
@@ -240,22 +240,21 @@ fn main() {
 
             let sync_uuid = Uuid::new_v4().hyphenated().to_string();
 
-            match create_archive(&token,
-                                 &sync_uuid,
-                                 &keyset.main,
-                                 &keyset.hmac,
-                                 &keyset.tweak,
-                                 folder.id,
-                                 &mut |total, current, progress_percent, tick| {
-                                     if tick {
-                                         pb.tick();
-                                     }
-                                     else {
-                                        pb.total = total as u64;
-                                        pb.inc();
-                                     }
-
-                }) {
+            match sync(&token,
+                       &sync_uuid,
+                       &keyset.main,
+                       &keyset.hmac,
+                       &keyset.tweak,
+                       folder.id,
+                       &mut |total, current, progress_percent, tick| {
+                           if tick {
+                               pb.tick();
+                           } else {
+                               pb.total = total as u64;
+                               pb.inc();
+                           }
+                       }
+            ) {
                 Ok(_) => { pb.finish(); return },
                 Err(e) => {
                     error!("Sync error: {:?}", e);
