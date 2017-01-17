@@ -152,7 +152,10 @@ fn main() {
 
     let credentials: Credentials = match serde_json::from_str(&cs) {
         Ok(c) => c,
-        Err(_) => Credentials { email: None, password: None, phrase: None }
+        Err(e) =>  {
+            error!("Couldn't parse credentials.json: {}", e);
+            std::process::exit(1);
+        }
     };
 
     let username = match credentials.email {
