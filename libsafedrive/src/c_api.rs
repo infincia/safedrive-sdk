@@ -160,7 +160,8 @@ impl From<CryptoError> for SDDKError {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char, unique_client_id: *const std::os::raw::c_char) -> *mut SDDKState {
+pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char,
+                                  unique_client_id: *const std::os::raw::c_char) -> *mut SDDKState {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
