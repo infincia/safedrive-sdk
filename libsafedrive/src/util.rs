@@ -78,7 +78,7 @@ pub fn unique_client_hash(email: &String) -> Result<String, String> {
     }
 }*/
 
-pub fn get_app_directory() -> Result<PathBuf, String> {
+pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
 
     let evar: &str;
@@ -107,10 +107,10 @@ pub fn get_app_directory() -> Result<PathBuf, String> {
         // probably linux, but either way not one of the others so use home dir
         storage_path.push(".safedrive");
     }
-    let mut c = CONFIGURATION.read().unwrap();
-    match *c {
-        Configuration::Staging => storage_path.push("staging"),
-        Configuration::Production => {},
+
+    match config {
+        &Configuration::Staging => storage_path.push("staging"),
+        &Configuration::Production => {},
     }
     if let Err(e) = fs::create_dir_all(&storage_path) {
         panic!("Failed to create local directories: {}", e);
