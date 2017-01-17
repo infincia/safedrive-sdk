@@ -48,6 +48,7 @@ impl From<Bip39Error> for CryptoError {
 #[derive(Debug)]
 pub enum SDAPIError {
     RequestFailed,
+    AuthFailed,
     RetryUpload,
     Conflict,
     BlockMissing,
