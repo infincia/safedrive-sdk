@@ -373,7 +373,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void, state: *mut
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
-                                              mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_int {
+                                            mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_int {
 
     let c_email: &CStr = unsafe { CStr::from_ptr(email) };
     let e: String =  match c_email.to_str() {
