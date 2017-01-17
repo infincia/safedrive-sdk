@@ -155,7 +155,7 @@ impl WrappedKey {
 
         let key_raw = match sodiumoxide::crypto::secretbox::open(&self.bytes, &self.key_type.nonce(), &wrapping_key_s) {
             Ok(k) => k,
-            Err(_) => return Err(CryptoError::DecryptFailed)
+            Err(_) => return Err(CryptoError::RecoveryPhraseIncorrect)
         };
 
         Ok(Key { bytes: key_raw, key_type: self.key_type })

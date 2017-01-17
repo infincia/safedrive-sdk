@@ -16,30 +16,35 @@ extern crate serde_json;
 
 #[derive(Debug)]
 pub enum CryptoError {
-    InvalidKey,
-    MissingKey,
-    MissingRecovery,
+    KeyInvalid,
+    KeyMissing,
+    RecoveryPhraseIncorrect,
     KeyGenerationFailed,
-    DecryptFailed,
-    EncryptFailed,
-    RetrieveFailed
+    KeyWrapFailed,
+    BlockDecryptFailed,
+    BlockEncryptFailed,
+    SessionDecryptFailed,
+    SessionEncryptFailed,
+    KeysetRetrieveFailed
+}
+
 }
 
 #[allow(unused_variables)]
 impl From<FromHexError> for CryptoError {
     fn from(err: FromHexError) -> CryptoError {
-        CryptoError::InvalidKey
+        CryptoError::KeyInvalid
     }
 }
 
 impl From<Bip39Error> for CryptoError {
     fn from(err: Bip39Error) -> CryptoError {
         match err {
-            Bip39Error::InvalidChecksum => CryptoError::DecryptFailed,
+            Bip39Error::InvalidChecksum => CryptoError::RecoveryPhraseIncorrect,
             Bip39Error::EntropyUnavailable => CryptoError::KeyGenerationFailed,
-            Bip39Error::InvalidKeysize => CryptoError::InvalidKey,
-            Bip39Error::InvalidWordLength => CryptoError::InvalidKey,
-            Bip39Error::LanguageUnavailable => CryptoError::DecryptFailed
+            Bip39Error::InvalidKeysize => CryptoError::RecoveryPhraseIncorrect,
+            Bip39Error::InvalidWordLength => CryptoError::RecoveryPhraseIncorrect,
+            Bip39Error::LanguageUnavailable => CryptoError::KeyInvalid
         }
     }
 }

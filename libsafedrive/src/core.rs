@@ -122,7 +122,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                 Err(e) => {
                     debug!("failed to decrypt keys: {:?}", e);
 
-                    return Err(CryptoError::DecryptFailed)
+                    return Err(CryptoError::RecoveryPhraseIncorrect)
                 }
             };
         } else if let Some(p) = new_wrapped_keyset.recovery {
@@ -136,12 +136,12 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                 Err(e) => {
                     debug!("failed to decrypt keys: {:?}", e);
 
-                    return Err(CryptoError::DecryptFailed)
+                    return Err(CryptoError::RecoveryPhraseIncorrect)
                 }
             };
         }
     };
-    return Err(CryptoError::RetrieveFailed)
+    return Err(CryptoError::KeysetRetrieveFailed)
 }
 
 #[allow(unused_variables)]
