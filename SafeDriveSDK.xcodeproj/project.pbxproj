@@ -300,6 +300,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = Wrappers/Swift/Info.plist;
@@ -336,6 +337,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = Wrappers/Swift/Info.plist;
