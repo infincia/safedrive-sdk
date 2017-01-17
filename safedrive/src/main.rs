@@ -116,6 +116,15 @@ fn main() {
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
     println!();
+    let mut config: Configuration = Configuration::Staging;
+
+    if matches.is_present("production") {
+        println!("Environment: production");
+        config = Configuration::Production;
+    } else {
+        println!("Environment: staging");
+    }
+    println!();
 
     let app_directory = get_app_directory().expect("Error: could not determine local storage directory");
     let mut credential_file_path = PathBuf::from(&app_directory);
@@ -169,15 +178,6 @@ fn main() {
             std::process::exit(1);
         },
     };
-
-    let mut config: Configuration = Configuration::Staging;
-
-    if matches.is_present("production") {
-        println!("Environment: production");
-        config = Configuration::Production;
-    } else {
-        println!("Environment: staging");
-    }
 
     let (_, _) = initialize(a, uid, config);
 
