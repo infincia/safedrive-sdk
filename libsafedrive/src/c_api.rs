@@ -90,7 +90,7 @@ pub enum SDDKErrorType {
     RecoveryPhraseIncorrect = 0x0007,
     InsufficientFreeSpace = 0x0008,
     AuthFailed = 0x0009,
-
+    UnicodeError = 0x000A,
 }
 
 #[derive(Debug)]
@@ -111,6 +111,12 @@ impl From<SDAPIError> for SDDKError {
             SDAPIError::RetryUpload => SDDKErrorType::RequestFailure,
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
+    }
+}
+
+impl From<str::Utf8Error> for SDDKError {
+    fn from(e: str::Utf8Error) -> Self {
+        SDDKError { error_type: SDDKErrorType::UnicodeError, message: CString::new(format!("{}", e)).unwrap().into_raw() }
     }
 }
 
