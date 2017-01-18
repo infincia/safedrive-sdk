@@ -139,8 +139,16 @@ pub fn get_local_user() -> Result<String, String> {
 }
 
 #[test]
-fn app_directory_test() {
-    match get_app_directory() {
+fn staging_directory_test() {
+    match get_app_directory(&Configuration::Staging) {
+        Ok(p) => p,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
+#[test]
+fn production_directory_test() {
+    match get_app_directory(&Configuration::Production) {
         Ok(p) => p,
         Err(_) => { assert!(true == false); return }
     };
