@@ -30,5 +30,6 @@ cp -a dep/$TARGET/lib/* dist-$TARGET/lib/
 cp -a target/debug/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
 cp -a target/debug/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
 install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib || true
+install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib || true
 cp -a target/debug/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
 cp -a target/debug/safedrive dist-$TARGET/bin/
