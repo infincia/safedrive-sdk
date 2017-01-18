@@ -112,8 +112,9 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         &Configuration::Staging => storage_path.push("staging"),
         &Configuration::Production => {},
     }
-    if let Err(e) = fs::create_dir_all(&storage_path) {
-        panic!("Failed to create local directories: {}", e);
+    match fs::create_dir_all(&storage_path) {
+        Ok(()) => {},
+        Err(e) => {}, //ignore this for the moment, it's primarily going to be the directory existing already
     }
 
     return Ok(storage_path)
