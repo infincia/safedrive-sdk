@@ -17,7 +17,7 @@ header! { (ContentType, "Content-Type") => [String] }
 header! { (ContentLength, "Content-Length") => [usize] }
 
 use util::*;
-use error::*;
+use error::SDAPIError;
 use models::*;
 use keys::*;
 use constants::*;
@@ -193,11 +193,6 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
         .json(&body);
 
     let mut result = try!(request.send());
-    match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
-    }
 
     let mut response = String::new();
 
@@ -205,10 +200,15 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
 
     debug!("response: {}", response);
 
-    let token: Token = match serde_json::from_str(&response) {
-        Ok(token) => token,
-        Err(_) => return Err(SDAPIError::RequestFailed)
-    };
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+
+    let token: Token = try!(serde_json::from_str(&response));
 
     let u = UniqueClientID { id: uid.to_owned() };
 
@@ -223,11 +223,6 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
-    match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
-    }
 
     let mut response = String::new();
 
@@ -235,10 +230,16 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 
     debug!("response: {}", response);
 
-    let account_status: AccountStatus = match serde_json::from_str(&response) {
-        Ok(a) => a,
-        Err(_) => return Err(SDAPIError::RequestFailed)
-    };
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+
+
+    let account_status: AccountStatus = try!(serde_json::from_str(&response));
 
     Ok(account_status)
 }
@@ -251,11 +252,6 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
-    match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
-    }
 
     let mut response = String::new();
 
@@ -263,10 +259,14 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
     debug!("response: {}", response);
 
-    let account_details: AccountDetails = match serde_json::from_str(&response) {
-        Ok(a) => a,
-        Err(_) => return Err(SDAPIError::RequestFailed)
-    };
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+    let account_details: AccountDetails = try!(serde_json::from_str(&response));
 
     Ok(account_details)
 }
@@ -282,17 +282,19 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
-    match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
-    }
 
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
 
     let wrapped_keyset_b: WrappedKeysetBody = try!(serde_json::from_str(&response));
 
@@ -308,11 +310,6 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
-    match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
-    }
 
     let mut response = String::new();
 
@@ -320,10 +317,14 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
     debug!("response: {}", response);
 
-    let folders: Vec<RegisteredFolder> = match serde_json::from_str(&response) {
-        Ok(f) => f,
-        Err(_) => return Err(SDAPIError::RequestFailed)
-    };
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+    let folders: Vec<RegisteredFolder> = try!(serde_json::from_str(&response));
 
     Ok(folders)
 }
@@ -342,11 +343,6 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
-    match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
-    }
 
     let mut response = String::new();
 
@@ -354,10 +350,14 @@ pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> 
 
     debug!("response: {}", response);
 
-    let folder_response: CreateFolderResponse = match serde_json::from_str(&response) {
-        Ok(r) => r,
-        Err(_) => return Err(SDAPIError::RequestFailed)
-    };
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+    let folder_response: CreateFolderResponse = try!(serde_json::from_str(&response));
 
     Ok(folder_response.id)
 }
@@ -370,6 +370,7 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -378,8 +379,9 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
 
     match result.status() {
         &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
     Ok(())
@@ -396,6 +398,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -404,14 +407,12 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
 
     match result.status() {
         &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let sessions: HashMap<u32, Vec<SyncSession>> = match serde_json::from_str(&response) {
-        Ok(s) => s,
-        Err(_) => return Err(SDAPIError::RequestFailed)
-    };
+    let sessions: HashMap<u32, Vec<SyncSession>> = try!(serde_json::from_str(&response));
 
     Ok(sessions)
 }
@@ -428,6 +429,7 @@ pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypte
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
+
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
@@ -437,8 +439,9 @@ pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypte
     match result.status() {
         &reqwest::StatusCode::Ok => {},
         &reqwest::StatusCode::Created => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
     Ok(())
@@ -472,8 +475,9 @@ pub fn finish_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted:
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(()),
         &reqwest::StatusCode::Created => Ok(()),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 }
 
@@ -491,8 +495,9 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
     match result.status() {
         &reqwest::StatusCode::Ok => {},
         &reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
     let mut buffer = Vec::new();
 
@@ -526,8 +531,9 @@ pub fn check_block<S>(token: &Token, name: S) -> Result<bool, SDAPIError> where 
     match result.status() {
         &reqwest::StatusCode::Ok => Ok(true),
         &reqwest::StatusCode::NotFound => Ok(false),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 }
 
@@ -563,8 +569,9 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
         &reqwest::StatusCode::Created => Ok(()),
         &reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
         &reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 }
 
@@ -580,8 +587,9 @@ pub fn read_block<'a, S>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAP
     match result.status() {
         &reqwest::StatusCode::Ok => {},
         &reqwest::StatusCode::NotFound => return Err(SDAPIError::BlockMissing),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::AuthFailed),
-        _ => return Err(SDAPIError::RequestFailed)
+        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
     let mut buffer = Vec::new();
 

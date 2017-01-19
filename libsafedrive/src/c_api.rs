@@ -30,7 +30,7 @@ use ::models::{Configuration, RegisteredFolder, SyncSession};
 
 use ::util::unique_client_hash;
 
-use ::error::*;
+use ::error::SDError;
 
 // exports
 
@@ -96,8 +96,11 @@ pub enum SDDKErrorType {
     SessionMissing = 0x0006,
     RecoveryPhraseIncorrect = 0x0007,
     InsufficientFreeSpace = 0x0008,
-    AuthFailed = 0x0009,
+    Authentication = 0x0009,
     UnicodeError = 0x000A,
+    TokenExpired = 0x000B,
+    CryptoError = 0x000C,
+    IO = 0x000D,
 }
 
 #[derive(Debug)]
@@ -107,15 +110,48 @@ pub struct SDDKError {
     pub error_type: SDDKErrorType,
 }
 
-impl From<SDAPIError> for SDDKError {
-    fn from(e: SDAPIError) -> Self {
+impl From<SDError> for SDDKError {
+    fn from(e: SDError) -> Self {
         let error_type = match e {
-            SDAPIError::RequestFailed => SDDKErrorType::RequestFailure,
-            SDAPIError::AuthFailed => SDDKErrorType::AuthFailed,
-            SDAPIError::BlockMissing => SDDKErrorType::BlockMissing,
-            SDAPIError::SessionMissing => SDDKErrorType::SessionMissing,
-            SDAPIError::Conflict => SDDKErrorType::Conflict,
-            SDAPIError::RetryUpload => SDDKErrorType::RequestFailure,
+            SDError::Internal(_) => {
+                SDDKErrorType::Internal
+            },
+            SDError::IO(_) => {
+                SDDKErrorType::IO
+            },
+            SDError::RequestFailure(_) => {
+                SDDKErrorType::RequestFailure
+            },
+            SDError::NetworkFailure(_) => {
+                SDDKErrorType::NetworkFailure
+            },
+            SDError::Conflict(_) => {
+                SDDKErrorType::Conflict
+            },
+            SDError::BlockMissing => {
+                SDDKErrorType::Internal
+            },
+            SDError::SessionMissing => {
+                SDDKErrorType::Internal
+            },
+            SDError::RecoveryPhraseIncorrect => {
+                SDDKErrorType::RecoveryPhraseIncorrect
+            },
+            SDError::InsufficientFreeSpace => {
+                SDDKErrorType::InsufficientFreeSpace
+            },
+            SDError::Authentication => {
+                SDDKErrorType::Authentication
+            },
+            SDError::UnicodeError => {
+                SDDKErrorType::UnicodeError
+            },
+            SDError::TokenExpired => {
+                SDDKErrorType::TokenExpired
+            },
+            SDError::CryptoError(_) => {
+                SDDKErrorType::CryptoError
+            },
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
     }
@@ -124,43 +160,6 @@ impl From<SDAPIError> for SDDKError {
 impl From<str::Utf8Error> for SDDKError {
     fn from(e: str::Utf8Error) -> Self {
         SDDKError { error_type: SDDKErrorType::UnicodeError, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-    }
-}
-
-impl From<CryptoError> for SDDKError {
-    fn from(e: CryptoError) -> Self {
-        match e {
-            CryptoError::KeyInvalid => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::KeyMissing => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::RecoveryPhraseIncorrect => {
-                SDDKError { error_type: SDDKErrorType::RecoveryPhraseIncorrect, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::KeyGenerationFailed => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::KeyWrapFailed => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::BlockDecryptFailed => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::BlockEncryptFailed => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::SessionDecryptFailed => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::SessionEncryptFailed => {
-                SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", e)).unwrap().into_raw() }
-            },
-            CryptoError::KeysetRetrieveFailed { embed } => {
-                SDDKError { error_type: SDDKErrorType::RequestFailure, message: CString::new(format!("{}", embed)).unwrap().into_raw() }
-            },
-        }
     }
 }
 

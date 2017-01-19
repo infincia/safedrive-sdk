@@ -37,7 +37,7 @@ use models::*;
 use constants::*;
 use sdapi::*;
 use keys::*;
-use error::{CryptoError, SDAPIError};
+use error::{CryptoError, SDAPIError, SDError};
 use CONFIGURATION;
 
 // internal functions
@@ -75,20 +75,20 @@ pub fn initialize<S, T>(local_directory: S, unique_client_id: T, config: Configu
 }
 
 pub fn login(username: &str,
-             password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), String> {
+             password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), SDError> {
 
     match register_client(username, password) {
         Ok((t, ucid)) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s, ucid)),
-                Err(e) => return Err(format!("failed to register client: {}", e))
+                Err(e) => Err(SDError::from(e))
             }
         },
-        Err(e) => return Err(format!("failed to register client: {}", e))
+        Err(e) => return Err(SDError::from(e))
     }
 }
 
-pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<Keyset, CryptoError> {
+pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<Keyset, SDError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
     //
@@ -109,7 +109,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     //
     let new_wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
-        Err(_) => return Err(CryptoError::KeyGenerationFailed)
+        Err(_) => return Err(SDError::from(CryptoError::KeyGenerationFailed))
     };
 
 
@@ -127,7 +127,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                     },
                     Err(e) => {
                         debug!("failed to decrypt keys: {}", e);
-                        Err(CryptoError::RecoveryPhraseIncorrect)
+                        Err(SDError::RecoveryPhraseIncorrect)
                     }
                 }
             } else if let Some(p) = new_wrapped_keyset.recovery {
@@ -140,60 +140,60 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                     },
                     Err(e) => {
                         debug!("failed to decrypt keys: {}", e);
-                        Err(CryptoError::RecoveryPhraseIncorrect)
+                        Err(SDError::from(e))
                     }
                 }
             } else {
                 unreachable!("");
             }
         },
-        Err(e) => Err(CryptoError::KeysetRetrieveFailed { embed: e })
+        Err(e) => Err(SDError::from(e))
     }
 }
 
 #[allow(unused_variables)]
 pub fn get_sync_folder(token: &Token,
-                       folder_id: u32) -> Result<RegisteredFolder, String> {
+                       folder_id: u32) -> Result<RegisteredFolder, SDError> {
     let folders = match read_folders(token) {
         Ok(folders) => folders,
-        Err(e) => return Err(format!("getting folder failed: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
     for folder in folders {
         if folder.id == folder_id {
             return Ok(folder)
         }
     }
-    return Err(format!("getting folder failed"))
+    return Err(SDError::Internal(format!("unexpected failure to find folder_id {}", folder_id)))
 }
 
 pub fn add_sync_folder(token: &Token,
                        name: &str,
-                       path: &str) -> Result<u32, String> {
+                       path: &str) -> Result<u32, SDError> {
     match create_folder(token, path, name, true) {
         Ok(folder_id) => Ok(folder_id),
-        Err(e) => return Err(format!("creating folder failed: {}", e))
+        Err(e) => Err(SDError::from(e))
     }
 }
 
 pub fn remove_sync_folder(token: &Token,
-                          folder_id: u32) -> Result<(), String> {
+                          folder_id: u32) -> Result<(), SDError> {
     match delete_folder(token, folder_id) {
         Ok(()) => Ok(()),
-        Err(e) => return Err(format!("removing folder failed: {}", e))
+        Err(e) => Err(SDError::from(e))
     }
 }
 
-pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, String> {
+pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDError> {
     match read_folders(token) {
         Ok(folders) => Ok(folders),
-        Err(e) => return Err(format!("getting folders failed: {}", e))
+        Err(e) => Err(SDError::from(e))
     }
 }
 
-pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, String> {
+pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
     let m = match read_sessions(token) {
         Ok(sessions) => sessions,
-        Err(e) => return Err(format!("getting sessions failed: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
     let mut v: Vec<SyncSession> = Vec::new();
 
@@ -214,16 +214,16 @@ pub fn sync(token: &Token,
             hmac_key: &Key,
             tweak_key: &Key,
             folder_id: u32,
-            progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
+            progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(format!("failed to get sync folder info from server: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
 
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
-        Err(e) => return Err(format!("registering sync session failed: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
 
     let folder_path = PathBuf::from(&folder.folderPath);
@@ -336,7 +336,7 @@ pub fn sync(token: &Token,
                     let mut data: Vec<u8> = Vec::with_capacity(100000); //expected size of largest block
 
                     if let Err(e) = buffer.read_to_end(&mut data) {
-                        return Err(format!("could not read from file: {}", e))
+                        return Err(SDError::from(e))
                     }
 
                     let raw_chunk = data.as_slice();
@@ -390,7 +390,7 @@ pub fn sync(token: &Token,
                                 skipped_blocks = skipped_blocks + 1;
                                 should_retry = false
                             },
-                            Err(SDAPIError::RequestFailed) => {
+                            Err(SDAPIError::RequestFailed(err)) => {
                                 retries_left = retries_left - 1.0;
                             },
                             Err(SDAPIError::RetryUpload) => {
@@ -548,7 +548,7 @@ pub fn sync(token: &Token,
 
     match finish_sync_session(&token, folder_id, session_name, true, &complete_archive, archive_size as usize) {
         Ok(()) => {},
-        Err(e) => return Err(format!("finishing session failed: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
     progress(entry_count as u32, completed_count as u32, 100.0, false);
 
@@ -563,16 +563,16 @@ pub fn restore(token: &Token,
                tweak_key: &Key,
                folder_id: u32,
                destination: PathBuf,
-               progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), String> {
+               progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(format!("failed to get sync folder info from server: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
 
     let session_data = match read_session(token, session_name, true) {
         Ok(session_data) => session_data,
-        Err(e) => return Err(format!("failed to get sync session data from server: {}", e))
+        Err(e) => return Err(SDError::from(e))
     };
 
     let folder_name = &folder.folderName;
