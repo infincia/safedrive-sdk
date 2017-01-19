@@ -171,20 +171,54 @@ impl From<String> for SDDKError {
 }
 
 
-/// Initialize the library, must be called before any other function
+/// Initialize the library, must be called before any other function.
 ///
-/// Will assert non-null on each parameter
+/// If the application needs to switch users or the unique client ID changes, free the SDDKState and
+/// call initialize again
+///
+/// Will assert non-null on `local_storage_path` and `unique_client_id`
 ///
 /// Parameters:
 ///
-///     db_path: a stack-allocated, NULL-terminated string representing the location for local database and block storage
+///     local_storage_path: a stack-allocated, NULL-terminated string representing the location the app can store settings for a user
 ///
-///     unique_client_id: a stack-allocated, NULL-terminated string representing the current user
+///     unique_client_id: a stack-allocated, NULL-terminated string representing the current unique_client_id
+///
+///     config: a stack-allocated enum variant of SDDKConfiguration which controls API endpoint and other things
+///
+///             use SDDKConfigurationStaging for the staging environment
+///             use SDDKConfigurationProduction for the production environment
+///
+///     state: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
+///
+///            must be freed by the caller using sddk_free_state()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
 ///
 /// # Examples
 ///
 /// ```c
-/// printf("Hello, world\n");
+/// SDDKState *state = NULL;
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_initialize("/home/user/.safedrive/", "12345", SDDKConfigurationProduction, &state, &error)) {
+///     printf("SDDK Initialization failed");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     // do something with SDDKState here, store it somewhere, then free it later on
+///     sddk_free_state(&state);
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -243,30 +277,42 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 
 /// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
 ///
-/// Will assert non-null on each parameter
+/// Will assert non-null on `state`, `username`, and `password`
 ///
 ///
 /// Parameters:
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     account_username: a stack-allocated pointer to a username for a SafeDrive account
+///     username: a stack-allocated, NULL-terminated string representing a username for a SafeDrive account
 ///
-///     account_password: a stack-allocated pointer to a password for a SafeDrive account
+///     password: a stack-allocated, NULL-terminated string representing a password for a SafeDrive account
 ///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
+///      0: success
 ///
 ///
 /// # Examples
 ///
 /// ```c
-/// if (0 != sddk_login(&state, "user@safedrive.io", "password")) {
+/// SDDKState *state; //retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_login(&state, "user@safedrive.io", "password", &error)) {
 ///     printf("Login failed");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Login successful");
 /// }
 /// ```
 #[no_mangle]
@@ -318,9 +364,9 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 
 
 
-/// Load keys, must be called before any other function that operates on archives
+/// Load keys, must be called before any other function that starts a sync or restore
 ///
-/// Will assert non-null on the state parameter only, the others will cause a crash if null
+/// Will assert non-null on the `state` parameter only
 ///
 ///
 /// Parameters:
@@ -339,22 +385,37 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 ///                                     note that the pointer becomes invalid after the callback function
 ///                                     returns
 ///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
 ///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
+///      0: success
 ///
 ///
 /// # Examples
 ///
 /// ```
+/// void *context; // arbitrary, can be anything you want access to in the callback
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
 /// void store_recovery_key_cb(char const* new_phrase) {
 ///     // do something with new_phrase, pointer becomes invalid after return
 /// }
-/// sddk_load_keys(&state, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb);
+///
+/// if (0 != sddk_load_keys(&context, &state, &error, "genius quality lunch cost cream question remain narrow barely circle weapon ask", &store_recovery_key_cb)) {
+///     printf("Loading keys failed");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Loading keys successful");
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -406,8 +467,6 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 ///
 /// Will return a failure code if for any reason the hash cannot be generated properly
 ///
-/// Return codes will be expanded in the future to provide more specific information on the failure
-///
 /// The caller does not own the memory pointed to by `unique_client_id` after this function returns, it must
 /// be returned and freed by the library.
 ///
@@ -420,22 +479,40 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 ///
 ///     email: a stack-allocated, NULL terminated string representing the user email address
 ///
-///     unique_client_id: an uninitialized pointer that will be allocated and initialized when the function returns
+///     unique_client_id: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
 ///
+///            must be freed by the caller using sddk_free_string()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
+///      0: success
 ///
 ///
 /// # Examples
 ///
 /// ```c
 /// char * unique_client_id;
-/// int success = sddk_get_unique_client_id("user@example.com", &unique_client_id);
-/// sddk_free_string(&unique_client_id);
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_get_unique_client_id("user@example.com", &unique_client_id, &error)) {
+///     printf("Failed to get unique client id");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got unique client id");
+///     // do something with unique_client_id here, then free it
+///     sddk_free_string(&unique_client_id);
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -474,8 +551,6 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 ///
 /// Will return a failure code if for any reason the folder cannot be added
 ///
-/// Return codes will be expanded in the future to provide more specific information on the failure
-///
 ///
 /// Parameters:
 ///
@@ -485,17 +560,32 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 ///
 ///     path: a stack-allocated, NULL terminated string representing the folder path in RFC3986 format
 ///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
+///      0: success
 ///
 ///
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_add_sync_folder(&state, "Documents", "/Users/name/Documents");
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_add_sync_folder(&state, "Documents", "/Users/name/Documents", &error)) {
+///     printf("Failed to add folder");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Added folder");
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -537,9 +627,7 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 
 /// Remove a sync folder
 ///
-/// Will return a failure code if for any reason the folder cannot be removed
-///
-/// Return codes will be expanded in the future to provide more specific information on the failure
+/// Will return a failure code and set the error parameter if for any reason the folder cannot be removed
 ///
 ///
 /// Parameters:
@@ -548,18 +636,32 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 ///
 ///     folder_id: a stack-allocated, unsigned 32-bit integer representing the registered folder ID
 ///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
+///      0: success
 ///
 ///
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_remove_sync_folder(&state, 7);
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_remove_sync_folder(&state, 7, &error)) {
+///     printf("Failed to remove folder");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Removed folder");
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -589,11 +691,11 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 
 /// Get a sync folder from the SafeDrive server
 ///
-/// The caller does not own the memory pointed to by `folder` after this function returns, it must
-/// be returned and freed by the library.
+/// The caller does not own the memory pointed to by `folder` or `error` after this function returns,
+/// they must be returned and freed by the library.
 ///
-/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
-/// it is freed.
+/// As a result, any data that the caller wishes to retain must be copied out of the buffers before
+/// they are freed.
 ///
 ///
 /// Parameters:
@@ -602,23 +704,39 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 ///
 ///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
 ///
-///     folders: an uninitialized pointer that will be allocated and initialized when the function returns
+///     folder: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
+///
+///            must be freed by the caller using sddk_free_folder()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     -1: failure
+///     -1: failure, `error` will be set with more information
 ///
 ///     0+: number of registered folders found, and number of SDDKFolder structs allocated in folders
-///
-/// Return codes will be expanded in the future to provide more specific information on the failure
 ///
 /// # Examples
 ///
 /// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
 /// SDDKFolder * folder = NULL;
-/// int res = sddk_get_sync_folder(&state, &folder);
-/// // do something with folder here
-/// sddk_free_sync_folder(&folder);
+///
+/// if (0 != sddk_get_sync_folder(&state, 7, &folder, &error)) {
+///     printf("Failed to get folder");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got folder");
+///     // do something with folder here, then free it
+///     sddk_free_sync_folder(&folder);
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -670,23 +788,41 @@ pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     folders: an uninitialized pointer that will be allocated and initialized when the function returns
+///     folders: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
+///
+///            must be freed by the caller using sddk_free_folders()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     -1: failure
+///     -1: failure, `error` will be set with more information
 ///
 ///     0+: number of registered folders found, and number of SDDKFolder structs allocated in folders
-///
-/// Return codes will be expanded in the future to provide more specific information on the failure
 ///
 /// # Examples
 ///
 /// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
 /// SDDKFolder * folders = NULL;
-/// int length = sddk_get_sync_folders(&state, &folders);
-/// // do something with folders here
-/// sddk_free_sync_folders(&folders, length);
+///
+/// int length = sddk_get_folders(&state, &folders, &error);
+///
+/// if (0 != length) {
+///     printf("Failed to get folders");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got folders");
+///     // do something with folders here, then free it
+///     sddk_free_folders(&folders, length);
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -741,24 +877,41 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     sessions: an uninitialized pointer that will be allocated and initialized when the function returns
+///     sessions: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
 ///
+///            must be freed by the caller using sddk_free_sessions()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     -1: failure
+///      -1: failure, `error` will be set with more information
 ///
 ///      0+: number of sessions found, and number of SDDKSyncSession structs allocated in sessions
-///
-/// Return codes will be expanded in the future to provide more specific information on the failure
 ///
 /// # Examples
 ///
 /// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
 /// SDDKSession * sessions = NULL;
-/// int length = sddk_get_sync_sessions(&state, &sessions);
-/// // do something with sessions here
-/// sddk_free_sync_sessions(&sessions, length);
+///
+/// int length = sddk_get_sync_sessions(&state, &sessions, &error);
+///
+/// if (0 != length) {
+///     printf("Failed to get sessions");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got sessions");
+///     // do something with sessions here, then free it
+///     sddk_free_sync_sessions(&sessions, length);
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -806,20 +959,34 @@ pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state:  an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
+///      0: success
 ///
-/// Return codes will be expanded in the future to provide more specific information on the failure
 ///
 /// # Examples
 ///
 /// ```c
-/// int result = sddk_gc(&state);
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_gc(&state)) {
+///     printf("Failed to run GC");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("GC successful");
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -830,7 +997,7 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState,
 }
 
 
-/// Create a snapshot archive for the folder ID
+/// Start a sync for the folder ID
 ///
 ///
 /// Parameters:
@@ -845,18 +1012,32 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState,
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
 ///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
-///
-/// Return codes will be expanded in the future to provide more specific information on the failure
+///      0: success
 ///
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_sync(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, &fp);
+/// void *context; // arbitrary, can be anything you want access to in the callback
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_sync(&context, &state, &error, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, &fp)) {
+///     printf("Failed to sync");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Sync successful");
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -912,7 +1093,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
     }
 }
 
-/// Restore a snapshot archive for the named folder
+/// Start a restore for the folder ID
 ///
 /// Parameters:
 ///
@@ -928,19 +1109,33 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
 ///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
 ///
 /// Return:
 ///
-///     0: success
+///     -1: failure, `error` will be set with more information
 ///
-///     1+: failure
-///
-/// Return codes will be expanded in the future to provide more specific information on the failure
+///      0: success
 ///
 /// # Examples
 ///
 /// ```c
-/// int success = sddk_restore(NULL, &state, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, "/path/to/destination", &fp);
+/// void *context; // arbitrary, can be anything you want access to in the callback
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_restore(&context, &state, &error, "02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", 7, "/path/to/destination", &fp)) {
+///     printf("Failed to restore");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Restore successful");
+/// }
+///
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -1123,7 +1318,7 @@ pub extern "C" fn sddk_free_state(state: *mut *mut SDDKState) {
 ///
 /// Parameters:
 ///
-///     string: a pointer obtained from calling a function that returns SDDKFolders
+///     string: a pointer obtained from calling a function that returns a C string
 ///
 /// # Examples
 ///
