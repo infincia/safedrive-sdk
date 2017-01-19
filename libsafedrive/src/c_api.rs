@@ -207,26 +207,15 @@ impl From<String> for SDDKError {
 /// # Examples
 ///
 /// ```c
-/// SDDKState *state = NULL;
-/// SDDKError *error = NULL;
-///
-/// if (0 != sddk_initialize("/home/user/.safedrive/", "12345", SDDKConfigurationProduction, &state, &error)) {
-///     printf("SDDK Initialization failed");
-///     // do something with error here, then free it
-///     sddk_free_error(&error);
-/// }
-/// else {
-///     // do something with SDDKState here, store it somewhere, then free it later on
-///     sddk_free_state(&state);
-/// }
+/// SDDKState *state = sddk_initialize("/home/user/.safedrive/", "12345", SDDKConfigurationProduction)
+/// // do something with SDDKState here, store it somewhere, then free it later on
+/// sddk_free_state(&state);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char,
                                   unique_client_id: *const std::os::raw::c_char,
-                                  config: SDDKConfiguration,
-                                  mut state: *mut *mut SDDKState,
-                                  mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+                                  config: SDDKConfiguration) -> *mut SDDKState {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
@@ -269,10 +258,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
     let b = Box::new(c_state);
     let ptr = Box::into_raw(b);
 
-    unsafe {
-        *state = ptr;
-    }
-    0
+    ptr
 }
 
 /// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
