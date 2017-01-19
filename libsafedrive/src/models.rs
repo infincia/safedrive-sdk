@@ -11,7 +11,7 @@ pub enum Configuration {
 // request bodies
 
 #[derive(Serialize, Debug)]
-pub struct RegisterClient<'a> {
+pub struct RegisterClientBody<'a> {
     pub operatingSystem: &'a str,
     pub email: &'a str,
     pub password: &'a str,
@@ -20,7 +20,7 @@ pub struct RegisterClient<'a> {
 }
 
 #[derive(Serialize, Debug)]
-pub struct AccountKey<'a> {
+pub struct AccountKeyBody<'a> {
     pub master: &'a str,
     pub main: &'a str,
     pub hmac: &'a str,
@@ -28,7 +28,7 @@ pub struct AccountKey<'a> {
 }
 
 #[derive(Serialize, Debug)]
-pub struct CreateFolder<'a> {
+pub struct CreateFolderBody<'a> {
     pub folderName: &'a str,
     pub folderPath: &'a str,
     pub encrypted: bool
