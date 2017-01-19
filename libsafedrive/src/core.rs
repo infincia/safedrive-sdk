@@ -354,6 +354,8 @@ pub fn sync(token: &Token,
                     let block_hmac = sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
                     chunks.extend_from_slice(block_hmac.as_ref());
 
+                    let block_name = block_hmac.as_ref().to_hex();
+
                     let mut should_retry = true;
                     let mut retries_left = 15.0;
                     let mut potentially_uploaded_data: Option<Vec<u8>> = None;
@@ -384,7 +386,7 @@ pub fn sync(token: &Token,
 
                         // tell the server to mark this block without the data first, if that fails we try uploading
 
-                        match write_block(&token, session_name, block_hmac.as_ref().to_hex(), &potentially_uploaded_data) {
+                        match write_block(&token, session_name, &block_name, &potentially_uploaded_data) {
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
                                 should_retry = false

@@ -347,13 +347,10 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     Ok(folders)
 }
 
-pub fn create_folder<S, T>(token: &Token, path: S, name: T, encrypted: bool) -> Result<u32, SDAPIError> where S: Into<String>, T: Into<String> {
+pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted: bool) -> Result<u32, SDAPIError> {
 
-    let pa = path.into();
-    let na = name.into();
-
-    let endpoint = APIEndpoint::CreateFolder { token: token, path: &pa, name: &na, encrypted: encrypted };
-    let body = CreateFolder { folderName: &na, folderPath: &pa, encrypted: encrypted };
+    let endpoint = APIEndpoint::CreateFolder { token: token, path: path, name: name, encrypted: encrypted };
+    let body = CreateFolderBody { folderName: name, folderPath: path, encrypted: encrypted };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
@@ -435,12 +432,9 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
     Ok(sessions)
 }
 
-pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted: bool) -> Result<(), SDAPIError> where S: Into<String> {
+pub fn register_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, encrypted: bool) -> Result<(), SDAPIError> {
 
-    let na = name.into();
-
-    let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: &na, encrypted: encrypted };
-
+    let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
@@ -465,13 +459,11 @@ pub fn register_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypte
     Ok(())
 }
 
-pub fn finish_sync_session<S>(token: &Token, folder_id: u32, name: S, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> where S: Into<String> {
+pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> {
 
-    let na = name.into();
+    let endpoint = APIEndpoint::FinishSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
 
-    let endpoint = APIEndpoint::FinishSyncSession { token: token, folder_id: folder_id, name: &na, encrypted: encrypted, size: size, session_data: session_data };
-
-    let (body, content_length, boundary) = multipart_for_bytes(session_data, &na);
+    let (body, content_length, boundary) = multipart_for_bytes(session_data, name);
 
     debug!("body: {}", String::from_utf8_lossy(&body));
 
@@ -527,11 +519,9 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
 
 // block handling
 
-pub fn check_block<S>(token: &Token, name: S) -> Result<bool, SDAPIError> where S: Into<String> {
+pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError> {
 
-    let na = name.into();
-
-    let endpoint = APIEndpoint::CheckBlock { token: token, name: &na };
+    let endpoint = APIEndpoint::CheckBlock { token: token, name: name };
 
     let client = reqwest::Client::new().unwrap();
 
@@ -555,19 +545,15 @@ pub fn check_block<S>(token: &Token, name: S) -> Result<bool, SDAPIError> where 
     }
 }
 
-pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option<Vec<u8>>) -> Result<(), SDAPIError> where S: Into<String>, T: Into<String> {
+pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_data: &Option<Vec<u8>>) -> Result<(), SDAPIError> {
 
-    let na = name.into();
-    let ses = session.into();
-
-    let endpoint = APIEndpoint::WriteBlock { token: token, name: &na, session: &ses, chunk_data: chunk_data };
-
+    let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session, chunk_data: chunk_data };
 
     let client = reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
     if let Some(ref data) = *chunk_data {
-        let (body, content_length, boundary) = multipart_for_bytes(data, &na);
+        let (body, content_length, boundary) = multipart_for_bytes(data, name);
         //debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
@@ -593,7 +579,7 @@ pub fn write_block<S, T>(token: &Token, session: S, name: T, chunk_data: &Option
     }
 }
 
-pub fn read_block<'a, S>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIError> where S: Into<String> {
+pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
 
     let client = reqwest::Client::new().unwrap();
