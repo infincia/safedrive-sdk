@@ -172,6 +172,33 @@ impl<'a> APIEndpoint<'a> {
 
 // SD API
 
+pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
+
+    let operatingSystem = get_current_os();
+
+    let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
+    let body = ErrorLogBody { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
+
+    let client = reqwest::Client::new().unwrap();
+    let request = client.request(endpoint.method(), &endpoint.url())
+        .json(&body);
+
+    let mut result = try!(request.send());
+
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
+
+    match result.status() {
+        &reqwest::StatusCode::Ok => {},
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+    Ok(())
+}
+
 pub fn register_client<'a>(uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<(Token, UniqueClientID), SDAPIError> {
 
     let operatingSystem = get_current_os();
