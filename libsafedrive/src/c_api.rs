@@ -1252,7 +1252,8 @@ pub extern "C" fn sddk_free_folder(folder: *mut *mut SDDKFolder) {
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder, length: u64) {
+pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder,
+                                    length: u64) {
     assert!(!folders.is_null());
     let l = length as usize;
 
@@ -1281,7 +1282,8 @@ pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder, length: u64) 
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession, length: u64) {
+pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession,
+                                          length: u64) {
     assert!(!sessions.is_null());
     let l = length as usize;
     let sessions: Vec<SDDKSyncSession> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*sessions, l)).into_vec() };
