@@ -46,7 +46,7 @@ pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     *c = config;
 
     if !sodiumoxide::init() == true {
-        panic!("Rust<sdsync_initialize>: sodium initialization failed, cannot continue");
+        panic!("sodium initialization failed, cannot continue");
     }
 
     if let Err(e) = fs::create_dir_all(&local_storage_path) {
