@@ -189,6 +189,16 @@ pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDError>
     }
 }
 
+pub fn get_sync_session<'a>(token: &Token,
+                            session: &'a str) -> Result<SyncSessionData<'a>, SDError> {
+    let session = match read_session(token, session, true) {
+        Ok(session) => session,
+        Err(e) => return Err(SDError::from(e))
+    };
+
+    Ok(session)
+}
+
 pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
     let m = match read_sessions(token) {
         Ok(sessions) => sessions,
