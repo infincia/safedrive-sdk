@@ -5,11 +5,7 @@ use std::path::{Path, PathBuf};
 
 use std::u64;
 
-// external imports
-
-extern crate libc;
-
-//internal imports
+// internal imports
 
 use ::state::State;
 
@@ -33,8 +29,6 @@ use ::util::unique_client_hash;
 use ::error::SDError;
 
 // exports
-
-
 
 #[derive(Debug)]
 #[repr(C)]

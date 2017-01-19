@@ -1,7 +1,5 @@
 #![allow(non_snake_case)]
 
-extern crate libc;
-
 #[derive(Debug)]
 pub enum Configuration {
     Staging,

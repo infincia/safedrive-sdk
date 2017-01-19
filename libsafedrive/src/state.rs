@@ -1,7 +1,9 @@
 use std::path::{PathBuf};
 
-use keys::Key;
-use models::{Token};
+// internal imports
+
+use ::keys::Key;
+use ::models::{Token};
 
 #[derive(Debug)]
 pub struct State {

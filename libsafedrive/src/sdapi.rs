@@ -1,27 +1,27 @@
 #![allow(non_snake_case)]
 
 use std::io::Read;
-
 use std::collections::HashMap;
 
-extern crate rustc_serialize;
+// external crate imports
 
-use self::rustc_serialize::hex::{ToHex};
+use ::rustc_serialize::hex::{ToHex};
 
-extern crate reqwest;
-extern crate serde;
-extern crate serde_json;
+// internal imports
+
+use ::util::*;
+use ::error::SDAPIError;
+use ::models::*;
+use ::keys::*;
+use ::constants::*;
+use ::CONFIGURATION;
+
+
+
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type") => [String] }
 header! { (ContentLength, "Content-Length") => [usize] }
-
-use util::*;
-use error::SDAPIError;
-use models::*;
-use keys::*;
-use constants::*;
-use CONFIGURATION;
 
 pub enum APIEndpoint<'a> {
     ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str] },
@@ -66,52 +66,52 @@ impl<'a> APIEndpoint<'a> {
         "https://".to_string()
     }
 
-    pub fn method(&self) -> self::reqwest::Method {
+    pub fn method(&self) -> ::reqwest::Method {
         match *self {
             APIEndpoint::ErrorLog { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::RegisterClient { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::AccountStatus { .. } => {
-                self::reqwest::Method::Get
+                ::reqwest::Method::Get
             },
             APIEndpoint::AccountDetails { .. } => {
-                self::reqwest::Method::Get
+                ::reqwest::Method::Get
             },
             APIEndpoint::AccountKey { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::ReadFolders { .. } => {
-                self::reqwest::Method::Get
+                ::reqwest::Method::Get
             },
             APIEndpoint::CreateFolder { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::DeleteFolder { .. } => {
-                self::reqwest::Method::Delete
+                ::reqwest::Method::Delete
             },
             APIEndpoint::RegisterSyncSession { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::FinishSyncSession { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::ReadSyncSession { .. } => {
-                self::reqwest::Method::Get
+                ::reqwest::Method::Get
             },
             APIEndpoint::ReadSyncSessions { .. } => {
-                self::reqwest::Method::Get
+                ::reqwest::Method::Get
             },
             APIEndpoint::CheckBlock { .. } => {
-                self::reqwest::Method::Head
+                ::reqwest::Method::Head
             },
             APIEndpoint::WriteBlock { .. } => {
-                self::reqwest::Method::Post
+                ::reqwest::Method::Post
             },
             APIEndpoint::ReadBlock { .. } => {
-                self::reqwest::Method::Get
+                ::reqwest::Method::Get
             },
         }
     }
@@ -179,7 +179,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, descrip
     let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
     let body = ErrorLogBody { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .json(&body);
 
@@ -192,7 +192,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, descrip
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Ok => {},
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
@@ -206,7 +206,7 @@ pub fn register_client<'a>(uniqueClientId: &'a str, email: &'a str, password: &'
     let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: "en_US", uniqueClientId: uniqueClientId };
     let body = RegisterClientBody { operatingSystem: operatingSystem, email: email, password: password, language: "en_US", uniqueClientId: uniqueClientId };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .json(&body);
 
@@ -219,14 +219,14 @@ pub fn register_client<'a>(uniqueClientId: &'a str, email: &'a str, password: &'
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
 
-    let token: Token = try!(serde_json::from_str(&response));
+    let token: Token = try!(::serde_json::from_str(&response));
 
     let u = UniqueClientID { id: uniqueClientId.to_owned() };
 
@@ -236,7 +236,7 @@ pub fn register_client<'a>(uniqueClientId: &'a str, email: &'a str, password: &'
 pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let endpoint = APIEndpoint::AccountStatus { token: token };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -249,15 +249,15 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
 
 
-    let account_status: AccountStatus = try!(serde_json::from_str(&response));
+    let account_status: AccountStatus = try!(::serde_json::from_str(&response));
 
     Ok(account_status)
 }
@@ -265,7 +265,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails { token: token };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -278,13 +278,13 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let account_details: AccountDetails = try!(serde_json::from_str(&response));
+    let account_details: AccountDetails = try!(::serde_json::from_str(&response));
 
     Ok(account_details)
 }
@@ -294,7 +294,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     let endpoint = APIEndpoint::AccountKey { token: token, master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
     let body = AccountKeyBody { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .json(&body)
         .header(SDAuthToken(token.token.to_owned()));
@@ -308,13 +308,13 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let wrapped_keyset_b: WrappedKeysetBody = try!(serde_json::from_str(&response));
+    let wrapped_keyset_b: WrappedKeysetBody = try!(::serde_json::from_str(&response));
 
     Ok(WrappedKeyset::from(wrapped_keyset_b))
 }
@@ -323,7 +323,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
     let endpoint = APIEndpoint::ReadFolders { token: token };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -336,13 +336,13 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let folders: Vec<RegisteredFolder> = try!(serde_json::from_str(&response));
+    let folders: Vec<RegisteredFolder> = try!(::serde_json::from_str(&response));
 
     Ok(folders)
 }
@@ -352,7 +352,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     let endpoint = APIEndpoint::CreateFolder { token: token, path: path, name: name, encrypted: encrypted };
     let body = CreateFolderBody { folderName: name, folderPath: path, encrypted: encrypted };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .json(&body)
         .header(SDAuthToken(token.token.to_owned()));
@@ -366,13 +366,13 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let folder_response: CreateFolderResponse = try!(serde_json::from_str(&response));
+    let folder_response: CreateFolderResponse = try!(::serde_json::from_str(&response));
 
     Ok(folder_response.id)
 }
@@ -380,7 +380,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
 pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -393,8 +393,8 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -408,7 +408,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
 
     let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -421,13 +421,13 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let sessions: HashMap<u32, Vec<SyncSession>> = try!(serde_json::from_str(&response));
+    let sessions: HashMap<u32, Vec<SyncSession>> = try!(::serde_json::from_str(&response));
 
     Ok(sessions)
 }
@@ -436,7 +436,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, e
 
     let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -449,9 +449,9 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, e
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::Created => {},
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Created => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -467,7 +467,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, enc
 
     debug!("body: {}", String::from_utf8_lossy(&body));
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .body(body)
         .header(SDAuthToken(token.token.to_owned()))
@@ -483,9 +483,9 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, enc
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => Ok(()),
-        &reqwest::StatusCode::Created => Ok(()),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => Ok(()),
+        &::reqwest::StatusCode::Created => Ok(()),
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -495,7 +495,7 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
     let endpoint = APIEndpoint::ReadSyncSession { token: token, name: name, encrypted: encrypted };
 
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
 
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
@@ -503,9 +503,9 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
     let mut result = try!(request.send());
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
@@ -523,7 +523,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 
     let endpoint = APIEndpoint::CheckBlock { token: token, name: name };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
 
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
@@ -537,9 +537,9 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => Ok(true),
-        &reqwest::StatusCode::NotFound => Ok(false),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => Ok(true),
+        &::reqwest::StatusCode::NotFound => Ok(false),
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -549,7 +549,7 @@ pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_dat
 
     let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session, chunk_data: chunk_data };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
     if let Some(ref data) = *chunk_data {
@@ -569,11 +569,11 @@ pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_dat
     debug!("response: {}", response);
 
     match result.status() {
-        &reqwest::StatusCode::Ok => Ok(()),
-        &reqwest::StatusCode::Created => Ok(()),
-        &reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
-        &reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => Ok(()),
+        &::reqwest::StatusCode::Created => Ok(()),
+        &::reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
+        &::reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -582,16 +582,16 @@ pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_dat
 pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
 
-    let client = reqwest::Client::new().unwrap();
+    let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
 
     match result.status() {
-        &reqwest::StatusCode::Ok => {},
-        &reqwest::StatusCode::NotFound => return Err(SDAPIError::BlockMissing),
-        &reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::NotFound => return Err(SDAPIError::BlockMissing),
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };

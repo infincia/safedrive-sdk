@@ -1,6 +1,5 @@
 use std;
 use std::str;
-
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::fs::File;
@@ -8,36 +7,22 @@ use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
 use std::{thread, time};
 
-// external imports
+// external crate imports
 
-extern crate rustc_serialize;
-extern crate libc;
-extern crate sodiumoxide;
-extern crate tar;
-extern crate rand;
-
-#[cfg(target_os = "linux")]
-extern crate openssl;
-
-extern crate walkdir;
-extern crate cdc;
-
-use self::rustc_serialize::hex::{ToHex};
-
-use self::rand::distributions::{IndependentSample, Range};
-
-use self::tar::{Builder, Header};
-use self::walkdir::WalkDir;
-use self::cdc::*;
+use ::rustc_serialize::hex::{ToHex};
+use ::rand::distributions::{IndependentSample, Range};
+use ::tar::{Builder, Header};
+use ::walkdir::WalkDir;
+use ::cdc::*;
 
 // internal imports
 
-use models::*;
-use constants::*;
-use sdapi::*;
-use keys::*;
-use error::{CryptoError, SDAPIError, SDError};
-use CONFIGURATION;
+use ::models::*;
+use ::constants::*;
+use ::sdapi::*;
+use ::keys::*;
+use ::error::{CryptoError, SDAPIError, SDError};
+use ::CONFIGURATION;
 
 // internal functions
 
@@ -45,7 +30,7 @@ pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     let mut c = CONFIGURATION.write().unwrap();
     *c = config;
 
-    if !sodiumoxide::init() == true {
+    if !::sodiumoxide::init() == true {
         panic!("sodium initialization failed, cannot continue");
     }
 
@@ -54,11 +39,11 @@ pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     }
 
 
-    let sodium_version = sodiumoxide::version::version_string();
+    let sodium_version = ::sodiumoxide::version::version_string();
     debug!("libsodium {}", sodium_version);
 
     #[cfg(target_os = "linux")]
-    let ssl_version = openssl::version::version();
+    let ssl_version = ::openssl::version::version();
     #[cfg(target_os = "linux")]
     debug!("{}>", ssl_version);
 
@@ -237,9 +222,9 @@ pub fn sync(token: &Token,
     if DEBUG_STATISTICS {
         debug!("creating archive for: {} (folder id {})", folder_name, folder_id);
     }
-    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
-    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
-    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
+    let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
+    let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
+    let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
     let mut ar = Builder::new(archive_file);
     let mut archive_size: i64 = 0;
@@ -344,14 +329,14 @@ pub fn sync(token: &Token,
                     let raw_chunk = data.as_slice();
 
 
-                    let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
+                    let main_key = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
                         .expect("failed to get main key struct");
 
                     // calculate hmac of the block
-                    let hmac_key = sodiumoxide::crypto::auth::Key::from_slice(hmac_key.as_ref())
+                    let hmac_key = ::sodiumoxide::crypto::auth::Key::from_slice(hmac_key.as_ref())
                         .expect("failed to get hmac key struct");
 
-                    let block_hmac = sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
+                    let block_hmac = ::sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
                     chunks.extend_from_slice(block_hmac.as_ref());
 
                     let block_name = block_hmac.as_ref().to_hex();
@@ -361,14 +346,14 @@ pub fn sync(token: &Token,
                     let mut potentially_uploaded_data: Option<Vec<u8>> = None;
 
                     // generate a new chunk key once in case we need it later. this is cheap to do
-                    let block_key_raw = sodiumoxide::randombytes::randombytes(key_size);
+                    let block_key_raw = ::sodiumoxide::randombytes::randombytes(key_size);
 
                     while should_retry {
                         // allow caller to tick the progress display, if one exists
                         progress(entry_count as u32, completed_count as u32, percent_completed, true);
 
                         let failed_count = 15.0 - retries_left;
-                        let mut rng = rand::thread_rng();
+                        let mut rng = ::rand::thread_rng();
 
                         // we pick a multiplier randomly to avoid a bunch of clients trying again
                         // at the same 2/4/8/16 backoff times time over and over if the server
@@ -405,7 +390,7 @@ pub fn sync(token: &Token,
                                     Some(_) => {},
                                     None => {
 
-                                        let block_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
+                                        let block_key_struct = ::sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
                                         .expect("failed to get block key struct");
 
                                         // We use the first 24 bytes of the block hmac value as nonce for wrapping
@@ -416,17 +401,17 @@ pub fn sync(token: &Token,
                                         // output block, which is critical for versioning and deduplication
                                         // across all backups of all sync folders
                                         let nonce_slice = block_hmac.as_ref();
-                                        let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
+                                        let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
                                         .expect("failed to get nonce");
 
                                         // we use the same nonce both while wrapping the block key, and the block itself
                                         // this is safe because using the same nonce with 2 different keys is not nonce reuse
 
                                         // encrypt the chunk data using the block key
-                                        let encrypted_chunk = sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
+                                        let encrypted_chunk = ::sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
 
                                         // wrap the block key with the main encryption key
-                                        let wrapped_block_key = sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
+                                        let wrapped_block_key = ::sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
 
                                         assert!(wrapped_block_key.len() == key_size + mac_size);
 
@@ -460,7 +445,7 @@ pub fn sync(token: &Token,
                         }
                     }
                 }
-                let hmac_tag_size = sodiumoxide::crypto::auth::TAGBYTES;
+                let hmac_tag_size = ::sodiumoxide::crypto::auth::TAGBYTES;
 
                 let chunklist = BufReader::new(chunks.as_slice());
                 header.set_size(nb_chunk * hmac_tag_size as u64); // hmac list size
@@ -499,31 +484,31 @@ pub fn sync(token: &Token,
 
     // get the main key
 
-    let main_key = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
+    let main_key = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
         .expect("failed to get main key struct");
 
     // generate a new archive key
-    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
-    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
-    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
+    let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
+    let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
+    let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
-    let archive_key_raw = sodiumoxide::randombytes::randombytes(key_size);
-    let archive_key_struct = sodiumoxide::crypto::secretbox::Key::from_slice(&archive_key_raw)
+    let archive_key_raw = ::sodiumoxide::randombytes::randombytes(key_size);
+    let archive_key_struct = ::sodiumoxide::crypto::secretbox::Key::from_slice(&archive_key_raw)
         .expect("failed to get archive key struct");
 
     // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
-    let nonce_raw = sodiumoxide::randombytes::randombytes(nonce_size);
-    let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw[0..24])
+    let nonce_raw = ::sodiumoxide::randombytes::randombytes(nonce_size);
+    let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw[0..24])
         .expect("failed to get nonce");
 
     // we use the same nonce both while wrapping the archive key, and the archive itself
     // this is safe because using the same nonce with 2 different keys is not nonce reuse
 
     // encrypt the archive data using the archive key
-    let encrypted_archive = sodiumoxide::crypto::secretbox::seal(&raw_archive, &nonce, &archive_key_struct);
+    let encrypted_archive = ::sodiumoxide::crypto::secretbox::seal(&raw_archive, &nonce, &archive_key_struct);
 
     // wrap the archive key with the main encryption key
-    let wrapped_archive_key = sodiumoxide::crypto::secretbox::seal(&archive_key_raw, &nonce, &main_key);
+    let wrapped_archive_key = ::sodiumoxide::crypto::secretbox::seal(&archive_key_raw, &nonce, &main_key);
     assert!(wrapped_archive_key.len() == key_size + mac_size);
 
     let mut complete_archive = Vec::new();
@@ -585,13 +570,13 @@ pub fn restore(token: &Token,
     if DEBUG_STATISTICS {
         debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
     }
-    let key_size = sodiumoxide::crypto::secretbox::KEYBYTES;
-    let nonce_size = sodiumoxide::crypto::secretbox::NONCEBYTES;
-    let mac_size = sodiumoxide::crypto::secretbox::MACBYTES;
+    let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
+    let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
+    let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
 
 
-    let main_key_s = sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
+    let main_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
         .expect("failed to get main key struct");
 
     let entry_count: u64 = 0;

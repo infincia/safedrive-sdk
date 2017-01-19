@@ -2,15 +2,11 @@ use std::path::{Path, PathBuf};
 use std::fs;
 use std::env;
 
-#[cfg(unix)]
-extern crate interfaces;
+// external crate imports
 
+use ::rustc_serialize::hex::{ToHex};
 
-extern crate sodiumoxide;
-
-extern crate rustc_serialize;
-
-use self::rustc_serialize::hex::{ToHex};
+// internal imports
 
 use ::models::Configuration;
 
@@ -47,12 +43,12 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
         interface = "eth0";
     }
 
-    if let Ok(hardware) = interfaces::Interface::get_by_name(interface) {
+    if let Ok(hardware) = ::interfaces::Interface::get_by_name(interface) {
         if let Some(interface) = hardware {
             if let Ok(mac) = interface.hardware_addr() {
                 let mac_string = mac.as_bare_string();
                 let to_hash = mac_string + &email;
-                let hashed = sodiumoxide::crypto::hash::sha256::hash(to_hash.as_bytes());
+                let hashed = ::sodiumoxide::crypto::hash::sha256::hash(to_hash.as_bytes());
                 let h = hashed.as_ref().to_hex();
                 return Ok(h)
             }

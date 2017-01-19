@@ -7,11 +7,30 @@ pub mod sdapi;
 pub mod keys;
 pub mod error;
 pub mod state;
-
 pub mod models;
 pub mod c_api;
-
 pub use c_api::*;
+
+
+// external crates
+
+extern crate rustc_serialize;
+extern crate libc;
+extern crate sodiumoxide;
+extern crate tar;
+extern crate rand;
+extern crate walkdir;
+extern crate cdc;
+extern crate bip39;
+extern crate serde_json;
+extern crate reqwest;
+extern crate serde;
+
+#[cfg(unix)]
+extern crate interfaces;
+
+#[cfg(target_os = "linux")]
+extern crate openssl;
 
 #[macro_use]
 extern crate serde_derive;

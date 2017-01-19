@@ -1,17 +1,10 @@
 use std;
 
+// external crate imports
 
-extern crate bip39;
+use ::bip39::{Bip39Error};
+use ::rustc_serialize::hex::{FromHexError};
 
-use self::bip39::{Bip39Error};
-
-extern crate rustc_serialize;
-
-use self::rustc_serialize::hex::{FromHexError};
-
-extern crate reqwest;
-
-extern crate serde_json;
 
 
 #[derive(Debug)]
@@ -342,18 +335,18 @@ impl From<std::io::Error> for SDAPIError {
     }
 }
 
-impl From<self::reqwest::Error> for SDAPIError {
-    fn from(e: self::reqwest::Error) -> SDAPIError {
+impl From<::reqwest::Error> for SDAPIError {
+    fn from(e: ::reqwest::Error) -> SDAPIError {
         match e {
             _ => SDAPIError::RequestFailed(Box::new(e))
         }
     }
 }
 
-impl From<self::serde_json::Error> for SDAPIError {
-    fn from(e: self::serde_json::Error) -> SDAPIError {
+impl From<::serde_json::Error> for SDAPIError {
+    fn from(e: ::serde_json::Error) -> SDAPIError {
         match e {
-            self::serde_json::Error::Io(err) => SDAPIError::IO(err),
+            ::serde_json::Error::Io(err) => SDAPIError::IO(err),
             _ => SDAPIError::RequestFailed(Box::new(e))
         }
     }
