@@ -1,10 +1,10 @@
 [root]
 name = "safedrive"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "clap 2.19.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.3.1",
+ "libsafedrive 0.3.2",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pbr 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "bip39"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bit-vec 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -326,9 +326,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "libsafedrive"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
- "bip39 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "interfaces 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1013,7 +1013,7 @@ dependencies = [
 "checksum ansi_term 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)" = "30275ad0ad84ec1c06dde3b3f7d23c6006b7d76d61a85e7060b426b747eff70d"
 "checksum ansi_term 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)" = "23ac7c30002a5accbf7e8987d0632fa6de155b7c3d39d0067317a391e00a2ef6"
 "checksum atty 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d912da0db7fa85514874458ca3651fe2cddace8d0b0505571dbdcd41ab490159"
-"checksum bip39 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1cad62f4b4659e9443b2afc8f70cbe2a371a63ad5ce3b8162f78aecd8817c05d"
+"checksum bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c2af55cdaf26ed31b8b4c99d9586cd1216559e3dfb0af8451a0c3b031a97bf75"
 "checksum bit-vec 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "5b97c2c8e8bbb4251754f559df8af22fb264853c7d009084a576cdf12565089d"
 "checksum bitflags 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "32866f4d103c4e438b1db1158aa1b1a80ee078e5d77a59a2f906fd62a577389c"
 "checksum bitflags 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8dead7461c1127cf637931a1e50934eb6eee8bff2f74433ac7909e9afcee04a3"
