@@ -239,16 +239,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 
     initialize(storage_path, c);
 
-    let sstate = State {
-        storage_path: storage_path.to_owned(),
-        unique_client_id: uid,
-        api_token: None,
-        username: None,
-        password: None,
-        main_key: None,
-        hmac_key: None,
-        tweak_key: None,
-    };
+    let sstate = State::new(storage_path.to_owned(), uid);
     let c_state = SDDKState(sstate);
 
     let b = Box::new(c_state);
