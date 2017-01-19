@@ -65,10 +65,11 @@ pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     debug!("ready");
 }
 
-pub fn login(username: &str,
+pub fn login(unique_client_id: &str,
+             username: &str,
              password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), SDError> {
 
-    match register_client(username, password) {
+    match register_client(unique_client_id, username, password) {
         Ok((t, ucid)) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s, ucid)),

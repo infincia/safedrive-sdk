@@ -324,8 +324,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
-
-    match login(&un, &pa) {
+    match login(c.0.get_unique_client_id(), &un, &pa) {
         Ok((token, _, _)) => {
             c.0.set_account(un.to_owned(), pa.to_owned());
             c.0.set_api_token(token);
