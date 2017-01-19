@@ -118,6 +118,22 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     return Ok(storage_path)
 }
 
+pub fn get_current_os() -> &'static str {
+
+    let os: &str;
+
+    if cfg!(target_os="windows") {
+        os = "Windows";
+    } else if cfg!(target_os="macos") {
+        os = "OS X";
+    } else if cfg!(target_os="linux") {
+        os = "Linux";
+    } else {
+        os = "Unknown";
+    }
+
+    os
+}
 
 pub fn get_local_user() -> Result<String, String> {
     let evar: &str;
