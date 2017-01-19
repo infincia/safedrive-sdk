@@ -362,9 +362,6 @@ pub fn sync(token: &Token,
                         // allow caller to tick the progress display, if one exists
                         progress(entry_count as u32, completed_count as u32, percent_completed, true);
 
-                        if retries_left <= 0.0 {
-                            return Err(format!("could not sync: {}", &folder_path.to_str().unwrap()))
-                        }
                         let failed_count = 15.0 - retries_left;
                         let mut rng = rand::thread_rng();
 
@@ -373,7 +370,7 @@ pub fn sync(token: &Token,
                         // is overloaded or down
                         let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
-                        if failed_count >= 2.0 {
+                        if failed_count >= 2.0 && retries_left > 0.0 {
                             // back off significantly every time a call fails but only after the
                             // second try, the first failure could be us not including the data
                             // when we should have
@@ -391,6 +388,10 @@ pub fn sync(token: &Token,
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
                                 retries_left = retries_left - 1.0;
+                                if retries_left <= 0.0 {
+                                    // TODO: pass better error info up the call chain here rather than a failure
+                                    return Err(SDError::RequestFailure(err))
+                                }
                             },
                             Err(SDAPIError::RetryUpload) => {
                                 retries_left = retries_left - 1.0;
