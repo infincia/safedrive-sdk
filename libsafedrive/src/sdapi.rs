@@ -172,29 +172,12 @@ impl<'a> APIEndpoint<'a> {
 
 // SD API
 
-pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClientID), SDAPIError> where S: Into<String>, T: Into<String> {
+pub fn register_client<'a>(uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<(Token, UniqueClientID), SDAPIError> {
 
-    let em = email.into();
-    let pa = password.into();
+    let operatingSystem = get_current_os();
 
-    let uid = match unique_client_hash(&em) {
-        Ok(hash) => hash,
-        Err(e) => e,
-    };
-
-    let os: &str;
-
-    if cfg!(target_os="windows") {
-        os = "Windows";
-    } else if cfg!(target_os="macos") {
-        os = "OS X";
-    } else if cfg!(target_os="linux") {
-        os = "Linux";
-    } else {
-        os = "Unknown";
-    }
-    let endpoint = APIEndpoint::RegisterClient{ operatingSystem: os, email: &em, password: &pa, language: "en_US", uniqueClientId: &uid };
-    let body = RegisterClient { operatingSystem: os, email: &em, password: &pa, language: "en_US", uniqueClientId: &uid };
+    let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: "en_US", uniqueClientId: uniqueClientId };
+    let body = RegisterClientBody { operatingSystem: operatingSystem, email: email, password: password, language: "en_US", uniqueClientId: uniqueClientId };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
@@ -218,7 +201,7 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
 
     let token: Token = try!(serde_json::from_str(&response));
 
-    let u = UniqueClientID { id: uid.to_owned() };
+    let u = UniqueClientID { id: uniqueClientId.to_owned() };
 
     Ok((token, u))
 }
