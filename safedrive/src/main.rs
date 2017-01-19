@@ -163,9 +163,7 @@ fn main() {
     let mut credential_file_path = PathBuf::from(&app_directory);
     credential_file_path.push("credentials.json");
 
-    let a = app_directory.to_str().expect("Error: could not determine local storage directory");
-
-    debug!("Using local dir: {}", &a);
+    debug!("Using local dir: {:?}", &app_directory);
 
     let mut credential_file = match File::open(credential_file_path) {
         Ok(file) => file,
@@ -215,9 +213,9 @@ fn main() {
         },
     };
 
-    let (_, _) = initialize(a, uid, config);
+    initialize(&app_directory, config);
 
-    let (token, _, _) = match login(&username, &password) {
+    let (token, _, _) = match login(&uid, &username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
         Err(e) => {
             error!("Login error: {}", e);
