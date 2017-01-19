@@ -185,8 +185,8 @@ pub fn register_client<S, T>(email: S, password: T) -> Result<(Token, UniqueClie
     } else {
         os = "Unknown";
     }
-    let endpoint = APIEndpoint::RegisterClient{ operatingSystem: os, email: &em, password: &pa, language: "en-US", uniqueClientId: &uid };
-    let body = RegisterClient { operatingSystem: os, email: &em, password: &pa, language: "en", uniqueClientId: &uid };
+    let endpoint = APIEndpoint::RegisterClient{ operatingSystem: os, email: &em, password: &pa, language: "en_US", uniqueClientId: &uid };
+    let body = RegisterClient { operatingSystem: os, email: &em, password: &pa, language: "en_US", uniqueClientId: &uid };
 
     let client = reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), &endpoint.url())
