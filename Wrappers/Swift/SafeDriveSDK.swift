@@ -23,6 +23,59 @@ public struct SyncSession {
 	public let folder_id: UInt32;
 }
 
+enum SDKError: Error {
+    case Internal(message: String)
+    case RequestFailure(message: String)
+    case NetworkFailure(message: String)
+    case Conflict(message: String)
+    case BlockMissing(message: String)
+    case SessionMissing(message: String)
+    case RecoveryPhraseIncorrect(message: String)
+    case InsufficientFreeSpace(message: String)
+    case Authentication(message: String)
+    case UnicodeError(message: String)
+    case TokenExpired(message: String)
+    case CryptoError(message: String)
+    case IO(message: String)
+}
+
+func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
+    let s = String(cString: sdkError.message!)
+    var e: SDKError
+    
+    switch sdkError.error_type.rawValue {
+    case 0x0001:
+        e = SDKError.Internal(message: s)
+    case 0x0002:
+        e = SDKError.RequestFailure(message: s)
+    case 0x0003:
+            e = SDKError.NetworkFailure(message: s)
+    case 0x0004:
+            e = SDKError.Conflict(message: s)
+    case 0x0005:
+            e = SDKError.BlockMissing(message: s)
+    case 0x0006:
+            e = SDKError.SessionMissing(message: s)
+    case 0x0007:
+            e = SDKError.RecoveryPhraseIncorrect(message: s)
+    case 0x0008:
+            e = SDKError.InsufficientFreeSpace(message: s)
+    case 0x0009:
+            e = SDKError.Authentication(message: s)
+    case 0x000A:
+            e = SDKError.UnicodeError(message: s)
+    case 0x000B:
+            e = SDKError.TokenExpired(message: s)
+    case 0x000C:
+            e = SDKError.CryptoError(message: s)
+    case 0x000D:
+            e = SDKError.IO(message: s)
+    default:
+        exit(1)
+        break
+    }
+    return e
+}
 
 public typealias SyncSessionSuccess = @convention(block) () -> Void
 public typealias SyncSessionProgress = @convention(block) (_ total: UInt32, _ current: UInt32, _ progress: Double) -> Void
