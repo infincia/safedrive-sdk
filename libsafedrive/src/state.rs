@@ -49,7 +49,7 @@ impl State {
     }
 
 
-    pub fn get_unique_client_id(&self) -> &String {
+    pub fn get_unique_client_id(&self) -> &str {
         &self.unique_client_id
     }
 
@@ -58,7 +58,7 @@ impl State {
         self.password = Some(password);
     }
 
-    pub fn get_account_username(&self) -> &String {
+    pub fn get_account_username(&self) -> &str {
         let username = match self.username {
             Some(ref u) => u,
             None => panic!("attempt to use account username before setting")
@@ -67,7 +67,7 @@ impl State {
         username
     }
 
-    pub fn get_account_password(&self) ->  &String {
+    pub fn get_account_password(&self) ->  &str {
         let password = match self.password {
             Some(ref p) => p,
             None => panic!("attempt to use account password before setting")
