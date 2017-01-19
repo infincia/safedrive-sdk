@@ -30,6 +30,16 @@ pub fn sha256(input: &[u8]) -> String {
     ::util::sha256(input)
 }
 
+// helpers
+
+pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
+    ::util::get_app_directory(config)
+}
+
+pub fn unique_client_hash(email: &str) -> Result<String, String> {
+    ::util::unique_client_hash(email)
+}
+
 // internal functions
 
 pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
