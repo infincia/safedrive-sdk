@@ -115,6 +115,9 @@ fn main() {
         .subcommand(SubCommand::with_name("list")
             .about("list all registered folders")
         )
+        .subcommand(SubCommand::with_name("sessions")
+                        .about("list all sync sessions")
+        )
         .subcommand(SubCommand::with_name("sync")
             .about("sync all registered folder")
         )
@@ -391,6 +394,36 @@ fn main() {
                 Cell::new(&folder.folderPath),
                 Cell::new(if folder.encrypted { "Yes" } else { "No" }),
                 Cell::new(&format!("{}", &folder.id))])
+            );
+        }
+        table.printstd();
+
+    } else if let Some(matches) = matches.subcommand_matches("sessions") {
+        let mut table = Table::new();
+
+        // Add a row
+        table.add_row(row!["Name", "Size (Bytes)", "Time", "Folder ID"]);
+
+        let folder_list = match get_sync_folders(&token) {
+            Ok(fl) => fl,
+            Err(e) => {
+                error!("Read folders error: {}", e);
+                std::process::exit(1);
+            }
+        };
+        let session_list = match get_sync_sessions(&token) {
+            Ok(sl) => sl,
+            Err(e) => {
+                error!("Read sessions error: {}", e);
+                std::process::exit(1);
+            }
+        };
+        for session in session_list {
+            table.add_row(Row::new(vec![
+                Cell::new(&session.name),
+                Cell::new(&format!("{}", &session.size)),
+                Cell::new(&format!("{}", &session.time)),
+                Cell::new(&format!("{}", &session.folder_id))])
             );
         }
         table.printstd();
