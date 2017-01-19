@@ -562,6 +562,9 @@ pub fn restore(token: &Token,
                destination: PathBuf,
                progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
 
+    return Err(SDError::Internal(format!("not implemented")));
+
+
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
         Err(e) => return Err(SDError::from(e))
