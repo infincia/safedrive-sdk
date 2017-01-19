@@ -53,7 +53,7 @@ impl<'a> APIEndpoint<'a> {
     }
 
     pub fn domain(&self) -> String {
-        let mut c = CONFIGURATION.read().unwrap();
+        let c = CONFIGURATION.read().unwrap();
         match *c {
             Configuration::Staging => SDAPIDOMAIN_STAGING.to_string(),
             Configuration::Production => SDAPIDOMAIN_PRODUCTION.to_string(),

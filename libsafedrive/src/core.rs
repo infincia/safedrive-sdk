@@ -7,7 +7,6 @@ use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
 use std::{thread, time};
-use std::sync::RwLock;
 
 // external imports
 
@@ -489,10 +488,7 @@ pub fn sync(token: &Token,
         }
     }
 
-    if let Err(e) = ar.finish() {
-        return Err(format!("error finalizing archive: {}", e))
-    }
-
+    // since we're writing to a buffer in memory there shouldn't be any errors here
     let raw_archive = &ar.into_inner().unwrap();
 
     // get the main key

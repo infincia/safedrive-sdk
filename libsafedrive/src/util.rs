@@ -2,8 +2,6 @@ use std::path::{Path, PathBuf};
 use std::fs;
 use std::env;
 
-use CONFIGURATION;
-
 #[cfg(unix)]
 extern crate interfaces;
 
@@ -114,7 +112,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     }
     match fs::create_dir_all(&storage_path) {
         Ok(()) => {},
-        Err(e) => {}, //ignore this for the moment, it's primarily going to be the directory existing already
+        Err(_) => {}, //ignore this for the moment, it's primarily going to be the directory existing already
     }
 
     return Ok(storage_path)
