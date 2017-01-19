@@ -164,6 +164,11 @@ impl From<str::Utf8Error> for SDDKError {
 }
 
 
+impl From<String> for SDDKError {
+    fn from(s: String) -> Self {
+        SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", s)).unwrap().into_raw() }
+    }
+}
 
 
 /// Initialize the library, must be called before any other function
@@ -185,7 +190,9 @@ impl From<str::Utf8Error> for SDDKError {
 #[allow(dead_code)]
 pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char,
                                   unique_client_id: *const std::os::raw::c_char,
-                                  config: SDDKConfiguration) -> *mut SDDKState {
+                                  config: SDDKConfiguration,
+                                  mut state: *mut *mut SDDKState,
+                                  mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
         CStr::from_ptr(local_storage_path)
@@ -213,7 +220,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 
     let (storage_path, client_id) = initialize(storage_directory, uid, c);
 
-    let state = State {
+    let sstate = State {
         storage_path: storage_path,
         unique_client_id: client_id,
         api_token: None,
@@ -223,8 +230,15 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         hmac_key: None,
         tweak_key: None,
     };
-    let cstate = SDDKState(state);
-    Box::into_raw(Box::new(cstate))
+    let c_state = SDDKState(sstate);
+
+    let b = Box::new(c_state);
+    let ptr = Box::into_raw(b);
+
+    unsafe {
+        *state = ptr;
+    }
+    0
 }
 
 /// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
@@ -259,7 +273,8 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
 #[allow(dead_code)]
 pub extern "C" fn sddk_login(state: *mut SDDKState,
                              username: *const std::os::raw::c_char,
-                             password:  *const std::os::raw::c_char) -> std::os::raw::c_int {
+                             password:  *const std::os::raw::c_char,
+                             mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * state };
 
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
@@ -282,8 +297,16 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
             c.0.set_api_token(token);
             0
         },
-        Err(_) => {
-            1
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
         }
     }
 }
@@ -337,6 +360,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 #[allow(dead_code)]
 pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
                                  state: *mut SDDKState,
+                                 mut error: *mut *mut SDDKError,
                                  recovery_phrase: *const std::os::raw::c_char,
                                  store_recovery_key: extern fn(context: *mut std::os::raw::c_void,
                                                                new_phrase: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
@@ -361,7 +385,17 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
         store_recovery_key(context, c_new_phrase.into_raw());
     }) {
         Ok(ks) => ks,
-        Err(_) => { return 1 }
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        }
     };
 
     c.0.set_keys(keyset.main, keyset.hmac, keyset.tweak);
@@ -406,7 +440,8 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
-                                            mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_int {
+                                            mut unique_client_id: *mut *mut std::os::raw::c_char,
+                                            mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
     let c_email: &CStr = unsafe { CStr::from_ptr(email) };
     let e: String =  match c_email.to_str() {
@@ -419,9 +454,19 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
             unsafe {
                 *unique_client_id = CString::new(hash).expect("Failed to get unique client id hash").into_raw();
             }
-            return 0
+            0
         },
-        Err(_) => return 1,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
     }
 }
 
@@ -456,7 +501,8 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
 #[allow(dead_code)]
 pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
                                        name: *const std::os::raw::c_char,
-                                       path: *const std::os::raw::c_char) -> std::os::raw::c_int {
+                                       path: *const std::os::raw::c_char,
+                                       mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
@@ -474,8 +520,18 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 
 
     match add_sync_folder(c.0.get_api_token(), &n, &p) {
-        Ok(_) => return 0,
-        Err(_) => return 1,
+        Ok(_) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
     }
 }
 
@@ -508,15 +564,26 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
-                                          folder_id: std::os::raw::c_uint) -> std::os::raw::c_int {
+                                          folder_id: std::os::raw::c_uint,
+                                          mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let id: u32 = folder_id as u32;
 
 
     match remove_sync_folder(c.0.get_api_token(), id) {
-        Ok(_) => return 0,
-        Err(_) => return 1,
+        Ok(_) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
     }
 }
 
@@ -557,13 +624,24 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 #[allow(dead_code)]
 pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
                                        folder_id: std::os::raw::c_uint,
-                                       mut folder: *mut *mut SDDKFolder) -> i8 {
+                                       mut folder: *mut *mut SDDKFolder,
+                                       mut error: *mut *mut SDDKError) -> i8 {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let id: u32 = folder_id as u32;
 
     let nf = match get_sync_folder(c.0.get_api_token(), id) {
         Ok(folder) => folder,
-        Err(e) => { error!("failed to get sync folder: {}", e); return -1 },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        },
     };
 
     let f = SDDKFolder::from(nf);
@@ -613,12 +691,23 @@ pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
-                                        mut folders: *mut *mut SDDKFolder) -> i64 {
+                                        mut folders: *mut *mut SDDKFolder,
+                                        mut error: *mut *mut SDDKError) -> i64 {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let result = match get_sync_folders(c.0.get_api_token()) {
         Ok(folders) => folders,
-        Err(e) => { error!("failed to get list of sync folders: {}", e); return -1 },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        },
     };
 
     let f = result.into_iter().map(|folder| {
@@ -674,12 +763,23 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState,
-                                         mut sessions: *mut *mut SDDKSyncSession) -> i64 {
+                                         mut sessions: *mut *mut SDDKSyncSession,
+                                         mut error: *mut *mut SDDKError) -> i64 {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let result = match get_sync_sessions(c.0.get_api_token()) {
         Ok(ses) => ses,
-        Err(e) => { error!("failed to get list of sync sessions: {}", e); return -1 },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        },
     };
 
     let s = result.into_iter().map(|session| {
@@ -723,7 +823,8 @@ pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
+pub extern "C" fn sddk_gc(state: *mut SDDKState,
+                          mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!state.is_null()); &mut * state };
     0
 }
@@ -761,6 +862,7 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState) -> std::os::raw::c_int {
 #[allow(dead_code)]
 pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                             state: *mut SDDKState,
+                            mut error: *mut *mut SDDKError,
                             name: *const std::os::raw::c_char,
                             folder_id: std::os::raw::c_uint,
                             progress: extern fn(context: *mut std::os::raw::c_void,
@@ -795,8 +897,18 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                    let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
                    progress(context, c_total, c_current, c_percent, c_tick);
                }) {
-        Ok(_) => return 0,
-        Err(_) => return 1
+        Ok(_) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        }
     }
 }
 
@@ -834,6 +946,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 #[allow(dead_code)]
 pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                state: *mut SDDKState,
+                               mut error: *mut *mut SDDKError,
                                name: *const std::os::raw::c_char,
                                folder_id: std::os::raw::c_uint,
                                destination: *const std::os::raw::c_char,
@@ -877,10 +990,19 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                       let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
                       progress(context, c_total, c_current, c_percent, c_tick);
                   }) {
-        Ok(_) => return 0,
-        Err(_) => return 1
+        Ok(_) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        }
     }
-    0
 }
 
 
