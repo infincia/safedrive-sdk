@@ -24,6 +24,8 @@ use constants::*;
 use CONFIGURATION;
 
 pub enum APIEndpoint<'a> {
+    ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str] },
+
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
     AccountStatus { token: &'a Token },
     AccountDetails { token: &'a Token },
@@ -66,6 +68,9 @@ impl<'a> APIEndpoint<'a> {
 
     pub fn method(&self) -> self::reqwest::Method {
         match *self {
+            APIEndpoint::ErrorLog { .. } => {
+                self::reqwest::Method::Post
+            },
             APIEndpoint::RegisterClient { .. } => {
                 self::reqwest::Method::Post
             },
@@ -113,6 +118,9 @@ impl<'a> APIEndpoint<'a> {
 
     pub fn path(&self) -> String {
         let path = match *self {
+            APIEndpoint::ErrorLog { .. } => {
+                format!("/api/1/error/log")
+            },
             APIEndpoint::RegisterClient { .. } => {
                 format!("/api/1/client/register")
             },
