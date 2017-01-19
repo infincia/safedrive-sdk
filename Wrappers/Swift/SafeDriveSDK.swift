@@ -24,6 +24,7 @@ public struct SyncSession {
 }
 
 enum SDKError: Error {
+    case StateMissing(message: String)
     case Internal(message: String)
     case RequestFailure(message: String)
     case NetworkFailure(message: String)
@@ -97,13 +98,14 @@ public class SafeDriveSDK: NSObject {
         super.init()
     }
 
-    public func setUp(local_storage_path: String, unique_client_id: String) {
+    public func setUp(local_storage_path: String, unique_client_id: String) throws {
         var config: SDDKConfiguration
         #if DEBUG
         config = SDDKConfigurationStaging
         #else
         config = SDDKConfigurationProduction
         #endif
+
         self.state = sddk_initialize(local_storage_path, unique_client_id, config)
     }
     
@@ -113,24 +115,31 @@ public class SafeDriveSDK: NSObject {
     
     public func login(_ username: String, password: String) throws {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
-        let res = sddk_login(state, username, password)
-        
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_login(state, username, password, &error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
         switch res {
         case 0:
             return
         default:
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
 
     public func loadKeys(_ recoveryPhrase: String?, storePhrase: @escaping SaveRecoveryPhrase) throws {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
-  
-        let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), state, recoveryPhrase) { (context, phrase) in
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), state, &error, recoveryPhrase) { (context, phrase) in
             // call back to Swift to save the phrase somewhere
             let b = unsafeBitCast(context, to: SaveRecoveryPhrase.self)
             let p = String(cString: phrase!)
@@ -138,142 +147,187 @@ public class SafeDriveSDK: NSObject {
             b(p)
             sddk_free_string(&m)
         }
-        
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
         switch res {
         case 0:
             return
         default:
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
     
     public func uniqueClientID(_ email_address: String) throws -> Optional<String> {
         var unique_client_id: UnsafeMutablePointer<CChar>? = nil
-        let res = sddk_get_unique_client_id(email_address, &unique_client_id)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_get_unique_client_id(email_address, &unique_client_id, &error)
         defer {
             if res >= 0 {
                 sddk_free_string(&unique_client_id)
             }
-        }
-        if res < 0 {
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+            if res == -1 {
+                sddk_free_error(&error)
+            }
         }
         switch res {
         case 0:
             return String(cString: unique_client_id!)
         default:
-            return nil
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
 
     public func addFolder(_ name: String, path: String) throws {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
-
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
-        let res = sddk_add_sync_folder(state, name, path)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_add_sync_folder(state, name, path, &error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
         switch res {
         case 0:
             return
         default:
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
     
     public func removeFolder(_ folderId: UInt32) throws {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
-
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
-        let res = sddk_remove_sync_folder(state, folderId)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
+        let res = sddk_remove_sync_folder(state, folderId, &error)
+        
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        
         switch res {
         case 0:
             return
         default:
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
     
     public func getFolder(folderId: UInt32) throws -> Folder {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
         var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
-        let res = sddk_get_sync_folder(state, folderId, &folder_ptr)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
+        let res = sddk_get_sync_folder(state, folderId, &folder_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_folders(&folder_ptr, UInt64(res))
             }
+            if res == -1 {
+                sddk_free_error(&error)
+            }
         }
-        if res < 0 {
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
-        }
-
-        let name = String(cString: folder_ptr!.pointee.name)
-        let path = String(cString: folder_ptr!.pointee.path)
-        let id = folder_ptr!.pointee.id
-        let folder = Folder(id: id, name: name, path: path)
+        switch res {
+        case 0:
+            let name = String(cString: folder_ptr!.pointee.name)
+            let path = String(cString: folder_ptr!.pointee.path)
+            let id = folder_ptr!.pointee.id
+            let folder = Folder(id: id, name: name, path: path)
         
-        return folder
+            return folder
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
     }
 
     public func getFolders() throws -> [Folder] {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
+        
         var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
-        let res = sddk_get_sync_folders(state, &folder_ptr)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
+        let res = sddk_get_sync_folders(state, &folder_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_folders(&folder_ptr, UInt64(res))
             }
+            if res == -1 {
+                sddk_free_error(&error)
+            }
         }
-        if res < 0 {
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+        switch res {
+        case 0:
+            let buffer = UnsafeBufferPointer<SDDKFolder>(start: UnsafePointer(folder_ptr), count: Int(res))
+            let a = Array(buffer)
+            var new_array = [Folder]()
+            for folder in a {
+                let name = String(cString: folder.name)
+                let path = String(cString: folder.path)
+                let id = folder.id
+                let new_folder = Folder(id: id, name: name, path: path)
+                new_array.append(new_folder)
+            }
+            
+            self.folders = new_array
+            return folders
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
-        let buffer = UnsafeBufferPointer<SDDKFolder>(start: UnsafePointer(folder_ptr), count: Int(res))
-        let a = Array(buffer)
-        var new_array = [Folder]()
-        for folder in a {
-            let name = String(cString: folder.name)
-            let path = String(cString: folder.path)
-            let id = folder.id
-            let new_folder = Folder(id: id, name: name, path: path)
-            new_array.append(new_folder)
-        }
-        
-        self.folders = new_array
-        return folders
+
     }
     
     public func getSessions() throws -> [SyncSession] {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
+        
         var sessions_ptr: UnsafeMutablePointer<SDDKSyncSession>? = nil
-        let res = sddk_get_sync_sessions(state, &sessions_ptr)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
+        let res = sddk_get_sync_sessions(state, &sessions_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_sync_sessions(&sessions_ptr, UInt64(res))
             }
+            if res == -1 {
+                sddk_free_error(&error)
+            }
         }
-        if res < 0 {
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+        switch res {
+        case 0:
+            let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
+            let a = Array(buffer)
+            var new_array = [SyncSession]()
+            for session in a {
+                let name = String(cString: session.name)
+                let size = session.size
+                let ti = (session.date / UInt64(1000))
+                let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
+                let id = session.folder_id
+                let new_session = SyncSession(name: name, size: size, date: date, folder_id: id)
+                new_array.append(new_session)
+            }
+            self.sessions = new_array
+            return sessions
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
-        let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
-        let a = Array(buffer)
-        var new_array = [SyncSession]()
-        for session in a {
-            let name = String(cString: session.name)
-            let size = session.size
-            let ti = (session.date / UInt64(1000))
-            let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
-            let id = session.folder_id
-            let new_session = SyncSession(name: name, size: size, date: date, folder_id: id)
-            new_array.append(new_session)
-        }
-        self.sessions = new_array
-        return sessions
+        
+
     }
     
     public func syncFolder(folderID: UInt32, sessionName: String, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
@@ -282,19 +336,25 @@ public class SafeDriveSDK: NSObject {
             failure(e)
             return
         }
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
         DispatchQueue.global(priority: .default).async {
-            let result = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, { (context, total, current, percent, tick) in
+            let res = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, &error, sessionName, folderID, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
                 b(total, current, percent)
             })
-            switch result {
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
             case 0:
                 success()
             default:
-                let e = NSError(domain: "io.safedrive.sdk", code: Int(result), userInfo: nil)
-                failure(e)
+                failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
             }
         }
 
@@ -306,19 +366,25 @@ public class SafeDriveSDK: NSObject {
             failure(e)
             return
         }
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
         DispatchQueue.global(priority: .default).async {
-            let result = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
+            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, &error, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
                 b(total, current, percent)
             })
-            switch result {
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
             case 0:
                 success()
             default:
-                let e = NSError(domain: "io.safedrive.sdk", code: Int(result), userInfo: nil)
-                failure(e)
+                failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
             }
         }
 
@@ -331,15 +397,22 @@ public class SafeDriveSDK: NSObject {
     
     public func gc() throws {
         guard let state = self.state else {
-            throw NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
-
+            throw SDKError.StateMissing(message: "State missing, cannot continue")
         }
-        let res = sddk_gc(state)
+        
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_gc(state, &error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
         switch res {
         case 0:
             return
         default:
-            throw NSError(domain: "io.safedrive.sdk", code: Int(res), userInfo: nil)
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
     
