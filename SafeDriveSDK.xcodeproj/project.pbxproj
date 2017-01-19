@@ -304,7 +304,7 @@
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = Wrappers/Swift/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -341,7 +341,7 @@
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				INFOPLIST_FILE = Wrappers/Swift/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
