@@ -24,6 +24,12 @@ use ::keys::*;
 use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 
+// crypto exports
+
+pub fn sha256(input: &[u8]) -> String {
+    ::util::sha256(input)
+}
+
 // internal functions
 
 pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {

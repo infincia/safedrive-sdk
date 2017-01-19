@@ -29,9 +29,8 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
             if let Ok(mac) = interface.hardware_addr() {
                 let mac_string = mac.as_bare_string();
                 let to_hash = mac_string + &email;
-                let hashed = ::sodiumoxide::crypto::hash::sha256::hash(to_hash.as_bytes());
-                let h = hashed.as_ref().to_hex();
-                return Ok(h)
+                let hash = sha256(to_hash.as_bytes());
+                return Ok(hash)
             }
         }
     } else {
@@ -99,7 +98,14 @@ pub fn get_current_os() -> &'static str {
     os
 }
 
+// crypto helpers
 
+pub fn sha256(input: &[u8]) -> String {
+    let hashed = ::sodiumoxide::crypto::hash::sha256::hash(input);
+    let h = hashed.as_ref().to_hex();
+
+    h
+}
 
 
 #[test]
