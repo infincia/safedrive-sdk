@@ -34,12 +34,12 @@ pub fn archive_directory(unique_client_id: &str) -> PathBuf {
 }
 
 #[cfg(target_os = "windows")]
-pub fn unique_client_hash(email: &String) -> Result<String, String> {
+pub fn unique_client_hash(email: &str) -> Result<String, String> {
     Ok("".to_string())
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn unique_client_hash(email: &String) -> Result<String, String> {
+pub fn unique_client_hash(email: &str) -> Result<String, String> {
     let interface: &str;
     if cfg!(target_os = "macos") {
         interface = "en0";
@@ -92,7 +92,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         Err(_) => { return Err(m) }
     };
 
-    let mut storage_path = Path::new(&path).to_owned();
+    let mut storage_path = PathBuf::from(&path);
 
     if cfg!(target_os="windows") {
         storage_path.push("SafeDrive");
