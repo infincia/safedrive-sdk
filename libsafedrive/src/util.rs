@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 use std::fs;
 use std::env;
 
@@ -9,25 +9,6 @@ use ::rustc_serialize::hex::{ToHex};
 // internal imports
 
 use ::models::Configuration;
-
-pub fn block_directory(unique_client_id: &str, hmac: &[u8]) -> PathBuf {
-
-    let shard_identifier = hmac[0..1].to_hex().chars().next().unwrap(); //unwrap is safe here, they're always going to be 0-9 or a-f
-
-    let mut storage_dir = Path::new("/storage/").to_owned();
-    storage_dir.push(&unique_client_id);
-    storage_dir.push(&Path::new("blocks"));
-    storage_dir.push(shard_identifier.to_string());
-    storage_dir.push(Path::new(&hmac.to_hex()));
-    storage_dir
-}
-
-pub fn archive_directory(unique_client_id: &str) -> PathBuf {
-    let mut storage_dir = Path::new("/storage/").to_owned();
-    storage_dir.push(&unique_client_id);
-    storage_dir.push(&Path::new("archives"));
-    storage_dir
-}
 
 #[cfg(target_os = "windows")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {
@@ -58,19 +39,6 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
     }
     Err("failed to get mac address".to_string())
 }
-
-// not being used at the moment
-/*fn folder_to_cfolder(folder: Folder) -> CFolder {
-    let s_name = CString::new(folder.name.as_str()).unwrap();
-    let s_path = CString::new(folder.path.as_str()).unwrap();
-    println!("CFolder found: {:?}:{:?}", &s_name, &s_path);
-
-    CFolder {
-        id: folder.id,
-        name: s_name,
-        path: s_path,
-    }
-}*/
 
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
@@ -131,23 +99,8 @@ pub fn get_current_os() -> &'static str {
     os
 }
 
-pub fn get_local_user() -> Result<String, String> {
-    let evar: &str;
 
-    if cfg!(target_os="windows") {
-        evar = "USERNAME";
-    } else {
-        evar = "USER";
-    }
 
-    let m = format!("failed to get {} environment variable", evar);
-    let username = match env::var(evar) {
-        Ok(e) => e,
-        Err(_) => { return Err(m) }
-    };
-
-    return Ok(username)
-}
 
 #[test]
 fn staging_directory_test() {
