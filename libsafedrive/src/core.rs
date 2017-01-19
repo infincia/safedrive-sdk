@@ -107,7 +107,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                         Err(SDError::RecoveryPhraseIncorrect)
                     }
                 }
-            } else if let Some(p) = new_wrapped_keyset.recovery {
+            } else if let Some(p) = new_wrapped_keyset.recovery_phrase() {
                 match real_wrapped_keyset.to_keyset(&p) {
                     Ok(ks) => {
                         // a new keyset was generated so we must return the phrase to the caller so it

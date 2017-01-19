@@ -41,7 +41,7 @@ impl KeyType {
 
 #[derive(Debug)]
 pub struct WrappedKeyset {
-    pub recovery: Option<String>,
+    recovery: Option<String>,
     pub master: WrappedKey,
     pub main: WrappedKey,
     pub hmac: WrappedKey,
