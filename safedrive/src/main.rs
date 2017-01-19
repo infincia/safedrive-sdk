@@ -33,11 +33,17 @@ use safedrive::core::initialize;
 use safedrive::core::login;
 use safedrive::core::load_keys;
 use safedrive::core::sync;
+use safedrive::core::restore;
+
 use safedrive::core::get_sync_folders;
 use safedrive::core::get_sync_folder;
 
 use safedrive::core::add_sync_folder;
 use safedrive::core::remove_sync_folder;
+
+use safedrive::core::get_sync_sessions;
+use safedrive::core::get_sync_session;
+
 
 use safedrive::util::unique_client_hash;
 use safedrive::util::get_app_directory;
@@ -102,7 +108,7 @@ fn main() {
                 .short("i")
                 .long("id")
                 .value_name("ID")
-                .help("folder id")
+                .help("folder ID")
                 .takes_value(true)
             )
         )
@@ -111,6 +117,30 @@ fn main() {
         )
         .subcommand(SubCommand::with_name("sync")
             .about("sync all registered folder")
+        )
+        .subcommand(SubCommand::with_name("restore")
+            .about("restore a folder")
+            .arg(Arg::with_name("id")
+                .short("i")
+                .long("id")
+                .value_name("ID")
+                .help("folder ID")
+                .takes_value(true)
+            )
+            .arg(Arg::with_name("destination")
+                .short("d")
+                .long("destination")
+                .value_name("DESTINATION")
+                .help("restore destination")
+                .takes_value(true)
+            )
+            .arg(Arg::with_name("session")
+                .short("s")
+                .long("session")
+                .value_name("SESSION")
+                .help("session to restore")
+                .takes_value(true)
+            )
         )
         .get_matches();
     println!("{} {}", NAME, VERSION);
@@ -284,6 +314,64 @@ fn main() {
                 }
             }
         }
+    } else if let Some(matches) = matches.subcommand_matches("restore") {
+        let id: u32 = matches.value_of("id").unwrap()
+            .trim()
+            .parse()
+            .expect("Expected a number");
+
+        let session_name = matches.value_of("session").unwrap();
+
+        let p = matches.value_of("destination").unwrap();
+        let pa = PathBuf::from(&p);
+
+        let folder = match get_sync_folder(&token, id) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("Read folder error: {}", e);
+                std::process::exit(1);
+            }
+        };
+
+        let session = match get_sync_session(&token, &session_name) {
+            Ok(s) => s,
+            Err(e) => {
+                error!("Read session error: {}", e);
+                std::process::exit(1);
+            }
+        };
+
+        //TODO: this is not portable to windows, must be fixed before use there
+        println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &session_name, &pa.to_str().unwrap());
+
+        let mut pb = ProgressBar::new(0);
+        pb.format("╢▌▌░╟");
+
+        let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+
+        match restore(&token,
+                      &session_name,
+                      &keyset.main,
+                      &keyset.hmac,
+                      &keyset.tweak,
+                      folder.id,
+                      pa,
+                      &mut |total, current, progress_percent, tick| {
+                          if tick {
+                              pb.tick();
+                          } else {
+                              pb.total = total as u64;
+                              pb.inc();
+                          }
+                      }
+        ) {
+            Ok(_) => { pb.finish(); return },
+            Err(e) => {
+                error!("Restore error: {}", e);
+                std::process::exit(1);
+            }
+        }
+
     } else if let Some(matches) = matches.subcommand_matches("list") {
         let mut table = Table::new();
 
