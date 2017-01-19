@@ -41,22 +41,16 @@ use CONFIGURATION;
 
 // internal functions
 
-pub fn initialize<S, T>(local_directory: S, unique_client_id: T, config: Configuration) -> (PathBuf, String) where S: Into<String>, T: Into<String>{
+pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     let mut c = CONFIGURATION.write().unwrap();
     *c = config;
-
-
-    let ldir = local_directory.into();
-    let uid = unique_client_id.into();
 
     if !sodiumoxide::init() == true {
         panic!("Rust<sdsync_initialize>: sodium initialization failed, cannot continue");
     }
 
-    let storage_path = Path::new(&ldir).to_owned();
-
-    if let Err(e) = fs::create_dir_all(&storage_path) {
-        panic!("Rust<sdsync_initialize>: failed to create local directories: {}", e);
+    if let Err(e) = fs::create_dir_all(&local_storage_path) {
+        panic!("failed to create local directories: {}", e);
     }
 
 
@@ -69,8 +63,6 @@ pub fn initialize<S, T>(local_directory: S, unique_client_id: T, config: Configu
     debug!("{}>", ssl_version);
 
     debug!("ready");
-
-    (storage_path, uid)
 }
 
 pub fn login(username: &str,

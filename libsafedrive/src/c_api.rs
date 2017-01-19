@@ -1,7 +1,7 @@
 use std;
 use std::ffi::{CStr, CString};
 use std::str;
-use std::path::{PathBuf};
+use std::path::{Path, PathBuf};
 
 use std::u64;
 
@@ -226,6 +226,8 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
+    let storage_path = Path::new(&storage_directory);
+
     let uids: &CStr = unsafe {
         assert!(!unique_client_id.is_null());
         CStr::from_ptr(unique_client_id)
@@ -241,11 +243,11 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    let (storage_path, client_id) = initialize(storage_directory, uid, c);
+    initialize(storage_path, c);
 
     let sstate = State {
-        storage_path: storage_path,
-        unique_client_id: client_id,
+        storage_path: storage_path.to_owned(),
+        unique_client_id: uid,
         api_token: None,
         username: None,
         password: None,
