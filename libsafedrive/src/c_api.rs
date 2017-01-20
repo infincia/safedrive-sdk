@@ -71,7 +71,7 @@ pub struct SDDKSyncSession {
 impl From<SyncSession> for SDDKSyncSession {
     fn from(session: SyncSession) -> SDDKSyncSession {
         SDDKSyncSession {
-            folder_id: session.folder_id,
+            folder_id: session.folder_id.unwrap(),
             size: session.size,
             name: CString::new(session.name.as_str()).unwrap().into_raw(),
             date: session.time

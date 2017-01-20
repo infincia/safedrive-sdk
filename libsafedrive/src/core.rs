@@ -194,17 +194,22 @@ pub fn get_sync_session<'a>(token: &Token,
 }
 
 pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
-    let m = match read_sessions(token) {
-        Ok(sessions) => sessions,
+    let res = match read_sessions(token) {
+        Ok(res) => res,
         Err(e) => return Err(SDError::from(e))
     };
+    let s = match res.get("sessionDetails") {
+        Some(s) => s,
+        None => return Err(SDError::Internal(format!("failed to get sessionDetails from sessions response")))
+    };
+
     let mut v: Vec<SyncSession> = Vec::new();
 
-    for (folder_id, sessions) in &m {
+    for (folder_id, sessions) in s {
         for session in sessions {
-            let mut s = session.clone();
-            s.folder_id = *folder_id;
-            v.push(s);
+            let mut ses = session.clone();
+            ses.folder_id = Some(*folder_id);
+            v.push(ses);
         }
     }
 

@@ -404,7 +404,7 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
 
 // sync session handling
 
-pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SDAPIError> {
+pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u32, Vec<SyncSession>>>, SDAPIError> {
 
     let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
 
@@ -427,7 +427,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<u32, Vec<SyncSession>>, SD
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let sessions: HashMap<u32, Vec<SyncSession>> = try!(::serde_json::from_str(&response));
+    let sessions: HashMap<String, HashMap<u32, Vec<SyncSession>>> = try!(::serde_json::from_str(&response));
 
     Ok(sessions)
 }
