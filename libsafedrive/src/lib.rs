@@ -2,15 +2,15 @@
 
 pub mod core;
 pub mod constants;
-pub mod util;
-pub mod sdapi;
-pub mod keys;
-pub mod error;
-pub mod state;
 pub mod models;
 pub mod c_api;
 pub use c_api::*;
+pub mod error;
+pub mod keys;
 
+mod util;
+mod sdapi;
+mod state;
 
 // external crates
 

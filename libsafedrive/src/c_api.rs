@@ -24,7 +24,7 @@ use ::core::login;
 
 use ::models::{Configuration, RegisteredFolder, SyncSession};
 
-use ::util::unique_client_hash;
+use ::core::unique_client_hash;
 
 use ::error::SDError;
 
