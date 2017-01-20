@@ -45,8 +45,8 @@ use safedrive::core::get_sync_sessions;
 use safedrive::core::get_sync_session;
 
 
-use safedrive::util::unique_client_hash;
-use safedrive::util::get_app_directory;
+use safedrive::core::unique_client_hash;
+use safedrive::core::get_app_directory;
 
 use safedrive::models::{RegisteredFolder, Configuration};
 
