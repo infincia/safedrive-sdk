@@ -1,9 +1,10 @@
 #[macro_use] extern crate log;
 
-pub mod core;
-pub mod models;
 pub mod c_api;
 pub use c_api::*;
+
+pub mod core;
+pub mod models;
 pub mod error;
 pub mod keys;
 
