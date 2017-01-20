@@ -421,7 +421,7 @@ fn main() {
                 Cell::new(&session.name),
                 Cell::new(&format!("{}", &session.size)),
                 Cell::new(&format!("{}", &session.time)),
-                Cell::new(&format!("{}", &session.folder_id))])
+                Cell::new(&format!("{}", &session.folder_id.unwrap()))])
             );
         }
         table.printstd();
