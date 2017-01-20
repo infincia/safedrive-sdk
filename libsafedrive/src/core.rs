@@ -248,7 +248,7 @@ pub fn sync(token: &Token,
     let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
     let mut ar = Builder::new(archive_file);
-    let mut archive_size: i64 = 0;
+    let mut archive_size: u64 = 0;
 
     let entry_count = WalkDir::new(&folder_path).into_iter().count() as u64;
 
@@ -328,11 +328,6 @@ pub fn sync(token: &Token,
 
                     nb_chunk += 1;
                     total_size += chunk.size;
-
-                    // truncating here for compatibility with the sqlite model
-                    // it is safe because it is virtually impossible that total archive
-                    // size will even reach i64 size,(8192 petabytes) and u64 is 2x larger still
-                    archive_size += total_size as i64;
 
 
                     smallest_size = min(smallest_size, chunk.size);
@@ -466,6 +461,9 @@ pub fn sync(token: &Token,
                         }
                     }
                 }
+
+                archive_size += total_size;
+
                 let hmac_tag_size = ::sodiumoxide::crypto::auth::TAGBYTES;
 
                 let chunklist = BufReader::new(chunks.as_slice());
