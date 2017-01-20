@@ -123,11 +123,3 @@ fn production_directory_test() {
         Err(_) => { assert!(true == false); return }
     };
 }
-
-#[test]
-fn local_username_test() {
-    match get_local_user() {
-        Ok(u) => u,
-        Err(_) => { assert!(true == false); return }
-    };
-}
