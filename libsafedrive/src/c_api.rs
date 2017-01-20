@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+
 use std;
 use std::ffi::{CStr, CString};
 use std::str;

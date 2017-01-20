@@ -60,6 +60,7 @@ impl State {
         self.password = Some(password);
     }
 
+    #[allow(dead_code)]
     pub fn get_account_username(&self) -> &str {
         let username = match self.username {
             Some(ref u) => u,
@@ -69,6 +70,7 @@ impl State {
         username
     }
 
+    #[allow(dead_code)]
     pub fn get_account_password(&self) ->  &str {
         let password = match self.password {
             Some(ref p) => p,
