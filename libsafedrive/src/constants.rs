@@ -1,5 +1,3 @@
-pub static DEFAULT_PERMISSIONS: i32 = 493;
-
 pub static DEBUG_STATISTICS: bool = false;
 
 
