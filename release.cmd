@@ -20,12 +20,11 @@ IF "%LINKTYPE%"=="mt" (
 
 rustup default %CHANNEL%-%TARGET%
 
-pushd libsafedrive
-cargo.exe build --release --verbose
-cheddar -f src\c_api.rs ..\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h
-popd
 pushd safedrive
 cargo.exe build --release --verbose
+popd
+pushd libsafedrive
+cheddar -f src\c_api.rs ..\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h
 popd
 
 robocopy %CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\ %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\ /COPYALL /E
