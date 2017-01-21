@@ -120,7 +120,7 @@ fn main() {
         .subcommand(SubCommand::with_name("sessions")
                         .about("list all sync sessions")
         )
-        .subcommand(SubCommand::with_name("sync")
+        .subcommand(SubCommand::with_name("syncall")
             .about("sync all registered folder")
         )
         .subcommand(SubCommand::with_name("restore")
@@ -280,7 +280,7 @@ fn main() {
         }
 
 
-    } else if let Some(matches) = matches.subcommand_matches("sync") {
+    } else if let Some(matches) = matches.subcommand_matches("syncall") {
         let folder_list = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
