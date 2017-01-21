@@ -1,4 +1,4 @@
-pub static DEBUG_STATISTICS: bool = false;
+pub static DEBUG_STATISTICS: bool = true;
 
 
 pub static SDAPIDOMAIN_STAGING: &'static str = "staging.safedrive.io";
