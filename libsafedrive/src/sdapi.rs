@@ -45,11 +45,12 @@ pub enum APIEndpoint<'a> {
 
 impl<'a> APIEndpoint<'a> {
 
-    pub fn url(&self) -> String {
-        let mut url = String::new();
-        url += &self.protocol();
-        url += &self.domain();
-        url += &self.path();
+    pub fn url(&self) -> ::reqwest::Url {
+        let mut base = String::new();
+        base += &self.protocol();
+        base += &self.domain();
+        let url_base = ::reqwest::Url::parse(&base).unwrap();
+        let mut url = url_base.join(&self.path()).unwrap();
 
         url
     }
@@ -180,7 +181,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, descrip
     let body = ErrorLogBody { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .json(&body);
 
     let mut result = try!(request.send());
@@ -207,7 +208,7 @@ pub fn register_client<'a>(uniqueClientId: &'a str, email: &'a str, password: &'
     let body = RegisterClientBody { operatingSystem: operatingSystem, email: email, password: password, language: "en_US", uniqueClientId: uniqueClientId };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .json(&body);
 
     let mut result = try!(request.send());
@@ -237,7 +238,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let endpoint = APIEndpoint::AccountStatus { token: token };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -266,7 +267,7 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails { token: token };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -295,7 +296,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     let body = AccountKeyBody { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .json(&body)
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -324,7 +325,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     let endpoint = APIEndpoint::ReadFolders { token: token };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -353,7 +354,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     let body = CreateFolderBody { folderName: name, folderPath: path, encrypted: encrypted };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .json(&body)
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -381,7 +382,7 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -409,7 +410,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u32, Vec<S
     let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -437,7 +438,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, e
     let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -468,7 +469,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, enc
     debug!("body: {}", String::from_utf8_lossy(&body));
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .body(body)
         .header(SDAuthToken(token.token.to_owned()))
         .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
@@ -497,7 +498,7 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -525,7 +526,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -550,7 +551,7 @@ pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_dat
     let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session, chunk_data: chunk_data };
 
     let client = ::reqwest::Client::new().unwrap();
-    let mut request = client.request(endpoint.method(), &endpoint.url())
+    let mut request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
     if let Some(ref data) = *chunk_data {
         let (body, content_length, boundary) = multipart_for_bytes(data, name);
@@ -583,7 +584,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIEr
     let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), &endpoint.url())
+    let request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
