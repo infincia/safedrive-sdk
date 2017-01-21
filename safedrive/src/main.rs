@@ -123,6 +123,17 @@ fn main() {
         .subcommand(SubCommand::with_name("syncall")
             .about("sync all registered folder")
         )
+        .subcommand(SubCommand::with_name("sync")
+                        .about("sync a folder")
+                        .arg(Arg::with_name("id")
+                            .short("i")
+                            .long("id")
+                            .value_name("ID")
+                            .help("folder ID")
+                            .takes_value(true)
+                            .required(true)
+                        )
+        )
         .subcommand(SubCommand::with_name("restore")
             .about("restore a folder")
             .arg(Arg::with_name("id")
@@ -318,6 +329,49 @@ fn main() {
                     error!("Sync error: {}", e);
                     std::process::exit(1);
                 }
+            }
+        }
+    } else if let Some(matches) = matches.subcommand_matches("sync") {
+        let id: u32 = matches.value_of("id").unwrap()
+            .trim()
+            .parse()
+            .expect("Expected a number");
+
+        let folder = match get_sync_folder(&token, id) {
+            Ok(f) => f,
+            Err(e) => {
+                error!("Read folder error: {}", e);
+                std::process::exit(1);
+            }
+        };
+
+        //TODO: this is not portable to windows, must be fixed before use there
+        println!("Syncing folder \"{}\"", &folder.folderName);
+
+        let mut pb = ProgressBar::new(0);
+        pb.format("╢▌▌░╟");
+
+        let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+
+        match sync(&token,
+                   &sync_uuid,
+                   &keyset.main,
+                   &keyset.hmac,
+                   &keyset.tweak,
+                   folder.id,
+                   &mut |total, current, progress_percent, tick| {
+                       if tick {
+                           pb.tick();
+                       } else {
+                           pb.total = total as u64;
+                           pb.inc();
+                       }
+                   }
+        ) {
+            Ok(_) => { pb.finish(); return },
+            Err(e) => {
+                error!("Sync error: {}", e);
+                std::process::exit(1);
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("restore") {
