@@ -51,6 +51,14 @@ impl<'a> APIEndpoint<'a> {
         base += &self.domain();
         let url_base = ::reqwest::Url::parse(&base).unwrap();
         let mut url = url_base.join(&self.path()).unwrap();
+        match *self {
+            APIEndpoint::DeleteFolder { folder_id, .. } => {
+                url.query_pairs_mut()
+                    .clear()
+                    .append_pair("folderIds", &format!("{}", folder_id));
+            },
+            _ => {}
+        }
 
         url
     }
