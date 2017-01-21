@@ -172,7 +172,7 @@ impl<'a> APIEndpoint<'a> {
 }
 
 // SD API
-
+#[allow(dead_code)]
 pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
 
     let operatingSystem = get_current_os();
@@ -263,6 +263,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     Ok(account_status)
 }
 
+#[allow(dead_code)]
 pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails { token: token };
 
@@ -519,7 +520,7 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
 
 
 // block handling
-
+#[allow(dead_code)]
 pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError> {
 
     let endpoint = APIEndpoint::CheckBlock { token: token, name: name };
