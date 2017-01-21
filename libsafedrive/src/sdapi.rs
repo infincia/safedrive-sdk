@@ -475,7 +475,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, enc
 
     let (body, content_length, boundary) = multipart_for_bytes(session_data, name);
 
-    debug!("body: {}", String::from_utf8_lossy(&body));
+    //debug!("body: {}", String::from_utf8_lossy(&body));
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
