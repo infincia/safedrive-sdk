@@ -23,6 +23,7 @@ use ::sdapi::*;
 use ::keys::*;
 use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
+use ::CACHE_DIR;
 
 // crypto exports
 
@@ -53,6 +54,20 @@ pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     if let Err(e) = fs::create_dir_all(&local_storage_path) {
         panic!("failed to create local directories: {}", e);
     }
+    let mut p = PathBuf::from(local_storage_path);
+    p.push("cache");
+
+    let cache_s = match p.as_path().to_str() {
+        Some(ref s) => s.to_string(),
+        None => {
+            panic!("failed to create local cache dir");
+        }
+    };
+    if let Err(e) = fs::create_dir_all(&cache_s) {
+        panic!("failed to create local cache dir: {}", e);
+    }
+    let mut cd = CACHE_DIR.write().unwrap();
+    *cd = cache_s;
 
 
     let sodium_version = ::sodiumoxide::version::version_string();

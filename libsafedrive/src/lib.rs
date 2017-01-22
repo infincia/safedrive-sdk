@@ -13,6 +13,7 @@ mod util;
 mod sdapi;
 mod state;
 mod binformat;
+mod cache;
 
 // external crates
 
@@ -51,6 +52,12 @@ extern crate lazy_static;
 lazy_static! {
     static ref CONFIGURATION: std::sync::RwLock<models::Configuration> = std::sync::RwLock::new(models::Configuration::Production);
 }
+
+lazy_static! {
+    static ref CACHE_DIR: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+}
+
+
 
 
 
