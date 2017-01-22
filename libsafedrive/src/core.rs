@@ -3,7 +3,7 @@ use std::str;
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::fs::File;
-use std::io::{BufReader, Read, Seek, SeekFrom};
+use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
 use std::cmp::{min, max};
 use std::{thread, time};
 
@@ -11,9 +11,10 @@ use std::{thread, time};
 
 use ::rustc_serialize::hex::{ToHex};
 use ::rand::distributions::{IndependentSample, Range};
-use ::tar::{Builder, Header};
+use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::cdc::*;
+use ::nom::IResult::*;
 
 // internal imports
 
@@ -483,6 +484,7 @@ pub fn sync(token: &Token,
                     }
                 }
                 assert!(total_size == stream_length);
+                debug!("calculated {} bytes of blocks, matching stream size {}", total_size, stream_length);
 
                 archive_size += total_size;
 
@@ -493,11 +495,11 @@ pub fn sync(token: &Token,
                 header.set_cksum();
                 ar.append(&header, chunklist).expect("failed to append chunk archive header");
 
-                if nb_chunk != skipped_blocks && DEBUG_STATISTICS {
-                    debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
-                }
+
                 if DEBUG_STATISTICS {
-                    debug!("hmac list has {} ids <{}>", chunks.len() / 32, nb_chunk * 32);
+                    debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
+
+                    debug!("hmac list has {} ids <{} bytes>", chunks.len() / 32, nb_chunk * 32);
                     debug!("expected chunk size: {} bytes", expected_size);
                     debug!("smallest chunk: {} bytes.", smallest_size);
                     debug!("largest chunk: {} bytes.", largest_size);
@@ -593,9 +595,6 @@ pub fn restore(token: &Token,
                destination: PathBuf,
                progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
 
-    return Err(SDError::Internal(format!("not implemented")));
-
-
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
         Err(e) => return Err(SDError::from(e))
@@ -615,16 +614,266 @@ pub fn restore(token: &Token,
     let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
     let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
+    let cd = &session_data.chunk_data;
 
+    let session: ::binformat::BinaryFormat = match ::binformat::binary_parse(cd) {
+        Done(i, o) => o,
+        Error(e) => return Err(SDError::SessionMissing),
+        Incomplete(needed) => panic!("should never happen")
+    };
+
+    debug!("got valid binary file: {}", &session);
+
+
+    let session_ver = session.version;
+    let wrapped_session_key = session.wrapped_key;
+    let nonce_raw = session.nonce;
+    let wrapped_session_raw = session.wrapped_data;
+
+    let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw)
+        .expect("failed to get nonce");
 
     let main_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
         .expect("failed to get main key struct");
 
-    let entry_count: u64 = 0;
+    let session_key_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_session_key, &nonce, &main_key_s) {
+        Ok(k) => k,
+        Err(e) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+    };
+
+    let session_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(&session_key_raw).expect("failed to get unwrapped session key struct");
+
+    let session_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_session_raw, &nonce, &session_key_s) {
+        Ok(s) => s,
+        Err(e) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+    };
+
+    let mut ar = Archive::new(session_raw.as_slice());
+
+    let entry_count: u64 = ar.entries().iter().count() as u64;
 
     let mut failed = 0;
 
     let mut completed_count = 0.0;
+    for item in ar.entries().unwrap() {
+        let mut file_entry = item.unwrap();
+        let mut full_p = PathBuf::from(&destination);
+
+        match file_entry.path() {
+            Ok(ref p) => {
+                if DEBUG_STATISTICS {
+                    debug!("examining {}", &p.display());
+                }
+                full_p.push(p);
+            }
+            Err(e) => {
+                if DEBUG_STATISTICS {
+                    debug!("not restoring invalid path: {})", e);
+                }
+                failed + failed + 1;
+                continue // we do care about errors here, but we can't really recover from them for this item
+            }
+        };
+
+        let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
+
+        // call out to the library user with progress
+        progress(entry_count as u32, completed_count as u32, percent_completed, false);
+
+        completed_count = completed_count + 1.0;
+
+
+        let entry_type = file_entry.header().entry_type();
+
+        // process if not a directory or socket
+        match entry_type {
+            EntryType::Regular => {
+                let f = match File::create(&full_p) {
+                    Ok(file) => file,
+                    Err(err) => {
+                        debug!("not able to create file at path: {})", err);
+                        failed = failed +1;
+                        continue
+                    },
+                };
+
+                let stream_length = file_entry.header().size().unwrap();
+
+                debug!("entry has {} blocks", stream_length / 32);
+                
+                if stream_length > 0 {
+                    let mut stream = BufWriter::new(f);
+
+                    let mut block_hmac_bag = Vec::new();
+
+                    try!(file_entry.read_to_end(&mut block_hmac_bag));
+                    let block_hmac_list = match ::binformat::parse_hmacs(block_hmac_bag.as_ref()) {
+                        Done(i, o) => o,
+                        Error(e) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed)),
+                        Incomplete(needed) => panic!("should never happen")
+                    };
+
+
+                    for block_hmac in block_hmac_list.iter() {
+
+                        // allow caller to tick the progress display, if one exists
+                        progress(entry_count as u32, completed_count as u32, percent_completed, true);
+
+                        let mut should_retry = true;
+                        let mut retries_left = 15.0;
+
+                        let block_hmac_hex = block_hmac.to_hex();
+                        println!("processing block {}", &block_hmac_hex);
+
+
+                        let mut block_raw: Option<Block> = None;
+
+                        while should_retry {
+                            // allow caller to tick the progress display, if one exists
+                            progress(entry_count as u32, completed_count as u32, percent_completed, true);
+
+                            let failed_count = 15.0 - retries_left;
+                            let mut rng = ::rand::thread_rng();
+
+                            // we pick a multiplier randomly to avoid a bunch of clients trying again
+                            // at the same 2/4/8/16 back off time over and over if the server
+                            // is overloaded or down
+                            let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+                            if failed_count >= 2.0 && retries_left > 0.0 {
+                                // back off significantly every time a call fails but only after the
+                                // second try, the first failure could be us not including the data
+                                // when we should have
+                                let backoff_time = backoff_multiplier * (failed_count * failed_count);
+                                let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+                                thread::sleep(delay);
+                            }
+
+                            // get block from cache if possible
+                            match ::cache::read_block(&block_hmac_hex) {
+                                Ok(b) => {
+                                    should_retry = false;
+                                    block_raw = Some(b);
+                                    break;
+                                },
+                                _ => {}
+                            };
+
+                            // get block from the server
+
+                            match ::sdapi::read_block(&token, &block_hmac_hex) {
+                                Ok(b) => {
+                                    should_retry = false;
+                                    match ::cache::write_block(&b) {
+                                        _ => {}
+                                    };
+                                    block_raw = Some(b);
+                                },
+                                Err(SDAPIError::RequestFailed(err)) => {
+                                    retries_left = retries_left - 1.0;
+                                    if retries_left <= 0.0 {
+                                        // TODO: pass better error info up the call chain here rather than a failure
+                                        return Err(SDError::RequestFailure(err))
+                                    }
+                                },
+                                _ => {}
+                            };
+                        }
+                        debug!("server provided block {}", &block_hmac_hex);
+
+                        let block_s = block_raw.unwrap();
+
+                        let block_wrapped: ::binformat::BinaryFormat = match ::binformat::binary_parse(&block_s.chunk_data) {
+                            Done(i, o) => o,
+                            Error(e) => return Err(SDError::BlockMissing),
+                            Incomplete(needed) => panic!("should never happen")
+                        };
+
+                        debug!("got valid binary file: {}", &block_wrapped);
+                        {
+                            let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
+                            debug!("write start {:?}", new_position);
+
+                        }
+                        let session_ver = block_wrapped.version;
+                        let wrapped_block_key = block_wrapped.wrapped_key;
+                        let nonce_raw = block_wrapped.nonce;
+                        let wrapped_block_raw = block_wrapped.wrapped_data;
+
+                        let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw)
+                            .expect("failed to get nonce");
+
+                        let block_key_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_key, &nonce, &main_key_s) {
+                            Ok(k) => k,
+                            Err(e) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+                        };
+
+                        let block_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw).expect("failed to get unwrapped block key struct");
+
+                        let block_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_raw, &nonce, &block_key_s) {
+                            Ok(s) => s,
+                            Err(e) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+                        };
+                        debug!("writing block segment of {} bytes", block_raw.len());
+
+                        {
+                            try!(stream.write_all(&block_raw));
+                        }
+                        {
+                            let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
+                            debug!("new position {:?}", new_position);
+
+                        }
+                    }
+                    let hmac_tag_size = ::sodiumoxide::crypto::auth::TAGBYTES;
+
+                } else {
+                    // empty file, just write one out with the same metadata but no body
+
+                }
+            },
+            EntryType::Directory => {
+                try!(fs::create_dir_all(&full_p));
+            },
+            EntryType::Link => {
+                // hard link, may not want to try handling these yet where they exist
+            },
+            EntryType::Symlink => {
+
+            },
+            EntryType::Char => {
+
+            },
+            EntryType::Block => {
+
+            },
+            EntryType::Fifo => {
+
+            },
+            EntryType::Continuous => {
+
+            },
+            EntryType::GNULongLink => {
+
+            },
+            EntryType::GNULongName => {
+
+            },
+            EntryType::GNUSparse => {
+
+            },
+            EntryType::XGlobalHeader => {
+
+            },
+            EntryType::XHeader => {
+
+            },
+            _ => {
+
+            },
+        }
+    }
+
     debug!("restoring session finished");
 
     progress(entry_count as u32, completed_count as u32, 100.0, false);
