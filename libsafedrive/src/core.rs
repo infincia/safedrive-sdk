@@ -357,7 +357,7 @@ pub fn sync(token: &Token,
                     let mut buffer = BufReader::new(&f_chunk).take(chunk.size);
                     let mut data: Vec<u8> = Vec::with_capacity(100000); //expected size of largest block
 
-                    chunk_start = chunk.index +1;
+                    chunk_start = chunk_start + chunk.size;
 
                     if let Err(e) = buffer.read_to_end(&mut data) {
                         return Err(SDError::from(e))
