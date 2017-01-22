@@ -12,6 +12,7 @@ mod constants;
 mod util;
 mod sdapi;
 mod state;
+mod binformat;
 
 // external crates
 
