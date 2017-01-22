@@ -35,6 +35,13 @@ extern crate interfaces;
 #[cfg(target_os = "linux")]
 extern crate openssl;
 
+#[cfg(target_os = "macos")]
+extern crate objc_foundation;
+
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc;
+
 #[macro_use]
 extern crate serde_derive;
 

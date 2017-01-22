@@ -6,9 +6,17 @@ use std::env;
 
 use ::rustc_serialize::hex::{ToHex};
 
+#[cfg(target_os = "macos")]
+use ::objc_foundation::{NSObject, NSString, INSString};
+
+#[cfg(target_os = "macos")]
+use ::objc::runtime::{Class};
+
+
 // internal imports
 
 use ::models::Configuration;
+use ::constants::SDGROUP_NAME;
 
 #[cfg(target_os = "windows")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {
@@ -39,6 +47,43 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
     Err("failed to get mac address".to_string())
 }
 
+#[cfg(target_os = "macos")]
+#[allow(non_snake_case)]
+pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
+    let NSFileManager_cls = Class::get("NSFileManager").unwrap();
+    let groupID = NSString::from_str(SDGROUP_NAME);
+
+    let mut storage_path = unsafe {
+        let fm: *mut NSObject = msg_send![NSFileManager_cls, new];
+
+        let groupContainerURL: *mut NSObject = msg_send![fm, containerURLForSecurityApplicationGroupIdentifier:&*groupID];
+
+        let groupContainerPath: *mut NSString = msg_send![groupContainerURL, path];
+
+        let s = (*groupContainerPath).as_str();
+
+        let p = PathBuf::from(s);
+
+        let _: () = msg_send![fm, release];
+        // these cause a segfault right now, but technically you would release these to avoid a leak
+        //let _: () = msg_send![groupContainerURL, release];
+        //let _: () = msg_send![groupContainerPath, release];
+
+        p
+    };
+    match config {
+        &Configuration::Staging => storage_path.push("staging"),
+        &Configuration::Production => {},
+    }
+    match fs::create_dir_all(&storage_path) {
+        Ok(()) => {},
+        Err(_) => {}, //ignore this for the moment, it's primarily going to be the directory existing already
+    }
+    return Ok(storage_path)
+
+}
+
+#[cfg(not(target_os = "macos"))]
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
 
@@ -47,6 +92,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     if cfg!(target_os="windows") {
         evar = "APPDATA";
     } else {
+        // probably linux, use home dir
         evar = "HOME";
     }
     let m = format!("failed to get {} environment variable", evar);
@@ -60,12 +106,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     if cfg!(target_os="windows") {
         storage_path.push("SafeDrive");
 
-    } else if cfg!(target_os="macos") {
-        storage_path.push("Library");
-        storage_path.push("Application Support");
-        storage_path.push("SafeDrive");
     } else {
-        // probably linux, but either way not one of the others so use home dir
         storage_path.push(".safedrive");
     }
 
