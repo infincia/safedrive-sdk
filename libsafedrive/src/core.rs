@@ -482,6 +482,7 @@ pub fn sync(token: &Token,
                         }
                     }
                 }
+                assert!(total_size == stream_length);
 
                 archive_size += total_size;
 
