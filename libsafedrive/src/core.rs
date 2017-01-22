@@ -322,6 +322,9 @@ pub fn sync(token: &Token,
                 let expected_size = 1 << 18;
                 let mut size_variance = 0;
                 let mut chunks: Vec<u8> = Vec::new();
+
+                let mut chunk_start = 0;
+
                 for chunk in chunk_iter {
                     // allow caller to tick the progress display, if one exists
                     progress(entry_count as u32, completed_count as u32, percent_completed, true);
@@ -329,14 +332,17 @@ pub fn sync(token: &Token,
                     nb_chunk += 1;
                     total_size += chunk.size;
 
+                    debug!("creating chunk at {} of size {}", chunk_start, chunk.size);
 
                     smallest_size = min(smallest_size, chunk.size);
                     largest_size = max(largest_size, chunk.size);
                     size_variance += (chunk.size as i64 - expected_size as i64).pow(2);
-                    f_chunk.seek(SeekFrom::Start(chunk.index)).expect("failed to seek chunk reader");
+                    f_chunk.seek(SeekFrom::Start(chunk_start)).expect("failed to seek chunk reader");
 
                     let mut buffer = BufReader::new(&f_chunk).take(chunk.size);
                     let mut data: Vec<u8> = Vec::with_capacity(100000); //expected size of largest block
+
+                    chunk_start = chunk.index +1;
 
                     if let Err(e) = buffer.read_to_end(&mut data) {
                         return Err(SDError::from(e))
