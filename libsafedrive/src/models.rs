@@ -1,10 +1,27 @@
 #![allow(non_snake_case)]
 
+use std;
+
+
 #[derive(Debug)]
 pub enum Configuration {
     Staging,
     Production
 }
+
+#[derive(Debug)]
+#[derive(Copy, Clone)]
+pub enum SyncVersion {
+    Version0, // doesn't exist
+    Version1, // testing format
+    Version2, // production
+}
+impl std::default::Default for SyncVersion {
+    fn default() -> SyncVersion {
+        SyncVersion::Version1
+    }
+}
+
 
 // request bodies
 
