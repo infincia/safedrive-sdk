@@ -101,12 +101,12 @@ impl WrappedSyncSession {
         // first 8 bytes are the file ID, version, and reserved area
         let magic: &'static [u8; 2] = br"sd";
         let file_type: &'static [u8; 1] = br"s";
-        let version: &'static [u8; 2] = br"01";
+        let version = self.version.as_ref();
         let reserved: &'static [u8; 3] = br"000";
 
         binary_data.extend(magic.as_ref());
         binary_data.extend(file_type.as_ref());
-        binary_data.extend(version.as_ref());
+        binary_data.extend(version);
         binary_data.extend(reserved.as_ref());
 
         // next 48 bytes will be the wrapped session key
