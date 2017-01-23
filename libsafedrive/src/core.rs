@@ -700,9 +700,9 @@ pub fn restore(token: &Token,
 
                     try!(file_entry.read_to_end(&mut block_hmac_bag));
                     let block_hmac_list = match ::binformat::parse_hmacs(block_hmac_bag.as_ref()) {
-                        Done(i, o) => o,
-                        Error(e) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed)),
-                        Incomplete(needed) => panic!("should never happen")
+                        Done(_, o) => o,
+                        Error(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed)),
+                        Incomplete(_) => panic!("should never happen")
                     };
 
 
@@ -776,9 +776,9 @@ pub fn restore(token: &Token,
                         let block_s = block_raw.unwrap();
 
                         let block_wrapped: ::binformat::BinaryFormat = match ::binformat::binary_parse(&block_s.chunk_data) {
-                            Done(i, o) => o,
-                            Error(e) => return Err(SDError::BlockMissing),
-                            Incomplete(needed) => panic!("should never happen")
+                            Done(_, o) => o,
+                            Error(_) => return Err(SDError::BlockMissing),
+                            Incomplete(_) => panic!("should never happen")
                         };
 
                         debug!("got valid binary file: {}", &block_wrapped);
@@ -797,14 +797,14 @@ pub fn restore(token: &Token,
 
                         let block_key_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_key, &nonce, &main_key_s) {
                             Ok(k) => k,
-                            Err(e) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+                            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
                         };
 
                         let block_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw).expect("failed to get unwrapped block key struct");
 
                         let block_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_raw, &nonce, &block_key_s) {
                             Ok(s) => s,
-                            Err(e) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+                            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
                         };
                         debug!("writing block segment of {} bytes", block_raw.len());
 
