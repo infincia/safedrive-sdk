@@ -2,6 +2,9 @@ use std;
 
 use ::nom::{IResult, rest};
 
+use ::constants::*;
+
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct BinaryFormat<'a> {
     pub magic: &'a str,
@@ -26,8 +29,8 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
     file_type: map_res!(alt!(tag!("b") | tag!("s")), std::str::from_utf8)        ~
     version: map_res!(take!(2), std::str::from_utf8)                             ~
     reserved: map_res!(take!(3), std::str::from_utf8)                            ~
-    wrapped_key: take!(48)                                                       ~
-    nonce: take!(24)                                                             ~
+    wrapped_key: take!(KEY_SIZE + MAC_SIZE)                                      ~
+    nonce: take!(NONCE_SIZE)                                                     ~
     wrapped_data: rest                                                           ,
     || {
     BinaryFormat {
@@ -44,7 +47,7 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
 }
 
 named!(hmac_parse<&[u8], &[u8]>, do_parse!(
-    hmac: take!(32) >>
+    hmac: take!(HMAC_SIZE) >>
     (hmac)
   )
 );

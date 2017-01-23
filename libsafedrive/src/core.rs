@@ -259,9 +259,6 @@ pub fn sync(token: &Token,
     if DEBUG_STATISTICS {
         debug!("creating archive for: {} (folder id {})", folder_name, folder_id);
     }
-    let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
-    let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
-    let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
     let mut ar = Builder::new(archive_file);
     let mut archive_size: u64 = 0;
@@ -384,7 +381,7 @@ pub fn sync(token: &Token,
                     let mut potentially_uploaded_data: Option<Vec<u8>> = None;
 
                     // generate a new chunk key once in case we need it later. this is cheap to do
-                    let block_key_raw = ::sodiumoxide::randombytes::randombytes(key_size);
+                    let block_key_raw = ::sodiumoxide::randombytes::randombytes(KEY_SIZE);
 
                     while should_retry {
                         // allow caller to tick the progress display, if one exists
@@ -439,7 +436,7 @@ pub fn sync(token: &Token,
                                         // output block, which is critical for versioning and deduplication
                                         // across all backups of all sync folders
                                         let nonce_slice = block_hmac.as_ref();
-                                        let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..nonce_size as usize])
+                                        let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..NONCE_SIZE as usize])
                                         .expect("failed to get nonce");
 
                                         // we use the same nonce both while wrapping the block key, and the block itself
@@ -451,7 +448,7 @@ pub fn sync(token: &Token,
                                         // wrap the block key with the main encryption key
                                         let wrapped_block_key = ::sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
 
-                                        assert!(wrapped_block_key.len() == key_size + mac_size);
+                                        assert!(wrapped_block_key.len() == KEY_SIZE + MAC_SIZE);
 
 
                                         // prepend the key to the actual encrypted chunk data so they can be written to the file together
@@ -466,8 +463,8 @@ pub fn sync(token: &Token,
                                         block_data.extend(wrapped_block_key);
 
                                         // next 24 bytes will be the nonce/hmac
-                                        block_data.extend(&block_hmac[0..nonce_size as usize]);
-                                        assert!(block_data.len() == block_ver.len() + (key_size + mac_size) + nonce_size);
+                                        block_data.extend(&block_hmac[0..NONCE_SIZE as usize]);
+                                        assert!(block_data.len() == block_ver.len() + (KEY_SIZE + MAC_SIZE) + NONCE_SIZE);
 
                                         // remainder will be the the chunk data
                                         block_data.extend(encrypted_chunk);
@@ -610,9 +607,6 @@ pub fn restore(token: &Token,
     if DEBUG_STATISTICS {
         debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
     }
-    let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
-    let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
-    let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
     let cd = &session_data.chunk_data;
 
@@ -825,7 +819,6 @@ pub fn restore(token: &Token,
 
                         }
                     }
-                    let hmac_tag_size = ::sodiumoxide::crypto::auth::TAGBYTES;
 
                 } else {
                     // empty file, just write one out with the same metadata but no body
