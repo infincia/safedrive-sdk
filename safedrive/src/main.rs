@@ -410,8 +410,6 @@ fn main() {
         pb.format("╢▌▌░╟");
         pb.set_units(Units::Bytes);
 
-        let sync_uuid = Uuid::new_v4().hyphenated().to_string();
-
         match restore(&token,
                       &session_name,
                       &keyset.main,
