@@ -12,6 +12,7 @@ use ::rustc_serialize::hex::{ToHex};
 use ::util::*;
 use ::error::SDAPIError;
 use ::models::*;
+use ::block::*;
 use ::session::*;
 use ::keys::*;
 use ::constants::*;

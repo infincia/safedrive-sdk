@@ -73,12 +73,6 @@ pub struct UniqueClientID {
     pub id: String,
 }
 
-#[derive(Debug)]
-pub struct Block<'a> {
-    pub chunk_data: Vec<u8>,
-    pub name: &'a str
-}
-
 //private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {

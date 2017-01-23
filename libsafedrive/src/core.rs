@@ -19,6 +19,7 @@ use ::nom::IResult::*;
 // internal imports
 
 use ::models::*;
+use ::block::*;
 use ::constants::*;
 use ::sdapi::*;
 use ::keys::*;

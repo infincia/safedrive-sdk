@@ -3,7 +3,7 @@ use std::path::{PathBuf};
 use std::io::{Read, Write};
 
 use ::CACHE_DIR;
-use ::models::Block;
+use ::block::Block;
 
 
 pub fn read_block<'a>(name: &'a str) -> Result<Block, ::std::io::Error> {
