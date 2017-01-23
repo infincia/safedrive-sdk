@@ -9,7 +9,7 @@ use std::{thread, time};
 
 // external crate imports
 
-use ::rustc_serialize::hex::{ToHex};
+use ::rustc_serialize::hex::{ToHex, FromHex};
 use ::rand::distributions::{IndependentSample, Range};
 use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
@@ -387,27 +387,18 @@ pub fn sync(token: &Token,
                         return Err(SDError::from(e))
                     }
 
-                    let raw_chunk = data.as_slice();
+                    let block = Block::new(SyncVersion::Version1, hmac_key, data);
+                    let block_name = block.name();
+                    chunks.extend_from_slice(&block.get_hmac());
 
-
-                    let main_key = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
-                        .expect("failed to get main key struct");
-
-                    // calculate hmac of the block
-                    let hmac_key = ::sodiumoxide::crypto::auth::Key::from_slice(hmac_key.as_ref())
-                        .expect("failed to get hmac key struct");
-
-                    let block_hmac = ::sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
-                    chunks.extend_from_slice(block_hmac.as_ref());
-
-                    let block_name = block_hmac.as_ref().to_hex();
+                    let wrapped_block = match block.to_wrapped(main_key) {
+                        Ok(wb) => wb,
+                        Err(e) => return Err(SDError::CryptoError(e)),
+                    };
 
                     let mut should_retry = true;
                     let mut retries_left = 15.0;
-                    let mut potentially_uploaded_data: Option<Vec<u8>> = None;
-
-                    // generate a new chunk key once in case we need it later. this is cheap to do
-                    let block_key_raw = ::sodiumoxide::randombytes::randombytes(KEY_SIZE);
+                    let mut should_upload = false;
 
                     while should_retry {
                         // allow caller to tick the progress display, if one exists
@@ -432,7 +423,7 @@ pub fn sync(token: &Token,
 
                         // tell the server to mark this block without the data first, if that fails we try uploading
 
-                        match write_block(&token, session_name, &block_name, &potentially_uploaded_data) {
+                        match write_block(&token, session_name, &block_name, &wrapped_block, should_upload) {
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
                                 // allow caller to tick the progress display, if one exists
@@ -449,60 +440,7 @@ pub fn sync(token: &Token,
                             Err(SDAPIError::RetryUpload) => {
                                 retries_left = retries_left - 1.0;
 
-                                match potentially_uploaded_data {
-                                    Some(_) => {},
-                                    None => {
-
-                                        let block_key_struct = ::sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw)
-                                        .expect("failed to get block key struct");
-
-                                        // We use the first 24 bytes of the block hmac value as nonce for wrapping
-                                        // the block key and encrypting the block itself.
-                                        //
-                                        // This is cryptographically safe but still deterministic: encrypting
-                                        // the same block twice with a specific key will always produce the same
-                                        // output block, which is critical for versioning and deduplication
-                                        // across all backups of all sync folders
-                                        let nonce_slice = block_hmac.as_ref();
-                                        let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_slice[0..NONCE_SIZE as usize])
-                                        .expect("failed to get nonce");
-
-                                        // we use the same nonce both while wrapping the block key, and the block itself
-                                        // this is safe because using the same nonce with 2 different keys is not nonce reuse
-
-                                        // encrypt the chunk data using the block key
-                                        let encrypted_chunk = ::sodiumoxide::crypto::secretbox::seal(&raw_chunk, &nonce, &block_key_struct);
-
-                                        // wrap the block key with the main encryption key
-                                        let wrapped_block_key = ::sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &main_key);
-
-                                        assert!(wrapped_block_key.len() == KEY_SIZE + MAC_SIZE);
-
-
-                                        // prepend the key to the actual encrypted chunk data so they can be written to the file together
-                                        let mut block_data = Vec::new();
-
-                                        // first 8 bytes are the file ID, version, and reserved area
-                                        let block_ver: &'static [u8; 8] = br"sdb01000";
-
-                                        block_data.extend(block_ver.as_ref());
-
-                                        // next 48 bytes will be the wrapped key
-                                        block_data.extend(wrapped_block_key);
-
-                                        // next 24 bytes will be the nonce/hmac
-                                        block_data.extend(&block_hmac[0..NONCE_SIZE as usize]);
-                                        assert!(block_data.len() == block_ver.len() + (KEY_SIZE + MAC_SIZE) + NONCE_SIZE);
-
-                                        // remainder will be the the chunk data
-                                        block_data.extend(encrypted_chunk);
-
-                                        // set the local variable to trigger a data upload next time
-                                        // we go through the loop
-                                        potentially_uploaded_data = Some(block_data);
-
-                                    }
-                                }
+                                should_upload = true;
                             },
                             _ => {}
                         }
@@ -511,11 +449,8 @@ pub fn sync(token: &Token,
                 assert!(total_size == stream_length);
                 debug!("calculated {} bytes of blocks, matching stream size {}", total_size, stream_length);
 
-
-                let hmac_tag_size = ::sodiumoxide::crypto::auth::TAGBYTES;
-
                 let chunklist = BufReader::new(chunks.as_slice());
-                header.set_size(nb_chunk * hmac_tag_size as u64); // hmac list size
+                header.set_size(nb_chunk * HMAC_SIZE as u64); // hmac list size
                 header.set_cksum();
                 ar.append(&header, chunklist).expect("failed to append chunk archive header");
 
@@ -687,7 +622,7 @@ pub fn restore(token: &Token,
                         println!("processing block {}", &block_hmac_hex);
 
 
-                        let mut block_raw: Option<Block> = None;
+                        let mut wrapped_block: Option<WrappedBlock> = None;
 
                         while should_retry {
                             // allow caller to tick the progress display, if one exists
@@ -712,8 +647,8 @@ pub fn restore(token: &Token,
 
                             // get block from cache if possible
                             match ::cache::read_block(&block_hmac_hex) {
-                                Ok(b) => {
-                                    block_raw = Some(b);
+                                Ok(br) => {
+                                    wrapped_block = Some(br);
                                     debug!("cache provided block {}", &block_hmac_hex);
                                     break;
                                 },
@@ -723,13 +658,18 @@ pub fn restore(token: &Token,
                             // get block from the server
 
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
-                                Ok(b) => {
+                                Ok(rb) => {
                                     should_retry = false;
                                     debug!("server provided block {}", &block_hmac_hex);
-                                    match ::cache::write_block(&b) {
+                                    let wb = match WrappedBlock::from(rb, (&block_hmac_hex).from_hex().unwrap()) {
+                                        Ok(wb) => wb,
+                                        Err(e) => return Err(e),
+                                    };
+
+                                    match ::cache::write_block(&wb) {
                                         _ => {}
                                     };
-                                    block_raw = Some(b);
+                                    wrapped_block = Some(wb);
                                 },
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
@@ -742,46 +682,22 @@ pub fn restore(token: &Token,
                             };
                         }
 
-                        let block_s = block_raw.unwrap();
+                        let wrapped_block_s = wrapped_block.unwrap();
 
-                        let block_wrapped: ::binformat::BinaryFormat = match ::binformat::binary_parse(&block_s.chunk_data) {
-                            Done(_, o) => o,
-                            Error(_) => return Err(SDError::BlockMissing),
-                            Incomplete(_) => panic!("should never happen")
+                        let block = match wrapped_block_s.to_block(main_key) {
+                            Ok(b) => b,
+                            Err(e) => return Err(e),
                         };
 
-                        debug!("got valid binary file: {}", &block_wrapped);
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
                             debug!("write start {:?}", new_position);
 
                         }
-                        let session_ver = block_wrapped.version;
-                        let wrapped_block_key = block_wrapped.wrapped_key;
-                        let nonce_raw = block_wrapped.nonce;
-                        let wrapped_block_raw = block_wrapped.wrapped_data;
-
-                        let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw)
-                            .expect("failed to get nonce");
-
-                        let main_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
-                            .expect("failed to get main key struct");
-
-                        let block_key_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_key, &nonce, &main_key_s) {
-                            Ok(k) => k,
-                            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
-                        };
-
-                        let block_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw).expect("failed to get unwrapped block key struct");
-
-                        let block_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_raw, &nonce, &block_key_s) {
-                            Ok(s) => s,
-                            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
-                        };
-                        debug!("writing block segment of {} bytes", block_raw.len());
+                        debug!("writing block segment of {} bytes", block.data.len());
 
                         {
-                            try!(stream.write_all(&block_raw));
+                            try!(stream.write_all(&block.data));
                         }
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();

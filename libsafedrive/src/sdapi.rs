@@ -557,15 +557,15 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
     }
 }
 
-pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_data: &Option<Vec<u8>>) -> Result<(), SDAPIError> {
+pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBlock, should_upload: bool) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session };
 
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
         .header(SDAuthToken(token.token.to_owned()));
-    if let Some(ref data) = *chunk_data {
-        let (body, content_length, boundary) = multipart_for_bytes(data, name);
+    if should_upload {
+        let (body, content_length, boundary) = multipart_for_bytes(block.wrapped_data.as_slice(), name);
         //debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
@@ -591,7 +591,7 @@ pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_dat
     }
 }
 
-pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIError> {
+pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
 
     let client = ::reqwest::Client::new().unwrap();
@@ -611,7 +611,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Block<'a>, SDAPIEr
 
     try!(result.read_to_end(&mut buffer));
 
-    Ok(Block { name: name, chunk_data: buffer })
+    Ok(buffer)
 }
 
 fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'static str) {

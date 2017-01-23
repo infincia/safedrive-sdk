@@ -1,40 +1,39 @@
 use std::fs::File;
 use std::path::{PathBuf};
 use std::io::{Read, Write};
+use ::rustc_serialize::hex::{ToHex, FromHex};
 
 use ::CACHE_DIR;
-use ::block::Block;
+use ::block::WrappedBlock;
+use ::error::SDError;
 
 
-pub fn read_block<'a>(name: &'a str) -> Result<Block, ::std::io::Error> {
+pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
     let cd = CACHE_DIR.read().unwrap();
     let mut bp = PathBuf::from(&*cd);
 
     bp.push(name);
 
-    match File::open(&bp) {
-        Ok(mut file) => {
-            let mut buffer = Vec::new();
+    let mut file = try!(File::open(&bp));
 
-            try!(file.read_to_end(&mut buffer));
+    let mut buffer = Vec::new();
 
-            Ok(Block { name: name, chunk_data: buffer })
-        },
-        Err(error) => Err(error),
-    }
+    try!(file.read_to_end(&mut buffer));
+    let h = name.from_hex().unwrap();
+
+    WrappedBlock::from(buffer, h)
+
 }
 
-pub fn write_block<'a>(block: &Block) -> Result<(), ::std::io::Error> {
+pub fn write_block<'a>(block: &WrappedBlock) -> Result<(), SDError> {
     let cd = CACHE_DIR.read().unwrap();
     let mut bp = PathBuf::from(&*cd);
+    let h = block.hmac.to_hex();
 
-    bp.push(&block.name);
+    bp.push(h);
 
-    let mut f = match File::create(&bp) {
-        Ok(file) => file,
-        Err(error) => return Err(error),
-    };
-    try!(f.write_all(&block.chunk_data));
+    let mut f = try!(File::create(&bp));
+    try!(f.write_all(&block.to_binary()));
 
     Ok(())
 }
