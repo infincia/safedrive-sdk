@@ -690,6 +690,7 @@ pub fn restore(token: &Token,
                             match ::cache::read_block(&block_hmac_hex) {
                                 Ok(b) => {
                                     block_raw = Some(b);
+                                    debug!("cache provided block {}", &block_hmac_hex);
                                     break;
                                 },
                                 _ => {}
@@ -700,6 +701,7 @@ pub fn restore(token: &Token,
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
                                 Ok(b) => {
                                     should_retry = false;
+                                    debug!("server provided block {}", &block_hmac_hex);
                                     match ::cache::write_block(&b) {
                                         _ => {}
                                     };
@@ -715,7 +717,6 @@ pub fn restore(token: &Token,
                                 _ => {}
                             };
                         }
-                        debug!("server provided block {}", &block_hmac_hex);
 
                         let block_s = block_raw.unwrap();
 
