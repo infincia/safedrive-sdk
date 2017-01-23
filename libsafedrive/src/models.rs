@@ -22,6 +22,15 @@ impl std::default::Default for SyncVersion {
     }
 }
 
+impl AsRef<[u8]> for SyncVersion {
+    fn as_ref(&self) -> &[u8] {
+        match *self {
+            SyncVersion::Version0 => "00".as_bytes(),
+            SyncVersion::Version1 => "01".as_bytes(),
+            SyncVersion::Version2 => "02".as_bytes(),
+        }
+    }
+}
 
 // request bodies
 
