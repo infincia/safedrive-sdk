@@ -40,7 +40,7 @@ pub enum APIEndpoint<'a> {
     ReadSyncSession { token: &'a Token, name: &'a str, encrypted: bool },
     ReadSyncSessions { token: &'a Token, encrypted: bool },
     CheckBlock { token: &'a Token, name: &'a str },
-    WriteBlock { token: &'a Token, session: &'a str, name: &'a str, chunk_data: &'a Option<Vec<u8>> },
+    WriteBlock { token: &'a Token, session: &'a str, name: &'a str },
     ReadBlock { token: &'a Token, name: &'a str },
 
 }
@@ -559,7 +559,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 
 pub fn write_block<'a>(token: &Token, session: &'a str, name: &'a str, chunk_data: &Option<Vec<u8>>) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session, chunk_data: chunk_data };
+    let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session };
 
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
