@@ -14,6 +14,7 @@ mod sdapi;
 mod state;
 mod binformat;
 mod cache;
+mod session;
 
 // external crates
 

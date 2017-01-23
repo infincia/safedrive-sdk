@@ -25,7 +25,9 @@ use ::core::restore;
 use ::core::load_keys;
 use ::core::login;
 
-use ::models::{Configuration, RegisteredFolder, SyncSession};
+use ::models::{Configuration, RegisteredFolder};
+
+use ::session::SyncSession;
 
 use ::core::unique_client_hash;
 
@@ -75,9 +77,9 @@ impl From<SyncSession> for SDDKSyncSession {
     fn from(session: SyncSession) -> SDDKSyncSession {
         SDDKSyncSession {
             folder_id: session.folder_id.unwrap(),
-            size: session.size,
+            size: session.size.unwrap(),
             name: CString::new(session.name.as_str()).unwrap().into_raw(),
-            date: session.time
+            date: session.time.unwrap(),
         }
     }
 }

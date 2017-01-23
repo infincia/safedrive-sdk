@@ -25,6 +25,7 @@ use ::keys::*;
 use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 use ::CACHE_DIR;
+use ::session::{SyncSession, WrappedSyncSession};
 
 // crypto exports
 
@@ -200,8 +201,9 @@ pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDError>
 }
 
 pub fn get_sync_session<'a>(token: &Token,
-                            session: &'a str) -> Result<SyncSessionData<'a>, SDError> {
-    let session = match read_session(token, session, true) {
+                            folder_id: u32,
+                            session: &'a str) -> Result<SyncSessionResponse<'a>, SDError> {
+    let session = match read_session(token, folder_id, session, true) {
         Ok(session) => session,
         Err(e) => return Err(SDError::from(e))
     };
@@ -520,60 +522,23 @@ pub fn sync(token: &Token,
     }
 
     // since we're writing to a buffer in memory there shouldn't be any errors here
-    let raw_archive = &ar.into_inner().unwrap();
-
-    // get the main key
-
-    let main_key = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
-        .expect("failed to get main key struct");
-
-    // generate a new archive key
-    let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
-    let nonce_size = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
-    let mac_size = ::sodiumoxide::crypto::secretbox::MACBYTES;
-
-    let archive_key_raw = ::sodiumoxide::randombytes::randombytes(key_size);
-    let archive_key_struct = ::sodiumoxide::crypto::secretbox::Key::from_slice(&archive_key_raw)
-        .expect("failed to get archive key struct");
-
-    // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
-    let nonce_raw = ::sodiumoxide::randombytes::randombytes(nonce_size);
-    let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw[0..24])
-        .expect("failed to get nonce");
-
-    // we use the same nonce both while wrapping the archive key, and the archive itself
-    // this is safe because using the same nonce with 2 different keys is not nonce reuse
-
-    // encrypt the archive data using the archive key
-    let encrypted_archive = ::sodiumoxide::crypto::secretbox::seal(&raw_archive, &nonce, &archive_key_struct);
-
-    // wrap the archive key with the main encryption key
-    let wrapped_archive_key = ::sodiumoxide::crypto::secretbox::seal(&archive_key_raw, &nonce, &main_key);
-    assert!(wrapped_archive_key.len() == key_size + mac_size);
-
-    let mut complete_archive = Vec::new();
-
-    // first 8 bytes are the file ID, version, and reserved area
-    let session_ver: &'static [u8; 8] = br"sds01000";
-
-    complete_archive.extend(session_ver.as_ref());
-
-    // next 48 bytes will be the wrapped session key
-    complete_archive.extend(wrapped_archive_key);
-
-    // next 24 bytes will be the nonce
-    complete_archive.extend(nonce_raw);
-    assert!(complete_archive.len() == session_ver.len() + (key_size + mac_size) + nonce_size);
+    let raw_session = ar.into_inner().unwrap();
 
 
-    // remainder will be the encrypted session data
-    complete_archive.extend(encrypted_archive);
+    let session = SyncSession::new(SyncVersion::Version1, folder_id, session_name.to_string(), Some(archive_size), None, raw_session);
+    let wrapped_session = match session.to_wrapped(main_key) {
+        Ok(ws) => ws,
+        Err(e) => return Err(SDError::CryptoError(e)),
+    };
+
+    let binary_data = wrapped_session.to_binary();
+
 
     debug!("finishing sync session");
 
 
 
-    match finish_sync_session(&token, folder_id, session_name, true, &complete_archive, archive_size as usize) {
+    match finish_sync_session(&token, folder_id, session_name, true, &binary_data, archive_size as usize) {
         Ok(()) => {},
         Err(e) => return Err(SDError::from(e))
     };
@@ -595,7 +560,7 @@ pub fn restore(token: &Token,
         Err(e) => return Err(SDError::from(e))
     };
 
-    let session_data = match read_session(token, session_name, true) {
+    let session_body = match read_session(token, folder_id, session_name, true) {
         Ok(session_data) => session_data,
         Err(e) => return Err(SDError::from(e))
     };
@@ -606,41 +571,20 @@ pub fn restore(token: &Token,
         debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
     }
 
-    let cd = &session_data.chunk_data;
 
-    let session: ::binformat::BinaryFormat = match ::binformat::binary_parse(cd) {
-        Done(i, o) => o,
-        Error(e) => return Err(SDError::SessionMissing),
-        Incomplete(needed) => panic!("should never happen")
+    let w_session = match WrappedSyncSession::from(session_body) {
+        Ok(ws) => ws,
+        Err(e) => return Err(e),
     };
 
-    debug!("got valid binary file: {}", &session);
-
-
-    let session_ver = session.version;
-    let wrapped_session_key = session.wrapped_key;
-    let nonce_raw = session.nonce;
-    let wrapped_session_raw = session.wrapped_data;
-
-    let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw)
-        .expect("failed to get nonce");
-
-    let main_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
-        .expect("failed to get main key struct");
-
-    let session_key_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_session_key, &nonce, &main_key_s) {
-        Ok(k) => k,
-        Err(e) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
-    };
-
-    let session_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(&session_key_raw).expect("failed to get unwrapped session key struct");
-
-    let session_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_session_raw, &nonce, &session_key_s) {
+    let session = match w_session.to_session(main_key) {
         Ok(s) => s,
-        Err(e) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+        Err(e) => return Err(e),
     };
 
-    let mut ar = Archive::new(session_raw.as_slice());
+    let session_data: Vec<u8> = session.data;
+
+    let mut ar = Archive::new(session_data.as_slice());
 
     let entry_count: u64 = ar.entries().iter().count() as u64;
 
@@ -794,6 +738,9 @@ pub fn restore(token: &Token,
 
                         let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw)
                             .expect("failed to get nonce");
+
+                        let main_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(main_key.as_ref())
+                            .expect("failed to get main key struct");
 
                         let block_key_raw = match ::sodiumoxide::crypto::secretbox::open(&wrapped_block_key, &nonce, &main_key_s) {
                             Ok(k) => k,

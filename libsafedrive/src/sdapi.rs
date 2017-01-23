@@ -12,6 +12,7 @@ use ::rustc_serialize::hex::{ToHex};
 use ::util::*;
 use ::error::SDAPIError;
 use ::models::*;
+use ::session::*;
 use ::keys::*;
 use ::constants::*;
 use ::CONFIGURATION;
@@ -501,7 +502,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, enc
     }
 }
 
-pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result<SyncSessionData<'a>, SDAPIError> {
+pub fn read_session<'a>(token: &Token, folder_id: u32, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
     let endpoint = APIEndpoint::ReadSyncSession { token: token, name: name, encrypted: encrypted };
 
 
@@ -523,7 +524,7 @@ pub fn read_session<'a>(token: &Token, name: &'a str, encrypted: bool) -> Result
 
     try!(result.read_to_end(&mut buffer));
 
-    Ok(SyncSessionData { name: name, chunk_data: buffer })
+    Ok(SyncSessionResponse { name: name, chunk_data: buffer, folder_id: folder_id })
 }
 
 

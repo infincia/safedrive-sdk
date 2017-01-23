@@ -130,16 +130,9 @@ pub struct WrappedKeysetBody {
     pub tweak: String
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SyncSession {
-    pub folder_id: Option<u32>,
-    pub name: String,
-    pub size: u64,
-    pub time: u64,
-}
-
-pub struct SyncSessionData<'a> {
+pub struct SyncSessionResponse<'a> {
     pub name: &'a str,
+    pub folder_id: u32,
     pub chunk_data: Vec<u8>
 }
 
