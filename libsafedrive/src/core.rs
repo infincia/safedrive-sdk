@@ -241,7 +241,7 @@ pub fn sync(token: &Token,
             hmac_key: &Key,
             tweak_key: &Key,
             folder_id: u32,
-            progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
+            progress: &mut FnMut(u32, u32, u32, f64, bool)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
@@ -266,7 +266,29 @@ pub fn sync(token: &Token,
     let mut ar = Builder::new(archive_file);
     let mut archive_size: u64 = 0;
 
-    let entry_count = WalkDir::new(&folder_path).into_iter().count() as u64;
+    let mut estimated_size: u64 = 0;
+
+    for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
+        if DEBUG_STATISTICS {
+            debug!("estimating size of {}...", item.path().display());
+        }
+        let p = item.path();
+
+        let f = match File::open(p) {
+            Ok(file) => file,
+            Err(_) => { continue },
+        };
+        let md = match f.metadata() {
+            Ok(m) => m,
+            Err(_) => { continue },
+        };
+
+        let stream_length = md.len();
+        if DEBUG_STATISTICS {
+            debug!("stream: {}", stream_length);
+        }
+        estimated_size = estimated_size + stream_length;
+    }
 
     let mut failed = 0;
 
@@ -275,10 +297,10 @@ pub fn sync(token: &Token,
         if DEBUG_STATISTICS {
             debug!("examining {}", item.path().display());
         }
-        let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
+        let percent_completed: f64 = (archive_size as f64 / estimated_size as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(entry_count as u32, completed_count as u32, percent_completed, false);
+        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
 
         completed_count = completed_count + 1.0;
 
@@ -343,10 +365,11 @@ pub fn sync(token: &Token,
 
                 for chunk in chunk_iter {
                     // allow caller to tick the progress display, if one exists
-                    progress(entry_count as u32, completed_count as u32, percent_completed, true);
+                    progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
 
                     nb_chunk += 1;
                     total_size += chunk.size;
+                    archive_size += chunk.size;
 
                     debug!("creating chunk at {} of size {}", chunk_start, chunk.size);
 
@@ -388,7 +411,7 @@ pub fn sync(token: &Token,
 
                     while should_retry {
                         // allow caller to tick the progress display, if one exists
-                        progress(entry_count as u32, completed_count as u32, percent_completed, true);
+                        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
 
                         let failed_count = 15.0 - retries_left;
                         let mut rng = ::rand::thread_rng();
@@ -412,6 +435,8 @@ pub fn sync(token: &Token,
                         match write_block(&token, session_name, &block_name, &potentially_uploaded_data) {
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
+                                // allow caller to tick the progress display, if one exists
+                                progress(estimated_size as u32, archive_size as u32, chunk.size as u32, percent_completed, false);
                                 should_retry = false
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
@@ -486,7 +511,6 @@ pub fn sync(token: &Token,
                 assert!(total_size == stream_length);
                 debug!("calculated {} bytes of blocks, matching stream size {}", total_size, stream_length);
 
-                archive_size += total_size;
 
                 let hmac_tag_size = ::sodiumoxide::crypto::auth::TAGBYTES;
 
@@ -543,7 +567,7 @@ pub fn sync(token: &Token,
         Ok(()) => {},
         Err(e) => return Err(SDError::from(e))
     };
-    progress(entry_count as u32, completed_count as u32, 100.0, false);
+    progress(estimated_size as u32, archive_size as u32, 0 as u32, 100.0, false);
 
     Ok(())
 }
@@ -554,7 +578,7 @@ pub fn restore(token: &Token,
                main_key: &Key,
                folder_id: u32,
                destination: PathBuf,
-               progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
+               progress: &mut FnMut(u32, u32, u32, f64, bool)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
@@ -615,7 +639,7 @@ pub fn restore(token: &Token,
         let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(entry_count as u32, completed_count as u32, percent_completed, false);
+        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false);
 
         completed_count = completed_count + 1.0;
 
@@ -654,7 +678,7 @@ pub fn restore(token: &Token,
                     for block_hmac in block_hmac_list.iter() {
 
                         // allow caller to tick the progress display, if one exists
-                        progress(entry_count as u32, completed_count as u32, percent_completed, true);
+                        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, true);
 
                         let mut should_retry = true;
                         let mut retries_left = 15.0;
@@ -667,7 +691,7 @@ pub fn restore(token: &Token,
 
                         while should_retry {
                             // allow caller to tick the progress display, if one exists
-                            progress(entry_count as u32, completed_count as u32, percent_completed, true);
+                            progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, true);
 
                             let failed_count = 15.0 - retries_left;
                             let mut rng = ::rand::thread_rng();
@@ -815,7 +839,7 @@ pub fn restore(token: &Token,
 
     debug!("restoring session finished");
 
-    progress(entry_count as u32, completed_count as u32, 100.0, false);
+    progress(entry_count as u32, completed_count as u32, 0 as u32, 100.0, false);
 
     Ok(())
 }

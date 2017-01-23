@@ -1048,9 +1048,10 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                hmac_key,
                tweak_key,
                id,
-               &mut |total, current, progress_percent, tick| {
+               &mut |total, current, new, progress_percent, tick| {
                    let c_total: std::os::raw::c_uint = total;
                    let c_current: std::os::raw::c_uint = current;
+                   let c_new: std::os::raw::c_uint = new;
                    let c_percent: std::os::raw::c_double = progress_percent;
                    let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
                    progress(context, c_total, c_current, c_percent, c_tick);
@@ -1153,10 +1154,11 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                   main_key,
                   id,
                   p,
-                  &mut |total, current, progress_percent, tick| {
+                  &mut |total, current, new, progress_percent, tick| {
                       let c_total: std::os::raw::c_uint = total;
                       let c_current: std::os::raw::c_uint = current;
                       let c_percent: std::os::raw::c_double = progress_percent;
+                      let c_new: std::os::raw::c_uint = new;
                       let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
                       progress(context, c_total, c_current, c_percent, c_tick);
                   }) {
