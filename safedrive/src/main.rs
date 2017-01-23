@@ -393,7 +393,7 @@ fn main() {
             }
         };
 
-        let session = match get_sync_session(&token, &session_name) {
+        let session = match get_sync_session(&token, id, &session_name) {
             Ok(s) => s,
             Err(e) => {
                 error!("Read session error: {}", e);
@@ -412,8 +412,6 @@ fn main() {
         match restore(&token,
                       &session_name,
                       &keyset.main,
-                      &keyset.hmac,
-                      &keyset.tweak,
                       folder.id,
                       pa,
                       &mut |total, current, progress_percent, tick| {
@@ -478,8 +476,8 @@ fn main() {
         for session in session_list {
             table.add_row(Row::new(vec![
                 Cell::new(&session.name),
-                Cell::new(&format!("{}", &session.size)),
-                Cell::new(&format!("{}", &session.time)),
+                Cell::new(&format!("{}", &session.size.unwrap())),
+                Cell::new(&format!("{}", &session.time.unwrap())),
                 Cell::new(&format!("{}", &session.folder_id.unwrap()))])
             );
         }
