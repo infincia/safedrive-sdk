@@ -1149,8 +1149,6 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
     match restore(c.0.get_api_token(),
                   &n,
                   main_key,
-                  hmac_key,
-                  tweak_key,
                   id,
                   p,
                   &mut |total, current, progress_percent, tick| {

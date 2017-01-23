@@ -586,8 +586,6 @@ pub fn sync(token: &Token,
 pub fn restore(token: &Token,
                session_name: &str,
                main_key: &Key,
-               hmac_key: &Key,
-               tweak_key: &Key,
                folder_id: u32,
                destination: PathBuf,
                progress: &mut FnMut(u32, u32, f64, bool)) -> Result<(), SDError> {
