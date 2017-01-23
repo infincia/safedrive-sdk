@@ -29,12 +29,12 @@ impl SyncSession {
     pub fn to_wrapped(self, main: &Key) -> Result<WrappedSyncSession, CryptoError> {
 
         // generate a new session key
-        let session_key_raw = ::sodiumoxide::randombytes::randombytes(KEY_SIZE);
+        let session_key_raw = ::sodiumoxide::randombytes::randombytes(SECRETBOX_KEY_SIZE);
         let session_key_struct = ::sodiumoxide::crypto::secretbox::Key::from_slice(&session_key_raw)
             .expect("failed to get session key struct");
 
         // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
-        let nonce_raw = ::sodiumoxide::randombytes::randombytes(NONCE_SIZE);
+        let nonce_raw = ::sodiumoxide::randombytes::randombytes(SECRETBOX_NONCE_SIZE);
 
         let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_raw)
             .expect("failed to get nonce");
@@ -46,8 +46,8 @@ impl SyncSession {
         let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(&self.data, &nonce, &session_key_struct);
 
         // wrap the session key with the main encryption key
-        let wrapped_session_key_raw = ::sodiumoxide::crypto::secretbox::seal(&session_key_raw, &nonce, &main.as_sodium_key());
-        assert!(wrapped_session_key_raw.len() == KEY_SIZE + MAC_SIZE);
+        let wrapped_session_key_raw = ::sodiumoxide::crypto::secretbox::seal(&session_key_raw, &nonce, &(main.as_sodium_secretbox_key()));
+        assert!(wrapped_session_key_raw.len() == SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE);
         let wrapped_session_key = WrappedKey::new(wrapped_session_key_raw, KeyType::KeyTypeSession);
 
 
@@ -114,7 +114,7 @@ impl WrappedSyncSession {
 
         // next 24 bytes will be the nonce
         binary_data.extend(self.nonce);
-        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + reserved.len() + (KEY_SIZE + MAC_SIZE) + NONCE_SIZE);
+        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
         // remainder will be the encrypted session data
         binary_data.extend(self.wrapped_data);

@@ -8,7 +8,7 @@ use ::rustc_serialize::hex::{ToHex, FromHex};
 
 use ::error::CryptoError;
 use ::models::WrappedKeysetBody;
-
+use ::constants::*;
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]
@@ -55,42 +55,43 @@ impl WrappedKeyset {
         // generate a recovery phrase that will be used to encrypt the master key
         let mnemonic_keytype = ::bip39::KeyType::Key128;
         let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
-        let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-        debug!("phrase: {}", mnemonic.mnemonic);
+        let recovery_phrase = { mnemonic.mnemonic.clone() };
+        let recovery_key = Key::from(mnemonic);
+        debug!("phrase: {}", recovery_phrase);
 
         // generate a master key and encrypt it with the recovery phrase and static nonce
         // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
         let master_key_type = KeyType::KeyTypeMaster;
         let master_key = Key::new(master_key_type);
-        let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key.as_ref()));
+        let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key));
 
         // generate a main key and encrypt it with the master key and static nonce
         let main_key_type = KeyType::KeyTypeMain;
         let main_key = Key::new(main_key_type);
-        let main_key_wrapped = try!(main_key.to_wrapped(&master_key.as_ref()));
+        let main_key_wrapped = try!(main_key.to_wrapped(&master_key));
 
         // generate an hmac key and encrypt it with the master key and static nonce
         let hmac_key_type = KeyType::KeyTypeHMAC;
         let hmac_key = Key::new(hmac_key_type);
-        let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key.as_ref()));
+        let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key));
 
         // generate a tweak key and encrypt it with the master key and static nonce
         let tweak_key_type = KeyType::KeyTypeTweak;
         let tweak_key = Key::new(tweak_key_type);
-        let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key.as_ref()));
+        let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key));
         debug!("generated key set");
 
-        Ok( WrappedKeyset { recovery: Some(mnemonic.mnemonic), master: master_key_wrapped, main: main_key_wrapped, hmac: hmac_key_wrapped, tweak: tweak_key_wrapped })
+        Ok( WrappedKeyset { recovery: Some(recovery_phrase), master: master_key_wrapped, main: main_key_wrapped, hmac: hmac_key_wrapped, tweak: tweak_key_wrapped })
 
     }
 
     pub fn to_keyset(&self, phrase: &str) -> Result<Keyset, CryptoError> {
         let mnemonic = try!(Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()));
-        let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(mnemonic.seed.as_ref());
-        let master_key = try!(self.master.to_key(recovery_key.as_ref()));
-        let main_key = try!(self.main.to_key(master_key.as_ref()));
-        let hmac_key = try!(self.hmac.to_key(master_key.as_ref()));
-        let tweak_key = try!(self.tweak.to_key(master_key.as_ref()));
+        let recovery_key = Key::from(mnemonic);
+        let master_key = try!(self.master.to_key(&recovery_key));
+        let main_key = try!(self.main.to_key(&master_key));
+        let hmac_key = try!(self.hmac.to_key(&master_key));
+        let tweak_key = try!(self.tweak.to_key(&master_key));
 
         Ok(Keyset { recovery: phrase.to_string(), master: master_key, main: main_key, hmac: hmac_key, tweak: tweak_key })
     }
@@ -148,10 +149,10 @@ impl WrappedKey {
         Ok(WrappedKey::new(try!(hex_key.from_hex()), key_type))
     }
 
-    pub fn to_key(&self, wrapping_key: &[u8]) -> Result<Key, CryptoError> {
+    pub fn to_key(&self, wrapping_key: &Key) -> Result<Key, CryptoError> {
 
         // decrypt the key with the recovery key and nonce
-        let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key).expect("failed to get wrapping key struct");
+        let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key.as_ref()).expect("failed to get wrapping key struct");
 
         let key_raw = match ::sodiumoxide::crypto::secretbox::open(&self.bytes, &self.key_type.nonce(), &wrapping_key_s) {
             Ok(k) => k,
@@ -187,27 +188,54 @@ pub struct Key {
 impl Key {
 
     fn new(key_type: KeyType) -> Key {
-        let key_size = ::sodiumoxide::crypto::secretbox::KEYBYTES;
+        let key_size = match key_type {
+            KeyType::KeyTypeMaster => SECRETBOX_KEY_SIZE,
+            KeyType::KeyTypeMain => SECRETBOX_KEY_SIZE,
+            KeyType::KeyTypeHMAC => HMAC_KEY_SIZE,
+            KeyType::KeyTypeTweak => SECRETBOX_KEY_SIZE,
+            _ => { panic!("other key types don't have a static nonce");  }
+        };
         let key = ::sodiumoxide::randombytes::randombytes(key_size);
 
         Key { bytes: key.to_vec(), key_type: key_type }
     }
+
+    fn from(recovery_phrase: Bip39) -> Key {
+        let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(recovery_phrase.seed.as_ref());
+        Key { bytes: recovery_key.as_ref().to_vec(), key_type: KeyType::KeyTypeRecovery }
+    }
 }
 
 pub trait KeyConversion {
-    fn as_sodium_key(&self) -> ::sodiumoxide::crypto::secretbox::Key;
-    fn to_wrapped(&self, wrapping_key: &[u8]) -> Result<WrappedKey, CryptoError>;
+    fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key;
+    fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key;
+    fn to_wrapped(&self, wrapping_key: &Key) -> Result<WrappedKey, CryptoError>;
 }
 
 impl KeyConversion for Key {
 
-    fn as_sodium_key(&self) -> ::sodiumoxide::crypto::secretbox::Key {
-        ::sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get key struct")
+    fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key {
+        match self.key_type {
+            KeyType::KeyTypeMaster => {},
+            KeyType::KeyTypeMain => {},
+            KeyType::KeyTypeTweak => {},
+            KeyType::KeyTypeRecovery => {},
+            _ => { panic!("other key types don't have a static nonce");  }
+        };
+        ::sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get secretbox key struct")
     }
 
-    fn to_wrapped(&self, wrapping_key: &[u8]) -> Result<WrappedKey, CryptoError> {
+    fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key {
+        match self.key_type {
+            KeyType::KeyTypeHMAC => HMAC_KEY_SIZE,
+            _ => { panic!("other key types don't have a static nonce");  }
+        };
+        ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")
+    }
+
+    fn to_wrapped(&self, wrapping_key: &Key) -> Result<WrappedKey, CryptoError> {
         let nonce = self.key_type.nonce();
-        let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key).expect("failed to get wrapping key struct");
+        let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key.as_ref()).expect("failed to get wrapping key struct");
         let wrapped_key = ::sodiumoxide::crypto::secretbox::seal(self.bytes.as_ref(), &nonce, &wrapping_key_s);
 
 
