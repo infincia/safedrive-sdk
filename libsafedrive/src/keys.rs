@@ -17,7 +17,9 @@ pub enum KeyType {
     KeyTypeMain,
     KeyTypeHMAC,
     KeyTypeTweak,
-    KeyTypeRecovery
+    KeyTypeRecovery,
+    KeyTypeSession,
+    KeyTypeBlock,
 }
 
 impl KeyType {
@@ -31,7 +33,7 @@ impl KeyType {
             KeyType::KeyTypeMain => [2u8; 24],
             KeyType::KeyTypeHMAC => [3u8; 24],
             KeyType::KeyTypeTweak => [4u8; 24],
-            KeyType::KeyTypeRecovery => { panic!("recovery key has no nonce, it is not wrapped!");  }
+            _ => { panic!("other key types don't have a static nonce");  }
         };
         let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_value).expect("failed to get nonce");
 
