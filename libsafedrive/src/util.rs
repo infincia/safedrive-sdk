@@ -1,5 +1,7 @@
 use std::path::{PathBuf};
 use std::fs;
+
+#[cfg(not(target_os = "macos"))]
 use std::env;
 
 // external crate imports
