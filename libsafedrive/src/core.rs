@@ -689,7 +689,6 @@ pub fn restore(token: &Token,
                             // get block from cache if possible
                             match ::cache::read_block(&block_hmac_hex) {
                                 Ok(b) => {
-                                    should_retry = false;
                                     block_raw = Some(b);
                                     break;
                                 },
