@@ -24,6 +24,7 @@ extern crate rpassword;
 
 extern crate pbr;
 use self::pbr::ProgressBar;
+use self::pbr::Units;
 
 extern crate uuid;
 use uuid::Uuid;
@@ -306,7 +307,7 @@ fn main() {
 
             let mut pb = ProgressBar::new(0);
             pb.format("╢▌▌░╟");
-
+            pb.set_units(Units::Bytes);
             let sync_uuid = Uuid::new_v4().hyphenated().to_string();
 
             match sync(&token,
@@ -315,12 +316,12 @@ fn main() {
                        &keyset.hmac,
                        &keyset.tweak,
                        folder.id,
-                       &mut |total, current, progress_percent, tick| {
+                       &mut |total, current, new, progress_percent, tick| {
                            if tick {
                                pb.tick();
                            } else {
                                pb.total = total as u64;
-                               pb.inc();
+                               pb.add(new as u64);
                            }
                        }
             ) {
@@ -350,6 +351,7 @@ fn main() {
 
         let mut pb = ProgressBar::new(0);
         pb.format("╢▌▌░╟");
+        pb.set_units(Units::Bytes);
 
         let sync_uuid = Uuid::new_v4().hyphenated().to_string();
 
@@ -359,12 +361,12 @@ fn main() {
                    &keyset.hmac,
                    &keyset.tweak,
                    folder.id,
-                   &mut |total, current, progress_percent, tick| {
+                   &mut |total, current, new, progress_percent, tick| {
                        if tick {
                            pb.tick();
                        } else {
                            pb.total = total as u64;
-                           pb.inc();
+                           pb.add(new as u64);
                        }
                    }
         ) {
@@ -406,6 +408,7 @@ fn main() {
 
         let mut pb = ProgressBar::new(0);
         pb.format("╢▌▌░╟");
+        pb.set_units(Units::Bytes);
 
         let sync_uuid = Uuid::new_v4().hyphenated().to_string();
 
@@ -414,12 +417,12 @@ fn main() {
                       &keyset.main,
                       folder.id,
                       pa,
-                      &mut |total, current, progress_percent, tick| {
+                      &mut |total, current, new, progress_percent, tick| {
                           if tick {
                               pb.tick();
                           } else {
                               pb.total = total as u64;
-                              pb.inc();
+                              pb.add(new as u64);
                           }
                       }
         ) {
