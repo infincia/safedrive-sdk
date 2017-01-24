@@ -51,6 +51,7 @@
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Wrappers/Swift/SafeDriveSDK.swift; sourceTree = "<group>"; };
 		AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafeDriveSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9D8AF01D6E9BCC0011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Wrappers/Swift/Info.plist; sourceTree = "<group>"; };
+		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -142,6 +143,7 @@
 		AAE34C781CF8EAAA0067B401 = {
 			isa = PBXGroup;
 			children = (
+				AABF37281E36E19C003DC6C2 /* update-version.sh */,
 				AA47B6491D7D336E005C134D /* Old */,
 				AA47B6331D7BCD0D005C134D /* Wrappers */,
 				AAE34C831CF8EAAA0067B401 /* Products */,
@@ -175,10 +177,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA5DCFBB1D6CFFDA00FEDAFB /* Build configuration list for PBXNativeTarget "SafeDriveSDK" */;
 			buildPhases = (
+				AABF372A1E36E1EE003DC6C2 /* Update version */,
 				AA5DCF671D6CFFDA00FEDAFB /* Sources */,
 				AA5DCF6F1D6CFFDA00FEDAFB /* Frameworks */,
 				AA5DCF751D6CFFDA00FEDAFB /* Headers */,
-				AA5DCFB91D6CFFDA00FEDAFB /* Resources */,
 				AA8CCDCE1E2948030002B1FF /* CopyFiles */,
 			);
 			buildRules = (
@@ -248,13 +250,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		AA5DCFB91D6CFFDA00FEDAFB /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		AA9D8AE31D6E9A300011DE1F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -263,6 +258,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AABF372A1E36E1EE003DC6C2 /* Update version */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Update version";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sh \"update-version.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AA5DCF671D6CFFDA00FEDAFB /* Sources */ = {
@@ -298,7 +310,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = G738Z89QKM;
 				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 564;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				FRAMEWORK_VERSION = A;
@@ -335,7 +347,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = G738Z89QKM;
 				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 564;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/dist-x86_64-apple-darwin/include";
 				FRAMEWORK_VERSION = A;
@@ -429,7 +441,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 564;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -480,7 +492,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 564;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
