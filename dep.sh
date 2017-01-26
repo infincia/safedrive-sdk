@@ -63,10 +63,12 @@ if [ ! -f dep/$TARGET/lib/libssl.a ]; then
 fi
 
 if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
-    wget https://github.com/jedisct1/libsodium/releases/download/1.0.11/libsodium-1.0.11.tar.gz
-    tar xvfz libsodium-1.0.11.tar.gz
+    export SODIUM_VER=1.0.11
+
+    wget https://github.com/jedisct1/libsodium/releases/download/$SODIUM_VER/libsodium-$SODIUM_VER.tar.gz
+    tar xvfz libsodium-$SODIUM_VER.tar.gz
     SODIUM_PREFIX=$PWD/dep/$TARGET
-    pushd libsodium-1.0.11
+    pushd libsodium-$SODIUM_VER
     ./configure --prefix=$SODIUM_PREFIX $CONFIGURE_ARGS
     make
     make install
