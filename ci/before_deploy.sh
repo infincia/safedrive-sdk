@@ -20,6 +20,7 @@ mk_tarball() {
 mk_deb() {
     # TODO update this part to package the artifacts that make sense for your project
     dobin dist-$TARGET/bin/safedrive
+    dobin dist-$TARGET/bin/safedrived
 }
 
 main() {
