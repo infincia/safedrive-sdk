@@ -4,10 +4,14 @@ case $TARGET in
     # configure emulation for transparent execution of foreign binaries
     aarch64-unknown-linux-gnu)
         export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu
+        export CFLAGS="-O2 -g -flto"
+        export LDFLAGS="-flto"
         export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     arm*-unknown-linux-gnueabihf)
         export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
+        export CFLAGS="-O2 -g -flto"
+        export LDFLAGS="-flto"
         export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     x86_64-apple-darwin)
@@ -19,6 +23,8 @@ case $TARGET in
         export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     x86_64-unknown-linux-gnu|i686-unknown-linux-gnu)
+        export CFLAGS="-O2 -g -flto"
+        export LDFLAGS="-flto"
         export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     *)
