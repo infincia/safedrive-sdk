@@ -15,6 +15,7 @@ addons:
     packages:
       - musl-tools
       - musl-dev
+      - linux-headers
 
 matrix:
   include:
