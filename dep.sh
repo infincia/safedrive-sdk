@@ -27,6 +27,12 @@ case $TARGET in
         export LDFLAGS="-flto"
         export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
+    x86_64-unknown-linux-musl|i686-unknown-linux-musl)
+        export CFLAGS="-O2 -g -flto"
+        export LDFLAGS="-flto"
+        export CC=musl-gcc
+        export CONFIGURE_ARGS="--enable-shared=no"
+        ;;
     *)
         ;;
 esac
