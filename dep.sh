@@ -6,14 +6,14 @@ case $TARGET in
         export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
-        export CONFIGURE_ARGS="--enable-shared=yes"
+        export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="shared"
         ;;
     arm*-unknown-linux-gnueabihf)
         export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
-        export CONFIGURE_ARGS="--enable-shared=yes"
+        export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="shared"
         ;;
     x86_64-apple-darwin)
@@ -22,20 +22,20 @@ case $TARGET in
         export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g -flto"
         export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
-        export CONFIGURE_ARGS="--enable-shared=yes"
+        export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="shared"
         ;;
     x86_64-unknown-linux-gnu|i686-unknown-linux-gnu)
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
-        export CONFIGURE_ARGS="--enable-shared=yes"
+        export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="shared"
         ;;
     x86_64-unknown-linux-musl|i686-unknown-linux-musl)
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
         export CC=musl-gcc
-        export CONFIGURE_ARGS="--enable-shared=no"
+        export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-shared"
         ;;
     *)
@@ -69,7 +69,7 @@ if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     tar xvfz libsodium-$SODIUM_VER.tar.gz
     SODIUM_PREFIX=$PWD/dep/$TARGET
     pushd libsodium-$SODIUM_VER
-    ./configure --prefix=$SODIUM_PREFIX $CONFIGURE_ARGS
+    ./configure --prefix=$SODIUM_PREFIX $SODIUM_ARGS
     make
     make install
     popd
