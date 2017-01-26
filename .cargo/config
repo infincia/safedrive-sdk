@@ -15,4 +15,9 @@ rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/i686-unknown-linux-gnu/lib"
 
+[target.x86_64-unknown-linux-musl.sodium]
+rustc-link-search = ["native=dep/x86_64-unknown-linux-musl/lib"]
+rustc-link-lib = ["static=sodium"]
+root = "dep/x86_64-unknown-linux-musl/lib"
+
 

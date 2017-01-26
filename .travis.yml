@@ -13,6 +13,9 @@ matrix:
   include:
     - os: linux
       rust: nightly
+      env: TARGET=x86_64-unknown-linux-musl
+    - os: linux
+      rust: nightly
       env: TARGET=x86_64-unknown-linux-gnu
     - os: osx
       osx_image: xcode8.2
