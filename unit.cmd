@@ -13,6 +13,4 @@ IF "%LINKTYPE%"=="mt" (
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
-pushd libsafedrive
-cargo.exe test --release --verbose
-popd
+cargo.exe test --release --verbose -p libsafedrive

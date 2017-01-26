@@ -15,12 +15,8 @@ mkdir -p dist-$TARGET/bin
 
 bash dep.sh
 
-pushd safedrive
-cargo build --verbose
-popd
-pushd libsafedrive
-cheddar -f src/c_api.rs ../dist-$TARGET/include/sddk.h
-popd
+cargo build --verbose -p safedrive
+cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
 
 
 cp -a dep/$TARGET/lib/* dist-$TARGET/lib/
