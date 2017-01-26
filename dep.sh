@@ -55,7 +55,7 @@ if [ ! -f dep/$TARGET/lib/libssl.a ]; then
     OPENSSL_PREFIX=$PWD/dep/$TARGET
     pushd openssl-$OPENSSL_VER
     ./config --prefix=$OPENSSL_PREFIX $OPENSSL_ARGS
-    env C_INCLUDE_PATH=$OPENSSL_PREFIX/include/ make depend
+    make clean
     make
     make install
     popd
@@ -70,6 +70,7 @@ if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     SODIUM_PREFIX=$PWD/dep/$TARGET
     pushd libsodium-$SODIUM_VER
     ./configure --prefix=$SODIUM_PREFIX $SODIUM_ARGS
+    make clean
     make
     make install
     popd
