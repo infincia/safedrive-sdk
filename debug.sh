@@ -15,7 +15,18 @@ mkdir -p dist-$TARGET/bin
 
 bash dep.sh
 
+
 cargo build --verbose -p safedrive
+
+# build safedrived on linux only
+case $TARGET in
+    x86_64-apple-darwin)
+        ;;
+    *)
+        cargo build --release --verbose -p safedrived
+        ;;
+esac
+
 cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
 
 
@@ -27,3 +38,4 @@ install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.
 install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib || true
 cp -a target/debug/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
 cp -a target/debug/safedrive dist-$TARGET/bin/
+cp -a target/debug/safedrived dist-$TARGET/bin/ || true
