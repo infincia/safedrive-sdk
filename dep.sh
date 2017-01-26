@@ -4,9 +4,11 @@ case $TARGET in
     # configure emulation for transparent execution of foreign binaries
     aarch64-unknown-linux-gnu)
         export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu
+        export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     arm*-unknown-linux-gnueabihf)
         export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
+        export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     x86_64-apple-darwin)
         export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
@@ -14,8 +16,10 @@ case $TARGET in
         export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g -flto"
         export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
+        export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     x86_64-unknown-linux-gnu|i686-unknown-linux-gnu)
+        export CONFIGURE_ARGS="--enable-shared=yes"
         ;;
     *)
         ;;
@@ -31,7 +35,7 @@ if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     tar xvfz libsodium-1.0.11.tar.gz
     SODIUM_PREFIX=$PWD/dep/$TARGET
     pushd libsodium-1.0.11
-    ./configure --prefix=$SODIUM_PREFIX --enable-shared=yes
+    ./configure --prefix=$SODIUM_PREFIX $CONFIGURE_ARGS
     make
     make install
     popd
