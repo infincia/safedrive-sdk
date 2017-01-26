@@ -8,6 +8,12 @@ env:
     - DEB_MAINTAINER="Stephen Oliver <steve@infincia.com>"
     - DEB_DESCRIPTION="SafeDrive SDK"
 
+addons:
+  apt:
+    packages:
+      - musl-gcc
+      - musl-tools
+      - musl-dev
 
 matrix:
   include:
