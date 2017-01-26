@@ -13,7 +13,6 @@ env:
 addons:
   apt:
     packages:
-      - musl-gcc
       - musl-tools
       - musl-dev
 
