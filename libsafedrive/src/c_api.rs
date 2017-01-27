@@ -242,7 +242,7 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    initialize(storage_path, c);
+    initialize(storage_path, &uid, c);
 
     let sstate = State::new(storage_path.to_owned(), uid);
     let c_state = SDDKState(sstate);

@@ -55,7 +55,7 @@ pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -
 
 // internal functions
 
-pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
+pub fn initialize<'a>(local_storage_path: &'a Path, unique_client_id: &'a str, config: Configuration) {
     let mut c = CONFIGURATION.write().unwrap();
     *c = config;
 
@@ -81,6 +81,10 @@ pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
     let mut cd = CACHE_DIR.write().unwrap();
     *cd = cache_s;
 
+    match ::util::set_unique_client_id(unique_client_id, local_storage_path) {
+        Ok(()) => {},
+        Err(e) => panic!("failed to set unique client id: {}", e),
+    }
 
     let sodium_version = ::sodiumoxide::version::version_string();
     debug!("libsodium {}", sodium_version);
