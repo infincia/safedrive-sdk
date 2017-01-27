@@ -14,7 +14,7 @@ mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
 
 bash dep.sh
-
+export DEP_OPENSSL_VERSION="110"
 
 cargo build --verbose -p safedrive --target $TARGET
 
