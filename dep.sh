@@ -1,21 +1,6 @@
 #!/usr/bin/env bash
 
 case $TARGET in
-    # configure emulation for transparent execution of foreign binaries
-    aarch64-unknown-linux-gnu)
-        export QEMU_LD_PREFIX=/usr/aarch64-linux-gnu
-        export CFLAGS="-O2 -g -flto"
-        export LDFLAGS="-flto"
-        export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        ;;
-    arm*-unknown-linux-gnueabihf)
-        export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
-        export CFLAGS="-O2 -g -flto"
-        export LDFLAGS="-flto"
-        export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        ;;
     x86_64-apple-darwin)
         export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
         export OSX_CPU_ARCH=${OSX_CPU_ARCH-"core2"}
