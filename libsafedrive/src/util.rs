@@ -11,6 +11,8 @@ use std::env;
 
 use ::rustc_serialize::hex::{ToHex};
 
+use uuid::Uuid;
+
 #[cfg(target_os = "macos")]
 use ::objc_foundation::{NSObject, NSString, INSString};
 
@@ -23,6 +25,13 @@ use ::objc::runtime::{Class};
 use ::models::Configuration;
 use ::constants::SDGROUP_NAME;
 use ::error::SDError;
+
+pub fn generate_uuid() -> String {
+    let sync_uuid = Uuid::new_v4().simple().to_string();
+
+    sync_uuid
+}
+
 
 #[cfg(target_os = "windows")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {

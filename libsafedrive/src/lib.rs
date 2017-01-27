@@ -30,6 +30,7 @@ extern crate bip39;
 extern crate serde_json;
 extern crate reqwest;
 extern crate serde;
+extern crate uuid;
 
 #[cfg(unix)]
 extern crate interfaces;

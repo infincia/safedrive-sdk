@@ -22,6 +22,7 @@ rand = "*"
 log = "*"
 nom = "*"
 lazy_static = "0.1.*"
+uuid = { version = "*", features = ["v4"] }
 
 [target."cfg(not(windows))".dependencies]
 interfaces = "*"

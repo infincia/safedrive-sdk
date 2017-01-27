@@ -44,6 +44,9 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
     ::util::unique_client_hash(email)
 }
 
+pub fn generate_unique_client_id() -> String {
+    ::util::generate_uuid()
+}
 
 pub fn get_unique_client_id(local_storage_path: &Path) -> Result<String, SDError> {
     ::util::get_unique_client_id(local_storage_path)
