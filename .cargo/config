@@ -26,3 +26,4 @@ rustc-link-lib = ["static=ssl", "static=crypto"]
 root = "dep/x86_64-unknown-linux-musl/lib"
 rustc-cfg = ["ossl110"]
 version = "110"
+
