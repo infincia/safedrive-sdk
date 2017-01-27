@@ -44,6 +44,15 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
     ::util::unique_client_hash(email)
 }
 
+
+pub fn get_unique_client_id(local_storage_path: &Path) -> Result<String, SDError> {
+    ::util::get_unique_client_id(local_storage_path)
+}
+
+pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -> Result<(), SDError> {
+    ::util::set_unique_client_id(unique_client_id, local_storage_path)
+}
+
 // internal functions
 
 pub fn initialize<'a>(local_storage_path: &'a Path, config: Configuration) {
