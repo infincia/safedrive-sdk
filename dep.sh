@@ -54,7 +54,7 @@ if [ ! -f dep/$TARGET/lib/libssl.a ]; then
     tar xvzf openssl-$OPENSSL_VER.tar.gz
     OPENSSL_PREFIX=$PWD/dep/$TARGET
     pushd openssl-$OPENSSL_VER
-    ./config --prefix=$OPENSSL_PREFIX $OPENSSL_ARGS
+    ./config --prefix=$OPENSSL_PREFIX --openssldir=$OPENSSL_PREFIX $OPENSSL_ARGS
     make clean
     make
     make install
