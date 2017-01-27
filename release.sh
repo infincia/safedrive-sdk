@@ -32,10 +32,10 @@ cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
 
 cp -a dep/$TARGET/lib/* dist-$TARGET/lib/
 
-cp -a target/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
-cp -a target/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
+cp -a target/$TARGET/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
+cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
 install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib || true
 install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib || true
-cp -a target/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
-cp -a target/release/safedrive dist-$TARGET/bin/
-cp -a target/release/safedrived dist-$TARGET/bin/ || true
+cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
+cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/ || true
