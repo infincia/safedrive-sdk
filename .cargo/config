@@ -20,4 +20,7 @@ rustc-link-search = ["native=dep/x86_64-unknown-linux-musl/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/x86_64-unknown-linux-musl/lib"
 
-
+[target.x86_64-unknown-linux-musl.openssl]
+rustc-link-search = ["native=dep/x86_64-unknown-linux-musl/lib"]
+rustc-link-lib = ["static=ssl", "static=crypto"]
+root = "dep/x86_64-unknown-linux-musl/lib"
