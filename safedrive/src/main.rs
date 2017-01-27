@@ -230,7 +230,7 @@ fn main() {
         },
     };
 
-    initialize(&app_directory, config);
+    initialize(&app_directory, &uid, config);
 
     let (token, _, _) = match login(&uid, &username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
