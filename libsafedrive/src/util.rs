@@ -22,7 +22,7 @@ use ::objc::runtime::{Class};
 
 // internal imports
 
-use ::models::Configuration;
+use ::models::{Configuration, FolderLock};
 use ::constants::SDGROUP_NAME;
 use ::error::SDError;
 
@@ -82,6 +82,41 @@ pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -
     let mut f = try!(File::create(&uidp));
 
     try!(f.write_all(unique_client_id.as_bytes()));
+
+    Ok(())
+}
+
+pub fn set_folder_lock_state(path: &Path, state: FolderLock) -> Result<(), SDError> {
+    let mut p = PathBuf::from(path);
+    p.push(".sdlock");
+    let current_lock = match File::open(&p) {
+        Ok(mut f) => {
+            let mut fbuf = Vec::new();
+
+            match f.read_to_end(&mut fbuf) {
+                Ok(_) => FolderLock::from(fbuf),
+                Err(_) => FolderLock::Unlocked,
+            }
+        },
+        Err(_) => {
+            FolderLock::Unlocked
+        }
+    };
+
+
+    match current_lock {
+        FolderLock::Unlocked => {
+            let mut f = try!(File::create(&p));
+
+            try!(f.write_all(state.as_ref()));
+        },
+        FolderLock::Sync => {
+            return Err(SDError::SyncAlreadyInProgress);
+        },
+        FolderLock::Restore => {
+            return Err(SDError::RestoreAlreadyInProgress);
+        },
+    }
 
     Ok(())
 }
