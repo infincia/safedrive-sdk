@@ -35,17 +35,17 @@ pub fn generate_uuid() -> String {
 
 #[cfg(target_os = "windows")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {
-    Ok("".to_string())
+    panic!("unique_client_hash unavailable on windows, cannot continue");
 }
 
-#[cfg(not(target_os = "windows"))]
+#[cfg(target_os = "linux")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {
-    let interface: &str;
-    if cfg!(target_os = "macos") {
-        interface = "en0";
-    } else {
-        interface = "eth0";
-    }
+    panic!("unique_client_hash unavailable on linux, cannot continue");
+}
+
+#[cfg(target_os = "macos")]
+pub fn unique_client_hash(email: &str) -> Result<String, String> {
+    let interface = "en0";
 
     if let Ok(hardware) = ::interfaces::Interface::get_by_name(interface) {
         if let Some(interface) = hardware {

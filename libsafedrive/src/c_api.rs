@@ -29,7 +29,6 @@ use ::models::{Configuration, RegisteredFolder};
 
 use ::session::SyncSession;
 
-use ::core::unique_client_hash;
 use ::core::get_unique_client_id;
 use ::core::generate_unique_client_id;
 
@@ -567,6 +566,7 @@ pub extern "C" fn sddk_get_unique_client_id(local_storage_path: *const std::os::
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
+#[cfg(target_os = "macos")]
 pub extern "C" fn sddk_generate_unique_client_id(mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_uint {
 
     let uid = generate_unique_client_id();

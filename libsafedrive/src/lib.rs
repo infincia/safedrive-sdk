@@ -32,7 +32,7 @@ extern crate reqwest;
 extern crate serde;
 extern crate uuid;
 
-#[cfg(unix)]
+#[cfg(target_os = "macos")]
 extern crate interfaces;
 
 #[cfg(target_os = "linux")]
