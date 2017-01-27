@@ -30,6 +30,8 @@ use ::models::{Configuration, RegisteredFolder};
 use ::session::SyncSession;
 
 use ::core::unique_client_hash;
+use ::core::get_unique_client_id;
+use ::core::generate_unique_client_id;
 
 use ::error::SDError;
 
@@ -440,9 +442,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
     0
 }
 
-/// Generate a unique client ID using the users email address and store it in the `unique_client_id` parameter
+/// Get the current unique client ID and store it in the `unique_client_id` parameter
 ///
-/// Will return a failure code if for any reason the hash cannot be generated properly
+/// Will return a failure code if there is no unique client ID available
 ///
 /// The caller does not own the memory pointed to by `unique_client_id` after this function returns, it must
 /// be returned and freed by the library.
@@ -452,9 +454,6 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 ///
 ///
 /// Parameters:
-///
-///
-///     email: a stack-allocated, NULL terminated string representing the user email address
 ///
 ///     unique_client_id: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was 0
@@ -477,10 +476,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 ///
 /// ```c
 /// char * unique_client_id;
-/// SDDKState *state; // retrieve from sddk_initialize()
 /// SDDKError *error = NULL;
 ///
-/// if (0 != sddk_get_unique_client_id("user@example.com", &unique_client_id, &error)) {
+/// if (0 != sddk_get_unique_client_id(&unique_client_id, &error)) {
 ///     printf("Failed to get unique client id");
 ///     // do something with error here, then free it
 ///     sddk_free_error(&error);
@@ -493,20 +491,26 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
+pub extern "C" fn sddk_get_unique_client_id(local_storage_path: *const std::os::raw::c_char,
                                             mut unique_client_id: *mut *mut std::os::raw::c_char,
                                             mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
-    let c_email: &CStr = unsafe { CStr::from_ptr(email) };
-    let e: String =  match c_email.to_str() {
+    let lstorage: &CStr = unsafe {
+        assert!(!local_storage_path.is_null());
+        CStr::from_ptr(local_storage_path)
+    };
+
+    let storage_directory: String = match lstorage.to_str() {
         Ok(s) => s.to_owned(),
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
-    match unique_client_hash(&e) {
-        Ok(hash) => {
+    let storage_path = Path::new(&storage_directory);
+
+    match get_unique_client_id(storage_path) {
+        Ok(uid) => {
             unsafe {
-                *unique_client_id = CString::new(hash).expect("Failed to get unique client id hash").into_raw();
+                *unique_client_id = CString::new(uid).expect("Failed to get unique client id").into_raw();
             }
             0
         },
@@ -522,6 +526,57 @@ pub extern "C" fn sddk_get_unique_client_id(email: *const std::os::raw::c_char,
             -1
         },
     }
+}
+
+
+
+/// Generate a unique client ID and store it in the `unique_client_id` parameter
+///
+/// Function cannot fail so has no return value for failure or error parameter.
+///
+/// The caller does not own the memory pointed to by `unique_client_id` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     unique_client_id: an uninitialized pointer that will be allocated and initialized when the function
+///            returns
+///
+///            must be freed by the caller using sddk_free_string()
+///
+/// Return:
+///
+///      0+: length of unique client ID string as bytes/chars
+///
+///
+/// # Examples
+///
+/// ```c
+/// char * unique_client_id;
+///
+/// sddk_generate_unique_client_id(&unique_client_id);
+/// printf("Generated unique client id");
+///
+/// // do something with unique_client_id here, then free it
+/// sddk_free_string(&unique_client_id);
+///
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_generate_unique_client_id(mut unique_client_id: *mut *mut std::os::raw::c_char) -> std::os::raw::c_uint {
+
+    let uid = generate_unique_client_id();
+    let length = uid.len();
+
+    unsafe {
+        *unique_client_id = CString::new(uid).expect("Failed to get unique client id").into_raw();
+    }
+
+    length as u32
 }
 
 /// Add a sync folder
