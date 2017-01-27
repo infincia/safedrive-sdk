@@ -9,8 +9,6 @@ SyncEngineTests
 test-osx
 libsodium-*
 openssl-*
-dep/x86_64-apple-darwin/include
-dep/x86_64-apple-darwin/lib
-dep/x86_64-apple-darwin/bin
-dep/x86_64-apple-darwin/share
-dep/x86_64-apple-darwin/ssl
+dep/x86_64-apple-darwin/*
+openssl.cnf
+openssl.cnf.dist
