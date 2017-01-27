@@ -8,20 +8,20 @@ case $TARGET in
         export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         ;;
     x86_64-unknown-linux-gnu|i686-unknown-linux-gnu)
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
         export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         ;;
     x86_64-unknown-linux-musl|i686-unknown-linux-musl)
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
-        export OPENSSL_ARGS="no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export OPENSSL_ARGS="--cross-compile-prefix=musl- no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         ;;
     *)
         ;;
