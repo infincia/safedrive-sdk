@@ -125,7 +125,9 @@ pub enum SDError {
     Authentication,
     UnicodeError,
     TokenExpired,
-    CryptoError(CryptoError)
+    CryptoError(CryptoError),
+    SyncAlreadyInProgress,
+    RestoreAlreadyInProgress,
 }
 
 impl std::error::Error for SDError {
@@ -144,6 +146,9 @@ impl std::error::Error for SDError {
             SDError::UnicodeError => "not valid unicode",
             SDError::TokenExpired => "authentication token expired",
             SDError::CryptoError(ref err) => err.description(),
+            SDError::SyncAlreadyInProgress => "folder currently being synced",
+            SDError::RestoreAlreadyInProgress => "folder currently being restored",
+
         }
     }
 
@@ -162,6 +167,8 @@ impl std::error::Error for SDError {
             SDError::UnicodeError => None,
             SDError::TokenExpired => None,
             SDError::CryptoError(ref err) => Some(err),
+            SDError::SyncAlreadyInProgress => None,
+            SDError::RestoreAlreadyInProgress => None,
         }
     }
 }
@@ -207,6 +214,12 @@ impl std::fmt::Display for SDError {
             },
             SDError::CryptoError(ref err) => {
                 write!(f, "Crypto error: {}", err)
+            },
+            SDError::SyncAlreadyInProgress => {
+                write!(f, "Sync already in progress")
+            },
+            SDError::RestoreAlreadyInProgress => {
+                write!(f, "Restore already in progress")
             },
         }
     }

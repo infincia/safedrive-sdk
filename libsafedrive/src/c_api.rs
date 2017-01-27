@@ -101,6 +101,8 @@ pub enum SDDKErrorType {
     TokenExpired = 0x000B,
     CryptoError = 0x000C,
     IO = 0x000D,
+    SyncAlreadyInProgress = 0x000E,
+    RestoreAlreadyInProgress = 0x000F,
 }
 
 #[derive(Debug)]
@@ -151,6 +153,12 @@ impl From<SDError> for SDDKError {
             },
             SDError::CryptoError(_) => {
                 SDDKErrorType::CryptoError
+            },
+            SDError::SyncAlreadyInProgress => {
+                SDDKErrorType::SyncAlreadyInProgress
+            },
+            SDError::RestoreAlreadyInProgress => {
+                SDDKErrorType::RestoreAlreadyInProgress
             },
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
