@@ -16,14 +16,14 @@ mkdir -p dist-$TARGET/bin
 bash dep.sh
 
 
-cargo build --release --verbose -p safedrive
+cargo build --release --verbose -p safedrive --target $TARGET
 
 # build safedrived on linux only
 case $TARGET in
     x86_64-apple-darwin)
         ;;
     *)
-        cargo build --release --verbose -p safedrived
+        cargo build --release --verbose -p safedrived --target $TARGET
         ;;
 esac
 

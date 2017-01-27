@@ -10,4 +10,4 @@ echo "Testing for $TARGET"
 
 bash dep.sh
 
-cargo test --release --verbose -p libsafedrive
+cargo test --release --verbose -p libsafedrive --target $TARGET
