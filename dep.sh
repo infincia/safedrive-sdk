@@ -21,7 +21,7 @@ case $TARGET in
         export LDFLAGS="-flto"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
-        export OPENSSL_ARGS="--cross-compile-prefix=musl- no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         ;;
     *)
         ;;

@@ -4,14 +4,6 @@ set -ex
 
 . $(dirname $0)/utils.sh
 
-install_c_toolchain() {
-    case $TARGET in
-        *)
-            # For most targets, this is handled by addons.apt.packages in .travis.yml
-            ;;
-    esac
-}
-
 install_rustup() {
     # uninstall the rust toolchain installed by travis, we are going to use rustup
     sh ~/rust/lib/rustlib/uninstall.sh
@@ -23,29 +15,8 @@ install_rustup() {
     cargo install rusty-cheddar
 }
 
-configure_cargo() {
-    local prefix=$(gcc_prefix)
-
-    if [ ! -z $prefix ]; then
-        # information about the cross compiler
-        ${prefix}gcc -v
-
-        # tell cargo which linker to use for cross compilation
-        mkdir -p .cargo
-        cat >>.cargo/config <<EOF
-[target.$TARGET]
-linker = "${prefix}gcc"
-EOF
-    fi
-}
-
 main() {
-    install_c_toolchain
     install_rustup
-    install_standard_crates
-    configure_cargo
-
-    # TODO if you need to install extra stuff add it here
 }
 
 main
