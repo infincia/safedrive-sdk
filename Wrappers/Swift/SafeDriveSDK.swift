@@ -10,6 +10,11 @@ import Foundation
 
 import sddk
 
+public enum SDKConfiguration {
+    case Production
+    case Staging
+}
+
 public struct Folder {
     public let id: UInt32
     public let name: String
@@ -104,15 +109,15 @@ public class SafeDriveSDK: NSObject {
         super.init()
     }
 
-    public func setUp(local_storage_path: String, unique_client_id: String) throws {
-        var config: SDDKConfiguration
-        #if DEBUG
-        config = SDDKConfigurationStaging
-        #else
-        config = SDDKConfigurationProduction
-        #endif
-
-        self.state = sddk_initialize(local_storage_path, unique_client_id, config)
+    public func setUp(local_storage_path: String, unique_client_id: String, config: SDKConfiguration) throws {
+        var sddk_config: SDDKConfiguration
+        switch config {
+        case .Production:
+            sddk_config = SDDKConfigurationProduction
+        case .Staging:
+            sddk_config = SDDKConfigurationStaging
+        }
+        self.state = sddk_initialize(local_storage_path, unique_client_id, sddk_config)
     }
     
     deinit {
