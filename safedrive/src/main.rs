@@ -190,6 +190,8 @@ fn main() {
     {
         match get_openssl_directory() {
             Ok(ssldir) => {
+                debug!("Using openssl dir: {:?}", &ssldir);
+
                 let mut cert_dir = PathBuf::from(&ssldir);
                 cert_dir.push("certs");
                 let cert_dir_r: &OsStr = cert_dir.as_ref();
