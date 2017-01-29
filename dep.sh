@@ -35,14 +35,14 @@ fi
 if [ ! -f dep/$TARGET/lib/libssl.a ]; then
     export OPENSSL_VER=1.1.0d
 
-    wget https://www.openssl.org/source/openssl-$OPENSSL_VER.tar.gz
-    tar xvzf openssl-$OPENSSL_VER.tar.gz
+    wget https://www.openssl.org/source/openssl-$OPENSSL_VER.tar.gz > /dev/null
+    tar xvzf openssl-$OPENSSL_VER.tar.gz > /dev/null
     OPENSSL_PREFIX=$PWD/dep/$TARGET
     pushd openssl-$OPENSSL_VER
-    ./config --prefix=$OPENSSL_PREFIX --openssldir=$OPENSSL_PREFIX $OPENSSL_ARGS
-    make clean
-    make
-    make install
+    ./config --prefix=$OPENSSL_PREFIX --openssldir=$OPENSSL_PREFIX $OPENSSL_ARGS > /dev/null
+    make clean > /dev/null
+    make > /dev/null
+    make install > /dev/null
     popd
     rm -rf openssl*
 fi
@@ -50,14 +50,14 @@ fi
 if [ ! -f dep/$TARGET/lib/libsodium.a ]; then
     export SODIUM_VER=1.0.11
 
-    wget https://github.com/jedisct1/libsodium/releases/download/$SODIUM_VER/libsodium-$SODIUM_VER.tar.gz
-    tar xvfz libsodium-$SODIUM_VER.tar.gz
+    wget https://github.com/jedisct1/libsodium/releases/download/$SODIUM_VER/libsodium-$SODIUM_VER.tar.gz > /dev/null
+    tar xvfz libsodium-$SODIUM_VER.tar.gz > /dev/null
     SODIUM_PREFIX=$PWD/dep/$TARGET
     pushd libsodium-$SODIUM_VER
-    ./configure --prefix=$SODIUM_PREFIX $SODIUM_ARGS
-    make clean
-    make
-    make install
+    ./configure --prefix=$SODIUM_PREFIX $SODIUM_ARGS > /dev/null
+    make clean > /dev/null
+    make > /dev/null
+    make install > /dev/null
     popd
     rm -rf libsodium*
 fi

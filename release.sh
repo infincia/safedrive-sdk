@@ -16,14 +16,14 @@ mkdir -p dist-$TARGET/bin
 bash dep.sh
 export DEP_OPENSSL_VERSION="110"
 
-cargo build --release --verbose -p safedrive --target $TARGET
+cargo build --release --verbose -p safedrive --target $TARGET > /dev/null
 
 # build safedrived on linux only
 case $TARGET in
     x86_64-apple-darwin)
         ;;
     *)
-        cargo build --release --verbose -p safedrived --target $TARGET
+        cargo build --release --verbose -p safedrived --target $TARGET > /dev/null
         ;;
 esac
 

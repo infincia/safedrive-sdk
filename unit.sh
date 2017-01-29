@@ -11,4 +11,4 @@ echo "Testing for $TARGET"
 bash dep.sh
 export DEP_OPENSSL_VERSION="110"
 
-cargo test --release --verbose -p libsafedrive --target $TARGET
+cargo test --release --verbose -p libsafedrive --target $TARGET > /dev/null
