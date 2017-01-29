@@ -192,6 +192,8 @@ impl From<String> for SDDKError {
 ///
 ///     unique_client_id: a stack-allocated, NULL-terminated string representing the current unique_client_id
 ///
+///     client_version: a stack-allocated, NULL-terminated string representing the name and version of the current app
+///
 ///     config: a stack-allocated enum variant of SDDKConfiguration which controls API endpoint and other things
 ///
 ///             use SDDKConfigurationStaging for the staging environment
@@ -215,7 +217,7 @@ impl From<String> for SDDKError {
 /// # Examples
 ///
 /// ```c
-/// SDDKState *state = sddk_initialize("/home/user/.safedrive/", "12345", SDDKConfigurationProduction)
+/// SDDKState *state = sddk_initialize("/home/user/.safedrive/", "12345", "SafeDrive 0.9", SDDKConfigurationProduction)
 /// // do something with SDDKState here, store it somewhere, then free it later on
 /// sddk_free_state(&state);
 /// ```
@@ -223,6 +225,7 @@ impl From<String> for SDDKError {
 #[allow(dead_code)]
 pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_char,
                                   unique_client_id: *const std::os::raw::c_char,
+                                  client_version: *const std::os::raw::c_char,
                                   config: SDDKConfiguration) -> *mut SDDKState {
     let lstorage: &CStr = unsafe {
         assert!(!local_storage_path.is_null());
@@ -246,12 +249,22 @@ pub extern "C" fn sddk_initialize(local_storage_path: *const std::os::raw::c_cha
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
+    let cvs: &CStr = unsafe {
+        assert!(!client_version.is_null());
+        CStr::from_ptr(client_version)
+    };
+
+    let cv: String = match cvs.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
     let c = match config {
         SDDKConfiguration::SDDKConfigurationProduction => Configuration::Production,
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    initialize(storage_path, &uid, c);
+    initialize(storage_path, &uid, &cv, c);
 
     let sstate = State::new(storage_path.to_owned(), uid);
     let c_state = SDDKState(sstate);

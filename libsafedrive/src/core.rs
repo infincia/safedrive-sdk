@@ -26,6 +26,8 @@ use ::keys::*;
 use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 use ::CACHE_DIR;
+use ::CLIENT_VERSION;
+
 use ::session::{SyncSession, WrappedSyncSession};
 
 // crypto exports
@@ -64,9 +66,12 @@ pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -
 
 // internal functions
 
-pub fn initialize<'a>(local_storage_path: &'a Path, unique_client_id: &'a str, config: Configuration) {
+pub fn initialize<'a>(local_storage_path: &'a Path, unique_client_id: &'a str, client_version: &'a str, config: Configuration) {
     let mut c = CONFIGURATION.write().unwrap();
     *c = config;
+
+    let mut cv = CLIENT_VERSION.write().unwrap();
+    *cv = client_version.to_string();
 
     if !::sodiumoxide::init() == true {
         panic!("sodium initialization failed, cannot continue");

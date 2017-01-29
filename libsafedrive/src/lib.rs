@@ -68,6 +68,11 @@ lazy_static! {
     static ref CACHE_DIR: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
 }
 
+lazy_static! {
+    static ref CLIENT_VERSION: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+}
+
+
 
 
 
