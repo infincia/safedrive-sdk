@@ -12,6 +12,7 @@ extern crate serde;
 extern crate serde_json;
 
 use std::str;
+use std::ffi::{OsStr};
 use std::fs::File;
 
 #[cfg(target_os = "linux")]
@@ -189,21 +190,19 @@ fn main() {
     {
         match get_openssl_directory() {
             Ok(p) => {
-                let mut cert_dir = PathBuf::from(&openssl_directory);
+                let mut cert_dir = PathBuf::from(&p);
                 cert_dir.push("certs");
-                let mut cert_file = PathBuf::from(&openssl_directory);
+                let cert_dir_r: &OsStr = cert_dir.as_ref();
+
+                let mut cert_file = PathBuf::from(&p);
                 cert_file.push("certs");
                 cert_file.push("ca-certificates.crt");
+                let cert_file_r: &OsStr = cert_file.as_ref();
 
-                match env::set_var("SSL_CERT_DIR", cert_dir.as_ref()) {
-                    Ok(()) => {},
-                    Err(e) => { error!("Could not find openssl certificate store: {}", e) },
-                };
+                env::set_var("SSL_CERT_DIR", cert_dir_r);
 
-                match env::set_var("SSL_CERT_FILE", cert_file.as_ref()) {
-                    Ok(()) => {},
-                    Err(e) => { error!("Could not find openssl certificate store: {}", e) },
-                };
+                env::set_var("SSL_CERT_FILE", cert_file_r);
+
             },
             Err(_) => {
                 error!("Could not find openssl certificate store");
