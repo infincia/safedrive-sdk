@@ -28,7 +28,7 @@ public struct SyncSession {
 	public let folder_id: UInt32;
 }
 
-enum SDKError: Error {
+public enum SDKError: Error {
     case StateMissing(message: String)
     case Internal(message: String)
     case RequestFailure(message: String)
