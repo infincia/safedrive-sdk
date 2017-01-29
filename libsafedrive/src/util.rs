@@ -2,6 +2,8 @@ use std::path::{PathBuf, Path};
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
+
+#[cfg(target_os = "linux")]
 use std::process::Command;
 
 #[cfg(not(target_os = "macos"))]
