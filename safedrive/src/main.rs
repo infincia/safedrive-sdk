@@ -46,7 +46,11 @@ use safedrive::core::get_sync_sessions;
 use safedrive::core::get_sync_session;
 
 
+#[cfg(target_os = "macos")]
 use safedrive::core::unique_client_hash;
+
+use safedrive::core::generate_unique_client_id;
+use safedrive::core::get_unique_client_id;
 use safedrive::core::get_app_directory;
 
 use safedrive::models::{RegisteredFolder, Configuration};
@@ -222,11 +226,28 @@ fn main() {
         }
     };
 
-    let uid = match unique_client_hash(&username) {
-        Ok(hash) => hash,
+    let uid = match get_unique_client_id(&app_directory) {
+        Ok(uid) => uid,
         Err(e) => {
-            error!("Error getting client ID: {}", e);
-            std::process::exit(1);
+            #[cfg(target_os = "macos")]
+            let uid = match unique_client_hash(&username) {
+                Ok(hash) => hash,
+                Err(e) => {
+                    error!("Error generating client ID: {}", e);
+                    std::process::exit(1);
+                },
+            };
+
+            #[cfg(not(target_os = "macos"))]
+            let uid = match generate_unique_client_id() {
+                Ok(uid) => uid,
+                Err(e) => {
+                    error!("Error generating client ID: {}", e);
+                    std::process::exit(1);
+                },
+            };
+
+            uid
         },
     };
 
