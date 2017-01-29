@@ -101,7 +101,7 @@ pub fn initialize<'a>(local_storage_path: &'a Path, unique_client_id: &'a str, c
     #[cfg(target_os = "linux")]
     let ssl_version = ::openssl::version::version();
     #[cfg(target_os = "linux")]
-    debug!("{}>", ssl_version);
+    debug!("{}", ssl_version);
 
     debug!("ready");
 }
