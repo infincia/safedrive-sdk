@@ -31,6 +31,7 @@ extern crate serde_json;
 extern crate reqwest;
 extern crate serde;
 extern crate uuid;
+extern crate regex;
 
 #[cfg(target_os = "macos")]
 extern crate interfaces;

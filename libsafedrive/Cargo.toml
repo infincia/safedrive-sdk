@@ -23,6 +23,7 @@ log = "*"
 nom = "*"
 lazy_static = "0.1.*"
 uuid = { version = "*", features = ["v4"] }
+regex = "0.2"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"

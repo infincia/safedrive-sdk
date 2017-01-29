@@ -194,9 +194,6 @@ pub fn get_openssl_directory() -> Result<PathBuf, ()> {
         Ok(o) => o,
         Err(e) => return Err(()),
     };
-    // output example:
-    //
-    // OPENSSLDIR: "/usr/lib/ssl"
 
     let out = output.stdout;
 
@@ -204,9 +201,20 @@ pub fn get_openssl_directory() -> Result<PathBuf, ()> {
         Ok(mut s) => s,
         Err(e) => return Err(()),
     };
-    let openssl_s = &s[13..];
 
-    let path = PathBuf::from(openssl_s);
+    let re = match ::regex::Regex::new(r#"OPENSSLDIR: "(.*)""#) {
+        Ok(re) => re,
+        Err(e) => return Err(()),
+    };
+
+    let cap = match re.captures(&s) {
+        Some(cap) => cap,
+        None => return Err(()),
+    };
+
+    let r = &cap[1];
+
+    let path = PathBuf::from(r);
 
     return Ok(path)
 }
