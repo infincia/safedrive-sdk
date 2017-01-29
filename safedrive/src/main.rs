@@ -278,7 +278,9 @@ fn main() {
         },
     };
 
-    initialize(&app_directory, &uid, config);
+    let client_version = format!("{} {}", NAME, VERSION);
+
+    initialize(&app_directory, &uid, &client_version, config);
 
     let (token, _, _) = match login(&uid, &username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
