@@ -39,7 +39,7 @@ if [ ! -f dep/$TARGET/lib/libssl.a ]; then
     tar xvzf openssl-$OPENSSL_VER.tar.gz > /dev/null
     OPENSSL_PREFIX=$PWD/dep/$TARGET
     pushd openssl-$OPENSSL_VER
-    ./config --prefix=$OPENSSL_PREFIX --openssldir=$OPENSSL_PREFIX $OPENSSL_ARGS > /dev/null
+    ./config --prefix=$OPENSSL_PREFIX --openssldir=/etc/ssl $OPENSSL_ARGS > /dev/null
     make clean > /dev/null
     make > /dev/null
     make install > /dev/null
