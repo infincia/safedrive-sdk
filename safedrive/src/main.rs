@@ -239,13 +239,7 @@ fn main() {
             };
 
             #[cfg(not(target_os = "macos"))]
-            let uid = match generate_unique_client_id() {
-                Ok(uid) => uid,
-                Err(e) => {
-                    error!("Error generating client ID: {}", e);
-                    std::process::exit(1);
-                },
-            };
+            let uid = generate_unique_client_id();
 
             uid
         },
