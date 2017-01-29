@@ -28,65 +28,73 @@ public struct SyncSession {
 	public let folder_id: UInt32;
 }
 
-public enum SDKError: Error {
-    case StateMissing(message: String)
-    case Internal(message: String)
-    case RequestFailure(message: String)
-    case NetworkFailure(message: String)
-    case Conflict(message: String)
-    case BlockMissing(message: String)
-    case SessionMissing(message: String)
-    case RecoveryPhraseIncorrect(message: String)
-    case InsufficientFreeSpace(message: String)
-    case Authentication(message: String)
-    case UnicodeError(message: String)
-    case TokenExpired(message: String)
-    case CryptoError(message: String)
-    case IO(message: String)
-    case SyncAlreadyInProgress(message: String)
-    case RestoreAlreadyInProgress(message: String)
+public enum SDKErrorType {
+    case StateMissing
+    case Internal
+    case RequestFailure
+    case NetworkFailure
+    case Conflict
+    case BlockMissing
+    case SessionMissing
+    case RecoveryPhraseIncorrect
+    case InsufficientFreeSpace
+    case Authentication
+    case UnicodeError
+    case TokenExpired
+    case CryptoError
+    case IO
+    case SyncAlreadyInProgress
+    case RestoreAlreadyInProgress
 }
+
+public struct SDKError: Error {
+    public var message: String
+    public var kind: SDKErrorType
+}
+
+
 
 func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
     let s = String(cString: sdkError.message!)
-    var e: SDKError
+    var type: SDKErrorType
     
-    switch sdkError.error_type.rawValue {
-    case 0x0001:
-        e = SDKError.Internal(message: s)
-    case 0x0002:
-        e = SDKError.RequestFailure(message: s)
-    case 0x0003:
-            e = SDKError.NetworkFailure(message: s)
-    case 0x0004:
-            e = SDKError.Conflict(message: s)
-    case 0x0005:
-            e = SDKError.BlockMissing(message: s)
-    case 0x0006:
-            e = SDKError.SessionMissing(message: s)
-    case 0x0007:
-            e = SDKError.RecoveryPhraseIncorrect(message: s)
-    case 0x0008:
-            e = SDKError.InsufficientFreeSpace(message: s)
-    case 0x0009:
-            e = SDKError.Authentication(message: s)
-    case 0x000A:
-            e = SDKError.UnicodeError(message: s)
-    case 0x000B:
-            e = SDKError.TokenExpired(message: s)
-    case 0x000C:
-            e = SDKError.CryptoError(message: s)
-    case 0x000D:
-            e = SDKError.IO(message: s)
-    case 0x000E:
-            e = SDKError.SyncAlreadyInProgress(message: s)
-    case 0x000F:
-            e = SDKError.RestoreAlreadyInProgress(message: s)
+    switch sdkError.error_type {
+    case Internal:
+        type = SDKErrorType.Internal
+    case RequestFailure:
+        type = SDKErrorType.RequestFailure
+    case NetworkFailure:
+        type = SDKErrorType.NetworkFailure
+    case Conflict:
+        type = SDKErrorType.Conflict
+    case BlockMissing:
+        type = SDKErrorType.BlockMissing
+    case SessionMissing:
+        type = SDKErrorType.SessionMissing
+    case RecoveryPhraseIncorrect:
+        type = SDKErrorType.RecoveryPhraseIncorrect
+    case InsufficientFreeSpace:
+        type = SDKErrorType.InsufficientFreeSpace
+    case Authentication:
+        type = SDKErrorType.Authentication
+    case UnicodeError:
+        type = SDKErrorType.UnicodeError
+    case TokenExpired:
+        type = SDKErrorType.TokenExpired
+    case CryptoError:
+        type = SDKErrorType.CryptoError
+    case IO:
+        type = SDKErrorType.IO
+    case SyncAlreadyInProgress:
+        type = SDKErrorType.SyncAlreadyInProgress
+    case RestoreAlreadyInProgress:
+        type = SDKErrorType.RestoreAlreadyInProgress
     default:
         exit(1)
         break
     }
-    return e
+
+    return SDKError(message: s, kind: type)
 }
 
 public typealias SyncSessionSuccess = @convention(block) () -> Void
@@ -126,7 +134,7 @@ public class SafeDriveSDK: NSObject {
     
     public func login(_ username: String, password: String) throws {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         var error: UnsafeMutablePointer<SDDKError>? = nil
 
@@ -146,7 +154,7 @@ public class SafeDriveSDK: NSObject {
 
     public func loadKeys(_ recoveryPhrase: String?, storePhrase: @escaping SaveRecoveryPhrase) throws {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         var error: UnsafeMutablePointer<SDDKError>? = nil
 
@@ -194,7 +202,7 @@ public class SafeDriveSDK: NSObject {
 
     public func addFolder(_ name: String, path: String) throws {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         var error: UnsafeMutablePointer<SDDKError>? = nil
 
@@ -214,7 +222,7 @@ public class SafeDriveSDK: NSObject {
     
     public func removeFolder(_ folderId: UInt32) throws {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
@@ -236,7 +244,7 @@ public class SafeDriveSDK: NSObject {
     
     public func getFolder(folderId: UInt32) throws -> Folder {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
@@ -265,7 +273,7 @@ public class SafeDriveSDK: NSObject {
 
     public func getFolders() throws -> [Folder] {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         
         var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
@@ -303,7 +311,7 @@ public class SafeDriveSDK: NSObject {
     
     public func getSessions() throws -> [SyncSession] {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         
         var sessions_ptr: UnsafeMutablePointer<SDDKSyncSession>? = nil
@@ -343,7 +351,7 @@ public class SafeDriveSDK: NSObject {
     
     public func syncFolder(folderID: UInt32, sessionName: String, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
         guard let state = self.state else {
-            let e = NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            let e = SDKError(message: "State missing, cannot continue", kind: .StateMissing)
             failure(e)
             return
         }
@@ -373,7 +381,7 @@ public class SafeDriveSDK: NSObject {
     
     public func restoreFolder(folderID: UInt32, sessionName: String, destination: URL, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
         guard let state = self.state else {
-            let e = NSError(domain: "io.safedrive.sdk", code: -9000, userInfo: nil)
+            let e = SDKError(message: "State missing, cannot continue", kind: .StateMissing)
             failure(e)
             return
         }
@@ -408,7 +416,7 @@ public class SafeDriveSDK: NSObject {
     
     public func gc() throws {
         guard let state = self.state else {
-            throw SDKError.StateMissing(message: "State missing, cannot continue")
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         
         var error: UnsafeMutablePointer<SDDKError>? = nil
