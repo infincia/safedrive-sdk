@@ -38,6 +38,8 @@ enum SDKError: Error {
     case TokenExpired(message: String)
     case CryptoError(message: String)
     case IO(message: String)
+    case SyncAlreadyInProgress(message: String)
+    case RestoreAlreadyInProgress(message: String)
 }
 
 func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
@@ -71,6 +73,10 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
             e = SDKError.CryptoError(message: s)
     case 0x000D:
             e = SDKError.IO(message: s)
+    case 0x000E:
+            e = SDKError.SyncAlreadyInProgress(message: s)
+    case 0x000F:
+            e = SDKError.RestoreAlreadyInProgress(message: s)
     default:
         exit(1)
         break
