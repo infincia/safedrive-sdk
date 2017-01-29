@@ -2,7 +2,7 @@ use std::path::{PathBuf, Path};
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
-
+use std::process::Command;
 
 #[cfg(not(target_os = "macos"))]
 use std::env;
@@ -185,6 +185,33 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     return Ok(storage_path)
 }
 
+#[cfg(target_os = "linux")]
+pub fn get_openssl_directory() -> Result<PathBuf, ()> {
+    let output = match Command::new("openssl")
+        .arg("version")
+        .arg("-d")
+        .output() {
+        Ok(o) => o,
+        Err(e) => return Err(()),
+    };
+    // output example:
+    //
+    // OPENSSLDIR: "/usr/lib/ssl"
+
+    let out = output.stdout;
+
+    let mut s = match String::from_utf8(out) {
+        Ok(mut s) => s,
+        Err(e) => return Err(()),
+    };
+    let openssl_s = &s[13..];
+
+    let path = PathBuf::from(openssl_s);
+
+    return Ok(path)
+}
+
+
 pub fn get_current_os() -> &'static str {
 
     let os: &str;
@@ -210,6 +237,16 @@ pub fn sha256(input: &[u8]) -> String {
 
     h
 }
+
+#[cfg(target_os = "linux")]
+#[test]
+fn openssl_directory_test() {
+    match get_openssl_directory() {
+        Ok(p) => p,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
 
 
 #[test]
