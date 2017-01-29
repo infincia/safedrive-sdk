@@ -32,17 +32,6 @@ pub fn generate_uuid() -> String {
     sync_uuid
 }
 
-
-#[cfg(target_os = "windows")]
-pub fn unique_client_hash(email: &str) -> Result<String, String> {
-    panic!("unique_client_hash unavailable on windows, cannot continue");
-}
-
-#[cfg(target_os = "linux")]
-pub fn unique_client_hash(email: &str) -> Result<String, String> {
-    panic!("unique_client_hash unavailable on linux, cannot continue");
-}
-
 #[cfg(target_os = "macos")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {
     let interface = "en0";
