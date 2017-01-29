@@ -189,12 +189,12 @@ fn main() {
     #[cfg(target_os = "linux")]
     {
         match get_openssl_directory() {
-            Ok(p) => {
-                let mut cert_dir = PathBuf::from(&p);
+            Ok(ssldir) => {
+                let mut cert_dir = PathBuf::from(&ssldir);
                 cert_dir.push("certs");
                 let cert_dir_r: &OsStr = cert_dir.as_ref();
 
-                let mut cert_file = PathBuf::from(&p);
+                let mut cert_file = PathBuf::from(&ssldir);
                 cert_file.push("certs");
                 cert_file.push("ca-certificates.crt");
                 let cert_file_r: &OsStr = cert_file.as_ref();
