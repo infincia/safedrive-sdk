@@ -279,13 +279,13 @@ impl std::fmt::Display for SDAPIError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
             SDAPIError::Internal(ref message) => {
-                write!(f, "API request failed: {}", message)
+                write!(f, "{}", message)
             },
             SDAPIError::IO(ref err) => {
-                write!(f, "API request failed: {}", err)
+                write!(f, "{}", err)
             },
             SDAPIError::RequestFailed(ref err) => {
-                write!(f, "API request failed: {}", err)
+                write!(f, "{}", err)
             },
             SDAPIError::NetworkFailure => {
                 write!(f, "Network failure")
