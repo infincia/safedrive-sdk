@@ -7,9 +7,9 @@ workspace = ".."
 
 [dependencies]
 clap = "*"
-serde = "*"
-serde_json = "*"
-serde_derive = "*"
+serde = "^0.8"
+serde_json = "^0.8"
+serde_derive = "^0.8"
 env_logger = "*"
 log = "*"
 prettytable-rs = "*"
