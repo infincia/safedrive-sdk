@@ -25,7 +25,7 @@ use ::core::restore;
 use ::core::load_keys;
 use ::core::login;
 
-use ::models::{Configuration, RegisteredFolder};
+use ::models::{Configuration, RegisteredFolder, AccountStatus, AccountDetails, Notification};
 
 use ::session::SyncSession;
 
@@ -45,6 +45,109 @@ pub struct SDDKState(State);
 pub enum SDDKConfiguration {
     SDDKConfigurationProduction,
     SDDKConfigurationStaging,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKNotification {
+    pub title: *const std::os::raw::c_char,
+    pub message: *const std::os::raw::c_char,
+}
+
+impl From<Notification> for SDDKNotification {
+    fn from(notification: Notification) -> SDDKNotification {
+        SDDKNotification {
+            title: CString::new(notification.title.as_str()).unwrap().into_raw(),
+            message: CString::new(notification.message.as_str()).unwrap().into_raw(),
+        }
+    }
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKAccountStatus {
+    pub status: *const std::os::raw::c_char,
+    pub host: *const std::os::raw::c_char,
+    pub port: u16,
+    pub user_name: *const std::os::raw::c_char,
+    pub time: *const std::os::raw::c_ulonglong,
+}
+
+impl From<AccountStatus> for SDDKAccountStatus {
+    fn from(status: AccountStatus) -> SDDKAccountStatus {
+        SDDKAccountStatus {
+            status: {
+                if let Some(s) = status.status {
+                    CString::new(s.as_str()).unwrap().into_raw()
+                } else {
+                    std::ptr::null()
+                }
+            },
+            host: CString::new(status.host.as_str()).unwrap().into_raw(),
+            port: status.port,
+            user_name: CString::new(status.userName.as_str()).unwrap().into_raw(),
+            time: {
+                if let Some(t) = status.time {
+                    let b = Box::new(t);
+                    let ptr = Box::into_raw(b);
+
+                    ptr
+                } else {
+                    std::ptr::null()
+                }
+            },
+        }
+    }
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKAccountDetails {
+    pub assigned_storage: u64,
+    pub used_storage: u64,
+    pub low_free_space_threshold: i64,
+    pub expiration_date: u64,
+    pub notifications:  *const SDDKNotification,
+    pub notification_count: i64,
+
+}
+
+impl From<AccountDetails> for SDDKAccountDetails {
+    fn from(details: AccountDetails) -> SDDKAccountDetails {
+        let (c_notifications, c_notifications_count) = match details.notifications {
+            Some(notifications) => {
+                let cn = notifications.into_iter().map(|notification| {
+                    SDDKNotification::from(notification)
+                }).collect::<Vec<SDDKNotification>>();
+
+                let mut b = cn.into_boxed_slice();
+                let ptr = b.as_mut_ptr();
+                let len = b.len();
+                std::mem::forget(b);
+
+                (Some(ptr), len as i64)
+            },
+            None => (None, -1),
+        };
+
+
+
+
+        let mut c_details = SDDKAccountDetails {
+            assigned_storage: details.assignedStorage,
+            used_storage: details.usedStorage,
+            low_free_space_threshold: details.lowFreeStorageThreshold,
+            expiration_date: details.expirationDate,
+            notifications: std::ptr::null(),
+            notification_count: c_notifications_count as i64,
+        };
+
+        if let Some(c_n) = c_notifications {
+            c_details.notifications = c_n;
+        }
+
+        c_details
+    }
 }
 
 #[derive(Debug)]
