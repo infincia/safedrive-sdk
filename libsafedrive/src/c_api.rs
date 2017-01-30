@@ -32,6 +32,7 @@ use ::session::SyncSession;
 use ::core::get_unique_client_id;
 use ::core::generate_unique_client_id;
 
+use ::core::get_account_status;
 use ::error::SDError;
 
 // exports
@@ -702,6 +703,89 @@ pub extern "C" fn sddk_generate_unique_client_id(mut unique_client_id: *mut *mut
 
     length as u32
 }
+
+/// Get account status from the SafeDrive server
+///
+/// The caller does not own the memory pointed to by `status` or `error` after this function returns,
+/// they must be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffers before
+/// they are freed.
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     status: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
+///
+///            must be freed by the caller using sddk_free_account_status()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///     0+: success
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+/// SDDKAccountStatus * status = NULL;
+///
+/// if (0 != sddk_get_account_status(&state, &status, &error)) {
+///     printf("Failed to get account status");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got account status");
+///     // do something with status here, then free it
+///     sddk_free_account_status(&status);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_account_status(state: *mut SDDKState,
+                                          mut status: *mut *mut SDDKAccountStatus,
+                                          mut error: *mut *mut SDDKError) -> i8 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let s = match get_account_status(c.0.get_api_token()) {
+        Ok(s) => s,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        },
+    };
+
+    let c_s = SDDKAccountStatus::from(s);
+
+    let b = Box::new(c_s);
+    let ptr = Box::into_raw(b);
+
+    unsafe {
+        *status = ptr;
+    }
+
+    0
+}
+
+
 
 /// Add a sync folder
 ///
@@ -1514,3 +1598,36 @@ pub extern "C" fn sddk_free_error(error: *mut *mut SDDKError) {
     let e: Box<SDDKError> = unsafe { Box::from_raw(*error) };
     let _ = unsafe { CString::from_raw(e.message as *mut std::os::raw::c_char) };
 }
+
+/// Free a pointer to an SDDKAccountStatus
+///
+/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+///
+/// Parameters:
+///
+///     status: a pointer to an SDDKStatus obtained from another call
+///
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_account_status(&status);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_free_account_status(status: *mut *mut SDDKAccountStatus) {
+    assert!(!status.is_null());
+    let s: Box<SDDKAccountStatus> = unsafe { Box::from_raw(*status) };
+    if !s.status.is_null() {
+        let _ = unsafe {
+            CString::from_raw(s.status as *mut std::os::raw::c_char)
+        };
+    }
+    if !s.time.is_null() {
+        let _ = unsafe {
+            Box::from_raw(s.time as *mut std::os::raw::c_ulonglong)
+        };
+    }
+}
+
