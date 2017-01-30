@@ -128,6 +128,20 @@ pub fn login(unique_client_id: &str,
     }
 }
 
+pub fn get_account_status(token: &Token) -> Result<AccountStatus, SDError> {
+    match account_status(&token) {
+        Ok(s) => return Ok(s),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
+pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
+    match account_details(&token) {
+        Ok(d) => return Ok(d),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
 pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<Keyset, SDError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
