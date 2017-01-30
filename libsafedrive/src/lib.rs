@@ -58,6 +58,9 @@ extern crate nom;
 #[macro_use]
 extern crate lazy_static;
 
+#[macro_use(defer)]
+extern crate scopeguard;
+
 // global config, can only be set once at runtime
 
 lazy_static! {

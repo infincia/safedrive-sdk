@@ -15,6 +15,8 @@ use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::cdc::*;
 use ::nom::IResult::*;
+use ::scopeguard::guard;
+
 
 // internal imports
 
@@ -275,13 +277,24 @@ pub fn sync(token: &Token,
         Err(e) => return Err(SDError::from(e))
     };
 
+    let folder_path = PathBuf::from(&folder.folderPath);
+    let folder_name = &folder.folderName;
+
+    try!(::util::set_folder_lock_state(&folder_path, FolderLock::Sync));
+    defer!({
+        // try to ensure the folder goes back to unlocked state, but if not there isn't anything
+        // we can do about it
+        match ::util::set_folder_lock_state(&folder_path, FolderLock::Unlocked) {
+            Ok(()) => {},
+            Err(e) => {},
+        }
+    });
+
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
         Err(e) => return Err(SDError::from(e))
     };
 
-    let folder_path = PathBuf::from(&folder.folderPath);
-    let folder_name = &folder.folderName;
 
 
     let archive_file = Vec::new();
@@ -547,12 +560,23 @@ pub fn restore(token: &Token,
         Err(e) => return Err(SDError::from(e))
     };
 
+    let folder_name = &folder.folderName;
+
+    try!(::util::set_folder_lock_state(&destination, FolderLock::Restore));
+    defer!({
+        // try to ensure the folder goes back to unlocked state, but if not there isn't anything
+        // we can do about it
+        match ::util::set_folder_lock_state(&destination, FolderLock::Unlocked) {
+            Ok(()) => {},
+            Err(e) => {},
+        }
+    });
+
     let session_body = match read_session(token, folder_id, session_name, true) {
         Ok(session_data) => session_data,
         Err(e) => return Err(SDError::from(e))
     };
 
-    let folder_name = &folder.folderName;
 
     if DEBUG_STATISTICS {
         debug!("restoring session for: {} (folder id {})", folder_name, folder_id);

@@ -24,6 +24,7 @@ nom = "*"
 lazy_static = "0.1.*"
 uuid = { version = "*", features = ["v4"] }
 regex = "0.2"
+scopeguard = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
