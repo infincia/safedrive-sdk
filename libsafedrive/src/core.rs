@@ -810,3 +810,11 @@ pub fn restore(token: &Token,
 
     Ok(())
 }
+
+pub fn send_error_report<'a>(unique_client_id: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDError> {
+    let cv = CLIENT_VERSION.read().unwrap();
+    match report_error(&**cv, unique_client_id, description, context, log) {
+        Ok(()) => return Ok(()),
+        Err(e) => Err(SDError::from(e))
+    }
+}
