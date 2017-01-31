@@ -988,7 +988,7 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 
 
     match add_sync_folder(c.0.get_api_token(), &n, &p) {
-        Ok(_) => 0,
+        Ok(folder_id) => folder_id as i64,
         Err(e) => {
             let c_err = SDDKError::from(e);
 
