@@ -202,7 +202,7 @@ public class SafeDriveSDK: NSObject {
         sddk_free_state(&state)
     }
     
-    public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String) throws -> AccountStatus {
+    public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue) throws -> AccountStatus {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -225,7 +225,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
 
-    public func loadKeys(_ recoveryPhrase: String?, storePhrase: @escaping SaveRecoveryPhrase) throws {
+    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase) throws {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -252,7 +252,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func getAccountStatus() throws -> AccountStatus {
+    public func getAccountStatus(completionQueue queue: DispatchQueue) throws -> AccountStatus {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -276,7 +276,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func getAccountDetails() throws -> AccountDetails {
+    public func getAccountDetails(completionQueue queue: DispatchQueue) throws -> AccountDetails {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -321,7 +321,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
 
-    public func addFolder(_ name: String, path: String) throws {
+    public func addFolder(_ name: String, path: String, completionQueue queue: DispatchQueue) throws {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -341,7 +341,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func removeFolder(_ folderId: UInt32) throws {
+    public func removeFolder(_ folderId: UInt32, completionQueue queue: DispatchQueue) throws {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -363,7 +363,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func getFolder(folderId: UInt32) throws -> Folder {
+    public func getFolder(folderId: UInt32, completionQueue queue: DispatchQueue) throws -> Folder {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -392,7 +392,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
 
-    public func getFolders() throws -> [Folder] {
+    public func getFolders(completionQueue queue: DispatchQueue) throws -> [Folder] {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -430,7 +430,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func getSessions() throws -> [SyncSession] {
+    public func getSessions(completionQueue queue: DispatchQueue) throws -> [SyncSession] {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
@@ -470,7 +470,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func syncFolder(folderID: UInt32, sessionName: String, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
+    public func syncFolder(folderID: UInt32, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
         guard let state = self.state else {
             let e = SDKError(message: "State missing, cannot continue", kind: .StateMissing)
             failure(e)
@@ -500,7 +500,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func restoreFolder(folderID: UInt32, sessionName: String, destination: URL, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
+    public func restoreFolder(folderID: UInt32, sessionName: String, destination: URL, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
         guard let state = self.state else {
             let e = SDKError(message: "State missing, cannot continue", kind: .StateMissing)
             failure(e)
@@ -562,7 +562,7 @@ public class SafeDriveSDK: NSObject {
     
     // gc
     
-    public func gc() throws {
+    public func gc(completionQueue queue: DispatchQueue) throws {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
