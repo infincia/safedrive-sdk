@@ -128,6 +128,7 @@ pub enum SDError {
     CryptoError(CryptoError),
     SyncAlreadyInProgress,
     RestoreAlreadyInProgress,
+    ExceededRetries(u64),
 }
 
 impl std::error::Error for SDError {
@@ -148,6 +149,7 @@ impl std::error::Error for SDError {
             SDError::CryptoError(ref err) => err.description(),
             SDError::SyncAlreadyInProgress => "folder currently being synced",
             SDError::RestoreAlreadyInProgress => "folder currently being restored",
+            SDError::ExceededRetries(retries) => "exceeded retry count",
 
         }
     }
@@ -169,6 +171,8 @@ impl std::error::Error for SDError {
             SDError::CryptoError(ref err) => Some(err),
             SDError::SyncAlreadyInProgress => None,
             SDError::RestoreAlreadyInProgress => None,
+            SDError::ExceededRetries(retries) => None,
+
         }
     }
 }
@@ -220,6 +224,9 @@ impl std::fmt::Display for SDError {
             },
             SDError::RestoreAlreadyInProgress => {
                 write!(f, "Restore already in progress")
+            },
+            SDError::ExceededRetries(retries) => {
+                write!(f, "Exceeded retry count ({})", retries)
             },
         }
     }

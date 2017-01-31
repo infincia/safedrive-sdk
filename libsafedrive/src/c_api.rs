@@ -217,6 +217,7 @@ pub enum SDDKErrorType {
     IO = 0x000D,
     SyncAlreadyInProgress = 0x000E,
     RestoreAlreadyInProgress = 0x000F,
+    ExceededRetries = 0x0010,
 }
 
 #[derive(Debug)]
@@ -273,6 +274,9 @@ impl From<SDError> for SDDKError {
             },
             SDError::RestoreAlreadyInProgress => {
                 SDDKErrorType::RestoreAlreadyInProgress
+            },
+            SDError::ExceededRetries(_) => {
+                SDDKErrorType::ExceededRetries
             },
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
