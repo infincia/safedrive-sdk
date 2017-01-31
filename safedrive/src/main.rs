@@ -328,7 +328,7 @@ fn main() {
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("remove") {
-        let id: u32 = matches.value_of("id").unwrap()
+        let id: u64 = matches.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
@@ -388,7 +388,7 @@ fn main() {
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("sync") {
-        let id: u32 = matches.value_of("id").unwrap()
+        let id: u64 = matches.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
@@ -432,7 +432,7 @@ fn main() {
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("restore") {
-        let id: u32 = matches.value_of("id").unwrap()
+        let id: u64 = matches.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
