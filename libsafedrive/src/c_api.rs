@@ -119,7 +119,7 @@ pub struct SDDKAccountDetails {
     pub low_free_space_threshold: i64,
     pub expiration_date: u64,
     pub notifications:  *const SDDKNotification,
-    pub notification_count: i64,
+    pub notification_count: i32,
 
 }
 
@@ -136,7 +136,7 @@ impl From<AccountDetails> for SDDKAccountDetails {
                 let len = b.len();
                 std::mem::forget(b);
 
-                (Some(ptr), len as i64)
+                (Some(ptr), len as i32)
             },
             None => (None, -1),
         };
@@ -150,7 +150,7 @@ impl From<AccountDetails> for SDDKAccountDetails {
             low_free_space_threshold: details.lowFreeStorageThreshold,
             expiration_date: details.expirationDate,
             notifications: std::ptr::null(),
-            notification_count: c_notifications_count as i64,
+            notification_count: c_notifications_count as i32,
         };
 
         if let Some(c_n) = c_notifications {
