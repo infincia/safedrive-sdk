@@ -75,6 +75,9 @@ lazy_static! {
     static ref CLIENT_VERSION: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
 }
 
+lazy_static! {
+    static ref OPERATING_SYSTEM: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+}
 
 
 

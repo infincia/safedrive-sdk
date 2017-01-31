@@ -28,6 +28,7 @@ use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 use ::CACHE_DIR;
 use ::CLIENT_VERSION;
+use ::OPERATING_SYSTEM;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
@@ -65,40 +66,24 @@ pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -
     ::util::set_unique_client_id(unique_client_id, local_storage_path)
 }
 
+pub fn get_current_os() -> &'static str {
+    ::util::get_current_os()
+}
+
 // internal functions
 
-pub fn initialize<'a>(local_storage_path: &'a Path, unique_client_id: &'a str, client_version: &'a str, config: Configuration) {
+pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, config: Configuration) {
     let mut c = CONFIGURATION.write().unwrap();
     *c = config;
 
     let mut cv = CLIENT_VERSION.write().unwrap();
     *cv = client_version.to_string();
 
+    let mut os = OPERATING_SYSTEM.write().unwrap();
+    *os = operating_system.to_string();
+
     if !::sodiumoxide::init() == true {
         panic!("sodium initialization failed, cannot continue");
-    }
-
-    if let Err(e) = fs::create_dir_all(&local_storage_path) {
-        panic!("failed to create local directories: {}", e);
-    }
-    let mut p = PathBuf::from(local_storage_path);
-    p.push("cache");
-
-    let cache_s = match p.as_path().to_str() {
-        Some(ref s) => s.to_string(),
-        None => {
-            panic!("failed to create local cache dir");
-        }
-    };
-    if let Err(e) = fs::create_dir_all(&cache_s) {
-        panic!("failed to create local cache dir: {}", e);
-    }
-    let mut cd = CACHE_DIR.write().unwrap();
-    *cd = cache_s;
-
-    match ::util::set_unique_client_id(unique_client_id, local_storage_path) {
-        Ok(()) => {},
-        Err(e) => panic!("failed to set unique client id: {}", e),
     }
 
     let sodium_version = ::sodiumoxide::version::version_string();
@@ -113,8 +98,38 @@ pub fn initialize<'a>(local_storage_path: &'a Path, unique_client_id: &'a str, c
 }
 
 pub fn login(unique_client_id: &str,
+             local_storage_path: &Path,
              username: &str,
              password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), SDError> {
+
+
+    if let Err(e) = fs::create_dir_all(local_storage_path) {
+        debug!("failed to create local directories: {}", e);
+        return Err(SDError::from(e))
+    }
+    let mut p = PathBuf::from(local_storage_path);
+    p.push("cache");
+
+    let cache_s = match p.as_path().to_str() {
+        Some(ref s) => s.to_string(),
+        None => { return Err(SDError::UnicodeError) },
+    };
+    if let Err(e) = fs::create_dir_all(&cache_s) {
+        debug!("failed to create local directories: {}", e);
+        return Err(SDError::from(e))
+    }
+    let mut cd = CACHE_DIR.write().unwrap();
+    *cd = cache_s;
+
+    match ::util::set_unique_client_id(unique_client_id, local_storage_path) {
+        Ok(()) => {},
+        Err(e) => {
+            debug!("failed to set unique client id: {}", e);
+            return Err(e)
+
+        },
+    }
+
 
     match register_client(unique_client_id, username, password) {
         Ok((t, ucid)) => {

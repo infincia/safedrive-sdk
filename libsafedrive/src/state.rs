@@ -1,5 +1,3 @@
-use std::path::{PathBuf};
-
 // internal imports
 
 use ::keys::Key;
@@ -7,8 +5,7 @@ use ::models::{Token};
 
 #[derive(Debug)]
 pub struct State {
-    pub storage_path: PathBuf,
-    pub unique_client_id: String,
+    pub unique_client_id: Option<String>,
     pub username: Option<String>,
     pub password: Option<String>,
     pub api_token: Option<Token>,
@@ -18,10 +15,9 @@ pub struct State {
 }
 
 impl State {
-    pub fn new(storage_path: PathBuf, unique_client_id: String) -> State {
+    pub fn new() -> State {
         State {
-            storage_path: storage_path,
-            unique_client_id: unique_client_id,
+            unique_client_id: None,
             username: None,
             password: None,
             api_token: None,
@@ -50,9 +46,17 @@ impl State {
         self.api_token = Some(token);
     }
 
+    pub fn set_unique_client_id(&mut self, unique_client_id: String) {
+        self.unique_client_id = Some(unique_client_id)
+    }
+
 
     pub fn get_unique_client_id(&self) -> &str {
-        &self.unique_client_id
+        let uid = match self.unique_client_id {
+            Some(ref u) => u,
+            None => panic!("Attempted to use unique client id before it was set")
+        };
+        uid
     }
 
     pub fn set_account(&mut self, username: String, password: String) {
