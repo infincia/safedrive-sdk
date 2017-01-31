@@ -190,21 +190,24 @@ public class SafeDriveSDK: NSObject {
         sddk_free_state(&state)
     }
     
-    public func login(_ username: String, password: String) throws {
+    public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String) throws -> AccountStatus {
         guard let state = self.state else {
             throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
         }
         var error: UnsafeMutablePointer<SDDKError>? = nil
+        var status: UnsafeMutablePointer<SDDKAccountStatus>? = nil
 
-        let res = sddk_login(state, username, password, &error)
+        let res = sddk_login(state, local_storage_path, unique_client_id, username, password, &status, &error)
         defer {
             if res == -1 {
                 sddk_free_error(&error)
+            } else {
+                sddk_free_account_status(&status)
             }
         }
         switch res {
         case 0:
-            return
+            return SDDKAccountStatusToAccountStatus(account_status: status!.pointee)
         default:
             throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
