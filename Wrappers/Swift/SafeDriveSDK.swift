@@ -240,6 +240,54 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    public func getAccountStatus() throws -> AccountStatus {
+        guard let state = self.state else {
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
+        }
+        var account_status_ptr: UnsafeMutablePointer<SDDKAccountStatus>? = nil
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
+        let res = sddk_get_account_status(state, &account_status_ptr, &error)
+        defer {
+            if res >= 0 {
+                sddk_free_account_status(&account_status_ptr)
+            }
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        switch res {
+        case 0:
+            return SDDKAccountStatusToAccountStatus(account_status: account_status_ptr!.pointee)
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
+    }
+    
+    public func getAccountDetails() throws -> AccountDetails {
+        guard let state = self.state else {
+            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
+        }
+        var account_details_ptr: UnsafeMutablePointer<SDDKAccountDetails>? = nil
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        
+        let res = sddk_get_account_details(state, &account_details_ptr, &error)
+        defer {
+            if res >= 0 {
+                sddk_free_account_details(&account_details_ptr)
+            }
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        switch res {
+        case 0:
+            return SDDKAccountDetailsToAccountDetails(account_details: account_details_ptr!.pointee)
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
+    }
+    
     public func uniqueClientID(_ email_address: String) throws -> Optional<String> {
         var unique_client_id: UnsafeMutablePointer<CChar>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
