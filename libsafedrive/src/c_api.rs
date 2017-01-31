@@ -35,6 +35,8 @@ use ::core::generate_unique_client_id;
 use ::core::get_account_status;
 use ::core::get_account_details;
 
+use ::core::send_error_report;
+
 use ::error::SDError;
 
 // exports
@@ -48,6 +50,12 @@ pub struct SDDKState(State);
 pub enum SDDKConfiguration {
     SDDKConfigurationProduction,
     SDDKConfigurationStaging,
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKLogLine {
+    pub line: *const std::os::raw::c_char,
 }
 
 #[derive(Debug)]
@@ -1524,6 +1532,134 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 }
 
 
+
+/// Report an error to the SafeDrive server
+///
+/// Will return a failure code if the parameters are invalid or the request could not be completed
+///
+///
+/// Parameters:
+///
+///     unique_client_id: a stack-allocated, NULL terminated string representing the current UCID
+///
+///     description: a stack-allocated, NULL terminated string representing the error description
+///
+///     context: a stack-allocated, NULL terminated string representing any context that should be
+///              included in the error report
+///
+///     log: a pointer to an array of SDDKLogLine structs, caller retains ownership of the memory
+///          and must free it after use
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char[] unique_client_id = "1234";
+///
+/// SDDKError *error = NULL;
+///
+///
+/// if (0 != sddk_report_error(&unique_client_id, &error)) {
+///     printf("Failed to report error");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Error reported");
+///
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_report_error(unique_client_id: *const std::os::raw::c_char,
+                                    description: *const std::os::raw::c_char,
+                                    context: *const std::os::raw::c_char,
+                                    log: *const SDDKLogLine,
+                                    logline_count: u64,
+                                    mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let c_ucid: &CStr = unsafe {
+        assert!(!unique_client_id.is_null());
+        CStr::from_ptr(unique_client_id)
+    };
+
+    let ucid: String = match c_ucid.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let c_desc: &CStr = unsafe {
+        assert!(!description.is_null());
+        CStr::from_ptr(description)
+    };
+
+    let desc: String = match c_desc.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let c_cont: &CStr = unsafe {
+        assert!(!context.is_null());
+        CStr::from_ptr(context)
+    };
+
+    let cont: String = match c_cont.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let rlog = unsafe {
+        assert!(!log.is_null());
+        let loglines = std::slice::from_raw_parts(log, logline_count as usize);
+
+        let mut rlv: Vec<&str > = Vec::new();
+
+        for line in loglines {
+            assert!(!line.line.is_null());
+
+            let c_line: &CStr = CStr::from_ptr(line.line);
+
+            let l = match c_line.to_str() {
+                Ok(s) => s,
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            };
+
+            rlv.push(l);
+        }
+
+        rlv
+    };
+
+
+
+    match send_error_report(&ucid, &desc, &cont, &rlog) {
+        Ok(()) => {
+            0
+        },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
 
 
 
