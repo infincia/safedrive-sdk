@@ -10,14 +10,27 @@ case $TARGET in
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         ;;
-    x86_64-unknown-linux-gnu|i686-unknown-linux-gnu)
+    x86_64-unknown-linux-gnu)
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         ;;
-    x86_64-unknown-linux-musl|i686-unknown-linux-musl)
+    i686-unknown-linux-gnu)
+        export CFLAGS="-O2 -g -flto -m32"
+        export LDFLAGS="-flto"
+        export SODIUM_ARGS="--enable-shared=yes"
+        export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        ;;
+    x86_64-unknown-linux-musl)
         export CFLAGS="-O2 -g -flto"
+        export LDFLAGS="-flto"
+        export CC=musl-gcc
+        export SODIUM_ARGS="--enable-shared=no"
+        export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        ;;
+    i686-unknown-linux-musl)
+        export CFLAGS="-O2 -g -flto -m32"
         export LDFLAGS="-flto"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
