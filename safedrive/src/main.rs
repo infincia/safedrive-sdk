@@ -59,6 +59,9 @@ use safedrive::core::generate_unique_client_id;
 use safedrive::core::get_unique_client_id;
 use safedrive::core::get_app_directory;
 
+use safedrive::core::get_current_os;
+
+
 use safedrive::models::{RegisteredFolder, Configuration};
 
 
@@ -280,9 +283,11 @@ fn main() {
 
     let client_version = format!("{} {}", NAME, VERSION);
 
-    initialize(&app_directory, &uid, &client_version, config);
+    let operating_system = get_current_os();
 
-    let (token, _, _) = match login(&uid, &username, &password) {
+    initialize(&client_version, operating_system, config);
+
+    let (token, _, _) = match login(&uid, &app_directory, &username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
         Err(e) => {
             error!("Login error: {}", e);
