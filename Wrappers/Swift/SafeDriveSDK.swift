@@ -66,6 +66,7 @@ public enum SDKErrorType {
     case IO
     case SyncAlreadyInProgress
     case RestoreAlreadyInProgress
+    case ExceededRetries
 }
 
 public struct SDKError: Error {
@@ -110,6 +111,8 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
         type = SDKErrorType.SyncAlreadyInProgress
     case RestoreAlreadyInProgress:
         type = SDKErrorType.RestoreAlreadyInProgress
+    case ExceededRetries:
+        type = SDKErrorType.ExceededRetries
     default:
         exit(1)
         break
