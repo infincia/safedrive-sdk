@@ -21,6 +21,7 @@ case $TARGET in
         export LDFLAGS="-flto"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="-O2 -g -flto"
@@ -35,6 +36,7 @@ case $TARGET in
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     *)
         ;;

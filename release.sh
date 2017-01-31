@@ -8,6 +8,14 @@ fi
 
 echo "Building for $TARGET"
 
+case $TARGET in
+    i686-unknown-linux-gnu|i686-unknown-linux-musl)
+        export PKG_CONFIG_ALLOW_CROSS=1
+        ;;
+    *)
+        ;;
+esac
+
 rm -rf dist-$TARGET
 mkdir -p dist-$TARGET/lib
 mkdir -p dist-$TARGET/include

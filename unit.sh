@@ -8,6 +8,14 @@ fi
 
 echo "Testing for $TARGET"
 
+case $TARGET in
+    i686-unknown-linux-gnu|i686-unknown-linux-musl)
+        export PKG_CONFIG_ALLOW_CROSS=1
+        ;;
+    *)
+        ;;
+esac
+
 bash dep.sh
 export DEP_OPENSSL_VERSION="110"
 
