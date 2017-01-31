@@ -34,9 +34,9 @@ pub enum APIEndpoint<'a> {
     AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
     ReadFolders { token: &'a Token },
     CreateFolder { token: &'a Token, path: &'a str, name: &'a str, encrypted: bool },
-    DeleteFolder { token: &'a Token, folder_id: u32 },
-    RegisterSyncSession { token: &'a Token, folder_id: u32, name: &'a str, encrypted: bool },
-    FinishSyncSession { token: &'a Token, folder_id: u32, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
+    DeleteFolder { token: &'a Token, folder_id: u64 },
+    RegisterSyncSession { token: &'a Token, folder_id: u64, name: &'a str, encrypted: bool },
+    FinishSyncSession { token: &'a Token, folder_id: u64, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
     ReadSyncSession { token: &'a Token, name: &'a str, encrypted: bool },
     ReadSyncSessions { token: &'a Token, encrypted: bool },
     CheckBlock { token: &'a Token, name: &'a str },
@@ -357,7 +357,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     Ok(folders)
 }
 
-pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted: bool) -> Result<u32, SDAPIError> {
+pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted: bool) -> Result<u64, SDAPIError> {
 
     let endpoint = APIEndpoint::CreateFolder { token: token, path: path, name: name, encrypted: encrypted };
     let body = CreateFolderBody { folderName: name, folderPath: path, encrypted: encrypted };
@@ -387,7 +387,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     Ok(folder_response.id)
 }
 
-pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
+pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
 
     let client = ::reqwest::Client::new().unwrap();
@@ -414,7 +414,7 @@ pub fn delete_folder(token: &Token, folder_id: u32) -> Result<(), SDAPIError> {
 
 // sync session handling
 
-pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u32, Vec<SyncSession>>>, SDAPIError> {
+pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<SyncSession>>>, SDAPIError> {
 
     let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
 
@@ -437,12 +437,12 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u32, Vec<S
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 
-    let sessions: HashMap<String, HashMap<u32, Vec<SyncSession>>> = try!(::serde_json::from_str(&response));
+    let sessions: HashMap<String, HashMap<u64, Vec<SyncSession>>> = try!(::serde_json::from_str(&response));
 
     Ok(sessions)
 }
 
-pub fn register_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, encrypted: bool) -> Result<(), SDAPIError> {
+pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted };
 
@@ -469,7 +469,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, e
     Ok(())
 }
 
-pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> {
+pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::FinishSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
 
@@ -501,7 +501,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u32, name: &'a str, enc
     }
 }
 
-pub fn read_session<'a>(token: &Token, folder_id: u32, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
+pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
     let endpoint = APIEndpoint::ReadSyncSession { token: token, name: name, encrypted: encrypted };
 
 

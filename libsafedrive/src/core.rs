@@ -221,7 +221,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 
 #[allow(unused_variables)]
 pub fn get_sync_folder(token: &Token,
-                       folder_id: u32) -> Result<RegisteredFolder, SDError> {
+                       folder_id: u64) -> Result<RegisteredFolder, SDError> {
     let folders = match read_folders(token) {
         Ok(folders) => folders,
         Err(e) => return Err(SDError::from(e))
@@ -236,7 +236,7 @@ pub fn get_sync_folder(token: &Token,
 
 pub fn add_sync_folder(token: &Token,
                        name: &str,
-                       path: &str) -> Result<u32, SDError> {
+                       path: &str) -> Result<u64, SDError> {
     match create_folder(token, path, name, true) {
         Ok(folder_id) => Ok(folder_id),
         Err(e) => Err(SDError::from(e))
@@ -244,7 +244,7 @@ pub fn add_sync_folder(token: &Token,
 }
 
 pub fn remove_sync_folder(token: &Token,
-                          folder_id: u32) -> Result<(), SDError> {
+                          folder_id: u64) -> Result<(), SDError> {
     match delete_folder(token, folder_id) {
         Ok(()) => Ok(()),
         Err(e) => Err(SDError::from(e))
@@ -259,7 +259,7 @@ pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDError>
 }
 
 pub fn get_sync_session<'a>(token: &Token,
-                            folder_id: u32,
+                            folder_id: u64,
                             session: &'a str) -> Result<SyncSessionResponse<'a>, SDError> {
     let session = match read_session(token, folder_id, session, true) {
         Ok(session) => session,
@@ -297,7 +297,7 @@ pub fn sync(token: &Token,
             main_key: &Key,
             hmac_key: &Key,
             tweak_key: &Key,
-            folder_id: u32,
+            folder_id: u64,
             progress: &mut FnMut(u32, u32, u32, f64, bool)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
@@ -615,7 +615,7 @@ pub fn sync(token: &Token,
 pub fn restore(token: &Token,
                session_name: &str,
                main_key: &Key,
-               folder_id: u32,
+               folder_id: u64,
                destination: PathBuf,
                progress: &mut FnMut(u32, u32, u32, f64, bool)) -> Result<(), SDError> {
 

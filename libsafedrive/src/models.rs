@@ -128,7 +128,7 @@ pub struct UniqueClientID {
 //private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
-    pub id: u32,
+    pub id: u64,
 }
 
 //private final String status;
@@ -178,7 +178,7 @@ pub struct WrappedKeysetBody {
 
 pub struct SyncSessionResponse<'a> {
     pub name: &'a str,
-    pub folder_id: u32,
+    pub folder_id: u64,
     pub chunk_data: Vec<u8>
 }
 
@@ -194,7 +194,7 @@ Current sync folder model:
 */
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegisteredFolder {
-    pub id: u32,
+    pub id: u64,
     pub folderName: String,
     pub folderPath: String,
     pub addedDate: u64,

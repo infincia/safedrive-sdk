@@ -12,7 +12,7 @@ use ::constants::*;
 pub struct SyncSession {
     #[serde(skip_deserializing)]
     version: SyncVersion,
-    pub folder_id: Option<u32>,
+    pub folder_id: Option<u64>,
     pub name: String,
     pub size: Option<u64>,
     pub time: Option<u64>,
@@ -21,7 +21,7 @@ pub struct SyncSession {
 }
 
 impl SyncSession {
-    pub fn new(version: SyncVersion, folder_id: u32, name: String, size: Option<u64>, time: Option<u64>, data: Vec<u8>) -> SyncSession {
+    pub fn new(version: SyncVersion, folder_id: u64, name: String, size: Option<u64>, time: Option<u64>, data: Vec<u8>) -> SyncSession {
         SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: data }
     }
 
@@ -60,7 +60,7 @@ impl SyncSession {
 
 pub struct WrappedSyncSession {
     pub version: SyncVersion,
-    pub folder_id: Option<u32>,
+    pub folder_id: Option<u64>,
     pub name: String,
     pub size: Option<u64>,
     pub time: Option<u64>,

@@ -164,7 +164,7 @@ impl From<AccountDetails> for SDDKAccountDetails {
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKFolder {
-    pub id: u32,
+    pub id: u64,
     pub name: *const std::os::raw::c_char,
     pub path: *const std::os::raw::c_char,
 }
@@ -185,7 +185,7 @@ pub struct SDDKSyncSession {
     pub name: *const std::os::raw::c_char,
     pub size: u64,
     pub date: u64,
-    pub folder_id: u32,
+    pub folder_id: u64,
 }
 
 impl From<SyncSession> for SDDKSyncSession {
@@ -970,7 +970,7 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
 pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
                                        name: *const std::os::raw::c_char,
                                        path: *const std::os::raw::c_char,
-                                       mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+                                       mut error: *mut *mut SDDKError) -> std::os::raw::c_longlong {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
@@ -1012,7 +1012,7 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     folder_id: a stack-allocated, unsigned 32-bit integer representing the registered folder ID
+///     folder_id: a stack-allocated, unsigned 64-bit integer representing the registered folder ID
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
@@ -1044,11 +1044,11 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
-                                          folder_id: std::os::raw::c_uint,
+                                          folder_id: std::os::raw::c_ulonglong,
                                           mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let id: u32 = folder_id as u32;
+    let id = folder_id as u64;
 
 
     match remove_sync_folder(c.0.get_api_token(), id) {
@@ -1080,7 +1080,7 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
+///     folder_id: a stack-allocated, unsigned 64-bit integer representing a registered folder ID
 ///
 ///     folder: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was 0
@@ -1119,11 +1119,11 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
-                                       folder_id: std::os::raw::c_uint,
+                                       folder_id: std::os::raw::c_ulonglong,
                                        mut folder: *mut *mut SDDKFolder,
                                        mut error: *mut *mut SDDKError) -> i8 {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
-    let id: u32 = folder_id as u32;
+    let id = folder_id as u64;
 
     let nf = match get_sync_folder(c.0.get_api_token(), id) {
         Ok(folder) => folder,
@@ -1386,7 +1386,7 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState,
 ///
 ///     name: a stack-allocated, NULL-terminated UUIDv4 string representing the name of the sync session
 ///
-///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
+///     folder_id: a stack-allocated, unsigned 64-bit integer representing a registered folder ID
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
 ///
@@ -1423,7 +1423,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                             state: *mut SDDKState,
                             mut error: *mut *mut SDDKError,
                             name: *const std::os::raw::c_char,
-                            folder_id: std::os::raw::c_uint,
+                            folder_id: std::os::raw::c_ulonglong,
                             progress: extern fn(context: *mut std::os::raw::c_void,
                                                 total: std::os::raw::c_uint,
                                                 current: std::os::raw::c_uint,
@@ -1441,7 +1441,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
     let hmac_key = (*c).0.get_hmac_key();
     let tweak_key = (*c).0.get_tweak_key();
 
-    let id: u32 = folder_id as u32;
+    let id = folder_id as u64;
 
     match sync(c.0.get_api_token(),
                &n,
@@ -1482,7 +1482,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 ///
 ///     name: a stack-allocated, NULL-terminated UTF-8 string representing the UUIDv4 name of the sync session
 ///
-///     folder_id: a stack-allocated, unsigned 32-bit integer representing a registered folder ID
+///     folder_id: a stack-allocated, unsigned 64-bit integer representing a registered folder ID
 ///
 ///     destination: a stack-allocated, NULL-terminated UTF-8 string representing the path the sync session will be restored to
 ///
@@ -1522,7 +1522,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                state: *mut SDDKState,
                                mut error: *mut *mut SDDKError,
                                name: *const std::os::raw::c_char,
-                               folder_id: std::os::raw::c_uint,
+                               folder_id: std::os::raw::c_ulonglong,
                                destination: *const std::os::raw::c_char,
                                progress: extern fn(context: *mut std::os::raw::c_void,
                                                    total: std::os::raw::c_uint,
@@ -1548,7 +1548,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
     let hmac_key = (*c).0.get_hmac_key();
     let tweak_key = (*c).0.get_tweak_key();
 
-    let id: u32 = folder_id as u32;
+    let id = folder_id as u64;
 
     match restore(c.0.get_api_token(),
                   &n,
