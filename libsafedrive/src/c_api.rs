@@ -1736,10 +1736,10 @@ pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetail
     let d: Box<SDDKAccountDetails> = unsafe { Box::from_raw(*details) };
     if !d.notifications.is_null() {
         let _ = unsafe {
-            let notifications: Vec<SDDKNotification> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(d.notifications as *mut SDDKNotification, d.notification_count as usize)).into_vec() };
+            let notifications: Vec<SDDKNotification> = Box::from_raw(std::slice::from_raw_parts_mut(d.notifications as *mut SDDKNotification, d.notification_count as usize)).into_vec();
             for notification in notifications {
-                let _ = unsafe { CString::from_raw(notification.title as *mut std::os::raw::c_char) };
-                let _ = unsafe { CString::from_raw(notification.message as *mut std::os::raw::c_char) };
+                let _ = CString::from_raw(notification.title as *mut std::os::raw::c_char);
+                let _ = CString::from_raw(notification.message as *mut std::os::raw::c_char);
 
             }
         };
