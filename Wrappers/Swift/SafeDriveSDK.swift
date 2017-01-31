@@ -187,7 +187,7 @@ public class SafeDriveSDK: NSObject {
         super.init()
     }
 
-    public func setUp(client_version: String, operating_system: String, config: SDKConfiguration) throws {
+    public func setUp(client_version: String, operating_system: String, config: SDKConfiguration) {
         var sddk_config: SDDKConfiguration
         switch config {
         case .Production:
