@@ -492,7 +492,9 @@ pub fn sync(token: &Token,
                             },
                             Err(SDAPIError::RetryUpload) => {
                                 retries_left = retries_left - 1.0;
-
+                                if retries_left <= 0.0 {
+                                    return Err(SDError::ExceededRetries(15))
+                                }
                                 should_upload = true;
                             },
                             _ => {}
