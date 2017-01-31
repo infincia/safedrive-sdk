@@ -299,7 +299,7 @@ pub fn sync(token: &Token,
         // we can do about it
         match ::util::set_folder_lock_state(&folder_path, FolderLock::Unlocked) {
             Ok(()) => {},
-            Err(e) => {},
+            Err(_) => {},
         }
     });
 
@@ -581,7 +581,7 @@ pub fn restore(token: &Token,
         // we can do about it
         match ::util::set_folder_lock_state(&destination, FolderLock::Unlocked) {
             Ok(()) => {},
-            Err(e) => {},
+            Err(_) => {},
         }
     });
 
