@@ -183,9 +183,7 @@ impl<'a> APIEndpoint<'a> {
 
 // SD API
 #[allow(dead_code)]
-pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
-
-    let operatingSystem = get_current_os();
+pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operatingSystem: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
     let body = ErrorLogBody { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };

@@ -1629,41 +1629,52 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_report_error(unique_client_id: *const std::os::raw::c_char,
+pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
+                                    operating_system: *const std::os::raw::c_char,
+                                    unique_client_id: *const std::os::raw::c_char,
                                     description: *const std::os::raw::c_char,
                                     context: *const std::os::raw::c_char,
                                     log: *const SDDKLogLine,
                                     logline_count: u64,
                                     mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
-    let c_ucid: &CStr = unsafe {
+    let ucid: String = unsafe {
         assert!(!unique_client_id.is_null());
-        CStr::from_ptr(unique_client_id)
+
+        let c_ucid: &CStr = CStr::from_ptr(unique_client_id);
+
+        let ucid: String = match c_ucid.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        };
+
+        ucid
     };
 
-    let ucid: String = match c_ucid.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
-    };
-
-    let c_desc: &CStr = unsafe {
+    let desc: String = unsafe {
         assert!(!description.is_null());
-        CStr::from_ptr(description)
+
+        let c_desc: &CStr = CStr::from_ptr(description);
+
+        let desc: String = match c_desc.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        };
+
+        desc
     };
 
-    let desc: String = match c_desc.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
-    };
-
-    let c_cont: &CStr = unsafe {
+    let cont: String = unsafe {
         assert!(!context.is_null());
-        CStr::from_ptr(context)
-    };
 
-    let cont: String = match c_cont.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        let c_cont: &CStr = CStr::from_ptr(context);
+
+        let cont: String = match c_cont.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        };
+
+        cont
     };
 
     let rlog = unsafe {
@@ -1688,9 +1699,38 @@ pub extern "C" fn sddk_report_error(unique_client_id: *const std::os::raw::c_cha
         rlv
     };
 
+    let ver: Option<String> = unsafe {
+        if client_version.is_null() {
+            None
+        } else {
+            let c_client_version: &CStr = CStr::from_ptr(client_version);
+
+            let ver: String = match c_client_version.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            };
+
+            Some(ver)
+        }
+    };
+
+    let os: Option<String> = unsafe {
+        if operating_system.is_null() {
+            None
+        } else {
+            let c_operating_system: &CStr = CStr::from_ptr(operating_system);
+
+            let os: String = match c_operating_system.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            };
+
+            Some(os)
+        }
+    };
 
 
-    match send_error_report(&ucid, &desc, &cont, &rlog) {
+    match send_error_report(ver, os, &ucid, &desc, &cont, &rlog) {
         Ok(()) => {
             0
         },

@@ -875,9 +875,25 @@ pub fn restore(token: &Token,
     Ok(())
 }
 
-pub fn send_error_report<'a>(unique_client_id: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDError> {
-    let cv = CLIENT_VERSION.read().unwrap();
-    match report_error(&**cv, unique_client_id, description, context, log) {
+pub fn send_error_report<'a>(client_version: Option<String>, operating_system: Option<String>, unique_client_id: &str, description: &str, context: &str, log: &'a [&'a str]) -> Result<(), SDError> {
+    let gcv = CLIENT_VERSION.read().unwrap();
+    let gos = OPERATING_SYSTEM.read().unwrap();
+
+    let cv: &str = match client_version {
+        Some(ref cv) => cv,
+        None => {
+            &**gcv
+        }
+    };
+
+    let os: &str = match operating_system {
+        Some(ref os) => os,
+        None => {
+            &**gos
+        }
+    };
+
+    match report_error(cv, os, unique_client_id, description, context, log) {
         Ok(()) => return Ok(()),
         Err(e) => Err(SDError::from(e))
     }
