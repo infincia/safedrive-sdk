@@ -346,11 +346,15 @@ pub fn sync(token: &Token,
     let mut failed = 0;
 
     let mut completed_count = 0.0;
+
+    let mut percent_completed: f64 = (archive_size as f64 / estimated_size as f64) * 100.0;
+
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
         if DEBUG_STATISTICS {
             debug!("examining {}", item.path().display());
         }
-        let percent_completed: f64 = (archive_size as f64 / estimated_size as f64) * 100.0;
+
+        percent_completed = (archive_size as f64 / estimated_size as f64) * 100.0;
 
         // call out to the library user with progress
         progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
@@ -551,12 +555,42 @@ pub fn sync(token: &Token,
 
     debug!("finishing sync session");
 
+    let mut should_retry = true;
+    let mut retries_left = 15.0;
+
+    while should_retry {
+        // allow caller to tick the progress display, if one exists
+        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
+
+        let failed_count = 15.0 - retries_left;
+        let mut rng = ::rand::thread_rng();
+
+        // we pick a multiplier randomly to avoid a bunch of clients trying again
+        // at the same 2/4/8/16 backoff times time over and over if the server
+        // is overloaded or down
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+        if failed_count >= 1.0 {
+            // back off significantly every time a call fails
+            let backoff_time = backoff_multiplier * (failed_count * failed_count);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
+
+        match finish_sync_session(&token, folder_id, session_name, true, &binary_data, archive_size as usize) {
+            Ok(()) => {
+                should_retry = false;
+            },
+            Err(e) => {
+                retries_left = retries_left - 1.0;
+                if retries_left <= 0.0 {
+                    return Err(SDError::RequestFailure(Box::new(e)))
+                }
+            }
+        };
+    }
 
 
-    match finish_sync_session(&token, folder_id, session_name, true, &binary_data, archive_size as usize) {
-        Ok(()) => {},
-        Err(e) => return Err(SDError::from(e))
-    };
     progress(estimated_size as u32, archive_size as u32, 0 as u32, 100.0, false);
 
     Ok(())
