@@ -16,7 +16,7 @@ public enum SDKConfiguration {
 }
 
 public struct Folder {
-    public let id: UInt32
+    public let id: UInt64
     public let name: String
     public let path: String
 }
@@ -25,7 +25,7 @@ public struct SyncSession {
     public let name: String
 	public let size: UInt64;
 	public let date: Date;
-	public let folder_id: UInt32;
+	public let folder_id: UInt64;
 }
 
 public struct AccountStatus {
