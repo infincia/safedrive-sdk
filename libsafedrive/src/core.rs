@@ -15,7 +15,6 @@ use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::cdc::*;
 use ::nom::IResult::*;
-use ::scopeguard::guard;
 
 
 // internal imports
