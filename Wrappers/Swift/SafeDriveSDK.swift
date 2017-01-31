@@ -122,6 +122,18 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
 }
 
 
+
+func SDDKLogLinesFromLog(log: [String]) -> [SDDKLogLine] {
+    var sl = [SDDKLogLine]()
+    
+    for line in log {
+        let l = SDDKLogLine(line: line)
+        sl.append(l)
+    }
+
+    return sl
+}
+
 func SDDKAccountStatusToAccountStatus(account_status: SDDKAccountStatus) -> AccountStatus {
     var s: Optional<String> = nil
     if account_status.status != nil {
@@ -519,6 +531,33 @@ public class SafeDriveSDK: NSObject {
     }
     
     
+    
+    // SDAPI
+    func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, withLog log: [String], completionQueue queue: DispatchQueue, success successBlock: @escaping () -> Void, failure failureBlock: @escaping (_ rerror: Error) -> Void) {
+        
+        let description = error.localizedDescription
+        
+        let context = error.domain
+        
+        let sl = SDDKLogLinesFromLog(log: log)
+        
+        let sl_count = UInt64(log.count)
+        
+        var s_error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_report_error(clientVersion, os, uniqueClientId, description, context, sl, sl_count, &s_error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&s_error)
+            }
+        }
+        switch res {
+        case 0:
+            successBlock()
+        default:
+            failureBlock(SDKErrorFromSDDKError(sdkError: s_error!.pointee))
+        }
+    }
     
     
     // gc
