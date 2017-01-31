@@ -28,6 +28,27 @@ public struct SyncSession {
 	public let folder_id: UInt32;
 }
 
+public struct AccountStatus {
+    public let status: Optional<String>
+    public let host: String
+    public let port: UInt16
+    public let userName: String
+    public let time: Optional<UInt64>
+}
+
+public struct AccountDetails {
+    public let assignedStorage: UInt64
+    public let usedStorage: UInt64
+    public let lowFreeStorageThreshold: Int64
+    public let expirationDate: UInt64
+    public let notifications: Optional<[Notification]>
+}
+
+public struct Notification {
+    public let title: String
+    public let message: String
+}
+
 public enum SDKErrorType {
     case StateMissing
     case Internal
@@ -95,6 +116,40 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
     }
 
     return SDKError(message: s, kind: type)
+}
+
+
+func SDDKAccountStatusToAccountStatus(account_status: SDDKAccountStatus) -> AccountStatus {
+    var s: Optional<String> = nil
+    if account_status.status != nil {
+        s = String(cString: account_status.status)
+    }
+    var t: Optional<UInt64> = nil
+    if account_status.time != nil {
+        t = account_status.time.pointee
+    }
+    let accountStatus = AccountStatus(status: s, host: String(cString: account_status.host), port: account_status.port, userName: String(cString: account_status.user_name), time: t)
+
+    return accountStatus
+}
+
+func SDDKAccountDetailsToAccountDetails(account_details: SDDKAccountDetails) -> AccountDetails {
+    let n: Optional<[Notification]> = nil
+    if account_details.notifications != nil {
+        let buffer = UnsafeBufferPointer<SDDKNotification>(start: UnsafePointer(account_details.notifications), count: Int(account_details.notification_count))
+        let a = Array(buffer)
+        var new_array = [Notification]()
+        for notification in a {
+            let title = String(cString: notification.title)
+            let message = String(cString: notification.message)
+            let n = Notification(title: title, message: message)
+            new_array.append(n)
+        }
+        
+    }
+    let accountDetails = AccountDetails(assignedStorage: account_details.assigned_storage, usedStorage: account_details.used_storage, lowFreeStorageThreshold: account_details.low_free_space_threshold, expirationDate: account_details.expiration_date, notifications: n)
+
+    return accountDetails
 }
 
 public typealias SyncSessionSuccess = @convention(block) () -> Void
