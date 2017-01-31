@@ -261,7 +261,7 @@ fn main() {
 
     let uid = match get_unique_client_id(&app_directory) {
         Ok(uid) => uid,
-        Err(e) => {
+        Err(_) => {
             #[cfg(target_os = "macos")]
             let uid = match unique_client_hash(&username) {
                 Ok(hash) => hash,
