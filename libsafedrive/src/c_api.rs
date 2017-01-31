@@ -33,6 +33,8 @@ use ::core::get_unique_client_id;
 use ::core::generate_unique_client_id;
 
 use ::core::get_account_status;
+use ::core::get_account_details;
+
 use ::error::SDError;
 
 // exports
@@ -785,6 +787,87 @@ pub extern "C" fn sddk_get_account_status(state: *mut SDDKState,
     0
 }
 
+
+/// Get account details from the SafeDrive server
+///
+/// The caller does not own the memory pointed to by `details` or `error` after this function returns,
+/// they must be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffers before
+/// they are freed.
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     details: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was 0
+///
+///            must be freed by the caller using sddk_free_account_details()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///     0+: success
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+/// SDDKAccountDetails * details = NULL;
+///
+/// if (0 != sddk_get_account_details(&state, &details, &error)) {
+///     printf("Failed to get account details");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got account details");
+///     // do something with details here, then free it
+///     sddk_free_account_details(&details);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
+                                          mut details: *mut *mut SDDKAccountDetails,
+                                          mut error: *mut *mut SDDKError) -> i8 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let d = match get_account_details(c.0.get_api_token()) {
+        Ok(d) => d,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        },
+    };
+
+    let c_d = SDDKAccountDetails::from(d);
+
+    let b = Box::new(c_d);
+    let ptr = Box::into_raw(b);
+
+    unsafe {
+        *details = ptr;
+    }
+
+    0
+}
 
 
 /// Add a sync folder
