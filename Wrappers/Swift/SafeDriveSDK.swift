@@ -19,6 +19,9 @@ public struct Folder {
     public let id: UInt64
     public let name: String
     public let path: String
+    public let date: UInt64
+    public let encrypted: Bool
+    
 }
 
 public struct SyncSession {
@@ -398,9 +401,9 @@ public class SafeDriveSDK: NSObject {
                 let name = String(cString: folder_ptr!.pointee.name)
                 let path = String(cString: folder_ptr!.pointee.path)
                 let id = folder_ptr!.pointee.id
-                let folder = Folder(id: id, name: name, path: path)
+                let new_folder = Folder(id: id, name: name, path: path, date: folder_ptr!.pointee.date, encrypted: folder_ptr!.pointee.encrypted == 1 ? true : false)
                 
-                queue.async { success(folder) }
+                queue.async { success(new_folder) }
             default:
                 let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
@@ -433,7 +436,7 @@ public class SafeDriveSDK: NSObject {
                     let name = String(cString: folder.name)
                     let path = String(cString: folder.path)
                     let id = folder.id
-                    let new_folder = Folder(id: id, name: name, path: path)
+                    let new_folder = Folder(id: id, name: name, path: path, date: folder.date, encrypted: folder.encrypted == 1 ? true : false)
                     new_array.append(new_folder)
                 }
                 
