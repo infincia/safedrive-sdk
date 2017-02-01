@@ -29,6 +29,7 @@ use ::CONFIGURATION;
 use ::CACHE_DIR;
 use ::CLIENT_VERSION;
 use ::OPERATING_SYSTEM;
+use ::LANGUAGE_CODE;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
@@ -72,7 +73,7 @@ pub fn get_current_os() -> &'static str {
 
 // internal functions
 
-pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, config: Configuration) {
+pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration) {
     let mut c = CONFIGURATION.write().unwrap();
     *c = config;
 
@@ -81,6 +82,9 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, config
 
     let mut os = OPERATING_SYSTEM.write().unwrap();
     *os = operating_system.to_string();
+
+    let mut lc = LANGUAGE_CODE.write().unwrap();
+    *lc = language_code.to_string();
 
     if !::sodiumoxide::init() == true {
         panic!("sodium initialization failed, cannot continue");

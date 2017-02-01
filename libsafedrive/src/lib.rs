@@ -79,6 +79,11 @@ lazy_static! {
     static ref OPERATING_SYSTEM: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
 }
 
+lazy_static! {
+    static ref LANGUAGE_CODE: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+}
+
+
 
 
 

@@ -343,6 +343,7 @@ impl From<String> for SDDKError {
 #[allow(dead_code)]
 pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                                   operating_system: *const std::os::raw::c_char,
+                                  language_code: *const std::os::raw::c_char,
                                   config: SDDKConfiguration) -> *mut SDDKState {
 
     let cvs: &CStr = unsafe {
@@ -365,12 +366,22 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
+    let c_language_code: &CStr = unsafe {
+        assert!(!language_code.is_null());
+        CStr::from_ptr(language_code)
+    };
+
+    let langc: String = match c_language_code.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
     let c = match config {
         SDDKConfiguration::SDDKConfigurationProduction => Configuration::Production,
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    initialize(&os, &cv, c);
+    initialize(&cv, &os, &langc, c);
 
     let sstate = State::new();
     let c_state = SDDKState(sstate);
