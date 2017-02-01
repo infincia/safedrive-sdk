@@ -188,7 +188,7 @@ public class SafeDriveSDK: NSObject {
         super.init()
     }
 
-    public func setUp(client_version: String, operating_system: String, config: SDKConfiguration) {
+    public func setUp(client_version: String, operating_system: String, language_code: String, config: SDKConfiguration) {
         var sddk_config: SDDKConfiguration
         switch config {
         case .Production:
@@ -196,7 +196,7 @@ public class SafeDriveSDK: NSObject {
         case .Staging:
             sddk_config = SDDKConfigurationStaging
         }
-        self.state = sddk_initialize(client_version, operating_system, sddk_config)
+        self.state = sddk_initialize(client_version, operating_system, language_code, sddk_config)
     }
     
     deinit {
