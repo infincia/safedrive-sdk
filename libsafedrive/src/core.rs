@@ -134,8 +134,10 @@ pub fn login(unique_client_id: &str,
         },
     }
 
+    let gos = OPERATING_SYSTEM.read().unwrap();
+    let lc = LANGUAGE_CODE.read().unwrap();
 
-    match register_client(unique_client_id, username, password) {
+    match register_client(&**gos, &**lc, unique_client_id, username, password) {
         Ok((t, ucid)) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s, ucid)),
