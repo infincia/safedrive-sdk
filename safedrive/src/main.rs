@@ -285,7 +285,7 @@ fn main() {
 
     let operating_system = get_current_os();
 
-    initialize(&client_version, operating_system, config);
+    initialize(&client_version, operating_system, "en_US", config);
 
     let (token, _, _) = match login(&uid, &app_directory, &username, &password) {
         Ok((t, a, ucid)) => (t, a, ucid),
