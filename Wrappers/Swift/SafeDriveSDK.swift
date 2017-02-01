@@ -167,9 +167,10 @@ func SDDKAccountDetailsToAccountDetails(account_details: SDDKAccountDetails) -> 
     return accountDetails
 }
 
-public typealias SyncSessionSuccess = @convention(block) () -> Void
+public typealias SDKSuccess = () -> Void
+public typealias SDKFailure = (_ error: SDKError) -> Void
+
 public typealias SyncSessionProgress = @convention(block) (_ total: UInt32, _ current: UInt32, _ progress: Double) -> Void
-public typealias SyncSessionFailure = @convention(block) (_ error: Error) -> Void
 
 public typealias SaveRecoveryPhrase = @convention(block) (_ phrase: String) -> Void
 
@@ -202,14 +203,12 @@ public class SafeDriveSDK: NSObject {
         sddk_free_state(&state)
     }
     
-    public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue) throws -> AccountStatus {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
+
         var error: UnsafeMutablePointer<SDDKError>? = nil
         var status: UnsafeMutablePointer<SDDKAccountStatus>? = nil
 
-        let res = sddk_login(state, local_storage_path, unique_client_id, username, password, &status, &error)
+        let res = sddk_login(self.state, local_storage_path, unique_client_id, username, password, &status, &error)
         defer {
             if res == -1 {
                 sddk_free_error(&error)
@@ -219,19 +218,17 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case 0:
-            return SDDKAccountStatusToAccountStatus(account_status: status!.pointee)
+            success(SDDKAccountStatusToAccountStatus(account_status: status!.pointee))
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
 
-    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase) throws {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    
         var error: UnsafeMutablePointer<SDDKError>? = nil
 
-        let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), state, &error, recoveryPhrase) { (context, phrase) in
+        let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), self.state!, &error, recoveryPhrase) { (context, phrase) in
             // call back to Swift to save the phrase somewhere
             let b = unsafeBitCast(context, to: SaveRecoveryPhrase.self)
             let p = String(cString: phrase!)
@@ -246,20 +243,18 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case 0:
-            return
+            success()
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
-    public func getAccountStatus(completionQueue queue: DispatchQueue) throws -> AccountStatus {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func getAccountStatus(completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
+
         var account_status_ptr: UnsafeMutablePointer<SDDKAccountStatus>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
-        let res = sddk_get_account_status(state, &account_status_ptr, &error)
+        let res = sddk_get_account_status(self.state!, &account_status_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_account_status(&account_status_ptr)
@@ -270,20 +265,18 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case 0:
-            return SDDKAccountStatusToAccountStatus(account_status: account_status_ptr!.pointee)
+            success(SDDKAccountStatusToAccountStatus(account_status: account_status_ptr!.pointee))
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
-    public func getAccountDetails(completionQueue queue: DispatchQueue) throws -> AccountDetails {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func getAccountDetails(completionQueue queue: DispatchQueue, success: @escaping (_ details: AccountDetails) -> Void, failure: @escaping SDKFailure) {
+
         var account_details_ptr: UnsafeMutablePointer<SDDKAccountDetails>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
-        let res = sddk_get_account_details(state, &account_details_ptr, &error)
+        let res = sddk_get_account_details(self.state!, &account_details_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_account_details(&account_details_ptr)
@@ -294,9 +287,9 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case 0:
-            return SDDKAccountDetailsToAccountDetails(account_details: account_details_ptr!.pointee)
+            success(SDDKAccountDetailsToAccountDetails(account_details: account_details_ptr!.pointee))
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
@@ -321,33 +314,29 @@ public class SafeDriveSDK: NSObject {
         }
     }
 
-    public func addFolder(_ name: String, path: String, completionQueue queue: DispatchQueue) throws {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func addFolder(_ name: String, path: String, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: Int64) -> Void, failure: @escaping SDKFailure) {
+
         var error: UnsafeMutablePointer<SDDKError>? = nil
 
-        let res = sddk_add_sync_folder(state, name, path, &error)
+        let res = sddk_add_sync_folder(self.state!, name, path, &error)
         defer {
             if res == -1 {
                 sddk_free_error(&error)
             }
         }
         switch res {
-        case 0:
-            return
+        case -1:
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            success(res)
         }
     }
     
-    public func removeFolder(_ folderId: UInt32, completionQueue queue: DispatchQueue) throws {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func removeFolder(_ folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
-        let res = sddk_remove_sync_folder(state, folderId, &error)
+        let res = sddk_remove_sync_folder(self.state!, folderId, &error)
         
         defer {
             if res == -1 {
@@ -357,20 +346,18 @@ public class SafeDriveSDK: NSObject {
         
         switch res {
         case 0:
-            return
+            success()
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
-    public func getFolder(folderId: UInt32, completionQueue queue: DispatchQueue) throws -> Folder {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func getFolder(folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping (_ folder: Folder) -> Void, failure: @escaping SDKFailure)  {
+
         var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
-        let res = sddk_get_sync_folder(state, folderId, &folder_ptr, &error)
+        let res = sddk_get_sync_folder(self.state!, folderId, &folder_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_folders(&folder_ptr, UInt64(res))
@@ -386,21 +373,18 @@ public class SafeDriveSDK: NSObject {
             let id = folder_ptr!.pointee.id
             let folder = Folder(id: id, name: name, path: path)
         
-            return folder
+            success(folder)
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
 
-    public func getFolders(completionQueue queue: DispatchQueue) throws -> [Folder] {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func getFolders(completionQueue queue: DispatchQueue, success: @escaping (_ folders: [Folder]) -> Void, failure: @escaping SDKFailure) {
         
         var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
-        let res = sddk_get_sync_folders(state, &folder_ptr, &error)
+        let res = sddk_get_sync_folders(self.state!, &folder_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_folders(&folder_ptr, UInt64(res))
@@ -423,22 +407,19 @@ public class SafeDriveSDK: NSObject {
             }
             
             self.folders = new_array
-            return folders
+            success(folders)
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
 
     }
     
-    public func getSessions(completionQueue queue: DispatchQueue) throws -> [SyncSession] {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func getSessions(completionQueue queue: DispatchQueue, success: @escaping (_ sessions: [SyncSession]) -> Void, failure: @escaping SDKFailure) {
         
         var sessions_ptr: UnsafeMutablePointer<SDDKSyncSession>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
-        let res = sddk_get_sync_sessions(state, &sessions_ptr, &error)
+        let res = sddk_get_sync_sessions(self.state!, &sessions_ptr, &error)
         defer {
             if res >= 0 {
                 sddk_free_sync_sessions(&sessions_ptr, UInt64(res))
@@ -462,24 +443,20 @@ public class SafeDriveSDK: NSObject {
                 new_array.append(new_session)
             }
             self.sessions = new_array
-            return sessions
+            success(sessions)
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
         
 
     }
     
-    public func syncFolder(folderID: UInt32, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
-        guard let state = self.state else {
-            let e = SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-            failure(e)
-            return
-        }
+    public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
         DispatchQueue.global(priority: .default).async {
-            let res = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, &error, sessionName, folderID, { (context, total, current, percent, tick) in
+            let res = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
@@ -500,16 +477,12 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func restoreFolder(folderID: UInt32, sessionName: String, destination: URL, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SyncSessionSuccess, failure: @escaping SyncSessionFailure) {
-        guard let state = self.state else {
-            let e = SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-            failure(e)
-            return
-        }
+    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+
         var error: UnsafeMutablePointer<SDDKError>? = nil
         
         DispatchQueue.global(priority: .default).async {
-            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), state, &error, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
+            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
@@ -533,7 +506,7 @@ public class SafeDriveSDK: NSObject {
     
     
     // SDAPI
-    func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, withLog log: [String], completionQueue queue: DispatchQueue, success successBlock: @escaping () -> Void, failure failureBlock: @escaping (_ rerror: Error) -> Void) {
+    func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, withLog log: [String], completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         let description = error.localizedDescription
         
@@ -553,23 +526,20 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case 0:
-            successBlock()
+            success()
         default:
-            failureBlock(SDKErrorFromSDDKError(sdkError: s_error!.pointee))
+            failure(SDKErrorFromSDDKError(sdkError: s_error!.pointee))
         }
     }
     
     
     // gc
     
-    public func gc(completionQueue queue: DispatchQueue) throws {
-        guard let state = self.state else {
-            throw SDKError(message: "State missing, cannot continue", kind: .StateMissing)
-        }
+    public func gc(completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         var error: UnsafeMutablePointer<SDDKError>? = nil
 
-        let res = sddk_gc(state, &error)
+        let res = sddk_gc(self.state!, &error)
         defer {
             if res == -1 {
                 sddk_free_error(&error)
@@ -579,7 +549,7 @@ public class SafeDriveSDK: NSObject {
         case 0:
             return
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
