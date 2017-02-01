@@ -44,10 +44,10 @@ public struct AccountDetails {
     public let usedStorage: UInt64
     public let lowFreeStorageThreshold: Int64
     public let expirationDate: UInt64
-    public let notifications: Optional<[Notification]>
+    public let notifications: Optional<[SafeDriveNotification]>
 }
 
-public struct Notification {
+public struct SafeDriveNotification {
     public let title: String
     public let message: String
 }
@@ -152,15 +152,15 @@ func SDDKAccountStatusToAccountStatus(account_status: SDDKAccountStatus) -> Acco
 }
 
 func SDDKAccountDetailsToAccountDetails(account_details: SDDKAccountDetails) -> AccountDetails {
-    let n: Optional<[Notification]> = nil
+    let n: Optional<[SafeDriveNotification]> = nil
     if account_details.notifications != nil {
         let buffer = UnsafeBufferPointer<SDDKNotification>(start: UnsafePointer(account_details.notifications), count: Int(account_details.notification_count))
         let a = Array(buffer)
-        var new_array = [Notification]()
+        var new_array = [SafeDriveNotification]()
         for notification in a {
             let title = String(cString: notification.title)
             let message = String(cString: notification.message)
-            let n = Notification(title: title, message: message)
+            let n = SafeDriveNotification(title: title, message: message)
             new_array.append(n)
         }
         
