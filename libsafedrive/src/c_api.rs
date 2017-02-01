@@ -167,6 +167,8 @@ pub struct SDDKFolder {
     pub id: u64,
     pub name: *const std::os::raw::c_char,
     pub path: *const std::os::raw::c_char,
+    pub date: u64,
+    pub encrypted: i8,
 }
 
 impl From<RegisteredFolder> for SDDKFolder {
@@ -175,6 +177,15 @@ impl From<RegisteredFolder> for SDDKFolder {
             id: folder.id,
             name: CString::new(folder.folderName.as_str()).unwrap().into_raw(),
             path: CString::new(folder.folderPath.as_str()).unwrap().into_raw(),
+            date: folder.addedDate,
+            encrypted: {
+                if folder.encrypted {
+                    1
+                } else {
+                    0
+                }
+
+            },
         }
     }
 }
