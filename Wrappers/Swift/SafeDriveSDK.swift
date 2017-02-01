@@ -428,7 +428,10 @@ public class SafeDriveSDK: NSObject {
                 }
             }
             switch res {
-            case 0:
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
                 let buffer = UnsafeBufferPointer<SDDKFolder>(start: UnsafePointer(folder_ptr), count: Int(res))
                 let a = Array(buffer)
                 var new_array = [Folder]()
@@ -442,9 +445,7 @@ public class SafeDriveSDK: NSObject {
                 
                 self.folders = new_array
                 queue.async { success(new_array) }
-            default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
-                queue.async { failure(e) }
+
             }
         }
 
@@ -467,7 +468,10 @@ public class SafeDriveSDK: NSObject {
                 }
             }
             switch res {
-            case 0:
+            case -1:
+               let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
                 let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
                 let a = Array(buffer)
                 var new_array = [SyncSession]()
@@ -482,9 +486,6 @@ public class SafeDriveSDK: NSObject {
                 }
                 self.sessions = new_array
                 queue.async { success(new_array) }
-            default:
-               let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
-                queue.async { failure(e) }
             }
         }
 
