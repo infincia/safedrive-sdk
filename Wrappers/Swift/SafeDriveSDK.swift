@@ -205,91 +205,109 @@ public class SafeDriveSDK: NSObject {
     
     public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
 
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-        var status: UnsafeMutablePointer<SDDKAccountStatus>? = nil
-
-        let res = sddk_login(self.state, local_storage_path, unique_client_id, username, password, &status, &error)
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
-            } else {
-                sddk_free_account_status(&status)
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            var status: UnsafeMutablePointer<SDDKAccountStatus>? = nil
+            
+            let res = sddk_login(self.state, local_storage_path, unique_client_id, username, password, &status, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                } else {
+                    sddk_free_account_status(&status)
+                }
             }
-        }
-        switch res {
-        case 0:
-            success(SDDKAccountStatusToAccountStatus(account_status: status!.pointee))
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+            switch res {
+            case 0:
+                let s = SDDKAccountStatusToAccountStatus(account_status: status!.pointee)
+                queue.async { success(s) }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
         }
     }
 
     public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
     
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), self.state!, &error, recoveryPhrase) { (context, phrase) in
-            // call back to Swift to save the phrase somewhere
-            let b = unsafeBitCast(context, to: SaveRecoveryPhrase.self)
-            let p = String(cString: phrase!)
-            var m = phrase
-            b(p)
-            sddk_free_string(&m)
-        }
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
+        DispatchQueue.global(priority: .default).async {
+            
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), self.state!, &error, recoveryPhrase) { (context, phrase) in
+                // call back to Swift to save the phrase somewhere
+                let b = unsafeBitCast(context, to: SaveRecoveryPhrase.self)
+                let p = String(cString: phrase!)
+                var m = phrase
+                b(p)
+                sddk_free_string(&m)
             }
-        }
-        switch res {
-        case 0:
-            success()
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
         }
     }
     
     public func getAccountStatus(completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
 
-        var account_status_ptr: UnsafeMutablePointer<SDDKAccountStatus>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
+        DispatchQueue.global(priority: .default).async {
         
-        let res = sddk_get_account_status(self.state!, &account_status_ptr, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_account_status(&account_status_ptr)
+            var account_status_ptr: UnsafeMutablePointer<SDDKAccountStatus>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_get_account_status(self.state!, &account_status_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_account_status(&account_status_ptr)
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-            if res == -1 {
-                sddk_free_error(&error)
+            switch res {
+            case 0:
+                let s = SDDKAccountStatusToAccountStatus(account_status: account_status_ptr!.pointee)
+                queue.async { success(s) }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
             }
-        }
-        switch res {
-        case 0:
-            success(SDDKAccountStatusToAccountStatus(account_status: account_status_ptr!.pointee))
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
     public func getAccountDetails(completionQueue queue: DispatchQueue, success: @escaping (_ details: AccountDetails) -> Void, failure: @escaping SDKFailure) {
 
-        var account_details_ptr: UnsafeMutablePointer<SDDKAccountDetails>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
+        DispatchQueue.global(priority: .default).async {
         
-        let res = sddk_get_account_details(self.state!, &account_details_ptr, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_account_details(&account_details_ptr)
+            var account_details_ptr: UnsafeMutablePointer<SDDKAccountDetails>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_get_account_details(self.state!, &account_details_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_account_details(&account_details_ptr)
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-            if res == -1 {
-                sddk_free_error(&error)
+            switch res {
+            case 0:
+                let d = SDDKAccountDetailsToAccountDetails(account_details: account_details_ptr!.pointee)
+                queue.async { success(d) }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
             }
-        }
-        switch res {
-        case 0:
-            success(SDDKAccountDetailsToAccountDetails(account_details: account_details_ptr!.pointee))
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
     
@@ -313,149 +331,167 @@ public class SafeDriveSDK: NSObject {
             throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
     }
-
+    
     public func addFolder(_ name: String, path: String, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: Int64) -> Void, failure: @escaping SDKFailure) {
-
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_add_sync_folder(self.state!, name, path, &error)
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
+        
+        DispatchQueue.global(priority: .default).async {
+            
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_add_sync_folder(self.state!, name, path, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-        }
-        switch res {
-        case -1:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
-        default:
-            success(res)
+            switch res {
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
+                queue.async { success(res) }
+            }
         }
     }
     
     public func removeFolder(_ folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
-
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-        
-        let res = sddk_remove_sync_folder(self.state!, folderId, &error)
-        
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
+        DispatchQueue.global(priority: .default).async {
+            
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_remove_sync_folder(self.state!, folderId, &error)
+            
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-        }
-        
-        switch res {
-        case 0:
-            success()
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+            
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
         }
     }
     
     public func getFolder(folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping (_ folder: Folder) -> Void, failure: @escaping SDKFailure)  {
 
-        var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-        
-        let res = sddk_get_sync_folder(self.state!, folderId, &folder_ptr, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_folders(&folder_ptr, UInt64(res))
+        DispatchQueue.global(priority: .default).async {
+            
+            var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_get_sync_folder(self.state!, folderId, &folder_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_folders(&folder_ptr, UInt64(res))
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-            if res == -1 {
-                sddk_free_error(&error)
+            switch res {
+            case 0:
+                let name = String(cString: folder_ptr!.pointee.name)
+                let path = String(cString: folder_ptr!.pointee.path)
+                let id = folder_ptr!.pointee.id
+                let folder = Folder(id: id, name: name, path: path)
+                
+                queue.async { success(folder) }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
             }
-        }
-        switch res {
-        case 0:
-            let name = String(cString: folder_ptr!.pointee.name)
-            let path = String(cString: folder_ptr!.pointee.path)
-            let id = folder_ptr!.pointee.id
-            let folder = Folder(id: id, name: name, path: path)
-        
-            success(folder)
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
         }
     }
 
     public func getFolders(completionQueue queue: DispatchQueue, success: @escaping (_ folders: [Folder]) -> Void, failure: @escaping SDKFailure) {
         
-        var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-        
-        let res = sddk_get_sync_folders(self.state!, &folder_ptr, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_folders(&folder_ptr, UInt64(res))
-            }
-            if res == -1 {
-                sddk_free_error(&error)
-            }
-        }
-        switch res {
-        case 0:
-            let buffer = UnsafeBufferPointer<SDDKFolder>(start: UnsafePointer(folder_ptr), count: Int(res))
-            let a = Array(buffer)
-            var new_array = [Folder]()
-            for folder in a {
-                let name = String(cString: folder.name)
-                let path = String(cString: folder.path)
-                let id = folder.id
-                let new_folder = Folder(id: id, name: name, path: path)
-                new_array.append(new_folder)
-            }
+        DispatchQueue.global(priority: .default).async {
+
+            var folder_ptr: UnsafeMutablePointer<SDDKFolder>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
             
-            self.folders = new_array
-            success(folders)
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+            let res = sddk_get_sync_folders(self.state!, &folder_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_folders(&folder_ptr, UInt64(res))
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                let buffer = UnsafeBufferPointer<SDDKFolder>(start: UnsafePointer(folder_ptr), count: Int(res))
+                let a = Array(buffer)
+                var new_array = [Folder]()
+                for folder in a {
+                    let name = String(cString: folder.name)
+                    let path = String(cString: folder.path)
+                    let id = folder.id
+                    let new_folder = Folder(id: id, name: name, path: path)
+                    new_array.append(new_folder)
+                }
+                
+                self.folders = new_array
+                queue.async { success(new_array) }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
         }
 
     }
     
     public func getSessions(completionQueue queue: DispatchQueue, success: @escaping (_ sessions: [SyncSession]) -> Void, failure: @escaping SDKFailure) {
-        
-        var sessions_ptr: UnsafeMutablePointer<SDDKSyncSession>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-        
-        let res = sddk_get_sync_sessions(self.state!, &sessions_ptr, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_sync_sessions(&sessions_ptr, UInt64(res))
+    
+        DispatchQueue.global(priority: .default).async {
+
+            var sessions_ptr: UnsafeMutablePointer<SDDKSyncSession>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_get_sync_sessions(self.state!, &sessions_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_sync_sessions(&sessions_ptr, UInt64(res))
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-            if res == -1 {
-                sddk_free_error(&error)
+            switch res {
+            case 0:
+                let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
+                let a = Array(buffer)
+                var new_array = [SyncSession]()
+                for session in a {
+                    let name = String(cString: session.name)
+                    let size = session.size
+                    let ti = (session.date / UInt64(1000))
+                    let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
+                    let id = session.folder_id
+                    let new_session = SyncSession(name: name, size: size, date: date, folder_id: id)
+                    new_array.append(new_session)
+                }
+                self.sessions = new_array
+                queue.async { success(new_array) }
+            default:
+               let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
             }
         }
-        switch res {
-        case 0:
-            let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
-            let a = Array(buffer)
-            var new_array = [SyncSession]()
-            for session in a {
-                let name = String(cString: session.name)
-                let size = session.size
-                let ti = (session.date / UInt64(1000))
-                let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
-                let id = session.folder_id
-                let new_session = SyncSession(name: name, size: size, date: date, folder_id: id)
-                new_array.append(new_session)
-            }
-            self.sessions = new_array
-            success(sessions)
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
-        }
-        
 
     }
     
     public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
-    
-        var error: UnsafeMutablePointer<SDDKError>? = nil
         
         DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+
             let res = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
@@ -469,19 +505,21 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                success()
+                queue.async { success() }
             default:
-                failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
             }
         }
 
     }
     
     public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
-
-        var error: UnsafeMutablePointer<SDDKError>? = nil
         
         DispatchQueue.global(priority: .default).async {
+        
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+
             let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, destination.path, { (context, total, current, percent, tick) in
                 // call back to Swift to report progress
             
@@ -495,9 +533,10 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                success()
+                queue.async { success() }
             default:
-                failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
             }
         }
 
@@ -508,27 +547,31 @@ public class SafeDriveSDK: NSObject {
     // SDAPI
     func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, withLog log: [String], completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
-        let description = error.localizedDescription
+        DispatchQueue.global(priority: .default).async {
         
-        let context = error.domain
-        
-        let sl = SDDKLogLinesFromLog(log: log)
-        
-        let sl_count = UInt64(log.count)
-        
-        var s_error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_report_error(clientVersion, os, uniqueClientId, description, context, sl, sl_count, &s_error)
-        defer {
-            if res == -1 {
-                sddk_free_error(&s_error)
+            let description = error.localizedDescription
+            
+            let context = error.domain
+            
+            let sl = SDDKLogLinesFromLog(log: log)
+            
+            let sl_count = UInt64(log.count)
+            
+            var s_error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_report_error(clientVersion, os, uniqueClientId, description, context, sl, sl_count, &s_error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&s_error)
+                }
             }
-        }
-        switch res {
-        case 0:
-            success()
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: s_error!.pointee))
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: s_error!.pointee)
+                queue.async { failure(e) }
+            }
         }
     }
     
@@ -537,19 +580,23 @@ public class SafeDriveSDK: NSObject {
     
     public func gc(completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_gc(self.state!, &error)
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
+        DispatchQueue.global(priority: .default).async {
+            
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_gc(self.state!, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
             }
-        }
-        switch res {
-        case 0:
-            return
-        default:
-            failure(SDKErrorFromSDDKError(sdkError: error!.pointee))
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
         }
     }
     
