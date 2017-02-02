@@ -372,7 +372,6 @@ impl From<::reqwest::Error> for SDAPIError {
 impl From<::serde_json::Error> for SDAPIError {
     fn from(e: ::serde_json::Error) -> SDAPIError {
         match e {
-            ::serde_json::Error::Io(err) => SDAPIError::IO(err),
             _ => SDAPIError::RequestFailed(Box::new(e))
         }
     }
