@@ -3,12 +3,6 @@
 use std;
 
 #[derive(Debug)]
-pub enum Configuration {
-    Staging,
-    Production
-}
-
-#[derive(Debug)]
 #[derive(Copy, Clone)]
 pub enum SyncVersion {
     Version0, // doesn't exist

@@ -25,7 +25,9 @@ use ::core::restore;
 use ::core::load_keys;
 use ::core::login;
 
-use ::models::{Configuration, RegisteredFolder, AccountStatus, AccountDetails, Notification};
+use ::constants::Configuration;
+
+use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification};
 
 use ::session::SyncSession;
 

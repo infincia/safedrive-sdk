@@ -24,8 +24,7 @@ use ::objc::runtime::{Class};
 
 // internal imports
 
-use ::models::{Configuration};
-use ::constants::SDGROUP_NAME;
+use ::constants::*;
 use ::error::SDError;
 
 pub fn generate_uuid() -> String {

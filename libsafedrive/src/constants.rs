@@ -1,3 +1,11 @@
+
+#[derive(Debug)]
+pub enum Configuration {
+    Staging,
+    Production
+}
+
+
 pub static DEBUG_STATISTICS: bool = true;
 
 

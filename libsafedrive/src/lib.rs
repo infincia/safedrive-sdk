@@ -7,8 +7,8 @@ pub mod core;
 pub mod models;
 pub mod error;
 pub mod keys;
+pub mod constants;
 
-mod constants;
 mod util;
 mod sdapi;
 mod state;
@@ -71,7 +71,7 @@ extern crate scopeguard;
 // global config, can only be set once at runtime
 
 lazy_static! {
-    static ref CONFIGURATION: std::sync::RwLock<models::Configuration> = std::sync::RwLock::new(models::Configuration::Production);
+    static ref CONFIGURATION: std::sync::RwLock<constants::Configuration> = std::sync::RwLock::new(constants::Configuration::Production);
 }
 
 lazy_static! {
