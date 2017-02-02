@@ -7,6 +7,7 @@ pub mod core;
 pub mod models;
 pub mod error;
 pub mod keys;
+pub mod keychain;
 pub mod constants;
 
 mod util;
