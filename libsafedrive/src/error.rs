@@ -115,6 +115,7 @@ impl From<Bip39Error> for CryptoError {
 pub enum SDError {
     Internal(String),
     IO(std::io::Error),
+    KeychainError(Box<std::error::Error + Send + Sync>),
     RequestFailure(Box<std::error::Error + Send + Sync>),
     NetworkFailure(Box<std::error::Error + Send + Sync>),
     Conflict(SDAPIError),
@@ -136,6 +137,7 @@ impl std::error::Error for SDError {
         match *self {
             SDError::Internal(ref message) => message,
             SDError::IO(ref err) => err.description(),
+            SDError::KeychainError(ref err) => err.description(),
             SDError::RequestFailure(ref err) => err.description(),
             SDError::NetworkFailure(ref err) => err.description(),
             SDError::Conflict(ref err) => err.description(),
@@ -158,6 +160,7 @@ impl std::error::Error for SDError {
         match *self {
             SDError::Internal(_) => None,
             SDError::IO(ref err) => Some(err),
+            SDError::KeychainError(ref err) => Some(&**err),
             SDError::RequestFailure(ref err) => Some(&**err),
             SDError::NetworkFailure(ref err) => Some(&**err),
             SDError::Conflict(ref err) => Some(err),
@@ -185,6 +188,9 @@ impl std::fmt::Display for SDError {
             },
             SDError::IO(ref err) => {
                 write!(f, "IO failure ({})", err)
+            },
+            SDError::KeychainError(ref err) => {
+                write!(f, "Keychain error ({})", err)
             },
             SDError::RequestFailure(ref err) => {
                 write!(f, "API request failed: {}", err)

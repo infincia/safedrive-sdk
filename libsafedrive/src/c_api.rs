@@ -229,6 +229,7 @@ pub enum SDDKErrorType {
     SyncAlreadyInProgress = 0x000E,
     RestoreAlreadyInProgress = 0x000F,
     ExceededRetries = 0x0010,
+    KeychainError = 0x0011,
 }
 
 #[derive(Debug)]
@@ -246,6 +247,9 @@ impl From<SDError> for SDDKError {
             },
             SDError::IO(_) => {
                 SDDKErrorType::IO
+            },
+            SDError::KeychainError(_) => {
+                SDDKErrorType::KeychainError
             },
             SDError::RequestFailure(_) => {
                 SDDKErrorType::RequestFailure
