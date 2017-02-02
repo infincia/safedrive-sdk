@@ -396,6 +396,7 @@ pub fn sync(token: &Token,
         let stream_length = md.len();
         let is_file = md.file_type().is_file();
         let is_dir = md.file_type().is_dir();
+        let is_symlink = md.file_type().is_symlink();
 
         // store metadata for directory or file
         let mut header = Header::new_ustar();
@@ -551,6 +552,13 @@ pub fn sync(token: &Token,
             }
         } else if is_dir {
             // folder
+            header.set_size(0); // hmac list size is zero when file has no actual data
+            let chunks: Vec<u8> = Vec::new();
+            let chunklist = BufReader::new(chunks.as_slice());
+            header.set_cksum();
+            ar.append(&header, chunklist).expect("failed to append folder to archive header");
+        } else if is_symlink {
+            // symlink
             header.set_size(0); // hmac list size is zero when file has no actual data
             let chunks: Vec<u8> = Vec::new();
             let chunklist = BufReader::new(chunks.as_slice());
