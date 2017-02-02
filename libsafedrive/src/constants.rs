@@ -15,7 +15,7 @@ static SD_WEB_DOMAIN_STAGING: &'static str = "staging.safedrive.io";
 static SD_API_DOMAIN_PRODUCTION: &'static str = "safedrive.io";
 static SD_API_DOMAIN_STAGING: &'static str = "staging.safedrive.io";
 
-pub static SDGROUP_NAME: &'static str = "group.io.safedrive.db";
+pub static SD_GROUP_NAME: &'static str = "group.io.safedrive.db";
 
 pub static HMAC_KEY_SIZE: usize = ::sodiumoxide::crypto::auth::KEYBYTES;
 pub static HMAC_SIZE: usize = ::sodiumoxide::crypto::auth::TAGBYTES;

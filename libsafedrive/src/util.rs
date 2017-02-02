@@ -80,7 +80,7 @@ pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -
 #[allow(non_snake_case)]
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     let NSFileManager_cls = Class::get("NSFileManager").unwrap();
-    let groupID = NSString::from_str(SDGROUP_NAME);
+    let groupID = NSString::from_str(::constants::SD_GROUP_NAME);
 
     let mut storage_path = unsafe {
         let fm: *mut NSObject = msg_send![NSFileManager_cls, new];
