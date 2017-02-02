@@ -28,12 +28,13 @@ scopeguard = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
+secret-service = "0.2.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
 interfaces = "*"
-
+security-framework = "*"
 
 [build-dependencies]
 rusty-cheddar = "*"
