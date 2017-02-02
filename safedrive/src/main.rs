@@ -62,8 +62,8 @@ use safedrive::core::get_app_directory;
 use safedrive::core::get_current_os;
 
 
-use safedrive::models::{RegisteredFolder, Configuration};
-
+use safedrive::models::{RegisteredFolder};
+use safedrive::constants::Configuration;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const NAME: &'static str = env!("CARGO_PKG_NAME");
