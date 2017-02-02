@@ -1,3 +1,4 @@
+use ::CONFIGURATION;
 
 #[derive(Debug)]
 pub enum Configuration {
@@ -20,3 +21,12 @@ pub static HMAC_SIZE: usize = ::sodiumoxide::crypto::auth::TAGBYTES;
 pub static SECRETBOX_KEY_SIZE: usize = ::sodiumoxide::crypto::secretbox::KEYBYTES;
 pub static SECRETBOX_NONCE_SIZE: usize = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
 pub static SECRETBOX_MAC_SIZE: usize = ::sodiumoxide::crypto::secretbox::MACBYTES;
+
+
+pub fn is_production() -> bool {
+    let c = CONFIGURATION.read().unwrap();
+    match *c {
+        Configuration::Staging => false,
+        Configuration::Production => true,
+    }
+}
