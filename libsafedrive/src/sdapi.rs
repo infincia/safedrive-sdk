@@ -65,11 +65,7 @@ impl<'a> APIEndpoint<'a> {
     }
 
     pub fn domain(&self) -> String {
-        let c = CONFIGURATION.read().unwrap();
-        match *c {
-            Configuration::Staging => SDAPIDOMAIN_STAGING.to_string(),
-            Configuration::Production => SDAPIDOMAIN_PRODUCTION.to_string(),
-        }
+        api_domain().to_string()
     }
 
     pub fn protocol(&self) -> String {
