@@ -315,12 +315,12 @@ pub fn sync(token: &Token,
     let folder_path = PathBuf::from(&folder.folderPath);
     let folder_name = &folder.folderName;
 
-    let flock = try!(FolderLock::new(&folder_path));
-    defer!({
+    //let flock = try!(FolderLock::new(&folder_path));
+    //defer!({
         // try to ensure the folder goes back to unlocked state, but if not there isn't anything
         // we can do about it
-        flock.unlock();
-    });
+        //flock.unlock();
+    //});
 
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
@@ -630,12 +630,12 @@ pub fn restore(token: &Token,
 
     let folder_name = &folder.folderName;
 
-    let flock = try!(FolderLock::new(&destination));
-    defer!({
+    //let flock = try!(FolderLock::new(&destination));
+    // defer!({
         // try to ensure the folder goes back to unlocked state, but if not there isn't anything
         // we can do about it
-        flock.unlock();
-    });
+        //flock.unlock();
+    //});
 
     let session_body = match read_session(token, folder_id, session_name, true) {
         Ok(session_data) => session_data,
