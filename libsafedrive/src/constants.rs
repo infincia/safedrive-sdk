@@ -24,6 +24,21 @@ pub static SECRETBOX_KEY_SIZE: usize = ::sodiumoxide::crypto::secretbox::KEYBYTE
 pub static SECRETBOX_NONCE_SIZE: usize = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
 pub static SECRETBOX_MAC_SIZE: usize = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
+// keychain constants
+
+static SD_ACCOUNT_CREDENTIAL_DOMAIN_PRODUCTION: &'static str = "safedrive.io";
+static SD_ACCOUNT_CREDENTIAL_DOMAIN_STAGING: &'static str = "staging.safedrive.io";
+
+static SD_SSH_CREDENTIAL_DOMAIN_PRODUCTION: &'static str = "ssh.safedrive.io";
+static SD_SSH_CREDENTIAL_DOMAIN_STAGING: &'static str = "staging.ssh.safedrive.io";
+
+static SD_AUTH_TOKEN_DOMAIN_PRODUCTION: &'static str = "session.safedrive.io";
+static SD_AUTH_TOKEN_DOMAIN_STAGING: &'static str = "staging.session.safedrive.io";
+
+static SD_RECOVERY_KEY_DOMAIN_PRODUCTION: &'static str = "recovery.safedrive.io";
+static SD_RECOVERY_KEY_DOMAIN_STAGING: &'static str = "staging.recovery.safedrive.io";
+
+
 
 pub fn is_production() -> bool {
     let c = CONFIGURATION.read().unwrap();
@@ -46,5 +61,37 @@ pub fn api_domain() -> &'static str {
         SD_API_DOMAIN_PRODUCTION
     } else {
         SD_API_DOMAIN_STAGING
+    }
+}
+
+pub fn token_domain() -> &'static str {
+    if is_production() {
+        SD_AUTH_TOKEN_DOMAIN_PRODUCTION
+    } else {
+        SD_AUTH_TOKEN_DOMAIN_STAGING
+    }
+}
+
+pub fn ssh_credential_domain() -> &'static str {
+    if is_production() {
+        SD_SSH_CREDENTIAL_DOMAIN_PRODUCTION
+    } else {
+        SD_SSH_CREDENTIAL_DOMAIN_STAGING
+    }
+}
+
+pub fn account_credential_domain() -> &'static str {
+    if is_production() {
+        SD_ACCOUNT_CREDENTIAL_DOMAIN_PRODUCTION
+    } else {
+        SD_ACCOUNT_CREDENTIAL_DOMAIN_STAGING
+    }
+}
+
+pub fn recovery_key_domain() -> &'static str {
+    if is_production() {
+        SD_RECOVERY_KEY_DOMAIN_PRODUCTION
+    } else {
+        SD_RECOVERY_KEY_DOMAIN_STAGING
     }
 }
