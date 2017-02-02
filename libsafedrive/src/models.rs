@@ -2,54 +2,10 @@
 
 use std;
 
-use ::rustc_serialize::hex::{ToHex};
-
-
 #[derive(Debug)]
 pub enum Configuration {
     Staging,
     Production
-}
-
-#[derive(Debug)]
-pub enum FolderLock {
-    Unlocked,
-    Sync,
-    Restore,
-}
-
-impl AsRef<[u8]> for FolderLock {
-    fn as_ref(&self) -> &'static [u8] {
-        match *self {
-            FolderLock::Unlocked => br"00",
-            FolderLock::Sync => br"01",
-            FolderLock::Restore => br"02",
-        }
-    }
-}
-
-impl<'a> From<&'a str> for FolderLock {
-    fn from(r: &str) -> FolderLock {
-        match r {
-            "00" => FolderLock::Unlocked,
-            "01" => FolderLock::Sync,
-            "02" => FolderLock::Restore,
-            _ => panic!("invalid folder lock state"),
-        }
-    }
-}
-
-impl<'a> From<Vec<u8>> for FolderLock {
-    fn from(v: Vec<u8>) -> FolderLock {
-        let s = v.to_hex();
-
-        match s.as_str() {
-            "00" => FolderLock::Unlocked,
-            "01" => FolderLock::Sync,
-            "02" => FolderLock::Restore,
-            _ => panic!("invalid folder lock state"),
-        }
-    }
 }
 
 #[derive(Debug)]

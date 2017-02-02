@@ -16,6 +16,7 @@ mod binformat;
 mod cache;
 mod block;
 mod session;
+mod lock;
 
 // external crates
 
