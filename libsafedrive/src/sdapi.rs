@@ -15,7 +15,6 @@ use ::block::*;
 use ::session::*;
 use ::keys::*;
 use ::constants::*;
-use ::CONFIGURATION;
 
 
 
