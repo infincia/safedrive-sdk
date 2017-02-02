@@ -9,7 +9,6 @@ use ::rustc_serialize::hex::{ToHex};
 
 // internal imports
 
-use ::util::*;
 use ::error::SDAPIError;
 use ::models::*;
 use ::block::*;
