@@ -9,6 +9,7 @@ use ::rustc_serialize::hex::{FromHexError};
 pub enum KeychainError {
     KeychainUnavailable,
     KeychainItemMissing,
+    KeychainInsertFailed(Box<std::error::Error + Send + Sync>),
 }
 
 impl std::fmt::Display for KeychainError {
@@ -20,6 +21,9 @@ impl std::fmt::Display for KeychainError {
             KeychainError::KeychainItemMissing => {
                 write!(f, "Keychain item missing")
             },
+            KeychainError::KeychainInsertFailed(ref err) => {
+                write!(f, "Keychain insert failed: {}", err)
+            },
         }
     }
 }
@@ -30,6 +34,8 @@ impl std::error::Error for KeychainError {
         match *self {
             KeychainError::KeychainUnavailable => "keychain unavailable",
             KeychainError::KeychainItemMissing => "keychain item missing",
+            KeychainError::KeychainInsertFailed(ref err) => err.description(),
+
         }
     }
 
@@ -37,6 +43,7 @@ impl std::error::Error for KeychainError {
         match *self {
             KeychainError::KeychainUnavailable => None,
             KeychainError::KeychainItemMissing => None,
+            KeychainError::KeychainInsertFailed(ref err) => Some(&**err),
         }
     }
 }
