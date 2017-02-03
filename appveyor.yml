@@ -85,7 +85,7 @@ deploy:
     # channel to use to produce the release artifacts
     # NOTE make sure you only release *once* per target
     # TODO you may want to pick a different channel
-    CHANNEL: nightly
+    CHANNEL: beta
     appveyor_repo_tag: true
 
 branches:
