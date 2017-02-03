@@ -72,6 +72,20 @@ pub fn get_current_os() -> &'static str {
     ::util::get_current_os()
 }
 
+pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
+    match ::keychain::get_keychain_item(account, service) {
+        Ok(i) => Ok(i),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
+pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, secret: &str) -> Result<(), SDError> {
+    match ::keychain::set_keychain_item(account, service, secret) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
 // internal functions
 
 pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration) {

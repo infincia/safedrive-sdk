@@ -16,7 +16,7 @@ use ::secret_service::EncryptionType;
 
 // internal imports
 
-use ::error::{SDError, KeychainError};
+use ::error::KeychainError;
 use ::constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain};
 
 // keychain types
@@ -89,7 +89,7 @@ impl KeychainService {
 // get
 
 #[cfg(target_os = "macos")]
-pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, SDError> {
+pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
     let mut i = ::security_framework::item::ItemSearchOptions::new();
 
     i.class(service.content_type());
@@ -103,7 +103,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
         Err(e) => {
             debug!("{}", e);
 
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
+            return Err(KeychainError::KeychainItemMissing)
         }
     };
 
@@ -113,16 +113,16 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
                 println!("ref: {:?}", reference);
             },
             None => {
-                return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
+                return Err(KeychainError::KeychainItemMissing)
             }
         }
     }
     // need generic password support in security-framework to grab these easily
-    Err(SDError::Internal("not implemented".to_string()))
+    Err(KeychainError::KeychainUnavailable)
 }
 
 #[cfg(target_os = "linux")]
-pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, SDError> {
+pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
     let service_name = format!("{}", service);
 
     // initialize secret service (dbus connection and encryption session)
@@ -131,7 +131,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
         Err(e) => {
             debug!("{}", e);
 
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
+            return Err(KeychainError::KeychainUnavailable)
         }
     };
 
@@ -141,7 +141,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
         Err(e) => {
             debug!("{}", e);
 
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
+            return Err(KeychainError::KeychainUnavailable)
         }
     };
 
@@ -153,7 +153,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
         Err(e) => {
             debug!("{}", e);
 
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
+            return Err(KeychainError::KeychainItemMissing)
         },
 
     };
@@ -162,7 +162,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
     let item = match search_items.get(0) {
         Some(i) => i,
         None => {
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
+            return Err(KeychainError::KeychainItemMissing)
         },
 
     };
@@ -171,7 +171,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
     let secret = match item.get_secret() {
         Some(s) => s,
         None => {
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
+            return Err(KeychainError::KeychainItemMissing)
         },
     };
 
@@ -179,20 +179,20 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 }
 
 #[cfg(target_os = "windows")]
-pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, SDError> {
-    Err(SDError::Internal("not implemented".to_string()))
+pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
+    Err(KeychainError::KeychainUnavailable)
 }
 
 
 // store
 
 #[cfg(target_os = "macos")]
-pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), SDError> {
-    Err(SDError::Internal("not implemented".to_string()))
+pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
+    Err(KeychainError::KeychainUnavailable)
 }
 
 #[cfg(target_os = "linux")]
-pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), SDError> {
+pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
     let service_name = format!("{}", service);
 
     // initialize secret service (dbus connection and encryption session)
@@ -201,7 +201,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
         Err(e) => {
             debug!("{}", e);
 
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
+            return Err(KeychainError::KeychainUnavailable)
         }
     };
 
@@ -211,7 +211,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
         Err(e) => {
             debug!("{}", e);
 
-            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
+            return Err(KeychainError::KeychainUnavailable)
         }
     };
 
@@ -224,13 +224,17 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
         service.content_type() // secret content type
     ) {
         Ok(res) => { return Ok(())},
-        Err(e) => { return Err(SDError::KeychainError(Box::new(e)))}
+        Err(e) => {
+            debug!("{}", e);
+
+            return Err(KeychainError::KeychainInsertFailed(Box::new(e)))
+        }
     }
 }
 
 #[cfg(target_os = "windows")]
-pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), SDError> {
-    Err(SDError::Internal("not implemented".to_string()))
+pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
+    Err(KeychainError::KeychainUnavailable)
 }
 
 
