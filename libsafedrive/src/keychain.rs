@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
+#![cfg(feature = "keychain")]
 
 use std;
 

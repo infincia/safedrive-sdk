@@ -7,7 +7,10 @@ pub mod core;
 pub mod models;
 pub mod error;
 pub mod keys;
+
+#[cfg(feature = "keychain")]
 pub mod keychain;
+
 pub mod constants;
 
 mod util;
@@ -42,6 +45,8 @@ extern crate interfaces;
 #[cfg(target_os = "linux")]
 extern crate openssl;
 
+#[cfg(feature = "keychain")]
+#[cfg(feature = "linux-keychain")]
 #[cfg(target_os = "linux")]
 extern crate secret_service;
 
@@ -53,6 +58,8 @@ extern crate objc_foundation;
 extern crate objc;
 
 #[cfg(target_os = "macos")]
+#[cfg(feature = "keychain")]
+#[cfg(feature = "mac-keychain")]
 extern crate security_framework;
 
 #[macro_use]

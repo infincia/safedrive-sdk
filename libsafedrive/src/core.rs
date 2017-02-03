@@ -72,6 +72,7 @@ pub fn get_current_os() -> &'static str {
     ::util::get_current_os()
 }
 
+#[cfg(feature = "keychain")]
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
     match ::keychain::get_keychain_item(account, service) {
         Ok(i) => Ok(i),
@@ -79,6 +80,7 @@ pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) ->
     }
 }
 
+#[cfg(feature = "keychain")]
 pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, secret: &str) -> Result<(), SDError> {
     match ::keychain::set_keychain_item(account, service, secret) {
         Ok(()) => Ok(()),

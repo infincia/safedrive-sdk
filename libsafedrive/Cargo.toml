@@ -29,13 +29,15 @@ parking_lot = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
-secret-service = "0.2.0"
+secret-service = { version = "0.2.0", optional = true }
+
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
 interfaces = "*"
-security-framework = "*"
+security-framework = { version = "*", optional = true }
+
 
 [build-dependencies]
 rusty-cheddar = "*"
@@ -44,3 +46,11 @@ rusty-cheddar = "*"
 name = "safedrive"
 crate-type = ["lib", "staticlib", "cdylib"]
 doctest = false
+
+[features]
+default = []
+
+keychain = []
+mac-keychain = ["security-framework"]
+linux-keychain = ["secret-service"]
+windows-keychain = []
