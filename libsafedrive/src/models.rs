@@ -64,7 +64,7 @@ pub struct CreateFolderBody<'a> {
 // responses
 
 //private final String token
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token {
     pub token: String,
 }

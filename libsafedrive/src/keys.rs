@@ -41,7 +41,7 @@ impl KeyType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WrappedKeyset {
     recovery: Option<String>,
     pub master: WrappedKey,
@@ -118,7 +118,7 @@ impl From<WrappedKeysetBody> for WrappedKeyset {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Keyset {
     pub recovery: String,
     pub master: Key,
@@ -133,7 +133,7 @@ impl Keyset {
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WrappedKey {
     pub bytes: Vec<u8>,
     pub key_type: KeyType
@@ -179,7 +179,7 @@ impl ToHex for WrappedKey {
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Key {
     pub bytes: Vec<u8>,
     pub key_type: KeyType
