@@ -74,6 +74,7 @@ extern crate nom;
 #[macro_use]
 extern crate lazy_static;
 
+#[cfg(feature = "locking")]
 #[macro_use(defer)]
 extern crate scopeguard;
 

@@ -24,7 +24,10 @@ use ::block::*;
 use ::constants::*;
 use ::sdapi::*;
 use ::keys::*;
+
+#[cfg(feature = "locking")]
 use ::lock::{FolderLock};
+
 use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 use ::CACHE_DIR;
@@ -331,12 +334,15 @@ pub fn sync(token: &Token,
     let folder_path = PathBuf::from(&folder.folderPath);
     let folder_name = &folder.folderName;
 
-    //let flock = try!(FolderLock::new(&folder_path));
-    //defer!({
+    #[cfg(feature = "locking")]
+    let flock = try!(FolderLock::new(&folder_path));
+
+    #[cfg(feature = "locking")]
+    defer!({
         // try to ensure the folder goes back to unlocked state, but if not there isn't anything
         // we can do about it
-        //flock.unlock();
-    //});
+        flock.unlock();
+    });
 
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
@@ -654,12 +660,15 @@ pub fn restore(token: &Token,
 
     let folder_name = &folder.folderName;
 
-    //let flock = try!(FolderLock::new(&destination));
-    // defer!({
+    #[cfg(feature = "locking")]
+    let flock = try!(FolderLock::new(&destination));
+
+    #[cfg(feature = "locking")]
+    defer!({
         // try to ensure the folder goes back to unlocked state, but if not there isn't anything
         // we can do about it
-        //flock.unlock();
-    //});
+        flock.unlock();
+    });
 
     let session_body = match read_session(token, folder_id, session_name, true) {
         Ok(session_data) => session_data,

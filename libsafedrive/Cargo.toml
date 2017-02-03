@@ -50,6 +50,7 @@ doctest = false
 [features]
 default = []
 
+locking = []
 keychain = []
 mac-keychain = ["security-framework"]
 linux-keychain = ["secret-service"]
