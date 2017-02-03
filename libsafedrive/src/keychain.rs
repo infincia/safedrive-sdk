@@ -169,13 +169,19 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 
     // retrieve secret from item
     let secret = match item.get_secret() {
-        Some(s) => s,
-        None => {
+        Ok(s) => s,
+        Err(e) => {
+            debug!("{}", e);
+
             return Err(KeychainError::KeychainItemMissing)
         },
     };
+    let s = match String::from_utf8(secret) {
+        Ok(s) => s,
+        Err(e) => return Err(KeychainError::KeychainItemMissing)
+    };
 
-    Ok(format!("{}", secret))
+    Ok(s)
 }
 
 #[cfg(target_os = "windows")]
@@ -217,7 +223,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
 
     //create new item
     match collection.create_item(
-        format!("safedrive"), // label
+        &format!("safedrive"), // label
         vec![("account", account), ("service", &service_name)], // properties
         secret.as_bytes(), //secret
         true, // replace item with same attributes

@@ -9,7 +9,7 @@ use ::rustc_serialize::hex::{FromHexError};
 pub enum KeychainError {
     KeychainUnavailable,
     KeychainItemMissing,
-    KeychainInsertFailed(Box<std::error::Error + Send + Sync>),
+    KeychainInsertFailed(Box<std::error::Error>),
 }
 
 impl std::fmt::Display for KeychainError {
