@@ -452,7 +452,12 @@ fn main() {
                    &keyset.hmac,
                    &keyset.tweak,
                    folder.id,
-                   &mut |total, current, new, progress_percent, tick| {
+                   &mut |total, current, new, progress_percent, tick, message| {
+                       if message.len() > 0 {
+                           let message = format!("Stalled: ");
+
+                           pb.message(&message);
+                       }
                        if tick {
                            pb.tick();
                        } else {
@@ -461,7 +466,7 @@ fn main() {
                        }
                    }
         ) {
-            Ok(_) => { pb.finish(); return },
+            Ok(_) => { pb.finish_print("Sync finished\n"); return },
             Err(e) => {
                 error!("Sync error: {}", e);
                 std::process::exit(1);
@@ -506,7 +511,12 @@ fn main() {
                       &keyset.main,
                       folder.id,
                       pa,
-                      &mut |total, current, new, progress_percent, tick| {
+                      &mut |total, current, new, progress_percent, tick, message| {
+                          if message.len() > 0 {
+                              let message = format!("Stalled: ");
+
+                              pb.message(&message);
+                          }
                           if tick {
                               pb.tick();
                           } else {
@@ -515,7 +525,7 @@ fn main() {
                           }
                       }
         ) {
-            Ok(_) => { pb.finish(); return },
+            Ok(_) => { pb.finish_print("Restore finished\n"); return },
             Err(e) => {
                 error!("Restore error: {}", e);
                 std::process::exit(1);
