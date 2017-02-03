@@ -158,7 +158,7 @@ impl From<Bip39Error> for CryptoError {
 pub enum SDError {
     Internal(String),
     IO(std::io::Error),
-    KeychainError(Box<std::error::Error + Send + Sync>),
+    KeychainError(KeychainError),
     RequestFailure(Box<std::error::Error + Send + Sync>),
     NetworkFailure(Box<std::error::Error + Send + Sync>),
     Conflict(SDAPIError),
@@ -203,7 +203,7 @@ impl std::error::Error for SDError {
         match *self {
             SDError::Internal(_) => None,
             SDError::IO(ref err) => Some(err),
-            SDError::KeychainError(ref err) => Some(&**err),
+            SDError::KeychainError(ref err) => Some(err),
             SDError::RequestFailure(ref err) => Some(&**err),
             SDError::NetworkFailure(ref err) => Some(&**err),
             SDError::Conflict(ref err) => Some(err),
