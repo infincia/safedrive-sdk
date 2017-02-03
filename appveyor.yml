@@ -23,14 +23,14 @@ environment:
     #  ESCRIPT: v120_xp.bat
     #  LINKTYPE: mt
     - TARGET: i686-pc-windows-msvc
-      CHANNEL: nightly
+      CHANNEL: beta
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
       ESCRIPT: v120_xp.bat
       LINKTYPE: dll
     - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: nightly
+      CHANNEL: beta
       ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
