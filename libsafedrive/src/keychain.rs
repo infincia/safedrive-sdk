@@ -314,7 +314,7 @@ fn get_recovery_phrase() {
 fn set_ssh_username() {
     let ssh_username = "ABCDEF";
 
-    match set_keychain_item("user@safedrive.io", KeychainService::SSHPassphrase, ssh_username) {
+    match set_keychain_item("user@safedrive.io", KeychainService::SSHUsername, ssh_username) {
         Ok(()) => {},
         Err(_) => { assert!(true == false); return }
     };
@@ -324,11 +324,11 @@ fn set_ssh_username() {
 fn get_ssh_username() {
     let ssh_username = "ABCDEF";
 
-    match set_keychain_item("user@safedrive.io", KeychainService::SSHPassphrase, ssh_username) {
+    match set_keychain_item("user@safedrive.io", KeychainService::SSHUsername, ssh_username) {
         Ok(()) => {},
         Err(_) => { assert!(true == false); return }
     };
-    match get_keychain_item("user@safedrive.io", KeychainService::SSHPassphrase) {
+    match get_keychain_item("user@safedrive.io", KeychainService::SSHUsername) {
         Ok(p) => p,
         Err(_) => { assert!(true == false); return }
     };
