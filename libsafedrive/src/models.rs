@@ -27,39 +27,7 @@ impl AsRef<[u8]> for SyncVersion {
 
 // request bodies
 
-#[derive(Serialize, Debug)]
-pub struct ErrorLogBody<'a> {
-    pub operatingSystem: &'a str,
-    pub uniqueClientId: &'a str,
-    pub clientVersion: &'a str,
-    pub description: &'a str,
-    pub context: &'a str,
-    pub log: &'a [&'a str],
-}
 
-#[derive(Serialize, Debug)]
-pub struct RegisterClientBody<'a> {
-    pub operatingSystem: &'a str,
-    pub email: &'a str,
-    pub password: &'a str,
-    pub language: &'a str,
-    pub uniqueClientId: &'a str
-}
-
-#[derive(Serialize, Debug)]
-pub struct AccountKeyBody<'a> {
-    pub master: &'a str,
-    pub main: &'a str,
-    pub hmac: &'a str,
-    pub tweak: &'a str
-}
-
-#[derive(Serialize, Debug)]
-pub struct CreateFolderBody<'a> {
-    pub folderName: &'a str,
-    pub folderPath: &'a str,
-    pub encrypted: bool
-}
 
 // responses
 

@@ -24,23 +24,24 @@ header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type") => [String] }
 header! { (ContentLength, "Content-Length") => [usize] }
 
+#[derive(Serialize, Debug)]
+#[serde(untagged)]
 pub enum APIEndpoint<'a> {
     ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str] },
-
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
-    AccountStatus { token: &'a Token },
-    AccountDetails { token: &'a Token },
-    AccountKey { token: &'a Token, master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
-    ReadFolders { token: &'a Token },
-    CreateFolder { token: &'a Token, path: &'a str, name: &'a str, encrypted: bool },
-    DeleteFolder { token: &'a Token, folder_id: u64 },
-    RegisterSyncSession { token: &'a Token, folder_id: u64, name: &'a str, encrypted: bool },
-    FinishSyncSession { token: &'a Token, folder_id: u64, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
-    ReadSyncSession { token: &'a Token, name: &'a str, encrypted: bool },
-    ReadSyncSessions { token: &'a Token, encrypted: bool },
-    CheckBlock { token: &'a Token, name: &'a str },
-    WriteBlock { token: &'a Token, session: &'a str, name: &'a str },
-    ReadBlock { token: &'a Token, name: &'a str },
+    AccountStatus,
+    AccountDetails,
+    AccountKey { master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
+    ReadFolders,
+    CreateFolder { folderPath: &'a str, folderName: &'a str, encrypted: bool },
+    DeleteFolder { folder_id: u64 },
+    RegisterSyncSession { folder_id: u64, name: &'a str, encrypted: bool },
+    FinishSyncSession { folder_id: u64, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
+    ReadSyncSession { name: &'a str, encrypted: bool },
+    ReadSyncSessions { encrypted: bool },
+    CheckBlock { name: &'a str },
+    WriteBlock { session: &'a str, name: &'a str },
+    ReadBlock { name: &'a str },
 
 }
 
@@ -80,16 +81,16 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::RegisterClient { .. } => {
                 ::reqwest::Method::Post
             },
-            APIEndpoint::AccountStatus { .. } => {
+            APIEndpoint::AccountStatus => {
                 ::reqwest::Method::Get
             },
-            APIEndpoint::AccountDetails { .. } => {
+            APIEndpoint::AccountDetails => {
                 ::reqwest::Method::Get
             },
             APIEndpoint::AccountKey { .. } => {
                 ::reqwest::Method::Post
             },
-            APIEndpoint::ReadFolders { .. } => {
+            APIEndpoint::ReadFolders => {
                 ::reqwest::Method::Get
             },
             APIEndpoint::CreateFolder { .. } => {
@@ -130,16 +131,16 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::RegisterClient { .. } => {
                 format!("/api/1/client/register")
             },
-            APIEndpoint::AccountStatus { .. } => {
+            APIEndpoint::AccountStatus => {
                 format!("/api/1/account/status")
             },
-            APIEndpoint::AccountDetails { .. } => {
+            APIEndpoint::AccountDetails => {
                 format!("/api/1/account/details")
             },
             APIEndpoint::AccountKey { .. } => {
                 format!("/api/1/account/key")
             },
-            APIEndpoint::ReadFolders { .. } => {
+            APIEndpoint::ReadFolders => {
                 format!("/api/1/folder")
             },
             APIEndpoint::CreateFolder { .. } => {
@@ -181,14 +182,13 @@ impl<'a> APIEndpoint<'a> {
 pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operatingSystem: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
-    let body = ErrorLogBody { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
 
     let user_agent = &**CLIENT_VERSION.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .header(UserAgent(user_agent.to_string()))
-        .json(&body);
+        .json(&endpoint);
 
     let mut result = try!(request.send());
 
@@ -209,14 +209,13 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
 pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<Token, SDAPIError> {
 
     let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
-    let body = RegisterClientBody { operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
 
     let user_agent = &**CLIENT_VERSION.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .header(UserAgent(user_agent.to_string()))
-        .json(&body);
+        .json(&endpoint);
 
     let mut result = try!(request.send());
 
@@ -240,7 +239,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
 }
 
 pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
-    let endpoint = APIEndpoint::AccountStatus { token: token };
+    let endpoint = APIEndpoint::AccountStatus;
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -273,7 +272,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 
 #[allow(dead_code)]
 pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
-    let endpoint = APIEndpoint::AccountDetails { token: token };
+    let endpoint = APIEndpoint::AccountDetails;
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -304,14 +303,13 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
 pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<WrappedKeyset, SDAPIError> {
 
-    let endpoint = APIEndpoint::AccountKey { token: token, master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
-    let body = AccountKeyBody { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
+    let endpoint = APIEndpoint::AccountKey { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
 
     let user_agent = &**CLIENT_VERSION.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
-        .json(&body)
+        .json(&endpoint)
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -337,7 +335,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
 
 pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> {
 
-    let endpoint = APIEndpoint::ReadFolders { token: token };
+    let endpoint = APIEndpoint::ReadFolders;
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -368,14 +366,13 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
 pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted: bool) -> Result<u64, SDAPIError> {
 
-    let endpoint = APIEndpoint::CreateFolder { token: token, path: path, name: name, encrypted: encrypted };
-    let body = CreateFolderBody { folderName: name, folderPath: path, encrypted: encrypted };
+    let endpoint = APIEndpoint::CreateFolder { folderPath: path, folderName: name, encrypted: encrypted };
 
     let user_agent = &**CLIENT_VERSION.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
-        .json(&body)
+        .json(&endpoint)
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -400,7 +397,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
 }
 
 pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
-    let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
+    let endpoint = APIEndpoint::DeleteFolder { folder_id: folder_id };
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -431,7 +428,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
 
 pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<SyncSession>>>, SDAPIError> {
 
-    let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
+    let endpoint = APIEndpoint::ReadSyncSessions { encrypted: true };
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -462,7 +459,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
 pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted };
+    let endpoint = APIEndpoint::RegisterSyncSession { folder_id: folder_id, name: name, encrypted: encrypted };
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -492,7 +489,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
 
 pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::FinishSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
+    let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
 
     let (body, content_length, boundary) = multipart_for_bytes(session_data, name);
 
@@ -526,7 +523,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 }
 
 pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
-    let endpoint = APIEndpoint::ReadSyncSession { token: token, name: name, encrypted: encrypted };
+    let endpoint = APIEndpoint::ReadSyncSession { name: name, encrypted: encrypted };
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -557,7 +554,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 #[allow(dead_code)]
 pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError> {
 
-    let endpoint = APIEndpoint::CheckBlock { token: token, name: name };
+    let endpoint = APIEndpoint::CheckBlock { name: name };
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -586,7 +583,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 
 pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBlock, should_upload: bool) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session };
+    let endpoint = APIEndpoint::WriteBlock { name: name, session: session };
 
     let user_agent = &**CLIENT_VERSION.read();
 
@@ -622,7 +619,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
 }
 
 pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIError> {
-    let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
+    let endpoint = APIEndpoint::ReadBlock { name: name };
 
     let user_agent = &**CLIENT_VERSION.read();
 
