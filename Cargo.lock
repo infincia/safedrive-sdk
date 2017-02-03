@@ -2,15 +2,15 @@
 name = "safedrived"
 version = "0.3.16"
 dependencies = [
- "clap 2.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clap 2.20.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsafedrive 0.3.16",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 0.9.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-core 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-inotify 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -140,7 +140,7 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "2.20.1"
+version = "2.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ansi_term 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -403,9 +403,9 @@ dependencies = [
  "scopeguard 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "secret-service 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "security-framework 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 0.9.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "sodiumoxide 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "tar 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -789,8 +789,8 @@ dependencies = [
  "hyper 0.10.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper-native-tls 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 0.9.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_urlencoded 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -853,16 +853,16 @@ dependencies = [
 name = "safedrive"
 version = "0.3.16"
 dependencies = [
- "clap 2.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clap 2.20.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsafedrive 0.3.16",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pbr 1.0.0-alpha.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 0.9.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -947,12 +947,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "serde"
-version = "0.9.5"
+version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "serde_codegen_internals"
-version = "0.12.1"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "syn 0.11.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -960,23 +960,23 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "0.9.5"
+version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "quote 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_codegen_internals 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_codegen_internals 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "syn 0.11.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "serde_json"
-version = "0.9.4"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "dtoa 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "itoa 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -986,7 +986,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "dtoa 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "itoa 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1007,7 +1007,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsodium-sys 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1345,7 +1345,7 @@ dependencies = [
 "checksum cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1a528d2f22b8d4919416388773048621a4dfd7c0cd652b6025dbe07265fc44ca"
 "checksum cfg-if 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de1e760d7b6535af4241fca8bd8adf68e2e7edacc6b29f5d399050c5e48cf88c"
 "checksum clap 1.5.5 (registry+https://github.com/rust-lang/crates.io-index)" = "a430ed980b54e5e6f5249d67abd1e9251e95a5491fafb33639e71c9608d23361"
-"checksum clap 2.20.1 (registry+https://github.com/rust-lang/crates.io-index)" = "73ec15755425b87a9766c3ef47000c01aae155266f9a4c2f1ffc962ee612863e"
+"checksum clap 2.20.2 (registry+https://github.com/rust-lang/crates.io-index)" = "bbca2757530dcef14db46b1da3a39d05ee7c161b85badfed1317ae29bf3a8830"
 "checksum core-foundation 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "25bfd746d203017f7d5cbd31ee5d8e17f94b6521c7af77ece6c9e4b2d4b16c67"
 "checksum core-foundation-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "065a5d7ffdcbc8fa145d6f0746f3555025b9097a9e9cda59f7467abae670c78d"
 "checksum crypt32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e34988f7e069e0b2f3bfc064295161e489b2d4e04a2e4248fb94360cdf00b4ec"
@@ -1433,10 +1433,10 @@ dependencies = [
 "checksum security-framework 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)" = "d7c1ff1c71e4e4474b46ded6687f0c28c721de2f5a05577e7f533d36330e4e3a"
 "checksum security-framework-sys 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)" = "5103c988054803538fe4d85333abf4c633f069510ab687dc71a50572104216d0"
 "checksum semver 0.1.20 (registry+https://github.com/rust-lang/crates.io-index)" = "d4f410fedcf71af0345d7607d246e7ad15faaadd49d240ee3b24e5dc21a820ac"
-"checksum serde 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)" = "4d8f810025e9d09c4eaa49c16eaf878f34a947889e878cd7d3b5bef3197cc119"
-"checksum serde_codegen_internals 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)" = "d582c270e85145985a3e1f578c8e02ff5e3e509bae0377351bf0fcb78c60877f"
-"checksum serde_derive 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fb6eef50123f9d4d917f50cc06fc88642228ca3b19482691907d4d6e94b4fcd1"
-"checksum serde_json 0.9.4 (registry+https://github.com/rust-lang/crates.io-index)" = "fea48f4d4df4e620e3c81fd2bf28c93dd0d266361a76bac4f254b71f0e13f3cd"
+"checksum serde 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)" = "0ae9a3c8b07c09dbe43022486d55a18c629a0618d2241e49829aaef9b6d862f9"
+"checksum serde_codegen_internals 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c3172bf2940b975c0e4f6ab42a511c0a4407d4f46ccef87a9d3615db5c26fa96"
+"checksum serde_derive 0.9.6 (registry+https://github.com/rust-lang/crates.io-index)" = "ecc6e0379ca933ece58302d2d3034443f06fbf38fd535857c1dc516195cbc3bf"
+"checksum serde_json 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)" = "cf37ce931677e98b4fa5e6469aaa3ab4b6228309ea33b1b22d3ec055adfc4515"
 "checksum serde_urlencoded 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a81f15da4b9780e1524697f73b09076b6e42298ef673bead9ca8f848b334ef84"
 "checksum slab 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "17b4fcaed89ab08ef143da37bc52adbcc04d4a69014f4c1208d6b51f0c47bc23"
 "checksum smallvec 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "fcc8d19212aacecf95e4a7a2179b26f7aeb9732a915cf01f05b0d3e044865410"
