@@ -13,7 +13,7 @@ use ::secret_service::EncryptionType;
 
 // internal imports
 
-use ::error::SDError;
+use ::error::{SDError, KeychainError};
 use ::constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain};
 
 // keychain types
@@ -98,7 +98,9 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
             v
         },
         Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+            debug!("{}", e);
+
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
         }
     };
 
@@ -108,7 +110,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
                 println!("ref: {:?}", reference);
             },
             None => {
-
+                return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
             }
         }
     }
@@ -124,7 +126,9 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
     let ss = match SecretService::new(EncryptionType::Dh) {
         Ok(ss) => ss,
         Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+            debug!("{}", e);
+
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
         }
     };
 
@@ -132,7 +136,9 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
     let collection = match ss.get_default_collection() {
         Ok(c) => c,
         Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+            debug!("{}", e);
+
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
         }
     };
 
@@ -142,27 +148,28 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
     ) {
         Ok(r) => r,
         Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+            debug!("{}", e);
+
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
         },
 
     };
 
 
     let item = match search_items.get(0) {
-        Ok(i) => i,
-        Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+        Some(i) => i,
+        None => {
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
         },
 
     };
 
     // retrieve secret from item
     let secret = match item.get_secret() {
-        Ok(s) => s,
-        Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+        Some(s) => s,
+        None => {
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainItemMissing)))
         },
-
     };
 
     Ok(format!("{}", secret))
@@ -189,7 +196,9 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
     let ss = match SecretService::new(EncryptionType::Dh) {
         Ok(ss) => ss,
         Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+            debug!("{}", e);
+
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
         }
     };
 
@@ -197,7 +206,9 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
     let collection = match ss.get_default_collection() {
         Ok(c) => c,
         Err(e) => {
-            return Err(SDError::KeychainError(Box::new(e)))
+            debug!("{}", e);
+
+            return Err(SDError::KeychainError(Box::new(KeychainError::KeychainUnavailable)))
         }
     };
 
