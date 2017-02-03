@@ -15,10 +15,11 @@ use ::block::*;
 use ::session::*;
 use ::keys::*;
 use ::constants::*;
+use ::CLIENT_VERSION;
 
 
 
-
+header! { (UserAgent, "User-Agent") => [String] }
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type") => [String] }
 header! { (ContentLength, "Content-Length") => [usize] }
@@ -182,8 +183,11 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
     let body = ErrorLogBody { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .json(&body);
 
     let mut result = try!(request.send());
@@ -207,8 +211,11 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
     let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
     let body = RegisterClientBody { operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .json(&body);
 
     let mut result = try!(request.send());
@@ -237,8 +244,11 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
 pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let endpoint = APIEndpoint::AccountStatus { token: token };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -267,8 +277,11 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails { token: token };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -296,9 +309,12 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     let endpoint = APIEndpoint::AccountKey { token: token, master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
     let body = AccountKeyBody { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .json(&body)
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -325,8 +341,11 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
     let endpoint = APIEndpoint::ReadFolders { token: token };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -354,9 +373,12 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     let endpoint = APIEndpoint::CreateFolder { token: token, path: path, name: name, encrypted: encrypted };
     let body = CreateFolderBody { folderName: name, folderPath: path, encrypted: encrypted };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .json(&body)
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -382,8 +404,11 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
 pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteFolder { token: token, folder_id: folder_id };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -410,8 +435,11 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
     let endpoint = APIEndpoint::ReadSyncSessions { token: token, encrypted: true };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -438,8 +466,11 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
 
     let endpoint = APIEndpoint::RegisterSyncSession { token: token, folder_id: folder_id, name: name, encrypted: encrypted };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -469,9 +500,12 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     //debug!("body: {}", String::from_utf8_lossy(&body));
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .body(body)
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()))
         .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
         .header(ContentLength(content_length));
@@ -496,10 +530,12 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
     let endpoint = APIEndpoint::ReadSyncSession { token: token, name: name, encrypted: encrypted };
 
+    let user_agent = &**CLIENT_VERSION.read();
 
     let client = ::reqwest::Client::new().unwrap();
 
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -525,9 +561,12 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 
     let endpoint = APIEndpoint::CheckBlock { token: token, name: name };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
 
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
@@ -551,8 +590,11 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
 
     let endpoint = APIEndpoint::WriteBlock { token: token, name: name, session: session };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
         let (body, content_length, boundary) = multipart_for_bytes(block.wrapped_data.as_slice(), name);
@@ -584,8 +626,11 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
 pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { token: token, name: name };
 
+    let user_agent = &**CLIENT_VERSION.read();
+
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
     let mut result = try!(request.send());
