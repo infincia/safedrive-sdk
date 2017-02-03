@@ -14,6 +14,7 @@ extern crate serde_json;
 use std::str;
 use std::ffi::{OsStr};
 use std::fs::File;
+use std::thread;
 
 #[cfg(target_os = "linux")]
 use std::env;
@@ -27,6 +28,7 @@ use clap::{Arg, App, SubCommand};
 extern crate rpassword;
 
 extern crate pbr;
+use self::pbr::MultiBar;
 use self::pbr::ProgressBar;
 use self::pbr::Units;
 
@@ -366,36 +368,61 @@ fn main() {
         };
         let encrypted_folders: Vec<RegisteredFolder> = folder_list.into_iter().filter(|f| f.encrypted).collect();
 
-        for folder in encrypted_folders {
-            println!("Syncing {}", folder.folderName);
+        let mut mb = MultiBar::new();
+        mb.println("Syncing all folders");
 
-            let mut pb = ProgressBar::new(0);
+        for folder in encrypted_folders {
+            let mut pb = mb.create_bar(0);
+
+            let message = format!("{}: ", folder.folderName);
+            pb.message(&message);
+
             pb.format("╢▌▌░╟");
             pb.set_units(Units::Bytes);
             let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+            let local_token = token.clone();
+            let local_main = keyset.main.clone();
+            let local_hmac = keyset.hmac.clone();
+            let local_tweak = keyset.tweak.clone();
+            let local_folder_name = folder.folderName.clone();
 
-            match sync(&token,
-                       &sync_uuid,
-                       &keyset.main,
-                       &keyset.hmac,
-                       &keyset.tweak,
-                       folder.id,
-                       &mut |total, current, new, progress_percent, tick| {
-                           if tick {
-                               pb.tick();
-                           } else {
-                               pb.total = total as u64;
-                               pb.add(new as u64);
+            let t = thread::spawn(move || {
+                match sync(&local_token,
+                           &sync_uuid,
+                           &local_main,
+                           &local_hmac,
+                           &local_tweak,
+                           folder.id,
+                           &mut |total, current, new, progress_percent, tick, message| {
+                               if message.len() > 0 {
+                                   let message = format!("Stalled: ");
+                                   pb.message(&message);
+                               } else {
+                                   let message = format!("{}: ", local_folder_name);
+                                   pb.message(&message);
+                               }
+                               if tick {
+                                   pb.tick();
+                               } else {
+                                   pb.total = total as u64;
+                                   pb.add(new as u64);
+                               }
                            }
-                       }
-            ) {
-                Ok(_) => { pb.finish(); return },
-                Err(e) => {
-                    error!("Sync error: {}", e);
-                    std::process::exit(1);
+                ) {
+                    Ok(_) => {
+                        let message = format!("{} finished", local_folder_name);
+                        pb.finish_println(&message);
+                    },
+                    Err(e) => {
+                        let message = format!("Sync failed: {}", e);
+                        pb.finish_println(&message);
+                    }
                 }
-            }
+            });
         }
+
+        mb.listen();
+
     } else if let Some(matches) = matches.subcommand_matches("sync") {
         let id: u64 = matches.value_of("id").unwrap()
             .trim()
