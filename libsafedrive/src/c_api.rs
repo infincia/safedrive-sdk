@@ -1456,7 +1456,8 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                                                 total: std::os::raw::c_uint,
                                                 current: std::os::raw::c_uint,
                                                 percent: std::os::raw::c_double,
-                                                tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
+                                                tick: std::os::raw::c_uint,
+                                                message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
@@ -1477,13 +1478,14 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                hmac_key,
                tweak_key,
                id,
-               &mut |total, current, new, progress_percent, tick| {
+               &mut |total, current, new, progress_percent, tick, message| {
                    let c_total: std::os::raw::c_uint = total;
                    let c_current: std::os::raw::c_uint = current;
                    let c_new: std::os::raw::c_uint = new;
                    let c_percent: std::os::raw::c_double = progress_percent;
                    let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                   progress(context, c_total, c_current, c_percent, c_tick);
+                   let c_message = CString::new(message).expect("failed to get sync message");
+                   progress(context, c_total, c_current, c_percent, c_tick, c_message.as_ptr());
                }) {
         Ok(_) => 0,
         Err(e) => {
@@ -1556,7 +1558,8 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                                    total: std::os::raw::c_uint,
                                                    current: std::os::raw::c_uint,
                                                    percent: std::os::raw::c_double,
-                                                   tick: std::os::raw::c_uint)) -> std::os::raw::c_int {
+                                                   tick: std::os::raw::c_uint,
+                                                   message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
@@ -1583,13 +1586,14 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                   main_key,
                   id,
                   p,
-                  &mut |total, current, new, progress_percent, tick| {
+                  &mut |total, current, new, progress_percent, tick, message| {
                       let c_total: std::os::raw::c_uint = total;
                       let c_current: std::os::raw::c_uint = current;
                       let c_percent: std::os::raw::c_double = progress_percent;
                       let c_new: std::os::raw::c_uint = new;
                       let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                      progress(context, c_total, c_current, c_percent, c_tick);
+                      let c_message = CString::new(message).expect("failed to get sync message");
+                      progress(context, c_total, c_current, c_percent, c_tick, c_message.as_ptr());
                   }) {
         Ok(_) => 0,
         Err(e) => {

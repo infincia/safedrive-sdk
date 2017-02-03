@@ -324,7 +324,7 @@ pub fn sync(token: &Token,
             hmac_key: &Key,
             tweak_key: &Key,
             folder_id: u64,
-            progress: &mut FnMut(u32, u32, u32, f64, bool)) -> Result<(), SDError> {
+            progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
@@ -398,7 +398,7 @@ pub fn sync(token: &Token,
         percent_completed = (archive_size as f64 / estimated_size as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
+        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, "");
 
         completed_count = completed_count + 1.0;
 
@@ -463,9 +463,6 @@ pub fn sync(token: &Token,
                 let mut chunk_start = 0;
 
                 for chunk in chunk_iter {
-                    // allow caller to tick the progress display, if one exists
-                    progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
-
                     nb_chunk += 1;
                     total_size += chunk.size;
                     archive_size += chunk.size;
@@ -501,7 +498,7 @@ pub fn sync(token: &Token,
 
                     while should_retry {
                         // allow caller to tick the progress display, if one exists
-                        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
+                        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, "");
 
                         let failed_count = 15.0 - retries_left;
                         let mut rng = ::rand::thread_rng();
@@ -526,10 +523,12 @@ pub fn sync(token: &Token,
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
                                 // allow caller to tick the progress display, if one exists
-                                progress(estimated_size as u32, archive_size as u32, chunk.size as u32, percent_completed, false);
+                                progress(estimated_size as u32, archive_size as u32, chunk.size as u32, percent_completed, false, "");
                                 should_retry = false
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
+                                progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, err.description());
+
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
                                     // TODO: pass better error info up the call chain here rather than a failure
@@ -609,7 +608,7 @@ pub fn sync(token: &Token,
 
     while should_retry {
         // allow caller to tick the progress display, if one exists
-        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false);
+        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, "");
 
         let failed_count = 15.0 - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -640,7 +639,7 @@ pub fn sync(token: &Token,
     }
 
 
-    progress(estimated_size as u32, archive_size as u32, 0 as u32, 100.0, false);
+    progress(estimated_size as u32, archive_size as u32, 0 as u32, 100.0, false, "");
 
     Ok(())
 }
@@ -651,7 +650,7 @@ pub fn restore(token: &Token,
                main_key: &Key,
                folder_id: u64,
                destination: PathBuf,
-               progress: &mut FnMut(u32, u32, u32, f64, bool)) -> Result<(), SDError> {
+               progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
@@ -723,7 +722,7 @@ pub fn restore(token: &Token,
         let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false);
+        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, "");
 
         completed_count = completed_count + 1.0;
 
@@ -762,7 +761,7 @@ pub fn restore(token: &Token,
                     for block_hmac in block_hmac_list.iter() {
 
                         // allow caller to tick the progress display, if one exists
-                        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, true);
+                        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, true, "");
 
                         let mut should_retry = true;
                         let mut retries_left = 15.0;
@@ -774,8 +773,6 @@ pub fn restore(token: &Token,
                         let mut wrapped_block: Option<WrappedBlock> = None;
 
                         while should_retry {
-                            // allow caller to tick the progress display, if one exists
-                            progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, true);
 
                             let failed_count = 15.0 - retries_left;
                             let mut rng = ::rand::thread_rng();
@@ -808,6 +805,9 @@ pub fn restore(token: &Token,
 
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
                                 Ok(rb) => {
+                                    // allow caller to tick the progress display, if one exists
+                                    progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, "");
+
                                     should_retry = false;
                                     debug!("server provided block {}", &block_hmac_hex);
                                     let wb = match WrappedBlock::from(rb, (&block_hmac_hex).from_hex().unwrap()) {
@@ -822,6 +822,10 @@ pub fn restore(token: &Token,
                                 },
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
+
+                                    progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, err.description());
+
+
                                     if retries_left <= 0.0 {
                                         // TODO: pass better error info up the call chain here rather than a failure
                                         return Err(SDError::RequestFailure(err))
@@ -904,7 +908,7 @@ pub fn restore(token: &Token,
 
     debug!("restoring session finished");
 
-    progress(entry_count as u32, completed_count as u32, 0 as u32, 100.0, false);
+    progress(entry_count as u32, completed_count as u32, 0 as u32, 100.0, false, "");
 
     Ok(())
 }
