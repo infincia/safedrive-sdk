@@ -1,6 +1,6 @@
 [package]
 name = "safedrived"
-version = "0.3.14"
+version = "0.3.15"
 authors = ["Stephen Oliver <steve@infincia.com>"]
 build = "build.rs"
 workspace = ".."
