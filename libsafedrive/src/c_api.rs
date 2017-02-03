@@ -518,10 +518,10 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
     };
 
     match login(&uid, &storage_path, &un, &pa) {
-        Ok((token, account_status, u)) => {
+        Ok((token, account_status)) => {
             c.0.set_account(un.to_owned(), pa.to_owned());
             c.0.set_api_token(token);
-            c.0.set_unique_client_id(u.id);
+            c.0.set_unique_client_id(uid);
             let c_s = SDDKAccountStatus::from(account_status);
 
             let b = Box::new(c_s);

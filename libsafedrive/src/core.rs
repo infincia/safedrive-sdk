@@ -124,7 +124,7 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
 pub fn login(unique_client_id: &str,
              local_storage_path: &Path,
              username: &str,
-             password:  &str) -> Result<(Token, AccountStatus, UniqueClientID), SDError> {
+             password:  &str) -> Result<(Token, AccountStatus), SDError> {
 
 
     if let Err(e) = fs::create_dir_all(local_storage_path) {
@@ -158,9 +158,9 @@ pub fn login(unique_client_id: &str,
     let lc = LANGUAGE_CODE.read();
 
     match register_client(&**gos, &**lc, unique_client_id, username, password) {
-        Ok((t, ucid)) => {
+        Ok(t) => {
             match account_status(&t) {
-                Ok(s) => return Ok((t, s, ucid)),
+                Ok(s) => return Ok((t, s)),
                 Err(e) => Err(SDError::from(e))
             }
         },

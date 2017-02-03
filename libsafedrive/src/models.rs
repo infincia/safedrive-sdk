@@ -69,12 +69,6 @@ pub struct Token {
     pub token: String,
 }
 
-//private final String uniqueClientId
-#[derive(Serialize, Deserialize, Debug)]
-pub struct UniqueClientID {
-    pub id: String,
-}
-
 //private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {

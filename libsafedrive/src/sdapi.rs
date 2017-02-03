@@ -206,7 +206,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     Ok(())
 }
 
-pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<(Token, UniqueClientID), SDAPIError> {
+pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<Token, SDAPIError> {
 
     let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
     let body = RegisterClientBody { operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
@@ -236,9 +236,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
 
     let token: Token = try!(::serde_json::from_str(&response));
 
-    let u = UniqueClientID { id: uniqueClientId.to_owned() };
-
-    Ok((token, u))
+    Ok(token)
 }
 
 pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
