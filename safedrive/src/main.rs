@@ -298,8 +298,8 @@ fn main() {
 
     initialize(&client_version, operating_system, "en_US", config);
 
-    let (token, _, _) = match login(&uid, &app_directory, &username, &password) {
-        Ok((t, a, ucid)) => (t, a, ucid),
+    let (token, _) = match login(&uid, &app_directory, &username, &password) {
+        Ok((t, a)) => (t, a),
         Err(e) => {
             error!("Login error: {}", e);
             std::process::exit(1);
