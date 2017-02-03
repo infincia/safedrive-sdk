@@ -5,6 +5,54 @@ use std;
 use ::bip39::{Bip39Error};
 use ::rustc_serialize::hex::{FromHexError};
 
+#[derive(Debug)]
+pub enum KeychainError {
+    KeychainUnavailable,
+    KeychainInvalid,
+    KeychainServiceInvalid,
+    KeychainItemMissing,
+}
+
+impl std::fmt::Display for KeychainError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        match *self {
+            KeychainError::KeychainUnavailable => {
+                write!(f, "Keychain unavailable")
+            },
+            KeychainError::KeychainInvalid => {
+                write!(f, "Keychain invalid")
+            },
+            KeychainError::KeychainServiceInvalid => {
+                write!(f, "Keychain service invalid")
+            },
+            KeychainError::KeychainItemMissing => {
+                write!(f, "Keychain item missing")
+            },
+        }
+    }
+}
+
+
+impl std::error::Error for KeychainError {
+    fn description(&self) -> &str {
+        match *self {
+            KeychainError::KeychainUnavailable => "keychain unavailable",
+            KeychainError::KeychainInvalid => "keychain invalid",
+            KeychainError::KeychainServiceInvalid => "keychain service invalid",
+            KeychainError::KeychainItemMissing => "keychain item missing",
+        }
+    }
+
+    fn cause(&self) -> Option<&std::error::Error> {
+        match *self {
+            KeychainError::KeychainUnavailable => None,
+            KeychainError::KeychainInvalid => None,
+            KeychainError::KeychainServiceInvalid => None,
+            KeychainError::KeychainItemMissing => None,
+        }
+    }
+}
+
 
 
 #[derive(Debug)]
