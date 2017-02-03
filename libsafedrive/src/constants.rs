@@ -41,7 +41,7 @@ static SD_RECOVERY_KEY_DOMAIN_STAGING: &'static str = "staging.recovery.safedriv
 
 
 pub fn is_production() -> bool {
-    let c = CONFIGURATION.read().unwrap();
+    let c = CONFIGURATION.read();
     match *c {
         Configuration::Staging => false,
         Configuration::Production => true,

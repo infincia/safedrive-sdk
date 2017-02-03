@@ -34,6 +34,7 @@ extern crate reqwest;
 extern crate serde;
 extern crate uuid;
 extern crate regex;
+extern crate parking_lot;
 
 #[cfg(target_os = "macos")]
 extern crate interfaces;
@@ -72,23 +73,23 @@ extern crate scopeguard;
 // global config, can only be set once at runtime
 
 lazy_static! {
-    static ref CONFIGURATION: std::sync::RwLock<constants::Configuration> = std::sync::RwLock::new(constants::Configuration::Production);
+    static ref CONFIGURATION: ::parking_lot::RwLock<constants::Configuration> = ::parking_lot::RwLock::new(constants::Configuration::Production);
 }
 
 lazy_static! {
-    static ref CACHE_DIR: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+    static ref CACHE_DIR: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 
 lazy_static! {
-    static ref CLIENT_VERSION: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+    static ref CLIENT_VERSION: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 
 lazy_static! {
-    static ref OPERATING_SYSTEM: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+    static ref OPERATING_SYSTEM: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 
 lazy_static! {
-    static ref LANGUAGE_CODE: std::sync::RwLock<::std::string::String> = std::sync::RwLock::new(::std::string::String::new());
+    static ref LANGUAGE_CODE: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 
 

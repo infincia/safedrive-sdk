@@ -9,7 +9,7 @@ use ::error::SDError;
 
 
 pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
-    let cd = CACHE_DIR.read().unwrap();
+    let cd = CACHE_DIR.read();
     let mut bp = PathBuf::from(&*cd);
 
     bp.push(name);
@@ -26,7 +26,7 @@ pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
 }
 
 pub fn write_block<'a>(block: &WrappedBlock) -> Result<(), SDError> {
-    let cd = CACHE_DIR.read().unwrap();
+    let cd = CACHE_DIR.read();
     let mut bp = PathBuf::from(&*cd);
     let h = block.hmac.to_hex();
 

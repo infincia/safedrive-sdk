@@ -89,16 +89,16 @@ pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, se
 // internal functions
 
 pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration) {
-    let mut c = CONFIGURATION.write().unwrap();
+    let mut c = CONFIGURATION.write();
     *c = config;
 
-    let mut cv = CLIENT_VERSION.write().unwrap();
+    let mut cv = CLIENT_VERSION.write();
     *cv = client_version.to_string();
 
-    let mut os = OPERATING_SYSTEM.write().unwrap();
+    let mut os = OPERATING_SYSTEM.write();
     *os = operating_system.to_string();
 
-    let mut lc = LANGUAGE_CODE.write().unwrap();
+    let mut lc = LANGUAGE_CODE.write();
     *lc = language_code.to_string();
 
     if !::sodiumoxide::init() == true {
@@ -137,7 +137,7 @@ pub fn login(unique_client_id: &str,
         debug!("failed to create local directories: {}", e);
         return Err(SDError::from(e))
     }
-    let mut cd = CACHE_DIR.write().unwrap();
+    let mut cd = CACHE_DIR.write();
     *cd = cache_s;
 
     match ::util::set_unique_client_id(unique_client_id, local_storage_path) {
@@ -149,8 +149,8 @@ pub fn login(unique_client_id: &str,
         },
     }
 
-    let gos = OPERATING_SYSTEM.read().unwrap();
-    let lc = LANGUAGE_CODE.read().unwrap();
+    let gos = OPERATING_SYSTEM.read();
+    let lc = LANGUAGE_CODE.read();
 
     match register_client(&**gos, &**lc, unique_client_id, username, password) {
         Ok((t, ucid)) => {
@@ -899,8 +899,8 @@ pub fn restore(token: &Token,
 }
 
 pub fn send_error_report<'a>(client_version: Option<String>, operating_system: Option<String>, unique_client_id: &str, description: &str, context: &str, log: &'a [&'a str]) -> Result<(), SDError> {
-    let gcv = CLIENT_VERSION.read().unwrap();
-    let gos = OPERATING_SYSTEM.read().unwrap();
+    let gcv = CLIENT_VERSION.read();
+    let gos = OPERATING_SYSTEM.read();
 
     let cv: &str = match client_version {
         Some(ref cv) => cv,
