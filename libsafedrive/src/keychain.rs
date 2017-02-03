@@ -4,9 +4,6 @@
 
 use std;
 
-#[cfg(target_os = "linux")]
-use std::process::Command;
-
 // external crate imports
 #[cfg(target_os = "linux")]
 use ::secret_service::SecretService;
