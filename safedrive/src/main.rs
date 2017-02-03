@@ -262,6 +262,15 @@ fn main() {
         }
     };
 
+    #[cfg(feature = "keychain")]
+    let s = match ::safedrive::core::get_keychain_item(&username, ::safedrive::keychain::KeychainService::Account) {
+        Ok(s) => s,
+        Err(e) => {
+            error!("Error getting keychain item: {}", e);
+            std::process::exit(1);
+        }
+    };
+
     let uid = match get_unique_client_id(&app_directory) {
         Ok(uid) => uid,
         Err(_) => {

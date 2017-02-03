@@ -19,3 +19,8 @@ prettytable-rs = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"
+
+[features]
+default = []
+
+keychain = []
