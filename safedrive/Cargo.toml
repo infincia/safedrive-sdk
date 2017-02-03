@@ -7,7 +7,7 @@ workspace = ".."
 
 [dependencies]
 clap = "*"
-pbr = "*"
+pbr = "1.0.0-alpha.2"
 rpassword = "*"
 uuid = { version = "*", features = ["v4"] }
 serde = "^0.9"
