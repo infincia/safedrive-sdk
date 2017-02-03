@@ -118,6 +118,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 
 #[cfg(target_os = "linux")]
 pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, SDError> {
+    let service_name = format!("{}", service);
 
     // initialize secret service (dbus connection and encryption session)
     let ss = match SecretService::new(EncryptionType::Dh) {
@@ -137,7 +138,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 
     // search items by properties
     let search_items = match ss.search_items(
-        vec![("account", account), ("service", format!("{}", service))], // properties
+        vec![("account", account), ("service", &service_name)], // properties
     ) {
         Ok(r) => r,
         Err(e) => {
@@ -182,6 +183,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
 
 #[cfg(target_os = "linux")]
 pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), SDError> {
+    let service_name = format!("{}", service);
 
     // initialize secret service (dbus connection and encryption session)
     let ss = match SecretService::new(EncryptionType::Dh) {
@@ -202,7 +204,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
     //create new item
     match collection.create_item(
         format!("safedrive"), // label
-        vec![("account", account), ("service", format!("{}", service))], // properties
+        vec![("account", account), ("service", &service_name)], // properties
         secret.as_bytes(), //secret
         true, // replace item with same attributes
         service.content_type() // secret content type
