@@ -281,6 +281,14 @@ impl std::fmt::Display for SDError {
     }
 }
 
+impl From<KeychainError> for SDError {
+    fn from(e: KeychainError) -> SDError {
+        match e {
+            _ => SDError::KeychainError(e)
+        }
+    }
+}
+
 impl From<std::io::Error> for SDError {
     fn from(e: std::io::Error) -> SDError {
         match e {
