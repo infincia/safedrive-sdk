@@ -23,7 +23,7 @@ pub enum KeyType {
 }
 
 impl KeyType {
-    pub fn nonce(&self) -> ::sodiumoxide::crypto::secretbox::Nonce {
+    pub fn key_wrapping_nonce(&self) -> ::sodiumoxide::crypto::secretbox::Nonce {
         let nonce_value = match *self {
             /// these are static for all accounts and must never change once in use
             ///
@@ -63,22 +63,22 @@ impl WrappedKeyset {
         // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
         let master_key_type = KeyType::Master;
         let master_key = Key::new(master_key_type);
-        let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key));
+        let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key, None));
 
         // generate a main key and encrypt it with the master key and static nonce
         let main_key_type = KeyType::Main;
         let main_key = Key::new(main_key_type);
-        let main_key_wrapped = try!(main_key.to_wrapped(&master_key));
+        let main_key_wrapped = try!(main_key.to_wrapped(&master_key, None));
 
         // generate an hmac key and encrypt it with the master key and static nonce
         let hmac_key_type = KeyType::HMAC;
         let hmac_key = Key::new(hmac_key_type);
-        let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key));
+        let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key, None));
 
         // generate a tweak key and encrypt it with the master key and static nonce
         let tweak_key_type = KeyType::Tweak;
         let tweak_key = Key::new(tweak_key_type);
-        let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key));
+        let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key, None));
         debug!("generated key set");
 
         Ok( WrappedKeyset { recovery: Some(recovery_phrase), master: master_key_wrapped, main: main_key_wrapped, hmac: hmac_key_wrapped, tweak: tweak_key_wrapped })
@@ -88,10 +88,10 @@ impl WrappedKeyset {
     pub fn to_keyset(&self, phrase: &str) -> Result<Keyset, CryptoError> {
         let mnemonic = try!(Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()));
         let recovery_key = Key::from(mnemonic);
-        let master_key = try!(self.master.to_key(&recovery_key));
-        let main_key = try!(self.main.to_key(&master_key));
-        let hmac_key = try!(self.hmac.to_key(&master_key));
-        let tweak_key = try!(self.tweak.to_key(&master_key));
+        let master_key = try!(self.master.to_key(&recovery_key, None));
+        let main_key = try!(self.main.to_key(&master_key, None));
+        let hmac_key = try!(self.hmac.to_key(&master_key, None));
+        let tweak_key = try!(self.tweak.to_key(&master_key, None));
 
         Ok(Keyset { recovery: phrase.to_string(), master: master_key, main: main_key, hmac: hmac_key, tweak: tweak_key })
     }
@@ -149,12 +149,27 @@ impl WrappedKey {
         Ok(WrappedKey::from(try!(hex_key.from_hex()), key_type))
     }
 
-    pub fn to_key(&self, wrapping_key: &Key) -> Result<Key, CryptoError> {
+    pub fn to_key(&self, wrapping_key: &Key, nonce: Option<&::sodiumoxide::crypto::secretbox::Nonce>) -> Result<Key, CryptoError> {
 
-        // decrypt the key with the recovery key and nonce
-        let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key.as_ref()).expect("failed to get wrapping key struct");
+        let n = match self.key_type {
+            KeyType::Recovery |
+            KeyType::Master |
+            KeyType::Main |
+            KeyType::Tweak => {
+                // all use a static nonce when wrapping their key type, MUST NOT use a random nonce
+                self.key_type.key_wrapping_nonce()
+            },
+            KeyType::Block | KeyType::Session => {
+                // use a non-static nonce when wrapping their key type, MUST NOT use a static nonce
+                nonce.expect("attempted to unwrap a block or session key without an external random nonce").clone()
+            },
+            _ => { panic!("other key types cannot be wrapped");  }
+        };
 
-        let key_raw = match ::sodiumoxide::crypto::secretbox::open(&self.bytes, &self.key_type.nonce(), &wrapping_key_s) {
+        // decrypt the key with the wrapping key and nonce
+        let wrapping_key_s = wrapping_key.as_sodium_secretbox_key();
+
+        let key_raw = match ::sodiumoxide::crypto::secretbox::open(&self.bytes, &n, &wrapping_key_s) {
             Ok(k) => k,
             Err(_) => return Err(CryptoError::RecoveryPhraseIncorrect)
         };
@@ -224,11 +239,25 @@ impl Key {
         ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")
     }
 
-    pub fn to_wrapped(&self, wrapping_key: &Key) -> Result<WrappedKey, CryptoError> {
-        let nonce = self.key_type.nonce();
-        let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key.as_ref()).expect("failed to get wrapping key struct");
-        let wrapped_key = ::sodiumoxide::crypto::secretbox::seal(self.bytes.as_ref(), &nonce, &wrapping_key_s);
+    pub fn to_wrapped(&self, wrapping_key: &Key, nonce: Option<&::sodiumoxide::crypto::secretbox::Nonce>) -> Result<WrappedKey, CryptoError> {
+        let n = match self.key_type {
+            KeyType::Recovery |
+            KeyType::Master |
+            KeyType::Main |
+            KeyType::Tweak => {
+                // use a static nonce when wrapping this key type, MUST NOT use a random nonce
+                self.key_type.key_wrapping_nonce()
+            },
+            KeyType::Block | KeyType::Session => {
+                // use a random nonce when wrapping this key type, MUST NOT use a static nonce
+                nonce.expect("attempted to wrap a block or session key without an external random nonce").clone()
+            },
+            _ => { panic!("other key types cannot be wrapped");  }
+        };
 
+        let wrapping_key_s = wrapping_key.as_sodium_secretbox_key();
+
+        let wrapped_key = ::sodiumoxide::crypto::secretbox::seal(self.bytes.as_ref(), &n, &wrapping_key_s);
 
         Ok(WrappedKey::from(wrapped_key, self.key_type))
     }
