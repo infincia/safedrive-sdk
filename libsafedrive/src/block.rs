@@ -68,7 +68,7 @@ impl Block {
         // wrap the block key with the main encryption key
         let wrapped_block_key_raw = ::sodiumoxide::crypto::secretbox::seal(&block_key_raw, &nonce, &(main.as_sodium_secretbox_key()));
         assert!(wrapped_block_key_raw.len() == SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE);
-        let wrapped_block_key = WrappedKey::new(wrapped_block_key_raw, KeyType::KeyTypeSession);
+        let wrapped_block_key = WrappedKey::new(wrapped_block_key_raw, KeyType::Session);
 
 
         Ok(WrappedBlock { version: self.version, hmac: self.hmac, wrapped_data: wrapped_data, wrapped_key: wrapped_block_key })
@@ -157,7 +157,7 @@ impl WrappedBlock {
         // let nonce_raw = raw_block.nonce.to_vec();
         let wrapped_block_raw = raw_block.wrapped_data.to_vec();
 
-        let wrapped_block_key = WrappedKey::new(wrapped_block_key_raw, KeyType::KeyTypeSession);
+        let wrapped_block_key = WrappedKey::new(wrapped_block_key_raw, KeyType::Session);
 
         Ok(WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw })
     }

@@ -13,13 +13,13 @@ use ::constants::*;
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 pub enum KeyType {
-    KeyTypeMaster,
-    KeyTypeMain,
-    KeyTypeHMAC,
-    KeyTypeTweak,
-    KeyTypeRecovery,
-    KeyTypeSession,
-    KeyTypeBlock,
+    Master,
+    Main,
+    HMAC,
+    Tweak,
+    Recovery,
+    Session,
+    Block,
 }
 
 impl KeyType {
@@ -29,10 +29,10 @@ impl KeyType {
             ///
             /// they're static because they're only ever used for a single encryption operation
             /// which is inherently safe as far as nonce reuse is concerned
-            KeyType::KeyTypeMaster => [1u8; 24],
-            KeyType::KeyTypeMain => [2u8; 24],
-            KeyType::KeyTypeHMAC => [3u8; 24],
-            KeyType::KeyTypeTweak => [4u8; 24],
+            KeyType::Master => [1u8; 24],
+            KeyType::Main => [2u8; 24],
+            KeyType::HMAC => [3u8; 24],
+            KeyType::Tweak => [4u8; 24],
             _ => { panic!("other key types don't have a static nonce");  }
         };
         let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_value).expect("failed to get nonce");
@@ -61,22 +61,22 @@ impl WrappedKeyset {
 
         // generate a master key and encrypt it with the recovery phrase and static nonce
         // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
-        let master_key_type = KeyType::KeyTypeMaster;
+        let master_key_type = KeyType::Master;
         let master_key = Key::new(master_key_type);
         let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key));
 
         // generate a main key and encrypt it with the master key and static nonce
-        let main_key_type = KeyType::KeyTypeMain;
+        let main_key_type = KeyType::Main;
         let main_key = Key::new(main_key_type);
         let main_key_wrapped = try!(main_key.to_wrapped(&master_key));
 
         // generate an hmac key and encrypt it with the master key and static nonce
-        let hmac_key_type = KeyType::KeyTypeHMAC;
+        let hmac_key_type = KeyType::HMAC;
         let hmac_key = Key::new(hmac_key_type);
         let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key));
 
         // generate a tweak key and encrypt it with the master key and static nonce
-        let tweak_key_type = KeyType::KeyTypeTweak;
+        let tweak_key_type = KeyType::Tweak;
         let tweak_key = Key::new(tweak_key_type);
         let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key));
         debug!("generated key set");
@@ -107,10 +107,10 @@ impl WrappedKeyset {
 
 impl From<WrappedKeysetBody> for WrappedKeyset {
     fn from(body: WrappedKeysetBody) -> Self {
-        let wrapped_master_key = WrappedKey::from_hex(body.master, KeyType::KeyTypeMaster).expect("failed to convert key hex to key");
-        let wrapped_main_key = WrappedKey::from_hex(body.main, KeyType::KeyTypeMain).expect("failed to convert key hex to key");
-        let wrapped_hmac_key = WrappedKey::from_hex(body.hmac, KeyType::KeyTypeHMAC).expect("failed to convert key hex to key");
-        let wrapped_tweak_key = WrappedKey::from_hex(body.tweak, KeyType::KeyTypeTweak).expect("failed to convert key hex to key");
+        let wrapped_master_key = WrappedKey::from_hex(body.master, KeyType::Master).expect("failed to convert key hex to key");
+        let wrapped_main_key = WrappedKey::from_hex(body.main, KeyType::Main).expect("failed to convert key hex to key");
+        let wrapped_hmac_key = WrappedKey::from_hex(body.hmac, KeyType::HMAC).expect("failed to convert key hex to key");
+        let wrapped_tweak_key = WrappedKey::from_hex(body.tweak, KeyType::Tweak).expect("failed to convert key hex to key");
 
         WrappedKeyset { master: wrapped_master_key, main: wrapped_main_key, hmac: wrapped_hmac_key, tweak: wrapped_tweak_key, recovery: None }
     }
@@ -189,10 +189,10 @@ impl Key {
 
     fn new(key_type: KeyType) -> Key {
         let key_size = match key_type {
-            KeyType::KeyTypeMaster => SECRETBOX_KEY_SIZE,
-            KeyType::KeyTypeMain => SECRETBOX_KEY_SIZE,
-            KeyType::KeyTypeHMAC => HMAC_KEY_SIZE,
-            KeyType::KeyTypeTweak => SECRETBOX_KEY_SIZE,
+            KeyType::Master => SECRETBOX_KEY_SIZE,
+            KeyType::Main => SECRETBOX_KEY_SIZE,
+            KeyType::HMAC => HMAC_KEY_SIZE,
+            KeyType::Tweak => SECRETBOX_KEY_SIZE,
             _ => { panic!("other key types don't have a static nonce");  }
         };
         let key = ::sodiumoxide::randombytes::randombytes(key_size);
@@ -202,7 +202,7 @@ impl Key {
 
     fn from(recovery_phrase: Bip39) -> Key {
         let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(recovery_phrase.seed.as_ref());
-        Key { bytes: recovery_key.as_ref().to_vec(), key_type: KeyType::KeyTypeRecovery }
+        Key { bytes: recovery_key.as_ref().to_vec(), key_type: KeyType::Recovery }
     }
 }
 
@@ -216,10 +216,10 @@ impl KeyConversion for Key {
 
     fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key {
         match self.key_type {
-            KeyType::KeyTypeMaster => {},
-            KeyType::KeyTypeMain => {},
-            KeyType::KeyTypeTweak => {},
-            KeyType::KeyTypeRecovery => {},
+            KeyType::Master => {},
+            KeyType::Main => {},
+            KeyType::Tweak => {},
+            KeyType::Recovery => {},
             _ => { panic!("other key types don't have a static nonce");  }
         };
         ::sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get secretbox key struct")
@@ -227,7 +227,7 @@ impl KeyConversion for Key {
 
     fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key {
         match self.key_type {
-            KeyType::KeyTypeHMAC => HMAC_KEY_SIZE,
+            KeyType::HMAC => HMAC_KEY_SIZE,
             _ => { panic!("other key types don't have a static nonce");  }
         };
         ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")

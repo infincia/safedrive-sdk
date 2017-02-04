@@ -48,7 +48,7 @@ impl SyncSession {
         // wrap the session key with the main encryption key
         let wrapped_session_key_raw = ::sodiumoxide::crypto::secretbox::seal(&session_key_raw, &nonce, &(main.as_sodium_secretbox_key()));
         assert!(wrapped_session_key_raw.len() == SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE);
-        let wrapped_session_key = WrappedKey::new(wrapped_session_key_raw, KeyType::KeyTypeSession);
+        let wrapped_session_key = WrappedKey::new(wrapped_session_key_raw, KeyType::Session);
 
 
         Ok(WrappedSyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, wrapped_data: wrapped_data, wrapped_key: wrapped_session_key, nonce: nonce_raw })
@@ -142,7 +142,7 @@ impl WrappedSyncSession {
         let nonce_raw = raw_session.nonce.to_vec();
         let wrapped_session_raw = raw_session.wrapped_data.to_vec();
 
-        let wrapped_session_key = WrappedKey::new(wrapped_session_key_raw, KeyType::KeyTypeSession);
+        let wrapped_session_key = WrappedKey::new(wrapped_session_key_raw, KeyType::Session);
 
         Ok(WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: nonce_raw })
     }
