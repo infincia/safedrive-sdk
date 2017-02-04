@@ -13,8 +13,8 @@ use ::constants::*;
 #[derive(Debug, Clone)]
 pub struct Block {
     version: SyncVersion,
-    pub hmac: Vec<u8>,
-    pub data: Vec<u8>,
+    hmac: Vec<u8>,
+    pub data: Vec<u8>
 }
 
 impl Block {
