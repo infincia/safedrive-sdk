@@ -142,7 +142,7 @@ impl WrappedBlock {
         binary_data.extend(self.hmac.as_slice());
         assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
-        // remainder will be the encrypted block data90
+        // remainder will be the encrypted block data
         binary_data.extend(self.wrapped_data.as_slice());
 
         binary_data
