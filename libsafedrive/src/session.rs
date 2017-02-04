@@ -149,7 +149,7 @@ impl WrappedSyncSession {
         let nonce_raw = raw_session.nonce.to_vec();
         let wrapped_session_raw = raw_session.wrapped_data.to_vec();
 
-        let wrapped_session_key = WrappedKey::new(wrapped_session_key_raw, KeyType::Session);
+        let wrapped_session_key = WrappedKey::from(wrapped_session_key_raw, KeyType::Session);
 
         Ok(WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: nonce_raw })
     }

@@ -157,7 +157,7 @@ impl WrappedBlock {
         // let nonce_raw = raw_block.nonce.to_vec();
         let wrapped_block_raw = raw_block.wrapped_data.to_vec();
 
-        let wrapped_block_key = WrappedKey::new(wrapped_block_key_raw, KeyType::Session);
+        let wrapped_block_key = WrappedKey::from(wrapped_block_key_raw, KeyType::Block);
 
         Ok(WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw })
     }

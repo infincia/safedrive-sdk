@@ -135,18 +135,18 @@ impl Keyset {
 
 #[derive(Debug, Clone)]
 pub struct WrappedKey {
-    pub bytes: Vec<u8>,
-    pub key_type: KeyType
+    bytes: Vec<u8>,
+    key_type: KeyType
 }
 
 impl WrappedKey {
-    pub fn new(key: Vec<u8>, key_type: KeyType) -> WrappedKey {
+    pub fn from(key: Vec<u8>, key_type: KeyType) -> WrappedKey {
 
         WrappedKey { bytes: key, key_type: key_type }
     }
 
     pub fn from_hex(hex_key: String, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
-        Ok(WrappedKey::new(try!(hex_key.from_hex()), key_type))
+        Ok(WrappedKey::from(try!(hex_key.from_hex()), key_type))
     }
 
     pub fn to_key(&self, wrapping_key: &Key) -> Result<Key, CryptoError> {
@@ -239,7 +239,7 @@ impl KeyConversion for Key {
         let wrapped_key = ::sodiumoxide::crypto::secretbox::seal(self.bytes.as_ref(), &nonce, &wrapping_key_s);
 
 
-        Ok(WrappedKey { bytes: wrapped_key, key_type: self.key_type })
+        Ok(WrappedKey::from(wrapped_key, self.key_type))
     }
 }
 
