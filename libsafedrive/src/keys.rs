@@ -181,8 +181,8 @@ impl ToHex for WrappedKey {
 
 #[derive(Debug, Clone)]
 pub struct Key {
-    pub bytes: Vec<u8>,
-    pub key_type: KeyType
+    bytes: Vec<u8>,
+    key_type: KeyType
 }
 
 impl Key {
