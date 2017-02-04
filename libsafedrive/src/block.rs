@@ -96,14 +96,14 @@ impl WrappedBlock {
 
         let block_key_raw = match ::sodiumoxide::crypto::secretbox::open(self.wrapped_key.as_ref(), &nonce, &main_key_s) {
             Ok(k) => k,
-            Err(_) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
         };
 
         let block_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(&block_key_raw).expect("failed to get unwrapped block key struct");
 
         let block_raw = match ::sodiumoxide::crypto::secretbox::open(&self.wrapped_data, &nonce, &block_key_s) {
             Ok(s) => s,
-            Err(_) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
         };
 
 
@@ -141,7 +141,7 @@ impl WrappedBlock {
 
         let raw_block: BinaryFormat = match ::binformat::binary_parse(&raw) {
             Done(_, o) => o,
-            Error(_) => return Err(SDError::SessionMissing),
+            Error(_) => return Err(SDError::BlockMissing),
             Incomplete(_) => panic!("should never happen")
         };
 
