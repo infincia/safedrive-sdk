@@ -187,7 +187,7 @@ pub struct Key {
 
 impl Key {
 
-    fn new(key_type: KeyType) -> Key {
+    pub fn new(key_type: KeyType) -> Key {
         let key_size = match key_type {
             KeyType::Master => SECRETBOX_KEY_SIZE,
             KeyType::Main => SECRETBOX_KEY_SIZE,
