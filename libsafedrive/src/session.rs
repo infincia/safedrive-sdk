@@ -22,6 +22,14 @@ pub struct SyncSession {
 
 impl SyncSession {
     pub fn new(version: SyncVersion, folder_id: u64, name: String, size: Option<u64>, time: Option<u64>, data: Vec<u8>) -> SyncSession {
+        match version {
+            SyncVersion::Version1 | SyncVersion::Version2 => {},
+            _ => {
+                panic!("Attempted to create invalid session version");
+            },
+        };
+
+
         SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: data }
     }
 
@@ -133,10 +141,9 @@ impl WrappedSyncSession {
         debug!("got valid binary file: {}", &raw_session);
 
         let session_ver = match raw_session.version {
-            "00" => SyncVersion::Version0,
             "01" => SyncVersion::Version1,
             "02" => SyncVersion::Version2,
-            _ => panic!("unknown binary version")
+            _ => panic!("Invalid binary session version")
         };
         let wrapped_session_key_raw = raw_session.wrapped_key.to_vec();
         let nonce_raw = raw_session.nonce.to_vec();
