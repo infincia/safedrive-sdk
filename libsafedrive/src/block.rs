@@ -22,14 +22,25 @@ impl Block {
         // calculate hmac of the block
         let hmac_key = hmac.as_sodium_auth_key();
 
-        let block_hmac = {
-            let raw_chunk = data.as_slice();
+        let block_hmac = match version {
+            SyncVersion::Version1 => {
+                let raw_chunk = data.as_slice();
 
-            let tag = ::sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
+                // use HMACSHA256
+                let tag = ::sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
 
-            let bh = tag.as_ref().to_vec();
+                tag.as_ref().to_vec()
+            },
+            SyncVersion::Version2 => {
+                let raw_chunk = data.as_slice();
 
-            bh
+                // use blake2
+                panic!("Version 2 unimplemented");
+            },
+            _ => {
+                panic!("Attempted to create invalid block version");
+            },
+
         };
         Block { version: version, data: data, hmac: block_hmac }
     }
