@@ -4,7 +4,7 @@ use ::models::{SyncVersion};
 use ::error::{CryptoError, SDError};
 use ::binformat::BinaryFormat;
 use ::nom::IResult::*;
-use ::keys::{Key, WrappedKey, KeyType, KeyConversion};
+use ::keys::{Key, WrappedKey, KeyType};
 use ::rustc_serialize::hex::{ToHex};
 
 use ::constants::*;

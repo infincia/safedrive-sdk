@@ -204,17 +204,8 @@ impl Key {
         let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(recovery_phrase.seed.as_ref());
         Key { bytes: recovery_key.as_ref().to_vec(), key_type: KeyType::Recovery }
     }
-}
 
-pub trait KeyConversion {
-    fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key;
-    fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key;
-    fn to_wrapped(&self, wrapping_key: &Key) -> Result<WrappedKey, CryptoError>;
-}
-
-impl KeyConversion for Key {
-
-    fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key {
+    pub fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key {
         match self.key_type {
             KeyType::Master => {},
             KeyType::Main => {},
@@ -225,7 +216,7 @@ impl KeyConversion for Key {
         ::sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get secretbox key struct")
     }
 
-    fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key {
+    pub fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key {
         match self.key_type {
             KeyType::HMAC => HMAC_KEY_SIZE,
             _ => { panic!("other key types don't have a static nonce");  }
@@ -233,7 +224,7 @@ impl KeyConversion for Key {
         ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")
     }
 
-    fn to_wrapped(&self, wrapping_key: &Key) -> Result<WrappedKey, CryptoError> {
+    pub fn to_wrapped(&self, wrapping_key: &Key) -> Result<WrappedKey, CryptoError> {
         let nonce = self.key_type.nonce();
         let wrapping_key_s = ::sodiumoxide::crypto::secretbox::Key::from_slice(wrapping_key.as_ref()).expect("failed to get wrapping key struct");
         let wrapped_key = ::sodiumoxide::crypto::secretbox::seal(self.bytes.as_ref(), &nonce, &wrapping_key_s);
