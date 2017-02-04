@@ -159,7 +159,6 @@ impl WrappedBlock {
         debug!("got valid binary file: {}", &raw_block);
 
         let block_ver = match raw_block.version {
-            "00" => SyncVersion::Version0,
             "01" => SyncVersion::Version1,
             "02" => SyncVersion::Version2,
             _ => panic!("unknown binary version")
