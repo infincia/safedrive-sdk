@@ -25,10 +25,6 @@ impl AsRef<[u8]> for SyncVersion {
     }
 }
 
-// request bodies
-
-
-
 // responses
 
 //private final String token
