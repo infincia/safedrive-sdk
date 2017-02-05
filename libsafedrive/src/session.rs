@@ -58,6 +58,11 @@ impl SyncSession {
     }
 }
 
+impl AsRef<[u8]> for SyncSession {
+    fn as_ref(&self) -> &[u8] {
+        self.data.as_ref()
+    }
+}
 
 
 
@@ -146,4 +151,10 @@ impl WrappedSyncSession {
         Ok(WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce })
     }
 
+}
+
+impl AsRef<[u8]> for WrappedSyncSession {
+    fn as_ref(&self) -> &[u8] {
+        self.wrapped_data.as_ref()
+    }
 }

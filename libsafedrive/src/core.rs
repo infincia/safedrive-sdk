@@ -690,9 +690,7 @@ pub fn restore(token: &Token,
         Err(e) => return Err(e),
     };
 
-    let session_data: Vec<u8> = session.data;
-
-    let mut ar = Archive::new(session_data.as_slice());
+    let mut ar = Archive::new(session.as_ref());
 
     let entry_count: u64 = ar.entries().iter().count() as u64;
 
