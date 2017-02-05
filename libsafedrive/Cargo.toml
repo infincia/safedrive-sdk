@@ -26,6 +26,7 @@ uuid = { version = "*", features = ["v4"] }
 regex = "0.2"
 scopeguard = "*"
 parking_lot = "*"
+byteorder = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"

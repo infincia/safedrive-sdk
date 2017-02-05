@@ -38,6 +38,7 @@ extern crate serde;
 extern crate uuid;
 extern crate regex;
 extern crate parking_lot;
+extern crate byteorder;
 
 #[cfg(target_os = "macos")]
 extern crate interfaces;
