@@ -108,9 +108,9 @@ impl AsRef<[u8]> for Block {
 
 
 pub struct WrappedBlock {
-    pub version: SyncVersion,
-    pub hmac: Vec<u8>,
-    pub wrapped_data: Vec<u8>,
+    version: SyncVersion,
+    hmac: Vec<u8>,
+    wrapped_data: Vec<u8>,
     nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     wrapped_key: WrappedKey,
 }
@@ -131,6 +131,10 @@ impl WrappedBlock {
 
 
         Ok(Block { version: self.version, hmac: self.hmac, data: block_raw })
+    }
+
+    pub fn get_hmac(&self) -> Vec<u8> {
+        self.hmac.clone()
     }
 
     pub fn to_binary(&self) -> Vec<u8> {

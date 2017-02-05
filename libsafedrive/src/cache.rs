@@ -28,7 +28,7 @@ pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
 pub fn write_block<'a>(block: &WrappedBlock) -> Result<(), SDError> {
     let cd = CACHE_DIR.read();
     let mut bp = PathBuf::from(&*cd);
-    let h = block.hmac.to_hex();
+    let h = block.get_hmac().to_hex();
 
     bp.push(h);
 
