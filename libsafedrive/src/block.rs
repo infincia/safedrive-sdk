@@ -239,6 +239,23 @@ fn wrap_block_v1_test() {
     };
 }
 
+#[test]
+#[should_panic]
+fn wrap_block_v2_test() {
+    let main = Key::new(KeyType::Main);
+    let hmac = Key::new(KeyType::HMAC);
+
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version2, &hmac, test_data);
+
+
+    let wrapped_block = match block.to_wrapped(&main) {
+        Ok(wb) => wb,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
 
 #[test]
 fn unwrap_block_v1_test() {
@@ -262,6 +279,28 @@ fn unwrap_block_v1_test() {
 }
 
 #[test]
+#[should_panic]
+fn unwrap_block_v2_test() {
+    let main = Key::new(KeyType::Main);
+    let hmac = Key::new(KeyType::HMAC);
+
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version2, &hmac, test_data);
+
+
+    let wrapped_block = match block.to_wrapped(&main) {
+        Ok(wb) => wb,
+        Err(_) => { assert!(true == false); return }
+    };
+
+    let unwrapped_block = match wrapped_block.to_block(&main) {
+        Ok(uwb) => uwb,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
+#[test]
 fn wrapped_block_from_vec_v1_test() {
     let main = Key::new(KeyType::Main);
     let hmac = Key::new(KeyType::HMAC);
@@ -269,6 +308,31 @@ fn wrapped_block_from_vec_v1_test() {
     let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
 
     let block = Block::new(SyncVersion::Version1, &hmac, test_data);
+    let hmac_value = block.get_hmac();
+
+    let wrapped_block = match block.to_wrapped(&main) {
+        Ok(wb) => wb,
+        Err(_) => { assert!(true == false); return }
+    };
+
+    let raw_wrapped_data = wrapped_block.to_binary();
+
+
+    let wrapped_block_from_vec = match WrappedBlock::from(raw_wrapped_data, hmac_value.to_vec()) {
+        Ok(rwb) => rwb,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
+#[test]
+#[should_panic]
+fn wrapped_block_from_vec_v2_test() {
+    let main = Key::new(KeyType::Main);
+    let hmac = Key::new(KeyType::HMAC);
+
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version2, &hmac, test_data);
     let hmac_value = block.get_hmac();
 
     let wrapped_block = match block.to_wrapped(&main) {
