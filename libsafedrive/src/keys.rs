@@ -152,9 +152,9 @@ impl WrappedKey {
     pub fn to_key(&self, wrapping_key: &Key, nonce: Option<&::sodiumoxide::crypto::secretbox::Nonce>) -> Result<Key, CryptoError> {
 
         let n = match self.key_type {
-            KeyType::Recovery |
             KeyType::Master |
             KeyType::Main |
+            KeyType::HMAC |
             KeyType::Tweak => {
                 // all use a static nonce when wrapping their key type, MUST NOT use a random nonce
                 self.key_type.key_wrapping_nonce()
@@ -241,9 +241,9 @@ impl Key {
 
     pub fn to_wrapped(&self, wrapping_key: &Key, nonce: Option<&::sodiumoxide::crypto::secretbox::Nonce>) -> Result<WrappedKey, CryptoError> {
         let n = match self.key_type {
-            KeyType::Recovery |
             KeyType::Master |
             KeyType::Main |
+            KeyType::HMAC |
             KeyType::Tweak => {
                 // use a static nonce when wrapping this key type, MUST NOT use a random nonce
                 self.key_type.key_wrapping_nonce()
