@@ -202,3 +202,85 @@ impl AsRef<[u8]> for WrappedBlock {
         self.wrapped_data.as_ref()
     }
 }
+
+
+static TEST_BLOCK_DATA_UNENCRYPTED: [u8; 1024] = [7u8; 1024];
+
+#[test]
+fn new_block_v1_test() {
+    let hmac = Key::new(KeyType::HMAC);
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version1, &hmac, test_data);
+}
+
+#[test]
+#[should_panic]
+fn new_block_v2_test() {
+    let hmac = Key::new(KeyType::HMAC);
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version2, &hmac, test_data);
+}
+
+#[test]
+fn wrap_block_v1_test() {
+    let main = Key::new(KeyType::Main);
+    let hmac = Key::new(KeyType::HMAC);
+
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version1, &hmac, test_data);
+
+
+    let wrapped_block = match block.to_wrapped(&main) {
+        Ok(wb) => wb,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
+
+#[test]
+fn unwrap_block_v1_test() {
+    let main = Key::new(KeyType::Main);
+    let hmac = Key::new(KeyType::HMAC);
+
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version1, &hmac, test_data);
+
+
+    let wrapped_block = match block.to_wrapped(&main) {
+        Ok(wb) => wb,
+        Err(_) => { assert!(true == false); return }
+    };
+
+    let unwrapped_block = match wrapped_block.to_block(&main) {
+        Ok(uwb) => uwb,
+        Err(_) => { assert!(true == false); return }
+    };
+}
+
+#[test]
+fn wrapped_block_from_vec_v1_test() {
+    let main = Key::new(KeyType::Main);
+    let hmac = Key::new(KeyType::HMAC);
+
+    let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
+
+    let block = Block::new(SyncVersion::Version1, &hmac, test_data);
+    let hmac_value = block.get_hmac();
+
+    let wrapped_block = match block.to_wrapped(&main) {
+        Ok(wb) => wb,
+        Err(_) => { assert!(true == false); return }
+    };
+
+    let raw_wrapped_data = wrapped_block.to_binary();
+
+
+    let wrapped_block_from_vec = match WrappedBlock::from(raw_wrapped_data, hmac_value.to_vec()) {
+        Ok(rwb) => rwb,
+        Err(_) => { assert!(true == false); return }
+    };
+}
