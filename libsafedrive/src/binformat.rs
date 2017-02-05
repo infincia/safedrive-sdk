@@ -52,9 +52,9 @@ named!(hmac_parse<&[u8], &[u8]>, do_parse!(
   )
 );
 
-pub fn parse_hmacs<'a>(input: &'a [u8]) -> IResult<&'a [u8], Vec<&'a [u8]>> {
+pub fn parse_hmacs<'a, T: AsRef<[u8]>>(input: &'a T) -> IResult<&'a [u8], Vec<&'a [u8]>> {
     let mut hmacs = vec![];
-    let (mut d, hmac) = try_parse!(input, hmac_parse);
+    let (mut d, hmac) = try_parse!(input.as_ref(), hmac_parse);
     hmacs.push(hmac);
     while d.len() > 0 {
         let (remaining, hmac) = try_parse!(d, hmac_parse);

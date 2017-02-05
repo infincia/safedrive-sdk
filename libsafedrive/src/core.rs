@@ -751,7 +751,7 @@ pub fn restore(token: &Token,
                     let mut block_hmac_bag = Vec::new();
 
                     try!(file_entry.read_to_end(&mut block_hmac_bag));
-                    let block_hmac_list = match ::binformat::parse_hmacs(block_hmac_bag.as_ref()) {
+                    let block_hmac_list = match ::binformat::parse_hmacs(&block_hmac_bag) {
                         Done(_, o) => o,
                         Error(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed)),
                         Incomplete(_) => panic!("should never happen")
