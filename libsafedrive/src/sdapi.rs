@@ -624,6 +624,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
     }
 }
 
+#[allow(dead_code)]
 pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedBlock], should_upload: bool) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::WriteBlocks { session: session };

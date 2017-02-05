@@ -158,19 +158,19 @@ pub fn get_openssl_directory() -> Result<PathBuf, ()> {
         .arg("-d")
         .output() {
         Ok(o) => o,
-        Err(e) => return Err(()),
+        Err(_) => return Err(()),
     };
 
     let out = output.stdout;
 
-    let mut s = match String::from_utf8(out) {
-        Ok(mut s) => s,
-        Err(e) => return Err(()),
+    let s = match String::from_utf8(out) {
+        Ok(s) => s,
+        Err(_) => return Err(()),
     };
 
     let re = match ::regex::Regex::new(r#"OPENSSLDIR: "(.*)""#) {
         Ok(re) => re,
-        Err(e) => return Err(()),
+        Err(_) => return Err(()),
     };
 
     let cap = match re.captures(&s) {

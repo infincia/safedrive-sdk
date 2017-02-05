@@ -326,7 +326,7 @@ fn main() {
 
 
 
-    if let Some(matches) = matches.subcommand_matches("add") {
+    if let Some(_) = matches.subcommand_matches("add") {
         let p = matches.value_of("path").unwrap();
         let pa = PathBuf::from(&p);
         //TODO: this is not portable to windows, must be fixed before use there
@@ -358,7 +358,7 @@ fn main() {
         }
 
 
-    } else if let Some(matches) = matches.subcommand_matches("syncall") {
+    } else if let Some(_) = matches.subcommand_matches("syncall") {
         let folder_list = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
@@ -386,14 +386,14 @@ fn main() {
             let local_tweak = keyset.tweak.clone();
             let local_folder_name = folder.folderName.clone();
 
-            let t = thread::spawn(move || {
+            let _ = thread::spawn(move || {
                 match sync(&local_token,
                            &sync_uuid,
                            &local_main,
                            &local_hmac,
                            &local_tweak,
                            folder.id,
-                           &mut |total, current, new, progress_percent, tick, message| {
+                           &mut |total, _, new, _, tick, message| {
                                if message.len() > 0 {
                                    let message = format!("Stalled: ");
                                    pb.message(&message);
@@ -452,7 +452,7 @@ fn main() {
                    &keyset.hmac,
                    &keyset.tweak,
                    folder.id,
-                   &mut |total, current, new, progress_percent, tick, message| {
+                   &mut |total, _, new, _, tick, message| {
                        if message.len() > 0 {
                            let message = format!("Stalled: ");
 
@@ -491,7 +491,7 @@ fn main() {
             }
         };
 
-        let session = match get_sync_session(&token, id, &session_name) {
+        let _ = match get_sync_session(&token, id, &session_name) {
             Ok(s) => s,
             Err(e) => {
                 error!("Read session error: {}", e);
@@ -511,7 +511,7 @@ fn main() {
                       &keyset.main,
                       folder.id,
                       pa,
-                      &mut |total, current, new, progress_percent, tick, message| {
+                      &mut |total, _, new, _, tick, message| {
                           if message.len() > 0 {
                               let message = format!("Stalled: ");
 
@@ -532,7 +532,7 @@ fn main() {
             }
         }
 
-    } else if let Some(matches) = matches.subcommand_matches("list") {
+    } else if let Some(_) = matches.subcommand_matches("list") {
         let mut table = Table::new();
 
         // Add a row
@@ -555,13 +555,13 @@ fn main() {
         }
         table.printstd();
 
-    } else if let Some(matches) = matches.subcommand_matches("sessions") {
+    } else if let Some(_) = matches.subcommand_matches("sessions") {
         let mut table = Table::new();
 
         // Add a row
         table.add_row(row!["Name", "Size (Bytes)", "Time", "Folder ID"]);
 
-        let folder_list = match get_sync_folders(&token) {
+        let _ = match get_sync_folders(&token) {
             Ok(fl) => fl,
             Err(e) => {
                 error!("Read folders error: {}", e);
