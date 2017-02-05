@@ -41,8 +41,8 @@ pub enum APIEndpoint<'a> {
     ReadSyncSessions { encrypted: bool },
     CheckBlock { name: &'a str },
     WriteBlock { session: &'a str, name: &'a str },
+    WriteBlocks { session: &'a str },
     ReadBlock { name: &'a str },
-
 }
 
 impl<'a> APIEndpoint<'a> {
@@ -117,6 +117,9 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::WriteBlock { .. } => {
                 ::reqwest::Method::Post
             },
+            APIEndpoint::WriteBlocks { .. } => {
+                ::reqwest::Method::Post
+            },
             APIEndpoint::ReadBlock { .. } => {
                 ::reqwest::Method::Get
             },
@@ -166,6 +169,9 @@ impl<'a> APIEndpoint<'a> {
             },
             APIEndpoint::WriteBlock { session, name, .. } => {
                 format!("/api/1/sync/block/{}/{}", name, session)
+            },
+            APIEndpoint::WriteBlocks { session } => {
+                format!("/api/1/sync/blocks/{}", session)
             },
             APIEndpoint::ReadBlock { name, .. } => {
                 format!("/api/1/sync/block/{}", name)
