@@ -497,7 +497,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
 
-    let (body, content_length, boundary) = multipart_for_bytes(session_data, name);
+    let (body, content_length) = multipart_for_bytes(session_data, name);
 
     //debug!("body: {}", String::from_utf8_lossy(&body));
 
@@ -508,7 +508,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
         .body(body)
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()))
-        .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
+        .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
         .header(ContentLength(content_length));
 
     let mut result = try!(request.send());
@@ -598,11 +598,11 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
-        let (body, content_length, boundary) = multipart_for_bytes(block.as_ref(), name);
+        let (body, content_length) = multipart_for_bytes(block.as_ref(), name);
         //debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
-        .header(ContentType(format!("multipart/form-data; boundary={}", boundary.to_owned())))
+        .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
         .header(ContentLength(content_length));
     }
     let mut result = try!(request.send());
@@ -650,12 +650,11 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
     Ok(buffer)
 }
 
-fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'static str) {
+fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
 
     let mut body: Vec<u8> = Vec::new();
 
     // these are compile time optimizations
-    let header_boundary: &'static str = "-----SAFEDRIVEBINARY";
     let rn: &'static [u8; 2] = b"\r\n";
     let body_boundary: &'static [u8; 22] = br"-------SAFEDRIVEBINARY";
     let end_boundary: &'static [u8; 24] =  br"-------SAFEDRIVEBINARY--";
@@ -689,6 +688,6 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize, &'stat
 
     let content_length = body.len();
 
-    (body, content_length, header_boundary)
+    (body, content_length)
 }
 

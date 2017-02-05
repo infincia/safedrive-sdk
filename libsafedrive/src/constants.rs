@@ -24,6 +24,10 @@ pub static SECRETBOX_KEY_SIZE: usize = ::sodiumoxide::crypto::secretbox::KEYBYTE
 pub static SECRETBOX_NONCE_SIZE: usize = ::sodiumoxide::crypto::secretbox::NONCEBYTES;
 pub static SECRETBOX_MAC_SIZE: usize = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
+// API constants
+
+pub static MULTIPART_BOUNDARY: &'static str = "-----SAFEDRIVEBINARY";
+
 // keychain constants
 
 static SD_ACCOUNT_CREDENTIAL_DOMAIN_PRODUCTION: &'static str = "safedrive.io";
