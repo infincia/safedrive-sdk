@@ -20,7 +20,7 @@ use std::thread;
 use std::env;
 
 use std::path::{PathBuf};
-use std::io::{Read};
+use std::io::{Read, Write};
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
@@ -82,8 +82,7 @@ pub struct Credentials {
 
 fn main() {
     env_logger::init().unwrap();
-
-    let matches = App::new(NAME)
+    let app = App::new(NAME)
         .version(VERSION)
         .about(COPYRIGHT)
         .arg(Arg::with_name("config")
@@ -176,12 +175,24 @@ fn main() {
                 .takes_value(true)
                 .required(true)
             )
-        )
-        .get_matches();
+        );
+    let mut help = Vec::new();
+    {
+        app.write_help(&mut help).ok().expect("failed to get help");
+    }
+
+    let matches = app.get_matches();
+
+    if let (_, None) = matches.subcommand() {
+        let mut out = ::std::io::stdout();
+        out.write_all(help.as_ref());
+        std::process::exit(1);
+    }
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
     println!();
     let mut config: Configuration = Configuration::Staging;
+
 
     if matches.is_present("production") {
         println!("Environment: production");
