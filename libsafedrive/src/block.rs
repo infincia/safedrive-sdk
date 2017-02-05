@@ -6,6 +6,8 @@ use ::binformat::BinaryFormat;
 use ::nom::IResult::*;
 use ::keys::{Key, WrappedKey, KeyType};
 use ::rustc_serialize::hex::{ToHex};
+use ::blake2_rfc::blake2b::blake2b;
+
 
 use ::constants::*;
 
@@ -20,13 +22,14 @@ pub struct Block {
 impl Block {
     pub fn new(version: SyncVersion, hmac: &Key, data: Vec<u8>) -> Block {
         // calculate hmac of the block
-        let hmac_key = hmac.as_sodium_auth_key();
 
         let block_hmac = match version {
             SyncVersion::Version1 => {
                 let raw_chunk = data.as_slice();
 
                 // use HMACSHA256
+                let hmac_key = hmac.as_sodium_auth_key();
+
                 let tag = ::sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
 
                 tag.as_ref().to_vec()
@@ -34,8 +37,12 @@ impl Block {
             SyncVersion::Version2 => {
                 let raw_chunk = data.as_slice();
 
-                // use blake2
-                panic!("Version 2 unimplemented");
+                // use blake2b
+                let hmac_key = hmac.as_ref();
+
+                let hash = blake2b(32, hmac_key, raw_chunk);
+
+                hash.as_ref().to_vec()
             },
             _ => {
                 panic!("Attempted to create invalid block version");
@@ -78,7 +85,10 @@ impl Block {
             },
             SyncVersion::Version2 => {
                 // We use the blake2 hash function to generate exactly 192-bits/24 bytes
-                panic!("Version 2 unimplemented");
+                let hash = blake2b(24, &[], &self.hmac.as_slice());
+
+                ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&hash.as_ref())
+                    .expect("failed to get nonce")
             },
             _ => {
                 panic!("Attempted to use secretbox nonce with invalid block version");
@@ -215,7 +225,6 @@ fn new_block_v1_test() {
 }
 
 #[test]
-#[should_panic]
 fn new_block_v2_test() {
     let hmac = Key::new(KeyType::HMAC);
     let test_data = Vec::from(TEST_BLOCK_DATA_UNENCRYPTED.as_ref());
@@ -233,14 +242,13 @@ fn wrap_block_v1_test() {
     let block = Block::new(SyncVersion::Version1, &hmac, test_data);
 
 
-    let _ = match block.to_wrapped(&main, &hmac) {
+    let _ = match block.to_wrapped(&main) {
         Ok(wb) => wb,
         Err(_) => { assert!(true == false); return }
     };
 }
 
 #[test]
-#[should_panic]
 fn wrap_block_v2_test() {
     let main = Key::new(KeyType::Main);
     let hmac = Key::new(KeyType::HMAC);
@@ -250,7 +258,7 @@ fn wrap_block_v2_test() {
     let block = Block::new(SyncVersion::Version2, &hmac, test_data);
 
 
-    let _ = match block.to_wrapped(&main, &hmac) {
+    let _ = match block.to_wrapped(&main) {
         Ok(wb) => wb,
         Err(_) => { assert!(true == false); return }
     };
@@ -279,7 +287,6 @@ fn unwrap_block_v1_test() {
 }
 
 #[test]
-#[should_panic]
 fn unwrap_block_v2_test() {
     let main = Key::new(KeyType::Main);
     let hmac = Key::new(KeyType::HMAC);
@@ -325,7 +332,6 @@ fn wrapped_block_from_vec_v1_test() {
 }
 
 #[test]
-#[should_panic]
 fn wrapped_block_from_vec_v2_test() {
     let main = Key::new(KeyType::Main);
     let hmac = Key::new(KeyType::HMAC);
