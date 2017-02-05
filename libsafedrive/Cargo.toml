@@ -27,6 +27,7 @@ regex = "0.2"
 scopeguard = "*"
 parking_lot = "*"
 byteorder = "*"
+blake2-rfc = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
