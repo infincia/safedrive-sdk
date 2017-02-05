@@ -17,7 +17,7 @@ pub struct SyncSession {
     pub size: Option<u64>,
     pub time: Option<u64>,
     #[serde(skip_deserializing)]
-    pub data: Vec<u8>,
+    data: Vec<u8>,
 }
 
 impl SyncSession {
@@ -67,12 +67,12 @@ impl AsRef<[u8]> for SyncSession {
 
 
 pub struct WrappedSyncSession {
-    pub version: SyncVersion,
+    version: SyncVersion,
     pub folder_id: Option<u64>,
     pub name: String,
     pub size: Option<u64>,
     pub time: Option<u64>,
-    pub wrapped_data: Vec<u8>,
+    wrapped_data: Vec<u8>,
     nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     wrapped_key: WrappedKey,
 }
