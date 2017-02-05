@@ -14,7 +14,7 @@ use ::constants::*;
 pub struct Block {
     version: SyncVersion,
     hmac: Vec<u8>,
-    pub data: Vec<u8>
+    data: Vec<u8>
 }
 
 impl Block {
@@ -43,6 +43,10 @@ impl Block {
         };
 
         Block { version: version, data: data, hmac: block_hmac }
+    }
+
+    pub fn len(&self) -> usize {
+        self.data.len()
     }
 
     pub fn name(&self) -> String {

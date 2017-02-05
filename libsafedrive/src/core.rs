@@ -847,7 +847,7 @@ pub fn restore(token: &Token,
                             debug!("write start {:?}", new_position);
 
                         }
-                        debug!("writing block segment of {} bytes", block.data.len());
+                        debug!("writing block segment of {} bytes", block.len());
 
                         {
                             try!(stream.write_all(block.as_ref()));
