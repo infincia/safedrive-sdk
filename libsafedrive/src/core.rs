@@ -15,7 +15,9 @@ use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::cdc::*;
 use ::nom::IResult::*;
-
+use ::byteorder::LittleEndian;
+use ::byteorder::ByteOrder;
+use ::blake2_rfc::blake2b::blake2b;
 
 // internal imports
 
@@ -441,14 +443,29 @@ pub fn sync(token: &Token,
 
                 let separator_size_nb_bits: u32 = 6;
 
-                let t = tweak_key.as_ref();
-
-                let c = |x: u64| {
+                let sync_version1_predicate = |x: u64| {
                     const BITMASK: u64 = (1u64 << 18) - 1;
                     x & BITMASK == BITMASK
                 };
 
-                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, c);
+                let sync_version2_predicate = |x: u64| {
+                    const BITMASK: u64 = (1u64 << 18) - 1;
+                    let mut buf = Vec::new();
+
+                    LittleEndian::write_u64(buf.as_mut(), x);
+
+                    let hash = blake2b(8, tweak_key.as_ref(), buf.as_ref());
+
+                    let h = hash.as_ref().to_vec();
+
+                    let s = h.as_slice();
+
+                    let to_test = LittleEndian::read_u64(&s);
+
+                    to_test & BITMASK == BITMASK
+                };
+
+                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, sync_version1_predicate);
                 let chunk_iter = ChunkIter::new(separator_iter, stream_length);
                 let mut nb_chunk = 0;
                 let mut total_size = 0;
