@@ -443,13 +443,12 @@ pub fn sync(token: &Token,
 
                 let t = tweak_key.as_ref();
 
-                #[inline]
-                fn chunk_predicate(x: u64) -> bool {
+                let c = |x: u64| {
                     const BITMASK: u64 = (1u64 << 18) - 1;
                     x & BITMASK == BITMASK
-                }
+                };
 
-                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, chunk_predicate);
+                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, c);
                 let chunk_iter = ChunkIter::new(separator_iter, stream_length);
                 let mut nb_chunk = 0;
                 let mut total_size = 0;
