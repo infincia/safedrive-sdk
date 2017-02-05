@@ -275,7 +275,7 @@ impl AsRef<[u8]> for Key {
 
 #[test]
 fn key_generate_test() {
-    let wrapped_keyset = match WrappedKeyset::new() {
+    let _ = match WrappedKeyset::new() {
         Ok(wks) => wks,
         Err(_) => { assert!(true == false); return }
     };
