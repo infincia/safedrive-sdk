@@ -497,7 +497,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
 
-    let (body, content_length) = multipart_for_bytes(session_data, name);
+    let (body, content_length) = multipart_for_bytes(session_data, name, true, true);
 
     //debug!("body: {}", String::from_utf8_lossy(&body));
 
@@ -598,7 +598,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
-        let (body, content_length) = multipart_for_bytes(block.as_ref(), name);
+        let (body, content_length) = multipart_for_bytes(block.as_ref(), name, true, true);
         //debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
@@ -623,6 +623,52 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
 }
+
+pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedBlock], should_upload: bool) -> Result<(), SDAPIError> {
+
+    let endpoint = APIEndpoint::WriteBlocks { session: session };
+
+    let user_agent = &**CLIENT_VERSION.read();
+
+    let client = ::reqwest::Client::new().unwrap();
+    let mut request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
+        .header(SDAuthToken(token.token.to_owned()));
+    if should_upload {
+        let mut multipart_body = Vec::new();
+        let mut total_size = 0 as usize;
+        for (i, block) in blocks.iter().enumerate() {
+            let first = i == 0;
+            let last = i == blocks.len() -1;
+            let (body, content_length) = multipart_for_bytes(block.as_ref(), name, first, last);
+            total_size += content_length;
+            multipart_body.extend(body);
+        }
+        //debug!("body: {}", String::from_utf8_lossy(&body));
+
+        request = request.body(multipart_body)
+            .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
+            .header(ContentLength(total_size));
+    }
+    let mut result = try!(request.send());
+
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
+
+    match result.status() {
+        &::reqwest::StatusCode::Ok => Ok(()),
+        &::reqwest::StatusCode::Created => Ok(()),
+        &::reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
+        &::reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+}
+
 
 pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { name: name };
@@ -650,7 +696,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
     Ok(buffer)
 }
 
-fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
+fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -> (Vec<u8>, usize) {
 
     let mut body: Vec<u8> = Vec::new();
 
@@ -664,8 +710,11 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
     let disp = format!("content-disposition: form-data; name=file; filename={}", name);
     let enc: &'static [u8; 33] = br"Content-Transfer-Encoding: binary";
 
-    body.extend(rn);
-    body.extend(rn);
+    if first {
+        body.extend(rn);
+        body.extend(rn);
+    }
+
     body.extend(body_boundary.as_ref());
     body.extend(rn);
 
@@ -682,9 +731,12 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
     body.extend(chunk_data);
     body.extend(rn);
 
-    body.extend(end_boundary.as_ref());
-    body.extend(rn);
-    body.extend(rn);
+    if last {
+        body.extend(end_boundary.as_ref());
+        body.extend(rn);
+        body.extend(rn);
+    }
+
 
     let content_length = body.len();
 
