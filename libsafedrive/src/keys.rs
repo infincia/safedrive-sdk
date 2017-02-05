@@ -208,6 +208,8 @@ impl Key {
             KeyType::Main => SECRETBOX_KEY_SIZE,
             KeyType::HMAC => HMAC_KEY_SIZE,
             KeyType::Tweak => SECRETBOX_KEY_SIZE,
+            KeyType::Block => SECRETBOX_KEY_SIZE,
+            KeyType::Session => SECRETBOX_KEY_SIZE,
             _ => { panic!("other key types can't be created this way");  }
         };
         let key = ::sodiumoxide::randombytes::randombytes(key_size);
@@ -226,6 +228,8 @@ impl Key {
             KeyType::Main => {},
             KeyType::Tweak => {},
             KeyType::Recovery => {},
+            KeyType::Block => {},
+            KeyType::Session => {},
             _ => { panic!("other key types can't be used as a secretbox key");  }
         };
         ::sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get secretbox key struct")
