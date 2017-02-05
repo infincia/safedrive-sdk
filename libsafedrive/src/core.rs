@@ -850,7 +850,7 @@ pub fn restore(token: &Token,
                         debug!("writing block segment of {} bytes", block.data.len());
 
                         {
-                            try!(stream.write_all(&block.data));
+                            try!(stream.write_all(block.as_ref()));
                         }
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();

@@ -95,6 +95,11 @@ impl Block {
     }
 }
 
+impl AsRef<[u8]> for Block {
+    fn as_ref(&self) -> &[u8] {
+        self.data.as_ref()
+    }
+}
 
 
 
@@ -180,4 +185,12 @@ impl WrappedBlock {
         Ok(WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce })
     }
 
+}
+
+
+
+impl AsRef<[u8]> for WrappedBlock {
+    fn as_ref(&self) -> &[u8] {
+        self.wrapped_data.as_ref()
+    }
 }

@@ -592,7 +592,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
-        let (body, content_length, boundary) = multipart_for_bytes(block.wrapped_data.as_slice(), name);
+        let (body, content_length, boundary) = multipart_for_bytes(block.as_ref(), name);
         //debug!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
