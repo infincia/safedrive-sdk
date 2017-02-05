@@ -50,7 +50,7 @@ impl State {
         self.unique_client_id = Some(unique_client_id)
     }
 
-
+    #[allow(dead_code)]
     pub fn get_unique_client_id(&self) -> &str {
         let uid = match self.unique_client_id {
             Some(ref u) => u,

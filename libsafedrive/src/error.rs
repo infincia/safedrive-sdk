@@ -194,7 +194,7 @@ impl std::error::Error for SDError {
             SDError::CryptoError(ref err) => err.description(),
             SDError::SyncAlreadyInProgress => "folder currently being synced",
             SDError::RestoreAlreadyInProgress => "folder currently being restored",
-            SDError::ExceededRetries(retries) => "exceeded retry count",
+            SDError::ExceededRetries(_) => "exceeded retry count",
 
         }
     }
@@ -217,7 +217,7 @@ impl std::error::Error for SDError {
             SDError::CryptoError(ref err) => Some(err),
             SDError::SyncAlreadyInProgress => None,
             SDError::RestoreAlreadyInProgress => None,
-            SDError::ExceededRetries(retries) => None,
+            SDError::ExceededRetries(_) => None,
 
         }
     }
