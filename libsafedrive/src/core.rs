@@ -328,6 +328,7 @@ pub fn sync(token: &Token,
             tweak_key: &Key,
             folder_id: u64,
             progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
+    debug!("creating version {} sync session", SYNC_VERSION);
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,

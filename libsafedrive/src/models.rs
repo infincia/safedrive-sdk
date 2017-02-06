@@ -25,6 +25,22 @@ impl AsRef<[u8]> for SyncVersion {
     }
 }
 
+impl std::fmt::Display for SyncVersion {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        match *self {
+            SyncVersion::Version0 => {
+                write!(f, "0")
+            },
+            SyncVersion::Version1 => {
+                write!(f, "1")
+            },
+            SyncVersion::Version2 => {
+                write!(f, "2")
+            },
+        }
+    }
+}
+
 // responses
 
 //private final String token
