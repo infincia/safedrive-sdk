@@ -17,6 +17,7 @@ env_logger = "*"
 log = "*"
 prettytable-rs = "*"
 chrono = "0.2"
+number_prefix = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"

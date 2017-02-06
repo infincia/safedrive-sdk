@@ -38,6 +38,9 @@ use uuid::Uuid;
 extern crate chrono;
 use ::chrono::{Local, UTC, TimeZone};
 
+extern crate number_prefix;
+use ::number_prefix::{binary_prefix, Standalone, Prefixed};
+
 extern crate safedrive;
 use safedrive::core::initialize;
 use safedrive::core::login;
@@ -604,7 +607,7 @@ fn main() {
         let mut table = Table::new();
 
         // Add a row
-        table.add_row(row!["Folder ID", "Time", "Size (Bytes)", "Name"]);
+        table.add_row(row!["Folder ID", "Time", "Size", "Name"]);
 
         let _ = match get_sync_folders(&token) {
             Ok(fl) => fl,
@@ -621,6 +624,11 @@ fn main() {
             }
         };
         for session in session_list {
+            let session_size = match binary_prefix(session.size.unwrap() as f64) {
+                Standalone(bytes)   => format!("{} bytes", bytes),
+                Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+            };
+
             table.add_row(Row::new(vec![
                 Cell::new(&format!("{}", &session.folder_id.unwrap())),
                 Cell::new(&format!("{}", {
@@ -631,7 +639,7 @@ fn main() {
                     local_time
 
                 })),
-                Cell::new(&format!("{}", &session.size.unwrap())),
+                Cell::new(&session_size),
                 Cell::new(&session.name),
             ]));
         }
