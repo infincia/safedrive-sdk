@@ -668,6 +668,7 @@ pub fn restore(token: &Token,
                main_key: &Key,
                folder_id: u64,
                destination: PathBuf,
+               session_size: u64,
                progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
     try!(fs::create_dir_all(&destination));
 
@@ -709,13 +710,12 @@ pub fn restore(token: &Token,
         Err(e) => return Err(e),
     };
 
-    let mut ar = Archive::new(session.as_ref());
+    let mut processed_size: u64 = 0;
 
-    let entry_count: u64 = ar.entries().iter().count() as u64;
+    let mut ar = Archive::new(session.as_ref());
 
     let mut failed = 0;
 
-    let mut completed_count = 0.0;
     for item in ar.entries().unwrap() {
         let mut file_entry = item.unwrap();
         let mut full_p = PathBuf::from(&destination);
@@ -736,12 +736,11 @@ pub fn restore(token: &Token,
             }
         };
 
-        let percent_completed: f64 = (completed_count / entry_count as f64) * 100.0;
+        let percent_completed: f64 = (processed_size as f64 / session_size as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, "");
+        progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
-        completed_count = completed_count + 1.0;
 
 
         let entry_type = file_entry.header().entry_type();
@@ -782,7 +781,7 @@ pub fn restore(token: &Token,
                     for block_hmac in block_hmac_list.iter() {
 
                         // allow caller to tick the progress display, if one exists
-                        progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, true, "");
+                        progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, true, "");
 
                         let mut should_retry = true;
                         let mut retries_left = 15.0;
@@ -827,7 +826,7 @@ pub fn restore(token: &Token,
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
                                 Ok(rb) => {
                                     // allow caller to tick the progress display, if one exists
-                                    progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, "");
+                                    progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
                                     should_retry = false;
                                     debug!("server provided block: {}", &block_hmac_hex);
@@ -849,7 +848,7 @@ pub fn restore(token: &Token,
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
 
-                                    progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, err.description());
+                                    progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, err.description());
 
 
                                     if retries_left <= 0.0 {
@@ -884,6 +883,10 @@ pub fn restore(token: &Token,
                             debug!("new position {:?}", new_position);
 
                         }
+
+                        processed_size += block.len() as u64;
+                        progress(session_size as u32, processed_size as u32, block.len() as u32, percent_completed, false, "");
+
                     }
 
                 } else {
@@ -935,7 +938,7 @@ pub fn restore(token: &Token,
 
     debug!("restoring session finished");
 
-    progress(entry_count as u32, completed_count as u32, 0 as u32, 100.0, false, "");
+    progress(session_size as u32, processed_size as u32, 0 as u32, 100.0, false, "");
 
     Ok(())
 }

@@ -1554,6 +1554,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                name: *const std::os::raw::c_char,
                                folder_id: std::os::raw::c_ulonglong,
                                destination: *const std::os::raw::c_char,
+                               session_size: std::os::raw::c_ulonglong,
                                progress: extern fn(context: *mut std::os::raw::c_void,
                                                    total: std::os::raw::c_uint,
                                                    current: std::os::raw::c_uint,
@@ -1580,12 +1581,15 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
     let tweak_key = (*c).0.get_tweak_key();
 
     let id = folder_id as u64;
+    let ses_size = session_size as u64;
+
 
     match restore(c.0.get_api_token(),
                   &n,
                   main_key,
                   id,
                   p,
+                  ses_size,
                   &mut |total, current, new, progress_percent, tick, message| {
                       let c_total: std::os::raw::c_uint = total;
                       let c_current: std::os::raw::c_uint = current;
