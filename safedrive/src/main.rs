@@ -628,17 +628,19 @@ fn main() {
                 Standalone(bytes)   => format!("{} bytes", bytes),
                 Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
             };
+            let session_folder_id = format!("{}", &session.folder_id.unwrap());
+
+            let session_time = format!("{}", {
+                let t = session.time.unwrap();
+                let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+                let local_time = utc_time.with_timezone(&Local);
+
+                local_time
+            });
 
             table.add_row(Row::new(vec![
-                Cell::new(&format!("{}", &session.folder_id.unwrap())),
-                Cell::new(&format!("{}", {
-                    let t = session.time.unwrap();
-                    let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
-                    let local_time = utc_time.with_timezone(&Local);
-
-                    local_time
-
-                })),
+                Cell::new(&session_folder_id),
+                Cell::new(&session_time),
                 Cell::new(&session_size),
                 Cell::new(&session.name),
             ]));
