@@ -690,9 +690,11 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
 
         _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
+
     let mut buffer = Vec::new();
 
     try!(result.read_to_end(&mut buffer));
+
 
     Ok(buffer)
 }
