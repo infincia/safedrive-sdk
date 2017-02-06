@@ -391,8 +391,6 @@ pub fn sync(token: &Token,
 
     let mut failed = 0;
 
-    let mut completed_count = 0.0;
-
     let mut percent_completed: f64 = (processed_size as f64 / estimated_size as f64) * 100.0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
@@ -403,9 +401,6 @@ pub fn sync(token: &Token,
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
         // call out to the library user with progress
-
-        completed_count = completed_count + 1.0;
-
         progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
         let p = item.path();
