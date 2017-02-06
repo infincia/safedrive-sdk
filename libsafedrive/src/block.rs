@@ -131,12 +131,18 @@ impl WrappedBlock {
 
         let block_key = match self.wrapped_key.to_key(main, Some(&self.nonce)) {
             Ok(k) => k,
-            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+            Err(e) => {
+                debug!("block key unwrap failed: {:?}", e);
+                return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+            }
         };
 
         let block_raw = match ::sodiumoxide::crypto::secretbox::open(&self.wrapped_data, &self.nonce, &block_key.as_sodium_secretbox_key()) {
             Ok(s) => s,
-            Err(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+            Err(e) => {
+                debug!("block decrypt failed: {:?}", e);
+                return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+            }
         };
 
 
@@ -179,7 +185,29 @@ impl WrappedBlock {
 
         let raw_block: BinaryFormat = match ::binformat::binary_parse(&raw) {
             Done(_, o) => o,
-            Error(_) => return Err(SDError::BlockMissing),
+            Error(e) => {
+                debug!("block parsing failed: {}", &e);
+
+                match e {
+                    ::nom::verbose_errors::Err::Code(ref kind) => {
+                        debug!("block parse failure kind: {:?}", kind);
+
+                    },
+                    ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
+                        debug!("block parse failure node: {:?}, {}", kind, err);
+
+                    },
+                    ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
+                        debug!("block parse failure position: {:?}: {:?}", kind, position);
+
+                    },
+                    ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
+                        debug!("block parse failure kind: {:?}: {:?}, {}", kind, position, err);
+
+                    },
+                };
+
+                return Err(SDError::BlockMissing) },
             Incomplete(_) => panic!("should never happen")
         };
 
