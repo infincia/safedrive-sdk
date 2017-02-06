@@ -454,11 +454,11 @@ pub fn sync(token: &Token,
                             x
                         },
                         SyncVersion::Version2 => {
-                            let mut buf = Vec::new();
+                            let mut buf = [0; 8];
 
-                            LittleEndian::write_u64(buf.as_mut(), x);
+                            LittleEndian::write_u64(&mut buf, x);
 
-                            let hash = blake2b(8, tweak_key.as_ref(), buf.as_ref());
+                            let hash = blake2b(8, tweak_key.as_ref(), &buf);
 
                             let h = hash.as_ref().to_vec();
 
