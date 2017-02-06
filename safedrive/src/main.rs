@@ -65,6 +65,7 @@ use safedrive::core::get_current_os;
 
 
 use safedrive::models::{RegisteredFolder};
+use safedrive::session::SyncSession;
 use safedrive::constants::Configuration;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -173,7 +174,7 @@ fn main() {
                 .value_name("SESSION")
                 .help("session to restore")
                 .takes_value(true)
-                .required(true)
+                .required(false)
             )
         );
     let mut help = Vec::new();
@@ -484,15 +485,23 @@ fn main() {
             }
         }
     } else if let Some(matches) = matches.subcommand_matches("restore") {
+        let p = matches.value_of("destination").unwrap();
+        let pa = PathBuf::from(&p);
+
+
+        let session_list = match get_sync_sessions(&token) {
+            Ok(sl) => sl,
+            Err(e) => {
+                error!("Read sessions error: {}", e);
+                std::process::exit(1);
+            }
+        };
+
+
         let id: u64 = matches.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
-
-        let session_name = matches.value_of("session").unwrap();
-
-        let p = matches.value_of("destination").unwrap();
-        let pa = PathBuf::from(&p);
 
         let folder = match get_sync_folder(&token, id) {
             Ok(f) => f,
@@ -502,26 +511,44 @@ fn main() {
             }
         };
 
-        let _ = match get_sync_session(&token, id, &session_name) {
-            Ok(s) => s,
-            Err(e) => {
-                error!("Read session error: {}", e);
+        let mut sessions: Vec<SyncSession> = session_list.into_iter().filter(|ses| ses.folder_id.unwrap() == id).collect();
+
+        sessions.sort_by(|a, b| a.time.unwrap().cmp(&b.time.unwrap()));
+
+        // if we got a session argument, use that one
+        let mut filtered = match matches.value_of("session") {
+            Some(m) => {
+                let sessions: Vec<SyncSession> = sessions.into_iter().filter(|ses| ses.name == m).collect();
+
+                sessions
+            },
+            None => {
+
+                sessions
+            },
+        };
+
+        let ref session = match filtered.pop() {
+            Some(ses) => ses,
+            None => {
+                error!("No session found");
                 std::process::exit(1);
-            }
+            },
         };
 
         //TODO: this is not portable to windows, must be fixed before use there
-        println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &session_name, &pa.to_str().unwrap());
+        println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &session.name, &pa.to_str().unwrap());
 
         let mut pb = ProgressBar::new(0);
         pb.format("╢▌▌░╟");
         pb.set_units(Units::Bytes);
 
         match restore(&token,
-                      &session_name,
+                      &session.name,
                       &keyset.main,
                       folder.id,
                       pa,
+                      session.size.unwrap(),
                       &mut |total, _, new, _, tick, message| {
                           if message.len() > 0 {
                               let message = format!("Stalled: ");
