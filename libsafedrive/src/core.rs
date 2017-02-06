@@ -810,7 +810,7 @@ pub fn restore(token: &Token,
                             match ::cache::read_block(&block_hmac_hex) {
                                 Ok(br) => {
                                     wrapped_block = Some(br);
-                                    debug!("cache provided block {}", &block_hmac_hex);
+                                    debug!("cache provided block: {}", &block_hmac_hex);
                                     break;
                                 },
                                 _ => {}
@@ -824,11 +824,12 @@ pub fn restore(token: &Token,
                                     progress(entry_count as u32, completed_count as u32, 0 as u32, percent_completed, false, "");
 
                                     should_retry = false;
-                                    debug!("server provided block {}", &block_hmac_hex);
+                                    debug!("server provided block: {}", &block_hmac_hex);
                                     let wb = match WrappedBlock::from(rb, (&block_hmac_hex).from_hex().unwrap()) {
                                         Ok(wb) => wb,
                                         Err(e) => return Err(e),
                                     };
+                                    debug!("block processed: {}", &block_hmac_hex);
 
                                     match ::cache::write_block(&wb) {
                                         _ => {}
@@ -856,6 +857,7 @@ pub fn restore(token: &Token,
                             Ok(b) => b,
                             Err(e) => return Err(e),
                         };
+                        debug!("block unwrapped");
 
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
