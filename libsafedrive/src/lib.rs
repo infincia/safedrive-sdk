@@ -19,7 +19,7 @@ mod state;
 mod binformat;
 mod cache;
 mod block;
-mod session;
+pub mod session;
 mod lock;
 
 // external crates
