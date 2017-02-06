@@ -9,6 +9,17 @@ pub enum SyncVersion {
     Version1, // testing format
     Version2, // production
 }
+
+impl SyncVersion {
+    pub fn leading_value_size(&self) -> usize {
+        match *self {
+            SyncVersion::Version0 => panic!("invalid version"),
+            SyncVersion::Version1 => 18 as usize,
+            SyncVersion::Version2 => 13 as usize,
+        }
+    }
+}
+
 impl std::default::Default for SyncVersion {
     fn default() -> SyncVersion {
         SyncVersion::Version1

@@ -442,7 +442,7 @@ pub fn sync(token: &Token,
                 let separator_size_nb_bits: u32 = 6;
 
                 let predicate = |x: u64| {
-                    const BITMASK: u64 = (1u64 << 18) - 1;
+                    let BITMASK: u64 = (1u64 << SYNC_VERSION.leading_value_size()) - 1;
 
                     let to_test = match SYNC_VERSION {
                         SyncVersion::Version0 => panic!("invalid sync version"),
@@ -474,7 +474,7 @@ pub fn sync(token: &Token,
                 let mut skipped_blocks = 0;
                 let mut smallest_size = std::u64::MAX;
                 let mut largest_size = 0;
-                let expected_size = 1 << 18;
+                let expected_size = 1 << SYNC_VERSION.leading_value_size();
                 let mut size_variance = 0;
                 let mut chunks: Vec<u8> = Vec::new();
 
