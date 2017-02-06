@@ -768,7 +768,11 @@ pub fn restore(token: &Token,
                     try!(file_entry.read_to_end(&mut block_hmac_bag));
                     let block_hmac_list = match ::binformat::parse_hmacs(&block_hmac_bag) {
                         Done(_, o) => o,
-                        Error(_) => return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed)),
+                        Error(e) => {
+                            debug!("hmac bag parsing failed: {}", e);
+
+                            return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+                        },
                         Incomplete(_) => panic!("should never happen")
                     };
 
