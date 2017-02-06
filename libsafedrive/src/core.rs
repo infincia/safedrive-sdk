@@ -782,7 +782,7 @@ pub fn restore(token: &Token,
                         let mut retries_left = 15.0;
 
                         let block_hmac_hex = block_hmac.to_hex();
-                        println!("processing block {}", &block_hmac_hex);
+                        debug!("processing block {}", &block_hmac_hex);
 
 
                         let mut wrapped_block: Option<WrappedBlock> = None;
