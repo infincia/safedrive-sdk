@@ -16,6 +16,7 @@ serde_derive = "^0.9"
 env_logger = "*"
 log = "*"
 prettytable-rs = "*"
+chrono = { version = "0.2", features = ["serde", "rustc-serialize"] }
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"

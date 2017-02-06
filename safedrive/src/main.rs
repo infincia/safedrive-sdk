@@ -35,6 +35,9 @@ use self::pbr::Units;
 extern crate uuid;
 use uuid::Uuid;
 
+extern crate chrono;
+use ::chrono::{Local, UTC, TimeZone};
+
 extern crate safedrive;
 use safedrive::core::initialize;
 use safedrive::core::login;
@@ -536,8 +539,12 @@ fn main() {
             },
         };
 
+        let t = session.time.unwrap();
+        let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+        let local_time = utc_time.with_timezone(&Local);
+
         //TODO: this is not portable to windows, must be fixed before use there
-        println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &session.name, &pa.to_str().unwrap());
+        println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &local_time, &pa.to_str().unwrap());
 
         let mut pb = ProgressBar::new(0);
         pb.format("╢▌▌░╟");
@@ -617,7 +624,14 @@ fn main() {
             table.add_row(Row::new(vec![
                 Cell::new(&session.name),
                 Cell::new(&format!("{}", &session.size.unwrap())),
-                Cell::new(&format!("{}", &session.time.unwrap())),
+                Cell::new(&format!("{}", {
+                    let t = session.time.unwrap();
+                    let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+                    let local_time = utc_time.with_timezone(&Local);
+
+                    local_time
+
+                })),
                 Cell::new(&format!("{}", &session.folder_id.unwrap()))])
             );
         }
