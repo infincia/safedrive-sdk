@@ -40,7 +40,7 @@ impl Block {
                 // use blake2b
                 let hmac_key = hmac.as_ref();
 
-                let hash = blake2b(32, hmac_key, raw_chunk);
+                let hash = blake2b(HMAC_SIZE, hmac_key, raw_chunk);
 
                 hash.as_ref().to_vec()
             },
@@ -85,7 +85,7 @@ impl Block {
             },
             SyncVersion::Version2 => {
                 // We use the blake2 hash function to generate exactly 192-bits/24 bytes
-                let hash = blake2b(24, &[], &self.hmac.as_slice());
+                let hash = blake2b(SECRETBOX_NONCE_SIZE, &[], &self.hmac.as_slice());
 
                 ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&hash.as_ref())
                     .expect("failed to get nonce")
