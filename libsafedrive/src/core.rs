@@ -36,6 +36,7 @@ use ::CACHE_DIR;
 use ::CLIENT_VERSION;
 use ::OPERATING_SYSTEM;
 use ::LANGUAGE_CODE;
+use ::SYNC_VERSION;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
@@ -443,29 +444,33 @@ pub fn sync(token: &Token,
 
                 let separator_size_nb_bits: u32 = 6;
 
-                let sync_version1_predicate = |x: u64| {
+                let predicate = |x: u64| {
                     const BITMASK: u64 = (1u64 << 18) - 1;
-                    x & BITMASK == BITMASK
-                };
 
-                let sync_version2_predicate = |x: u64| {
-                    const BITMASK: u64 = (1u64 << 18) - 1;
-                    let mut buf = Vec::new();
+                    let to_test = match SYNC_VERSION {
+                        SyncVersion::Version0 => panic!("invalid sync version"),
+                        SyncVersion::Version1 => {
+                            x
+                        },
+                        SyncVersion::Version2 => {
+                            let mut buf = Vec::new();
 
-                    LittleEndian::write_u64(buf.as_mut(), x);
+                            LittleEndian::write_u64(buf.as_mut(), x);
 
-                    let hash = blake2b(8, tweak_key.as_ref(), buf.as_ref());
+                            let hash = blake2b(8, tweak_key.as_ref(), buf.as_ref());
 
-                    let h = hash.as_ref().to_vec();
+                            let h = hash.as_ref().to_vec();
 
-                    let s = h.as_slice();
+                            let s = h.as_slice();
 
-                    let to_test = LittleEndian::read_u64(&s);
+                            LittleEndian::read_u64(&s)
+                        },
+                    };
 
                     to_test & BITMASK == BITMASK
                 };
 
-                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, sync_version1_predicate);
+                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, predicate);
                 let chunk_iter = ChunkIter::new(separator_iter, stream_length);
                 let mut nb_chunk = 0;
                 let mut total_size = 0;
@@ -499,7 +504,7 @@ pub fn sync(token: &Token,
                         return Err(SDError::from(e))
                     }
 
-                    let block = Block::new(SyncVersion::Version1, hmac_key, data);
+                    let block = Block::new(SYNC_VERSION, hmac_key, data);
                     let block_name = block.name();
                     chunks.extend_from_slice(&block.get_hmac());
 
@@ -608,7 +613,7 @@ pub fn sync(token: &Token,
     let raw_session = ar.into_inner().unwrap();
 
 
-    let session = SyncSession::new(SyncVersion::Version1, folder_id, session_name.to_string(), Some(archive_size), None, raw_session);
+    let session = SyncSession::new(SYNC_VERSION, folder_id, session_name.to_string(), Some(archive_size), None, raw_session);
     let wrapped_session = match session.to_wrapped(main_key) {
         Ok(ws) => ws,
         Err(e) => return Err(SDError::CryptoError(e)),
