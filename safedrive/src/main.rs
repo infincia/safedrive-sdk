@@ -604,7 +604,7 @@ fn main() {
         let mut table = Table::new();
 
         // Add a row
-        table.add_row(row!["Name", "Size (Bytes)", "Time", "Folder ID"]);
+        table.add_row(row!["Folder ID", "Time", "Size (Bytes)", "Name"]);
 
         let _ = match get_sync_folders(&token) {
             Ok(fl) => fl,
@@ -622,8 +622,7 @@ fn main() {
         };
         for session in session_list {
             table.add_row(Row::new(vec![
-                Cell::new(&session.name),
-                Cell::new(&format!("{}", &session.size.unwrap())),
+                Cell::new(&format!("{}", &session.folder_id.unwrap())),
                 Cell::new(&format!("{}", {
                     let t = session.time.unwrap();
                     let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
@@ -632,8 +631,9 @@ fn main() {
                     local_time
 
                 })),
-                Cell::new(&format!("{}", &session.folder_id.unwrap()))])
-            );
+                Cell::new(&format!("{}", &session.size.unwrap())),
+                Cell::new(&session.name),
+            ]));
         }
         table.printstd();
 
