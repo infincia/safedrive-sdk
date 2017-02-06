@@ -827,7 +827,11 @@ pub fn restore(token: &Token,
                                     debug!("server provided block: {}", &block_hmac_hex);
                                     let wb = match WrappedBlock::from(rb, (&block_hmac_hex).from_hex().unwrap()) {
                                         Ok(wb) => wb,
-                                        Err(e) => return Err(e),
+                                        Err(e) => {
+                                            debug!("block failed validation: {}", &block_hmac_hex);
+
+                                            return Err(e)
+                                        },
                                     };
                                     debug!("block processed: {}", &block_hmac_hex);
 
