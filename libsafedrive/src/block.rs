@@ -233,14 +233,6 @@ impl WrappedBlock {
 
 }
 
-
-
-impl AsRef<[u8]> for WrappedBlock {
-    fn as_ref(&self) -> &[u8] {
-        self.wrapped_data.as_ref()
-    }
-}
-
 #[allow(dead_code)]
 static TEST_BLOCK_DATA_UNENCRYPTED: [u8; 1024] = [7u8; 1024];
 
