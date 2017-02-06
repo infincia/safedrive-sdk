@@ -667,6 +667,7 @@ pub fn restore(token: &Token,
                folder_id: u64,
                destination: PathBuf,
                progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
+    try!(fs::create_dir_all(&destination));
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
