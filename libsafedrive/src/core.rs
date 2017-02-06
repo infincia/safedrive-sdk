@@ -362,7 +362,8 @@ pub fn sync(token: &Token,
     }
 
     let mut ar = Builder::new(archive_file);
-    let mut archive_size: u64 = 0;
+
+    let mut processed_size: u64 = 0;
 
     let mut estimated_size: u64 = 0;
 
@@ -392,20 +393,20 @@ pub fn sync(token: &Token,
 
     let mut completed_count = 0.0;
 
-    let mut percent_completed: f64 = (archive_size as f64 / estimated_size as f64) * 100.0;
+    let mut percent_completed: f64 = (processed_size as f64 / estimated_size as f64) * 100.0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
         if DEBUG_STATISTICS {
             debug!("examining {}", item.path().display());
         }
 
-        percent_completed = (archive_size as f64 / estimated_size as f64) * 100.0;
+        percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
         // call out to the library user with progress
-        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, "");
 
         completed_count = completed_count + 1.0;
 
+        progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
         let p = item.path();
         let p_relative = p.strip_prefix(&folder_path).expect("failed to unwrap relative path");
@@ -474,7 +475,7 @@ pub fn sync(token: &Token,
                 let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, predicate);
                 let chunk_iter = ChunkIter::new(separator_iter, stream_length);
                 let mut nb_chunk = 0;
-                let mut total_size = 0;
+                let mut item_size = 0;
                 let mut skipped_blocks = 0;
                 let mut smallest_size = std::u64::MAX;
                 let mut largest_size = 0;
@@ -486,8 +487,8 @@ pub fn sync(token: &Token,
 
                 for chunk in chunk_iter {
                     nb_chunk += 1;
-                    total_size += chunk.size;
-                    archive_size += chunk.size;
+                    item_size += chunk.size;
+                    processed_size += chunk.size;
 
                     debug!("creating chunk at {} of size {}", chunk_start, chunk.size);
 
@@ -520,7 +521,7 @@ pub fn sync(token: &Token,
 
                     while should_retry {
                         // allow caller to tick the progress display, if one exists
-                        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, "");
+                        progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
                         let failed_count = 15.0 - retries_left;
                         let mut rng = ::rand::thread_rng();
@@ -545,11 +546,11 @@ pub fn sync(token: &Token,
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
                                 // allow caller to tick the progress display, if one exists
-                                progress(estimated_size as u32, archive_size as u32, chunk.size as u32, percent_completed, false, "");
+                                progress(estimated_size as u32, processed_size as u32, chunk.size as u32, percent_completed, false, "");
                                 should_retry = false
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
-                                progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, err.description());
+                                progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, err.description());
 
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
@@ -568,8 +569,8 @@ pub fn sync(token: &Token,
                         }
                     }
                 }
-                assert!(total_size == stream_length);
-                debug!("calculated {} bytes of blocks, matching stream size {}", total_size, stream_length);
+                assert!(item_size == stream_length);
+                debug!("calculated {} bytes of blocks, matching stream size {}", item_size, stream_length);
 
                 let chunklist = BufReader::new(chunks.as_slice());
                 header.set_size(nb_chunk * HMAC_SIZE as u64); // hmac list size
@@ -578,7 +579,7 @@ pub fn sync(token: &Token,
 
 
                 if DEBUG_STATISTICS {
-                    debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, total_size / nb_chunk);
+                    debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, item_size / nb_chunk);
 
                     debug!("hmac list has {} ids <{} bytes>", chunks.len() / 32, nb_chunk * 32);
                     debug!("expected chunk size: {} bytes", expected_size);
@@ -614,7 +615,7 @@ pub fn sync(token: &Token,
     let raw_session = ar.into_inner().unwrap();
 
 
-    let session = SyncSession::new(SYNC_VERSION, folder_id, session_name.to_string(), Some(archive_size), None, raw_session);
+    let session = SyncSession::new(SYNC_VERSION, folder_id, session_name.to_string(), Some(processed_size), None, raw_session);
     let wrapped_session = match session.to_wrapped(main_key) {
         Ok(ws) => ws,
         Err(e) => return Err(SDError::CryptoError(e)),
@@ -630,7 +631,7 @@ pub fn sync(token: &Token,
 
     while should_retry {
         // allow caller to tick the progress display, if one exists
-        progress(estimated_size as u32, archive_size as u32, 0 as u32, percent_completed, false, "");
+        progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
         let failed_count = 15.0 - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -647,7 +648,7 @@ pub fn sync(token: &Token,
             thread::sleep(delay);
         }
 
-        match finish_sync_session(&token, folder_id, session_name, true, &binary_data, archive_size as usize) {
+        match finish_sync_session(&token, folder_id, session_name, true, &binary_data, processed_size as usize) {
             Ok(()) => {
                 should_retry = false;
             },
@@ -661,7 +662,7 @@ pub fn sync(token: &Token,
     }
 
 
-    progress(estimated_size as u32, archive_size as u32, 0 as u32, 100.0, false, "");
+    progress(estimated_size as u32, processed_size as u32, 0 as u32, 100.0, false, "");
 
     Ok(())
 }
