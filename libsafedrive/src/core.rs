@@ -357,9 +357,8 @@ pub fn sync(token: &Token,
 
     let archive_file = Vec::new();
 
-    if DEBUG_STATISTICS {
-        debug!("creating archive for: {} (folder id {})", folder_name, folder_id);
-    }
+    debug!("creating session for: {} (folder id {})", folder_name, folder_id);
+
 
     let mut ar = Builder::new(archive_file);
 
@@ -695,9 +694,8 @@ pub fn restore(token: &Token,
     };
 
 
-    if DEBUG_STATISTICS {
-        debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
-    }
+    debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
+
 
 
     let w_session = match WrappedSyncSession::from(session_body) {
