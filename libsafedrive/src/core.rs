@@ -420,7 +420,7 @@ pub fn sync(token: &Token,
         let is_symlink = md.file_type().is_symlink();
 
         // store metadata for directory or file
-        let mut header = Header::new_ustar();
+        let mut header = Header::new_gnu();
         if let Err(err) = header.set_path(p_relative) {
             if DEBUG_STATISTICS {
                 debug!("not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
