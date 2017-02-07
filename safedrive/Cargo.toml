@@ -16,7 +16,7 @@ serde_derive = "^0.9"
 env_logger = "*"
 log = "*"
 prettytable-rs = "*"
-chrono = "0.2"
+chrono = "0.3"
 number_prefix = "*"
 
 [dependencies.libsafedrive]
