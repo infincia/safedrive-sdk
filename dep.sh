@@ -9,18 +9,21 @@ case $TARGET in
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export DBUS_ARGS="--enable-shared=yes"
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="-O2 -g -flto"
         export LDFLAGS="-flto"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export DBUS_ARGS="--enable-shared=yes"
         ;;
     i686-unknown-linux-gnu)
         export CFLAGS="-O2 -g -flto -m32"
         export LDFLAGS="-flto"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export DBUS_ARGS="--enable-shared=yes"
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     x86_64-unknown-linux-musl)
@@ -29,6 +32,7 @@ case $TARGET in
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export DBUS_ARGS="--enable-shared=no"
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="-O2 -g -flto -m32"
@@ -36,6 +40,7 @@ case $TARGET in
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
+        export DBUS_ARGS="--enable-shared=no"
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     *)
@@ -46,6 +51,20 @@ if [ ! -z "$QEMU_LD_PREFIX" ]; then
     # Run tests on a single thread when using QEMU user emulation
     export RUST_TEST_THREADS=1
 fi
+
+#if [ ! -f dep/$TARGET/lib/libdbus-1.a ]; then
+#    export LIBDBUS_VER=1.10.14
+
+#    wget https://dbus.freedesktop.org/releases/dbus/dbus-$LIBDBUS_VER.tar.gz > /dev/null
+#    tar xvzf dbus-$LIBDBUS_VER.tar.gz > /dev/null
+#    DBUS_PREFIX=$PWD/dep/$TARGET
+#    pushd dbus-$LIBDBUS_VER
+#    ./configure --prefix=$DBUS_PREFIX $DBUS_ARGS > /dev/null
+#    make > /dev/null
+#    make install > /dev/null
+#    popd
+#    rm -rf dbus*
+#fi
 
 if [ ! -f dep/$TARGET/lib/libssl.a ]; then
     export OPENSSL_VER=1.1.0d
