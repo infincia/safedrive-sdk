@@ -367,9 +367,8 @@ pub fn sync(token: &Token,
     let mut estimated_size: u64 = 0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
-        if DEBUG_STATISTICS {
-            debug!("estimating size of {}...", item.path().display());
-        }
+        debug!("estimating size of {}...", item.path().display());
+
         let p = item.path();
 
         let f = match File::open(p) {
@@ -382,9 +381,8 @@ pub fn sync(token: &Token,
         };
 
         let stream_length = md.len();
-        if DEBUG_STATISTICS {
-            debug!("stream: {}", stream_length);
-        }
+        debug!("stream: {}", stream_length);
+
         estimated_size = estimated_size + stream_length;
     }
 
@@ -393,9 +391,7 @@ pub fn sync(token: &Token,
     let mut percent_completed: f64 = (processed_size as f64 / estimated_size as f64) * 100.0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
-        if DEBUG_STATISTICS {
-            debug!("examining {}", item.path().display());
-        }
+        debug!("examining {}", item.path().display());
 
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
@@ -422,9 +418,8 @@ pub fn sync(token: &Token,
         // store metadata for directory or file
         let mut header = Header::new_gnu();
         if let Err(err) = header.set_path(p_relative) {
-            if DEBUG_STATISTICS {
-                debug!("not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
-            }
+            debug!("not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
+
             failed + failed + 1;
             continue // we don't care about errors here, they'll only happen for truly invalid paths
         }
@@ -720,15 +715,13 @@ pub fn restore(token: &Token,
 
         match file_entry.path() {
             Ok(ref p) => {
-                if DEBUG_STATISTICS {
-                    debug!("examining {}", &p.display());
-                }
+                debug!("examining {}", &p.display());
+
                 full_p.push(p);
             }
             Err(e) => {
-                if DEBUG_STATISTICS {
-                    debug!("not restoring invalid path: {})", e);
-                }
+                debug!("not restoring invalid path: {})", e);
+
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
             }
