@@ -12,7 +12,6 @@ extern crate serde;
 extern crate serde_json;
 
 use std::str;
-use std::ffi::{OsStr};
 use std::fs::File;
 use std::thread;
 
@@ -20,7 +19,7 @@ use std::thread;
 use std::env;
 
 use std::path::{PathBuf};
-use std::io::{Read, Write};
+use std::io::{Read};
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
@@ -55,7 +54,6 @@ use safedrive::core::add_sync_folder;
 use safedrive::core::remove_sync_folder;
 
 use safedrive::core::get_sync_sessions;
-use safedrive::core::get_sync_session;
 
 #[cfg(target_os = "linux")]
 use safedrive::core::get_openssl_directory;
