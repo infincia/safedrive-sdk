@@ -15,7 +15,7 @@ impl SyncVersion {
         match *self {
             SyncVersion::Version0 => panic!("invalid version"),
             SyncVersion::Version1 => 18 as usize,
-            SyncVersion::Version2 => 13 as usize,
+            SyncVersion::Version2 => 18 as usize,
         }
     }
 }
