@@ -244,6 +244,54 @@ impl Key {
         ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")
     }
 
+    pub fn as_blake2_64(&self) -> &[u8] {
+        match self.key_type {
+            KeyType::HMAC => {},
+            KeyType::Tweak => {},
+            _ => { panic!("other key types can't be used as a blake2 key");  }
+        };
+        let s = self.bytes.as_slice();
+        let k = &s[0..8];
+
+        k
+    }
+
+    pub fn as_blake2_128(&self) -> &[u8] {
+        match self.key_type {
+            KeyType::HMAC => {},
+            KeyType::Tweak => {},
+            _ => { panic!("other key types can't be used as a blake2 key");  }
+        };
+        let s = self.bytes.as_slice();
+        let k = &s[0..16];
+
+        k
+    }
+
+    pub fn as_blake2_192(&self) -> &[u8] {
+        match self.key_type {
+            KeyType::HMAC => {},
+            KeyType::Tweak => {},
+            _ => { panic!("other key types can't be used as a blake2 key");  }
+        };
+        let s = self.bytes.as_slice();
+        let k = &s[0..24];
+
+        k
+    }
+
+    pub fn as_blake2_256(&self) -> &[u8] {
+        match self.key_type {
+            KeyType::HMAC => {},
+            KeyType::Tweak => {},
+            _ => { panic!("other key types can't be used as a blake2 key");  }
+        };
+        let s = self.bytes.as_slice();
+        let k = &s[0..32];
+
+        k
+    }
+
     pub fn to_wrapped(&self, wrapping_key: &Key, nonce: Option<&::sodiumoxide::crypto::secretbox::Nonce>) -> Result<WrappedKey, CryptoError> {
         let n = match self.key_type {
             KeyType::Master |
@@ -268,11 +316,6 @@ impl Key {
     }
 }
 
-impl AsRef<[u8]> for Key {
-    fn as_ref(&self) -> &[u8] {
-        self.bytes.as_slice()
-    }
-}
 
 #[test]
 fn key_generate_test() {

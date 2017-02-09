@@ -38,7 +38,7 @@ impl Block {
                 let raw_chunk = data.as_slice();
 
                 // use blake2b
-                let hmac_key = hmac.as_ref();
+                let hmac_key = hmac.as_blake2_256();
 
                 let hash = blake2b(HMAC_SIZE, hmac_key, raw_chunk);
 
