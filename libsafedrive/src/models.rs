@@ -18,6 +18,14 @@ impl SyncVersion {
             SyncVersion::Version2 => 18 as usize,
         }
     }
+
+    pub fn window_size_bits(&self) -> u32 {
+        match *self {
+            SyncVersion::Version0 => panic!("invalid version"),
+            SyncVersion::Version1 => 6,
+            SyncVersion::Version2 => 6,
+        }
+    }
 }
 
 impl std::default::Default for SyncVersion {
