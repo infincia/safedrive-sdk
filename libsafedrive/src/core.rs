@@ -889,9 +889,69 @@ pub fn restore(token: &Token,
                 try!(fs::create_dir_all(&full_p));
             },
             EntryType::Link => {
-                // hard link, may not want to try handling these yet where they exist
+                let src = match file_entry.link_name() {
+                    Ok(op) => {
+                        match op {
+                            Some(pa) => pa,
+                            None => {
+                                debug!("not restoring invalid hard link: no link name found");
+                                continue;
+                            },
+                        }
+                    },
+                    Err(e) => {
+                        debug!("not restoring invalid hard link: {})", e);
+                        continue;
+                    }
+                };
+
+
+                match ::std::fs::hard_link(&src, full_p) {
+                    Ok(()) => {},
+                    Err(e) => {
+                        error!("failed to restore hard link: {})", e);
+                    },
+                }
+
             },
             EntryType::Symlink => {
+                let src = match file_entry.link_name() {
+                    Ok(op) => {
+                        match op {
+                            Some(pa) => pa,
+                            None => {
+                                debug!("not restoring invalid hard link: no link name found");
+                                continue;
+                            },
+                        }
+                    },
+                    Err(e) => {
+                        debug!("not restoring invalid hard link: {})", e);
+                        continue;
+                    }
+                };
+
+                if src.iter().count() == 0 {
+                    debug!("not restoring invalid symlink: destination not found");
+                    continue;
+                }
+
+                #[cfg(unix)]
+                match ::std::os::unix::fs::symlink(&src, full_p) {
+                    Ok(()) => {},
+                    Err(e) => {
+                        error!("failed to restore sym link: {})", e);
+                    },
+                }
+
+                #[cfg(windows)]
+                match ::std::os::windows::fs::symlink_file(&src, full_p) {
+                    Ok(()) => {},
+                    Err(e) => {
+                        error!("failed to restore sym link: {})", e);
+                    },
+                }
+
 
             },
             EntryType::Char => {
