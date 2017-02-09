@@ -237,7 +237,8 @@ impl Key {
 
     pub fn as_sodium_auth_key(&self) -> ::sodiumoxide::crypto::auth::Key {
         match self.key_type {
-            KeyType::HMAC => HMAC_KEY_SIZE,
+            KeyType::HMAC => {},
+            KeyType::Tweak => {},
             _ => { panic!("other key types can't be used as an auth key");  }
         };
         ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")
