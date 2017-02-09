@@ -27,6 +27,7 @@ regex = "0.2"
 scopeguard = "*"
 parking_lot = "*"
 byteorder = "*"
+#blake2-rfc = { version = "*" }
 blake2-rfc = { version = "*", features = ["simd", "simd_opt", "simd_asm"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
