@@ -334,8 +334,15 @@ fn main() {
 
 
 
-    if let Some(_) = matches.subcommand_matches("add") {
-        let p = matches.value_of("path").unwrap();
+    if let Some(m) = matches.subcommand_matches("add") {
+        let p = match m.value_of("path") {
+            Some(p) => p,
+            None => {
+                error!("failed to get path from argument list");
+                std::process::exit(1);
+            }
+        };
+
         let pa = PathBuf::from(&p);
         //TODO: this is not portable to windows, must be fixed before use there
         println!("Adding new sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
@@ -346,8 +353,8 @@ fn main() {
                 error!("failed to add new sync folder: {}", e);
             }
         }
-    } else if let Some(matches) = matches.subcommand_matches("remove") {
-        let id: u64 = matches.value_of("id").unwrap()
+    } else if let Some(m) = matches.subcommand_matches("remove") {
+        let id: u64 = m.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
@@ -431,8 +438,8 @@ fn main() {
 
         mb.listen();
 
-    } else if let Some(matches) = matches.subcommand_matches("sync") {
-        let id: u64 = matches.value_of("id").unwrap()
+    } else if let Some(m) = matches.subcommand_matches("sync") {
+        let id: u64 = m.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
@@ -480,8 +487,8 @@ fn main() {
                 std::process::exit(1);
             }
         }
-    } else if let Some(matches) = matches.subcommand_matches("restore") {
-        let p = matches.value_of("destination").unwrap();
+    } else if let Some(m) = matches.subcommand_matches("restore") {
+        let p = m.value_of("destination").unwrap();
         let pa = PathBuf::from(&p);
 
 
@@ -494,7 +501,7 @@ fn main() {
         };
 
 
-        let id: u64 = matches.value_of("id").unwrap()
+        let id: u64 = m.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
@@ -512,7 +519,7 @@ fn main() {
         sessions.sort_by(|a, b| a.time.unwrap().cmp(&b.time.unwrap()));
 
         // if we got a session argument, use that one
-        let mut filtered = match matches.value_of("session") {
+        let mut filtered = match m.value_of("session") {
             Some(m) => {
                 let sessions: Vec<SyncSession> = sessions.into_iter().filter(|ses| ses.name == m).collect();
 
