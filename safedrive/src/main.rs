@@ -90,6 +90,7 @@ fn main() {
     let app = App::new(NAME)
         .version(VERSION)
         .about(COPYRIGHT)
+        .setting(::clap::AppSettings::SubcommandRequiredElseHelp)
         .arg(Arg::with_name("config")
             .short("c")
             .long("config")
@@ -181,18 +182,9 @@ fn main() {
                 .required(false)
             )
         );
-    let mut help = Vec::new();
-    {
-        app.write_help(&mut help).ok().expect("failed to get help");
-    }
 
     let matches = app.get_matches();
 
-    if let (_, None) = matches.subcommand() {
-        let mut out = ::std::io::stdout();
-        out.write_all(help.as_ref());
-        std::process::exit(1);
-    }
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
     println!();
