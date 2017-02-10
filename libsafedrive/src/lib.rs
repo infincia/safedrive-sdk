@@ -24,6 +24,7 @@ mod cache;
 mod block;
 pub mod session;
 mod lock;
+pub mod chunk;
 
 // external crates
 

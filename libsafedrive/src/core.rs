@@ -13,11 +13,7 @@ use ::rustc_serialize::hex::{ToHex, FromHex};
 use ::rand::distributions::{IndependentSample, Range};
 use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
-use ::cdc::*;
 use ::nom::IResult::*;
-use ::byteorder::LittleEndian;
-use ::byteorder::ByteOrder;
-use ::blake2_rfc::blake2b::blake2b;
 
 // internal imports
 
@@ -26,6 +22,7 @@ use ::block::*;
 use ::constants::*;
 use ::sdapi::*;
 use ::keys::*;
+use ::chunk::*;
 
 #[cfg(feature = "locking")]
 use ::lock::{FolderLock};
@@ -432,37 +429,8 @@ pub fn sync(token: &Token,
 
                 let reader: BufReader<File> = BufReader::new(f);
                 let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap block data"));
+                let chunk_iter = ChunkGenerator::new(byte_iter, &tweak_key, stream_length, SYNC_VERSION);
 
-                let separator_size_nb_bits: u32 = 6;
-
-                let predicate = |x: u64| {
-                    let BITMASK: u64 = (1u64 << SYNC_VERSION.leading_value_size()) - 1;
-
-                    let to_test = match SYNC_VERSION {
-                        SyncVersion::Version0 => panic!("invalid sync version"),
-                        SyncVersion::Version1 => {
-                            x
-                        },
-                        SyncVersion::Version2 => {
-                            let mut buf = [0; 8];
-
-                            LittleEndian::write_u64(&mut buf, x);
-
-                            let hash = blake2b(8, tweak_key.as_ref(), &buf);
-
-                            let h = hash.as_ref().to_vec();
-
-                            let s = h.as_slice();
-
-                            LittleEndian::read_u64(&s)
-                        },
-                    };
-
-                    to_test & BITMASK == BITMASK
-                };
-
-                let separator_iter = SeparatorIter::custom_new(byte_iter, separator_size_nb_bits, predicate);
-                let chunk_iter = ChunkIter::new(separator_iter, stream_length);
                 let mut nb_chunk = 0;
                 let mut item_size = 0;
                 let mut skipped_blocks = 0;
