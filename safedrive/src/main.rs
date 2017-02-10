@@ -94,6 +94,24 @@ fn main() {
         .version(VERSION)
         .about(COPYRIGHT)
         .setting(::clap::AppSettings::SubcommandRequiredElseHelp)
+        .subcommand(SubCommand::with_name("bench")
+            .about("benchmark chunking a file")
+            .arg(Arg::with_name("path")
+                .short("p")
+                .long("path")
+                .value_name("PATH")
+                .help("test file path")
+                .takes_value(true)
+                .required(true)
+            )
+            .arg(Arg::with_name("versiontwo")
+                .short("2")
+                .long("versiontwo")
+                .help("benchmark sync version 2")
+                .takes_value(false)
+                .required(false)
+            )
+        )
         .arg(Arg::with_name("config")
             .short("c")
             .long("config")
@@ -187,6 +205,92 @@ fn main() {
         );
 
     let matches = app.get_matches();
+
+    if let Some(m) = matches.subcommand_matches("bench") {
+
+        let version = match m.is_present("versiontwo") {
+            true => {
+                println!("Benchmark: version2");
+                ::safedrive::models::SyncVersion::Version2
+            },
+            false => {
+                println!("Benchmark: version1");
+                ::safedrive::models::SyncVersion::Version1
+            }
+
+        };
+
+        let p = match m.value_of("path") {
+            Some(p) => p,
+            None => {
+                error!("failed to get path from argument list");
+                std::process::exit(1);
+            }
+        };
+
+        let pa = PathBuf::from(&p);
+        //TODO: this is not portable to windows, must be fixed before use there
+        println!("Benchmarking file {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+
+        use std::io::{BufReader, Read};
+
+        let f = match File::open(&pa) {
+            Ok(m) => m,
+            Err(e) => {
+                println!("Failed to open file: {}", e);
+
+                std::process::exit(1);
+            }
+        };
+
+        let md = match f.metadata() {
+            Ok(m) => m,
+            Err(e) => {
+                println!("Failed to open file metadata: {}", e);
+
+                std::process::exit(1);
+            },
+        };
+
+        let stream_length = md.len();
+
+
+        let reader: BufReader<File> = BufReader::new(f);
+        let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap test data"));
+        let tweak_key = ::safedrive::keys::Key::new(::safedrive::keys::KeyType::Tweak);
+
+        let chunk_iter = ::safedrive::chunk::ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
+
+        let start = std::time::Instant::now();
+
+        let mut nb_chunk = 0;
+        let mut processed_size = 0;
+
+        for chunk in chunk_iter {
+            nb_chunk += 1;
+            processed_size += chunk.size;
+            println!("Benchmarking found chunk with {} bytes, {} of {} finished", chunk.size, processed_size, stream_length);
+        }
+        println!("Benchmarking finished with {} chunks", nb_chunk);
+
+        let avg = match binary_prefix(stream_length as f64 / nb_chunk as f64) {
+            Standalone(bytes)   => format!("{} bytes", bytes),
+            Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+        };
+
+        println!("Benchmarking average chunk size: {} bytes", avg);
+
+        let speed = match binary_prefix(stream_length as f64 / start.elapsed().as_secs() as f64) {
+            Standalone(bytes)   => format!("{} bytes", bytes),
+            Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+        };
+
+        println!("Benchmarking took {} seconds", start.elapsed().as_secs());
+        println!("Benchmarking throughput average: {} per second", speed);
+
+        std::process::exit(0);
+
+    }
 
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
