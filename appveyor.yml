@@ -23,14 +23,14 @@ environment:
     #  ESCRIPT: v120_xp.bat
     #  LINKTYPE: mt
     - TARGET: i686-pc-windows-msvc
-      CHANNEL: beta
+      CHANNEL: nightly
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
       ESCRIPT: v120_xp.bat
       LINKTYPE: dll
     - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: beta
+      CHANNEL: nightly
       ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
@@ -85,7 +85,7 @@ deploy:
     # channel to use to produce the release artifacts
     # NOTE make sure you only release *once* per target
     # TODO you may want to pick a different channel
-    CHANNEL: beta
+    CHANNEL: nightly
     appveyor_repo_tag: true
 
 branches:

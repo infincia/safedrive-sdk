@@ -20,14 +20,14 @@ addons:
 matrix:
   include:
     - os: linux
-      rust: beta
+      rust: nightly
       env: TARGET=x86_64-unknown-linux-musl
     #- os: linux
-    #  rust: beta
+    #  rust: nightly
     #  env: TARGET=i686-unknown-linux-musl
     - os: osx
       osx_image: xcode8.2
-      rust: beta
+      rust: nightly
       env: TARGET=x86_64-apple-darwin
 
 
