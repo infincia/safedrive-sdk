@@ -1,6 +1,8 @@
 #![feature(alloc_system)]
 extern crate alloc_system;
 
+extern crate semver;
+
 #[macro_use] extern crate log;
 
 pub mod c_api;
@@ -90,6 +92,24 @@ pub static SYNC_VERSION: ::models::SyncVersion = ::models::SyncVersion::Version1
 
 lazy_static! {
     static ref CONFIGURATION: ::parking_lot::RwLock<constants::Configuration> = ::parking_lot::RwLock::new(constants::Configuration::Production);
+}
+
+lazy_static! {
+    static ref CHANNEL: ::parking_lot::RwLock<constants::Channel> = {
+        let version: &str = env!("CARGO_PKG_VERSION");
+        let current_version = ::semver::Version::parse(version).unwrap();
+
+        let stable_version = ::semver::VersionReq::parse(">= 1.0.0").unwrap();
+
+        if stable_version.matches(&current_version) {
+            ::parking_lot::RwLock::new(::constants::Channel::Stable)
+        } else if !current_version.pre.is_empty() {
+            ::parking_lot::RwLock::new(::constants::Channel::Beta)
+        } else {
+            ::parking_lot::RwLock::new(::constants::Channel::Nightly)
+        }
+
+    };
 }
 
 lazy_static! {
