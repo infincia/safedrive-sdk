@@ -77,7 +77,7 @@ use safedrive::core::get_current_os;
 
 use safedrive::models::{RegisteredFolder};
 use safedrive::session::SyncSession;
-use safedrive::constants::Configuration;
+use safedrive::constants::{Configuration, Channel};
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -307,6 +307,15 @@ fn main() {
         config = Configuration::Production;
     } else {
         println!("Environment: staging");
+    }
+    let channel = ::safedrive::core::get_channel();
+    println!("Channel: {}", channel);
+
+    match channel {
+        Channel::Nightly => {
+            println!("Warning: data synced using nightly version of SafeDrive may not restore properly on stable channel");
+        },
+        _ => {},
     }
     println!();
 
