@@ -530,7 +530,7 @@ fn main() {
                            folder.id,
                            &mut |total, _, new, _, tick, message| {
                                if message.len() > 0 {
-                                   let message = format!("Stalled: ");
+                                   let message = format!("{}: stalled", local_folder_name);
                                    pb.message(&message);
                                } else {
                                    let message = format!("{}: ", local_folder_name);
@@ -545,11 +545,11 @@ fn main() {
                            }
                 ) {
                     Ok(_) => {
-                        let message = format!("{} finished", local_folder_name);
+                        let message = format!("{}: finished", local_folder_name);
                         pb.finish_println(&message);
                     },
                     Err(e) => {
-                        let message = format!("Sync failed: {}", e);
+                        let message = format!("{}: sync failed: {}", local_folder_name, e);
                         pb.finish_println(&message);
                     }
                 }
@@ -589,8 +589,7 @@ fn main() {
                    folder.id,
                    &mut |total, _, new, _, tick, message| {
                        if message.len() > 0 {
-                           let message = format!("Stalled: ");
-
+                           let message = format!("{}: stalled", &folder.folderName);
                            pb.message(&message);
                        }
                        if tick {
@@ -601,9 +600,13 @@ fn main() {
                        }
                    }
         ) {
-            Ok(_) => { pb.finish_print("Sync finished\n"); return },
+            Ok(_) => {
+                let message = format!("{}: finished", &folder.folderName);
+                pb.finish_println(&message);
+            },
             Err(e) => {
-                error!("Sync error: {}", e);
+                let message = format!("{}: sync failed: {}", &folder.folderName, e);
+                pb.finish_println(&message);
                 std::process::exit(1);
             }
         }
@@ -678,8 +681,7 @@ fn main() {
                       session.size.unwrap(),
                       &mut |total, _, new, _, tick, message| {
                           if message.len() > 0 {
-                              let message = format!("Stalled: ");
-
+                              let message = format!("{}: stalled", &folder.folderName);
                               pb.message(&message);
                           }
                           if tick {
@@ -690,9 +692,13 @@ fn main() {
                           }
                       }
         ) {
-            Ok(_) => { pb.finish_print("Restore finished\n"); return },
+            Ok(_) => {
+                let message = format!("{}: finished", &folder.folderName);
+                pb.finish_println(&message);
+            },
             Err(e) => {
-                error!("Restore error: {}", e);
+                let message = format!("{}: restore failed: {}", &folder.folderName, e);
+                pb.finish_println(&message);
                 std::process::exit(1);
             }
         }
