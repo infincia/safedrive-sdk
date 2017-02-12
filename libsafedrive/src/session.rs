@@ -4,10 +4,10 @@ use ::error::{CryptoError, SDError};
 use ::binformat::BinaryFormat;
 use ::nom::IResult::*;
 use ::keys::{Key, WrappedKey, KeyType};
-use ::models::{SyncSessionResponse, SyncVersion};
+use ::models::*;
 
 use ::constants::*;
-
+use ::CHANNEL;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct SyncSession {
@@ -143,15 +143,46 @@ impl WrappedSyncSession {
 
         let mut binary_data = Vec::new();
 
-        // first 8 bytes are the file ID, version, and reserved area
+        // first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
         let magic: &'static [u8; 2] = br"sd";
         let file_type: &'static [u8; 1] = br"s";
         let version = self.version.as_ref();
-        let reserved: &'static [u8; 3] = br"000";
+        let reserved: &'static [u8; 2] = br"00";
+
+        let mut flags = Empty;
+
+        let c = CHANNEL.read();
+
+        match *c {
+            Channel::Stable => {
+                flags.insert(Stable)
+            },
+            Channel::Beta => {
+                flags.insert(Beta);
+            },
+            Channel::Nightly => {
+                flags.insert(Nightly);
+            },
+        };
+
+        if is_production() {
+            flags.insert(Production);
+        } else {
+            flags.insert(!Production);
+        }
+
+        if self.compressed() {
+            flags.insert(Compressed);
+        } else {
+            flags.insert(!Compressed);
+        }
+
+        let flag_ref: &[u8] = &[flags.bits()];
 
         binary_data.extend(magic.as_ref());
         binary_data.extend(file_type.as_ref());
         binary_data.extend(version);
+        binary_data.extend(flag_ref);
         binary_data.extend(reserved.as_ref());
 
         // next 48 bytes will be the wrapped session key
@@ -159,7 +190,7 @@ impl WrappedSyncSession {
 
         // next 24 bytes will be the nonce
         binary_data.extend(self.nonce.as_ref());
-        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
+        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
         // remainder will be the encrypted session data
         binary_data.extend(self.wrapped_data);

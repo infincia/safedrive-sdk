@@ -416,6 +416,7 @@ name = "libsafedrive"
 version = "0.3.18"
 dependencies = [
  "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "blake2-rfc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
