@@ -34,6 +34,7 @@ use ::CLIENT_VERSION;
 use ::OPERATING_SYSTEM;
 use ::LANGUAGE_CODE;
 use ::SYNC_VERSION;
+use ::CHANNEL;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
@@ -88,6 +89,22 @@ pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, se
     match ::keychain::set_keychain_item(account, service, secret) {
         Ok(()) => Ok(()),
         Err(e) => Err(SDError::from(e))
+    }
+}
+
+pub fn get_channel() -> Channel {
+    let c = CHANNEL.read();
+
+    match *c {
+        Channel::Stable => {
+            Channel::Stable
+        },
+        Channel::Beta => {
+            Channel::Beta
+        },
+        Channel::Nightly => {
+            Channel::Nightly
+        },
     }
 }
 
