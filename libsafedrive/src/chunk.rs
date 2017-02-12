@@ -38,7 +38,16 @@ impl<'a> ChunkGenerator<'a> {
             },
 
             SyncVersion::Version2 => {
-                panic!("chunking unimplemented for this sync version");
+
+                let separator_iter = ::cdc::SeparatorIter::custom_new(byte_iter, version.window_size_bits(), move |x: u64| {
+                    let bit_mask: u64 = (1u64 << leading_value_bits) - 1;
+
+                    x & bit_mask == bit_mask
+                });
+
+                let chunk_iter = ::cdc::ChunkIter::new(separator_iter, total_size);
+
+                Box::new(chunk_iter)
             },
 
         };
