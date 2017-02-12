@@ -189,8 +189,69 @@ impl WrappedBlock {
             }
         };
 
+        let unpadded_data = match self.version {
+            SyncVersion::Version1 => {
+                block_raw
+            },
+            SyncVersion::Version2 => {
+                let unpadded = match ::binformat::remove_padding(&block_raw) {
+                    Done(_, o) => o,
+                    Error(e) => {
+                        debug!("block padding removal failed: {}", &e);
 
-        Ok(Block { version: self.version, hmac: self.hmac, data: data, compressed: self.compressed })
+                        match e {
+                            ::nom::verbose_errors::Err::Code(ref kind) => {
+                                debug!("block padding removal failure kind: {:?}", kind);
+
+                            },
+                            ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
+                                debug!("block padding removal failure node: {:?}, {}", kind, err);
+
+                            },
+                            ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
+                                debug!("block padding removal failure position: {:?}: {:?}", kind, position);
+
+                            },
+                            ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
+                                debug!("block padding removal failure kind: {:?}: {:?}, {}", kind, position, err);
+
+                            },
+                        };
+
+                        return Err(SDError::BlockMissing) },
+                    Incomplete(_) => panic!("should never happen")
+                };
+
+                let unpadded_data = unpadded.to_vec();
+
+                unpadded_data
+            },
+            _ => panic!("unknown binary version")
+        };
+
+        let uncompressed_data = match self.version {
+            SyncVersion::Version1 => {
+                unpadded_data
+            },
+            SyncVersion::Version2 => {
+                match self.compressed {
+                    true => {
+                        let mut uncompressed_data = Vec::new();
+                        let mut decoder = ::lz4::Decoder::new(unpadded_data.as_slice()).unwrap();
+                        let _ = decoder.read_to_end(&mut uncompressed_data);
+
+                        uncompressed_data
+                    },
+                    false => {
+                        unpadded_data
+                    }
+                }
+            },
+            _ => panic!("unknown binary version")
+        };
+
+
+        Ok(Block { version: self.version, hmac: self.hmac, data: uncompressed_data, compressed: self.compressed })
     }
 
     pub fn get_hmac(&self) -> Vec<u8> {

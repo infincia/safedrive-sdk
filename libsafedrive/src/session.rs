@@ -135,8 +135,68 @@ impl WrappedSyncSession {
             Err(_) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
         };
 
+        let unpadded_data = match self.version {
+            SyncVersion::Version1 => {
+                session_raw
+            },
+            SyncVersion::Version2 => {
+                let unpadded = match ::binformat::remove_padding(&session_raw) {
+                    Done(_, o) => o,
+                    Error(e) => {
+                        debug!("session padding removal failed: {}", &e);
 
-        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: data, compressed: self.compressed })
+                        match e {
+                            ::nom::verbose_errors::Err::Code(ref kind) => {
+                                debug!("session padding removal failure kind: {:?}", kind);
+
+                            },
+                            ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
+                                debug!("session padding removal failure node: {:?}, {}", kind, err);
+
+                            },
+                            ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
+                                debug!("session padding removal failure position: {:?}: {:?}", kind, position);
+
+                            },
+                            ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
+                                debug!("session padding removal failure kind: {:?}: {:?}, {}", kind, position, err);
+
+                            },
+                        };
+
+                        return Err(SDError::SessionMissing) },
+                    Incomplete(_) => panic!("should never happen")
+                };
+
+                let unpadded_data = unpadded.to_vec();
+
+                unpadded_data
+            },
+            _ => panic!("unknown binary version")
+        };
+
+        let uncompressed_data = match self.version {
+            SyncVersion::Version1 => {
+                unpadded_data
+            },
+            SyncVersion::Version2 => {
+                match self.compressed {
+                    true => {
+                        let mut uncompressed_data = Vec::new();
+                        let mut decoder = ::lz4::Decoder::new(unpadded_data.as_slice()).unwrap();
+                        let _ = decoder.read_to_end(&mut uncompressed_data);
+
+                        uncompressed_data
+                    },
+                    false => {
+                        unpadded_data
+                    }
+                }
+            },
+            _ => panic!("unknown binary version")
+        };
+
+        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: uncompressed_data, compressed: self.compressed })
     }
 
     pub fn to_binary(self) -> Vec<u8> {
