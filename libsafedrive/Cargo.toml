@@ -30,6 +30,7 @@ byteorder = "*"
 #blake2-rfc = { version = "*" }
 blake2-rfc = { version = "*", features = ["simd", "simd_opt", "simd_asm"] }
 semver = "^0.6.0"
+lz4 = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
