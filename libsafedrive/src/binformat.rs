@@ -1,6 +1,6 @@
 use std;
 
-use ::nom::{IResult, rest};
+use ::nom::{IResult, rest, le_u32};
 
 use ::constants::*;
 
@@ -44,6 +44,15 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
       }
     }
   )
+}
+
+pub fn remove_padding<'a>(input: &'a [u8]) -> IResult<&'a [u8], &'a [u8]> {
+    chain!(input,
+        length: le_u32      ~
+        data: take!(length) ,
+    || {
+        (data)
+    })
 }
 
 named!(hmac_parse<&[u8], &[u8]>, do_parse!(
