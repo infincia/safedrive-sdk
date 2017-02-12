@@ -3,6 +3,8 @@ extern crate alloc_system;
 
 extern crate semver;
 
+extern crate lz4;
+
 #[macro_use] extern crate log;
 
 pub mod c_api;

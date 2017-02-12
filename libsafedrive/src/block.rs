@@ -1,3 +1,4 @@
+use std::io::{Read, Write};
 
 use ::models::{SyncVersion};
 
@@ -16,7 +17,8 @@ use ::constants::*;
 pub struct Block {
     version: SyncVersion,
     hmac: Vec<u8>,
-    data: Vec<u8>
+    data: Vec<u8>,
+    compressed: bool,
 }
 
 impl Block {
@@ -49,7 +51,27 @@ impl Block {
             },
         };
 
-        Block { version: version, data: data, hmac: block_hmac }
+        let (compressed, maybe_compressed_data) = match version {
+            SyncVersion::Version1 => {
+                // no compression
+
+                (false, data)
+            },
+            SyncVersion::Version2 => {
+                let buf = Vec::new();
+                let mut encoder = ::lz4::EncoderBuilder::new().level(1).build(buf).unwrap();
+                encoder.write(data.as_slice()).unwrap();
+                let (compressed_data, result) = encoder.finish();
+                result.unwrap();
+
+                (true, compressed_data)
+            },
+            _ => {
+                panic!();
+            }
+        };
+
+        Block { version: version, data: maybe_compressed_data, hmac: block_hmac, compressed: compressed }
     }
 
     pub fn len(&self) -> usize {
@@ -62,6 +84,10 @@ impl Block {
 
     pub fn get_hmac(&self) -> Vec<u8> {
         self.hmac.clone()
+    }
+
+    pub fn compressed(&self) -> bool {
+        self.compressed
     }
 
     pub fn to_wrapped(self, main: &Key) -> Result<WrappedBlock, CryptoError> {
@@ -105,7 +131,7 @@ impl Block {
         };
 
 
-        Ok(WrappedBlock { version: self.version, hmac: self.hmac, wrapped_data: wrapped_data, wrapped_key: wrapped_block_key, nonce: block_nonce })
+        Ok(WrappedBlock { version: self.version, hmac: self.hmac, wrapped_data: wrapped_data, wrapped_key: wrapped_block_key, nonce: block_nonce, compressed: self.compressed })
     }
 }
 
@@ -123,6 +149,7 @@ pub struct WrappedBlock {
     wrapped_data: Vec<u8>,
     nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     wrapped_key: WrappedKey,
+    compressed: bool,
 }
 
 
@@ -146,11 +173,15 @@ impl WrappedBlock {
         };
 
 
-        Ok(Block { version: self.version, hmac: self.hmac, data: block_raw })
+        Ok(Block { version: self.version, hmac: self.hmac, data: data, compressed: self.compressed })
     }
 
     pub fn get_hmac(&self) -> Vec<u8> {
         self.hmac.clone()
+    }
+
+    pub fn compressed(&self) -> bool {
+        self.compressed
     }
 
     pub fn to_binary(&self) -> Vec<u8> {
@@ -228,7 +259,7 @@ impl WrappedBlock {
 
         let wrapped_block_key = WrappedKey::from(wrapped_block_key_raw, KeyType::Block);
 
-        Ok(WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce })
+        Ok(WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: false })
     }
 
 }

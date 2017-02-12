@@ -1,3 +1,4 @@
+use std::io::{Read, Write};
 
 use ::error::{CryptoError, SDError};
 use ::binformat::BinaryFormat;
@@ -18,6 +19,9 @@ pub struct SyncSession {
     pub time: Option<u64>,
     #[serde(skip_deserializing)]
     data: Vec<u8>,
+    #[serde(skip_deserializing)]
+    compressed: bool,
+
 }
 
 impl SyncSession {
@@ -29,8 +33,28 @@ impl SyncSession {
             },
         };
 
+        let (compressed, maybe_compressed_data) = match version {
+            SyncVersion::Version1 => {
+                // no compression
 
-        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: data }
+                (false, data)
+            },
+            SyncVersion::Version2 => {
+                let buf = Vec::new();
+                let mut encoder = ::lz4::EncoderBuilder::new().level(1).build(buf).unwrap();
+                encoder.write(data.as_slice()).unwrap();
+                let (compressed_data, result) = encoder.finish();
+                result.unwrap();
+
+                (true, compressed_data)
+            },
+            _ => {
+                panic!();
+            }
+        };
+
+
+        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed }
     }
 
 
@@ -54,7 +78,11 @@ impl SyncSession {
             Err(e) => return Err(e),
         };
 
-        Ok(WrappedSyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, wrapped_data: wrapped_data, wrapped_key: wrapped_session_key, nonce: session_nonce })
+        Ok(WrappedSyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, wrapped_data: wrapped_data, wrapped_key: wrapped_session_key, nonce: session_nonce, compressed: self.compressed })
+    }
+
+    pub fn compressed(&self) -> bool {
+        self.compressed
     }
 }
 
@@ -75,6 +103,7 @@ pub struct WrappedSyncSession {
     wrapped_data: Vec<u8>,
     nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     wrapped_key: WrappedKey,
+    compressed: bool,
 }
 
 
@@ -92,7 +121,7 @@ impl WrappedSyncSession {
         };
 
 
-        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: session_raw })
+        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: data, compressed: self.compressed })
     }
 
     pub fn to_binary(self) -> Vec<u8> {
@@ -148,7 +177,11 @@ impl WrappedSyncSession {
 
         let wrapped_session_key = WrappedKey::from(wrapped_session_key_raw, KeyType::Session);
 
-        Ok(WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce })
+        Ok(WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce, compressed: false })
+    }
+
+    pub fn compressed(&self) -> bool {
+        self.compressed
     }
 
 }
