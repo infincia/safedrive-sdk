@@ -6,6 +6,12 @@ pub enum Configuration {
     Production
 }
 
+#[derive(Debug)]
+pub enum Channel {
+    Stable,
+    Beta,
+    Nightly,
+}
 
 pub static DEBUG_STATISTICS: bool = true;
 
