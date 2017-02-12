@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+#![allow(non_upper_case_globals)]
 
 use std;
 
@@ -73,6 +74,20 @@ impl std::fmt::Display for SyncVersion {
                 write!(f, "2")
             },
         }
+    }
+}
+
+// binary flags
+
+
+bitflags! {
+    pub flags BinaryFlags: u8 {
+        const Empty      = 0b00000000,
+        const Production = 0b00000001,
+        const Stable     = 0b00000010,
+        const Beta       = 0b00000100,
+        const Nightly    = 0b00001000,
+        const Compressed = 0b00010000,
     }
 }
 
