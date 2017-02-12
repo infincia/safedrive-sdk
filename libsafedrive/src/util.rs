@@ -21,6 +21,8 @@ use ::objc_foundation::{NSObject, NSString, INSString};
 #[cfg(target_os = "macos")]
 use ::objc::runtime::{Class};
 
+use ::byteorder::LittleEndian;
+use ::byteorder::ByteOrder;
 
 // internal imports
 
@@ -211,6 +213,150 @@ pub fn sha256(input: &[u8]) -> String {
 
     h
 }
+
+/// Add a length prefix and zero-padding to a slice of bytes
+///
+/// Used to pad the unencrypted data chunks we generate from files before encryption
+///
+/// Without padding, it is easier to guess whether a user has stored a specific, known file by
+/// looking for pre-calculated patterns in the sizes of blocks stored in a user's account.
+///
+/// Padding doesn't solve the problem entirely, only reduces the probability of a guess being
+/// correct. Storing a large number of blocks should greatly reduce that probability.
+///
+/// It can't be prevented entirely without breaking any relationship between the data
+/// and the sizes, as the sizes are a function of the hash value of the data. Attempts to
+/// break that relationship using secret parameters with the hash function may cause it to be
+/// obscured, but won't have any effect at all on files that are not large enough to contain a
+/// boundary or trigger the minimum chunk size. Those files would be stored at their actual sizes
+/// without some form of padding.
+///
+/// For an example of why padding doesn't solve the problem entirely, if a block is stored padded to
+/// 1024 bytes, there is still a 1 in 128 (2^7) chance that it was any specific size between 896 and
+/// 1023. We progressively increase that by 1-bit at specific sizes to trade overhead for safety
+/// margin, but it's still fairly small.
+///
+/// For safety, we would prefer to pad all binary files to the same size, but that would require
+/// limiting the maximum size of blocks to a relatively small size, or incurring extreme overhead
+/// for smaller blocks.
+///
+///
+/// Parameters:
+///
+///     input: a slice of unencrypted data to be prefixed with the length of the original data and
+///            then padded with zeros
+///
+/// # Examples
+///
+/// ```
+/// let v = vec![1u8, 2u8, 3u8, 4u8];
+/// let padded_v = pad_and_prefix_length(v.as_slice());
+///
+/// ```
+///
+pub fn pad_and_prefix_length(input: &[u8]) -> Vec<u8> {
+    let mut buf = Vec::new();
+
+    /// add the length of the input data as little endian u32 in the first 4 bytes
+    let input_length = input.len();
+
+    assert!(input_length <= u32::max_value() as usize);
+
+
+    let mut size_buf = [0; 4];
+    LittleEndian::write_u32(&mut size_buf, input_length as u32);
+    buf.extend(&size_buf);
+
+    /// add the input data
+    buf.extend(input);
+
+    /// determine what to round up to for the input size
+    ///
+    /// we don't actually need to map all of these, they're just here to keep the worst case overhead
+    /// visible
+    let round = match input_length {
+           0...128  => 128,  // potentially 99%, but necessary and shouldn't affect the average much
+         128...256  => 128,  // 50%
+         256...384  => 128,  // 33%
+         384...512  => 128,  // 33%
+         512...640  => 128,  // 25%
+         640...768  => 128,  // 20%
+         768...896  => 128,  // 16.5%
+         896...1024 => 128,  // 14.2%
+        1024...1152 => 128,  // 12.5%
+        1152...1280 => 128,  // 11%
+        1280...1408 => 128,  // 10%
+        1408...1536 => 128,  // 9%,
+        1536...1664 => 128,  // 8.3%,
+        1664...1792 => 128,  // 7.69%,
+        1792...1920 => 128,  // 7.14%,
+        1920...2048 => 128,  // 6.6%,
+        2048...2304 => 256,  // 12.5%
+        2304...2560 => 256,  // 11%
+        2560...2816 => 256,  // 10%
+        2816...3072 => 256,  // 9%
+        3072...3328 => 256,  // 8.3%
+        3328...3584 => 256,  // 7.69%
+        3584...3840 => 256,  // 7.14%
+        3840...4096 => 256,  // 6.6%
+        4096...4608 => 512,  // 12.5%
+        4608...5120 => 512,  // 11%
+        5120...5632 => 512,  // 10%
+        5632...6114 => 512,  // 9%
+        6114...6656 => 512,  // 8.3%
+        _ => 512,            // less than 7.69%, average closer to 1-2%
+    };
+
+    // check to see how much padding we need
+    let nearest = nearest_to(input_length, round);
+    let padding_needed = nearest - input_length;
+
+    // pad the end of the data with zeros if needed
+    buf.resize(size_buf.len() + input_length + padding_needed, 0u8);
+
+    buf
+}
+
+
+#[test]
+pub fn pad_4bytes() {
+    let v = vec![1u8, 2u8, 3u8, 4u8];
+    assert!(v.len() == 4);
+
+    let padded_v = pad_and_prefix_length(v.as_slice());
+
+    assert!(padded_v.len() == 4 + 128);
+}
+
+// math helpers
+
+/// Get the next highest integer after `num` that is a multiple of `multiple`
+///
+/// Parameters:
+///
+///     num: any integer that will fit in a u32
+///
+///     multiple: the next standardized size to look for
+///
+pub fn nearest_to(num: usize, multiple: usize) -> usize {
+    (num + multiple - 1) & !(multiple - 1) as usize
+}
+
+#[test]
+fn nearest_to_60() {
+    assert!(nearest_to(60, 128) == 128);
+}
+
+#[test]
+fn nearest_to_405() {
+    assert!(nearest_to(405, 512) == 512);
+}
+
+#[test]
+fn nearest_to_1890() {
+    assert!(nearest_to(1890, 512) == 2048);
+}
+
 
 #[cfg(target_os = "linux")]
 #[test]
