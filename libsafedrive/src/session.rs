@@ -64,13 +64,28 @@ impl SyncSession {
         let session_key = Key::new(KeyType::Session);
 
         // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
+        //
+        // We use the same nonce both while wrapping the session key, and the session data itself
+        // this is safe because using the same nonce with 2 different keys is not nonce reuse
         let session_nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
 
-        // we use the same nonce both while wrapping the session key, and the session data itself
-        // this is safe because using the same nonce with 2 different keys is not nonce reuse
+        // get the session data, padded and prefixed with a u32 length as little endian
+        let to_encrypt = match self.version {
+            SyncVersion::Version1 => {
+                // version 1 directly inserts the data before encryption
+                self.data
+            },
+            SyncVersion::Version2 => {
+                // version 2 has padded and prefixed data segments
+                ::util::pad_and_prefix_length(self.data.as_slice())
+            },
+            _ => {
+                panic!("Attempted to wrap invalid session version");
+            },
+        };
 
-        // encrypt the session data using the session key
-        let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(&self.data, &session_nonce, &session_key.as_sodium_secretbox_key());
+        // encrypt the data using the session key
+        let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(&to_encrypt, &session_nonce, &session_key.as_sodium_secretbox_key());
 
         // wrap the session key with the main encryption key
         let wrapped_session_key = match session_key.to_wrapped(main, Some(&session_nonce)) {

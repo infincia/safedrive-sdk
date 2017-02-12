@@ -121,8 +121,24 @@ impl Block {
             },
         };
 
+        // get the block data, padded and prefixed with a u32 length as little endian
+        let to_encrypt = match self.version {
+            SyncVersion::Version1 => {
+                // version 1 directly inserts the data before encryption
+                self.data
+            },
+            SyncVersion::Version2 => {
+                // version 2 has padded and prefixed data segments
+                ::util::pad_and_prefix_length(self.data.as_slice())
+            },
+            _ => {
+                panic!("Attempted to wrap invalid block version");
+            },
+        };
+
+
         // encrypt the block data using the block key
-        let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(self.data.as_slice(), &block_nonce, &block_key.as_sodium_secretbox_key());
+        let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(to_encrypt.as_slice(), &block_nonce, &block_key.as_sodium_secretbox_key());
 
         // wrap the block key with the main encryption key
         let wrapped_block_key = match block_key.to_wrapped(main, Some(&block_nonce)) {
