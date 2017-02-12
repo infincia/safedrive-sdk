@@ -15,7 +15,10 @@ extern crate serde;
 extern crate serde_json;
 
 use std::str;
+
+#[cfg(target_os = "linux")]
 use std::ffi::{OsStr};
+
 use std::fs::File;
 use std::thread;
 
