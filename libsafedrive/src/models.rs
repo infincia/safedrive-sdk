@@ -4,6 +4,14 @@ use std;
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]
+pub enum CompressionType {
+    None,
+    Gzip,
+    Lz4,
+}
+
+#[derive(Debug)]
+#[derive(Copy, Clone)]
 pub enum SyncVersion {
     Version0, // doesn't exist
     Version1, // testing format
@@ -24,6 +32,14 @@ impl SyncVersion {
             SyncVersion::Version0 => panic!("invalid version"),
             SyncVersion::Version1 => 6,
             SyncVersion::Version2 => 6,
+        }
+    }
+
+    pub fn compression(&self) -> CompressionType {
+        match *self {
+            SyncVersion::Version0 => panic!("invalid version"),
+            SyncVersion::Version1 => CompressionType::None,
+            SyncVersion::Version2 => CompressionType::Lz4,
         }
     }
 }
