@@ -43,6 +43,22 @@ impl SyncVersion {
             SyncVersion::Version2 => CompressionType::Lz4,
         }
     }
+
+    pub fn min_chunk_size(&self) -> usize {
+        match *self {
+            SyncVersion::Version0 => panic!("invalid version"),
+            SyncVersion::Version1 => 0,
+            SyncVersion::Version2 => 2048,
+        }
+    }
+
+    pub fn max_chunk_size(&self) -> usize {
+        match *self {
+            SyncVersion::Version0 => panic!("invalid version"),
+            SyncVersion::Version1 => ::std::usize::MAX,
+            SyncVersion::Version2 => 1_000_000,
+        }
+    }
 }
 
 impl std::default::Default for SyncVersion {
