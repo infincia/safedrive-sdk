@@ -15,7 +15,7 @@ use ::block::*;
 use ::session::*;
 use ::keys::*;
 use ::constants::*;
-use ::CLIENT_VERSION;
+use ::USER_AGENT;
 
 
 
@@ -201,7 +201,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
 
     let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -228,7 +228,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
 
     let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -259,7 +259,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
 pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let endpoint = APIEndpoint::AccountStatus;
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -292,7 +292,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails;
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -323,7 +323,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
 
     let endpoint = APIEndpoint::AccountKey { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -355,7 +355,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
     let endpoint = APIEndpoint::ReadFolders;
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -386,7 +386,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
 
     let endpoint = APIEndpoint::CreateFolder { folderPath: path, folderName: name, encrypted: encrypted };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -417,7 +417,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
 pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteFolder { folder_id: folder_id };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -448,7 +448,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
     let endpoint = APIEndpoint::ReadSyncSessions { encrypted: true };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -479,7 +479,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
 
     let endpoint = APIEndpoint::RegisterSyncSession { folder_id: folder_id, name: name, encrypted: encrypted };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -513,7 +513,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     //debug!("body: {}", String::from_utf8_lossy(&body));
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -543,7 +543,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
     let endpoint = APIEndpoint::ReadSyncSession { name: name, encrypted: encrypted };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
 
@@ -570,7 +570,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteSyncSession { session_id: session_id };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
@@ -601,7 +601,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 
     let endpoint = APIEndpoint::CheckBlock { name: name };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
 
@@ -630,7 +630,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
 
     let endpoint = APIEndpoint::WriteBlock { name: name, session: session };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
@@ -668,7 +668,7 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
 
     let endpoint = APIEndpoint::WriteBlocks { session: session };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
@@ -713,7 +713,7 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
 pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { name: name };
 
-    let user_agent = &**CLIENT_VERSION.read();
+    let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())

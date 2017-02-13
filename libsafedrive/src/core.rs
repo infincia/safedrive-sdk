@@ -31,6 +31,7 @@ use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 use ::CACHE_DIR;
 use ::CLIENT_VERSION;
+use ::USER_AGENT;
 use ::OPERATING_SYSTEM;
 use ::LANGUAGE_CODE;
 use ::SYNC_VERSION;
@@ -116,6 +117,9 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
 
     let mut cv = CLIENT_VERSION.write();
     *cv = client_version.to_string();
+
+    let mut ua = USER_AGENT.write();
+    *ua = str::replace(client_version, " ", "/").to_string();
 
     let mut os = OPERATING_SYSTEM.write();
     *os = operating_system.to_string();

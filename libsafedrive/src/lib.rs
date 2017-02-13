@@ -127,6 +127,10 @@ lazy_static! {
 }
 
 lazy_static! {
+    static ref USER_AGENT: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
+}
+
+lazy_static! {
     static ref OPERATING_SYSTEM: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 
