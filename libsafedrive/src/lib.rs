@@ -38,6 +38,7 @@ pub mod chunk;
 extern crate rustc_serialize;
 extern crate libc;
 extern crate sodiumoxide;
+extern crate libsodium_sys;
 extern crate tar;
 extern crate rand;
 extern crate walkdir;
