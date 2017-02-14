@@ -1017,13 +1017,13 @@ pub fn restore(token: &Token,
                         match op {
                             Some(pa) => pa,
                             None => {
-                                debug!("not restoring invalid hard link: no link name found");
+                                debug!("not restoring invalid symlink: no link name found");
                                 continue;
                             },
                         }
                     },
                     Err(e) => {
-                        debug!("not restoring invalid hard link: {})", e);
+                        debug!("not restoring invalid symlink: {})", e);
                         continue;
                     }
                 };
@@ -1037,7 +1037,7 @@ pub fn restore(token: &Token,
                 match ::std::os::unix::fs::symlink(&src, full_p) {
                     Ok(()) => {},
                     Err(e) => {
-                        error!("failed to restore sym link: {})", e);
+                        error!("failed to restore symlink: {})", e);
                     },
                 }
 
