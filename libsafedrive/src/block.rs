@@ -20,6 +20,8 @@ pub struct Block {
     hmac: Vec<u8>,
     data: Vec<u8>,
     compressed: bool,
+    channel: Channel,
+    production: bool,
 }
 
 impl Block {
@@ -72,7 +74,24 @@ impl Block {
             }
         };
 
-        Block { version: version, data: maybe_compressed_data, hmac: block_hmac, compressed: compressed }
+
+        let c = CHANNEL.read();
+
+        let channel = match *c {
+            Channel::Stable => {
+                Channel::Stable
+            },
+            Channel::Beta => {
+                Channel::Beta
+            },
+            Channel::Nightly => {
+                Channel::Nightly
+            },
+        };
+
+        let production = is_production();
+
+        Block { version: version, data: maybe_compressed_data, hmac: block_hmac, compressed: compressed, channel: channel, production: production }
     }
 
     pub fn len(&self) -> usize {
@@ -89,6 +108,14 @@ impl Block {
 
     pub fn compressed(&self) -> bool {
         self.compressed
+    }
+
+    pub fn production(&self) -> bool {
+        self.production
+    }
+
+    pub fn channel(&self) -> Channel {
+        self.channel.clone()
     }
 
     pub fn to_wrapped(self, main: &Key) -> Result<WrappedBlock, CryptoError> {
@@ -148,7 +175,7 @@ impl Block {
         };
 
 
-        Ok(WrappedBlock { version: self.version, hmac: self.hmac, wrapped_data: wrapped_data, wrapped_key: wrapped_block_key, nonce: block_nonce, compressed: self.compressed })
+        Ok(WrappedBlock { version: self.version, hmac: self.hmac, wrapped_data: wrapped_data, wrapped_key: wrapped_block_key, nonce: block_nonce, compressed: self.compressed, channel: self.channel, production: self.production })
     }
 }
 
@@ -167,6 +194,8 @@ pub struct WrappedBlock {
     nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     wrapped_key: WrappedKey,
     compressed: bool,
+    channel: Channel,
+    production: bool,
 }
 
 
@@ -251,7 +280,7 @@ impl WrappedBlock {
         };
 
 
-        Ok(Block { version: self.version, hmac: self.hmac, data: uncompressed_data, compressed: self.compressed })
+        Ok(Block { version: self.version, hmac: self.hmac, data: uncompressed_data, compressed: self.compressed, channel: self.channel, production: self.production })
     }
 
     pub fn get_hmac(&self) -> Vec<u8> {
@@ -273,9 +302,7 @@ impl WrappedBlock {
 
         let mut flags = Empty;
 
-        let c = CHANNEL.read();
-
-        match *c {
+        match self.channel {
             Channel::Stable => {
                 flags.insert(Stable)
             },
@@ -287,7 +314,7 @@ impl WrappedBlock {
             },
         };
 
-        if is_production() {
+        if self.production {
             flags.insert(Production);
         } else {
             flags.insert(!Production);
@@ -368,7 +395,23 @@ impl WrappedBlock {
 
         let wrapped_block_key = WrappedKey::from(wrapped_block_key_raw, KeyType::Block);
 
-        Ok(WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: false })
+        let flags = ::models::BinaryFlags::from_bits_truncate(raw_block.flags[0]);
+
+        let channel = if flags & Stable == Stable {
+            Channel::Stable
+        } else if flags & Beta == Beta {
+            Channel::Beta
+        } else {
+            Channel::Nightly
+        };
+
+        let production = flags & Production == Production;
+        let compressed = flags & Compressed == Compressed;
+
+        let wrapped_block = WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: false, channel: channel, production: production };
+        debug!("got valid wrapped block: {}", &wrapped_block);
+
+        Ok(wrapped_block)
     }
 
 }

@@ -19,6 +19,10 @@ pub struct SyncSession {
     pub time: Option<u64>,
     pub id: Option<u64>,
     #[serde(skip_deserializing)]
+    channel: Channel,
+    #[serde(skip_deserializing)]
+    production: bool,
+    #[serde(skip_deserializing)]
     data: Vec<u8>,
     #[serde(skip_deserializing)]
     compressed: bool,
@@ -54,8 +58,23 @@ impl SyncSession {
             }
         };
 
+        let c = CHANNEL.read();
 
-        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed }
+        let channel = match *c {
+            Channel::Stable => {
+                Channel::Stable
+            },
+            Channel::Beta => {
+                Channel::Beta
+            },
+            Channel::Nightly => {
+                Channel::Nightly
+            },
+        };
+
+        let production = is_production();
+
+        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed, id: None, production: production, channel: channel }
     }
 
 
@@ -94,7 +113,7 @@ impl SyncSession {
             Err(e) => return Err(e),
         };
 
-        Ok(WrappedSyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, wrapped_data: wrapped_data, wrapped_key: wrapped_session_key, nonce: session_nonce, compressed: self.compressed })
+        Ok(WrappedSyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, wrapped_data: wrapped_data, wrapped_key: wrapped_session_key, nonce: session_nonce, compressed: self.compressed, production: self.production, channel: self.channel })
     }
 
     pub fn compressed(&self) -> bool {
@@ -117,6 +136,8 @@ pub struct WrappedSyncSession {
     pub size: Option<u64>,
     pub time: Option<u64>,
     wrapped_data: Vec<u8>,
+    channel: Channel,
+    production: bool,
     nonce: ::sodiumoxide::crypto::secretbox::Nonce,
     wrapped_key: WrappedKey,
     compressed: bool,
@@ -197,7 +218,7 @@ impl WrappedSyncSession {
             _ => panic!("unknown binary version")
         };
 
-        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: uncompressed_data, compressed: self.compressed })
+        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: uncompressed_data, compressed: self.compressed, id: None, production: self.production, channel: self.channel })
     }
 
     pub fn to_binary(self) -> Vec<u8> {
@@ -212,9 +233,7 @@ impl WrappedSyncSession {
 
         let mut flags = Empty;
 
-        let c = CHANNEL.read();
-
-        match *c {
+        match self.channel {
             Channel::Stable => {
                 flags.insert(Stable)
             },
@@ -226,7 +245,7 @@ impl WrappedSyncSession {
             },
         };
 
-        if is_production() {
+        if self.production {
             flags.insert(Production);
         } else {
             flags.insert(!Production);
@@ -284,7 +303,26 @@ impl WrappedSyncSession {
 
         let wrapped_session_key = WrappedKey::from(wrapped_session_key_raw, KeyType::Session);
 
-        Ok(WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce, compressed: false })
+        let flags = ::models::BinaryFlags::from_bits_truncate(raw_session.flags[0]);
+
+
+        let channel = if flags & Stable == Stable {
+            Channel::Stable
+        } else if flags & Beta == Beta {
+            Channel::Beta
+        } else {
+            Channel::Nightly
+        };
+
+        let production = flags & Production == Production;
+        let compressed = flags & Compressed == Compressed;
+
+        let wrapped_session = WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce, compressed: compressed, channel: channel, production: production };
+
+
+        debug!("got valid wrapped session: {}", &wrapped_session);
+
+        Ok(wrapped_session)
     }
 
     pub fn compressed(&self) -> bool {
