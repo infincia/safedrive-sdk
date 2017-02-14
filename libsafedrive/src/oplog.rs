@@ -1,3 +1,7 @@
+#![allow(dead_code)]
+
+#![allow(unused_variables)]
+
 use std;
 
 use ::nom::{IResult, rest, le_u8, le_u16, le_u64};
