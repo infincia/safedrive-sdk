@@ -11,7 +11,6 @@ pub struct BinaryFormat<'a> {
     pub file_type: &'a str,
     pub version: &'a str,
     pub flags: &'a [u8],
-    pub reserved: &'a str,
     pub wrapped_key: &'a [u8],
     pub nonce: &'a [u8],
     pub wrapped_data: &'a [u8],
@@ -30,7 +29,7 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
     file_type: map_res!(alt!(tag!("b") | tag!("s")), std::str::from_utf8)        ~
     version: map_res!(take!(2), std::str::from_utf8)                             ~
     flags: take!(1)                                                              ~
-    reserved: map_res!(take!(2), std::str::from_utf8)                            ~
+    reserved: take!(2)                                                           ~
     wrapped_key: take!(SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE)                  ~
     nonce: take!(SECRETBOX_NONCE_SIZE)                                           ~
     wrapped_data: rest                                                           ,
@@ -40,7 +39,6 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
         file_type: file_type,
         version: version,
         flags: flags,
-        reserved: reserved,
         wrapped_key: wrapped_key,
         nonce: nonce,
         wrapped_data: wrapped_data,
