@@ -26,11 +26,16 @@ pub struct SyncSession {
     data: Vec<u8>,
     #[serde(skip_deserializing)]
     compressed: bool,
-
+    #[serde(skip_deserializing)]
+    real_size: u64,
+    #[serde(skip_deserializing)]
+    compressed_size: Option<u64>,
 }
 
 impl SyncSession {
     pub fn new(version: SyncVersion, folder_id: u64, name: String, size: Option<u64>, time: Option<u64>, data: Vec<u8>) -> SyncSession {
+        let real_size = data.len();
+
         match version {
             SyncVersion::Version1 | SyncVersion::Version2 => {},
             _ => {
@@ -38,20 +43,24 @@ impl SyncSession {
             },
         };
 
-        let (compressed, maybe_compressed_data) = match version {
+        let (compressed, maybe_compressed_data, maybe_compressed_size) = match version {
             SyncVersion::Version1 => {
                 // no compression
 
-                (false, data)
+                (false, data, None)
             },
             SyncVersion::Version2 => {
                 let buf = Vec::new();
-                let mut encoder = ::lz4::EncoderBuilder::new().level(1).build(buf).unwrap();
+                let mut encoder = ::lz4::EncoderBuilder::new().level(16).build(buf).unwrap();
                 encoder.write(data.as_slice()).unwrap();
-                let (compressed_data, result) = encoder.finish();
+                let (mut compressed_data, result) = encoder.finish();
                 result.unwrap();
 
-                (true, compressed_data)
+                compressed_data.shrink_to_fit();
+
+                let compressed_size = compressed_data.len() as u64;
+
+                (true, compressed_data, Some(compressed_size))
             },
             _ => {
                 panic!("Attempted to create invalid session version");
@@ -74,7 +83,7 @@ impl SyncSession {
 
         let production = is_production();
 
-        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed, id: None, production: production, channel: channel }
+        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed, id: None, production: production, channel: channel, real_size: real_size as u64, compressed_size: maybe_compressed_size }
     }
 
 
@@ -118,6 +127,14 @@ impl SyncSession {
 
     pub fn compressed(&self) -> bool {
         self.compressed
+    }
+
+    pub fn real_size(&self) -> u64 {
+        self.real_size
+    }
+
+    pub fn compressed_size(&self) -> Option<u64> {
+        self.compressed_size
     }
 }
 
@@ -207,9 +224,9 @@ impl WrappedSyncSession {
             _ => panic!("unknown binary version")
         };
 
-        let uncompressed_data = match self.version {
+        let (maybe_uncompressed_data, maybe_compressed_size) = match self.version {
             SyncVersion::Version1 => {
-                unpadded_data
+                (unpadded_data, None)
             },
             SyncVersion::Version2 => {
                 match self.compressed {
@@ -218,17 +235,22 @@ impl WrappedSyncSession {
                         let mut decoder = ::lz4::Decoder::new(unpadded_data.as_slice()).unwrap();
                         let _ = decoder.read_to_end(&mut uncompressed_data);
 
-                        uncompressed_data
+                        let compressed_size = unpadded_data.len();
+
+
+                        (uncompressed_data, Some(compressed_size as u64))
                     },
                     false => {
-                        unpadded_data
+                        (unpadded_data, None)
                     }
                 }
             },
             _ => panic!("unknown binary version")
         };
 
-        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, data: uncompressed_data, compressed: self.compressed, id: None, production: self.production, channel: self.channel })
+        let real_size = maybe_uncompressed_data.len();
+
+        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, real_size: real_size as u64, compressed_size: maybe_compressed_size, time: self.time, data: maybe_uncompressed_data, compressed: self.compressed, id: None, production: self.production, channel: self.channel })
     }
 
     pub fn to_binary(self) -> Vec<u8> {

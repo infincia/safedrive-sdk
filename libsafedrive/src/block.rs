@@ -19,6 +19,8 @@ pub struct Block {
     version: SyncVersion,
     hmac: Vec<u8>,
     data: Vec<u8>,
+    real_size: u64,
+    compressed_size: Option<u64>,
     compressed: bool,
     channel: Channel,
     production: bool,
@@ -26,6 +28,9 @@ pub struct Block {
 
 impl Block {
     pub fn new(version: SyncVersion, hmac: &Key, data: Vec<u8>) -> Block {
+
+        let real_size = data.len();
+
         // calculate hmac of the block
 
         let block_hmac = match version {
@@ -54,20 +59,24 @@ impl Block {
             },
         };
 
-        let (compressed, maybe_compressed_data) = match version {
+        let (compressed, maybe_compressed_data, maybe_compressed_size) = match version {
             SyncVersion::Version1 => {
                 // no compression
 
-                (false, data)
+                (false, data, None)
             },
             SyncVersion::Version2 => {
                 let buf = Vec::new();
-                let mut encoder = ::lz4::EncoderBuilder::new().level(1).build(buf).unwrap();
+                let mut encoder = ::lz4::EncoderBuilder::new().level(8).build(buf).unwrap();
                 encoder.write(data.as_slice()).unwrap();
-                let (compressed_data, result) = encoder.finish();
+                let (mut compressed_data, result) = encoder.finish();
                 result.unwrap();
 
-                (true, compressed_data)
+                compressed_data.shrink_to_fit();
+
+                let compressed_size = compressed_data.len() as u64;
+
+                (true, compressed_data, Some(compressed_size))
             },
             _ => {
                 panic!("Attempted to create invalid session version");
@@ -91,11 +100,19 @@ impl Block {
 
         let production = is_production();
 
-        Block { version: version, data: maybe_compressed_data, hmac: block_hmac, compressed: compressed, channel: channel, production: production }
+        Block { version: version, data: maybe_compressed_data, real_size: real_size as u64, compressed_size: maybe_compressed_size, hmac: block_hmac, compressed: compressed, channel: channel, production: production }
     }
 
     pub fn len(&self) -> usize {
         self.data.len()
+    }
+
+    pub fn real_size(&self) -> u64 {
+        self.real_size
+    }
+
+    pub fn compressed_size(&self) -> Option<u64> {
+        self.compressed_size
     }
 
     pub fn name(&self) -> String {
@@ -266,29 +283,33 @@ impl WrappedBlock {
             _ => panic!("unknown binary version")
         };
 
-        let uncompressed_data = match self.version {
+        let (maybe_uncompressed_data, maybe_compressed_size) = match self.version {
             SyncVersion::Version1 => {
-                unpadded_data
+                (unpadded_data, None)
             },
             SyncVersion::Version2 => {
                 match self.compressed {
                     true => {
+                        let compressed_size = unpadded_data.len() as u64;
+
                         let mut uncompressed_data = Vec::new();
                         let mut decoder = ::lz4::Decoder::new(unpadded_data.as_slice()).unwrap();
                         let _ = decoder.read_to_end(&mut uncompressed_data);
 
-                        uncompressed_data
+                        (uncompressed_data, Some(compressed_size))
                     },
                     false => {
-                        unpadded_data
+                        (unpadded_data, None)
                     }
                 }
             },
             _ => panic!("unknown binary version")
         };
 
+        let real_size = maybe_uncompressed_data.len();
 
-        Ok(Block { version: self.version, hmac: self.hmac, data: uncompressed_data, compressed: self.compressed, channel: self.channel, production: self.production })
+
+        Ok(Block { version: self.version, hmac: self.hmac, data: maybe_uncompressed_data, real_size: real_size as u64, compressed_size: maybe_compressed_size, compressed: self.compressed, channel: self.channel, production: self.production })
     }
 
     pub fn get_hmac(&self) -> Vec<u8> {
