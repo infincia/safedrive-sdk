@@ -1596,7 +1596,7 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
         if date.is_null() {
             None
         } else {
-            let c_date: &CStr = unsafe { CStr::from_ptr(date) };
+            let c_date: &CStr = CStr::from_ptr(date);
             let d: String = match c_date.to_str() {
                 Ok(s) => s.to_owned(),
                 Err(e) => { panic!("string is not valid UTF-8: {}", e) },
