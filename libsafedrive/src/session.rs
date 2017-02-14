@@ -193,7 +193,10 @@ impl WrappedSyncSession {
                         };
 
                         return Err(SDError::SessionMissing) },
-                    Incomplete(_) => panic!("should never happen")
+                    Incomplete(_) => {
+                        debug!("session data cannot be unpadded, this should never happen");
+                        return Err(SDError::SessionMissing)
+                    }
                 };
 
                 let unpadded_data = unpadded.to_vec();
@@ -289,7 +292,10 @@ impl WrappedSyncSession {
         let raw_session: BinaryFormat = match ::binformat::binary_parse(&body.chunk_data) {
             Done(_, o) => o,
             Error(_) => return Err(SDError::SessionMissing),
-            Incomplete(_) => panic!("should never happen")
+            Incomplete(_) => {
+                debug!("session file cannot be parsed, this should never happen");
+                return Err(SDError::SessionMissing)
+            }
         };
 
         debug!("got valid binary file: {}", &raw_session);

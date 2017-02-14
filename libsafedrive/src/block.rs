@@ -253,7 +253,10 @@ impl WrappedBlock {
                         };
 
                         return Err(SDError::BlockMissing) },
-                    Incomplete(_) => panic!("should never happen")
+                    Incomplete(_) => {
+                        debug!("block data cannot be unpadded, this should never happen");
+                        return Err(SDError::BlockMissing)
+                    }
                 };
 
                 let unpadded_data = unpadded.to_vec();
@@ -379,8 +382,12 @@ impl WrappedBlock {
                     },
                 };
 
-                return Err(SDError::BlockMissing) },
-            Incomplete(_) => panic!("should never happen")
+                return Err(SDError::BlockMissing)
+            },
+            Incomplete(_) => {
+                debug!("block file cannot be parsed, this should never happen");
+                return Err(SDError::BlockMissing)
+            }
         };
 
         debug!("got valid binary file: {}", &raw_block);
