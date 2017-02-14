@@ -40,6 +40,7 @@ pub enum APIEndpoint<'a> {
     ReadSyncSession { name: &'a str, encrypted: bool },
     ReadSyncSessions { encrypted: bool },
     DeleteSyncSession { session_id: u64 },
+    DeleteSyncSessions { timestamp: i64 },
     CheckBlock { name: &'a str },
     WriteBlock { session: &'a str, name: &'a str },
     WriteBlocks { session: &'a str },
@@ -64,6 +65,11 @@ impl<'a> APIEndpoint<'a> {
                 url.query_pairs_mut()
                     .clear()
                     .append_pair("sessionIds", &format!("{}", session_id));
+            },
+            APIEndpoint::DeleteSyncSessions { timestamp, .. } => {
+                url.query_pairs_mut()
+                    .clear()
+                    .append_pair("date", &format!("{}", timestamp));
             },
             _ => {}
         }
@@ -118,6 +124,9 @@ impl<'a> APIEndpoint<'a> {
                 ::reqwest::Method::Get
             },
             APIEndpoint::DeleteSyncSession { .. } => {
+                ::reqwest::Method::Delete
+            },
+            APIEndpoint::DeleteSyncSessions { .. } => {
                 ::reqwest::Method::Delete
             },
             APIEndpoint::CheckBlock { .. } => {
@@ -175,6 +184,9 @@ impl<'a> APIEndpoint<'a> {
             },
             APIEndpoint::DeleteSyncSession { .. } => {
                 format!("/api/1/sync/session/ids")
+            },
+            APIEndpoint::DeleteSyncSessions { .. } => {
+                format!("/api/1/sync/session/date")
             },
             APIEndpoint::CheckBlock { name, .. } => {
                 format!("/api/1/sync/block/{}", name)
@@ -569,6 +581,34 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 
 pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::DeleteSyncSession { session_id: session_id };
+
+    let user_agent = &**USER_AGENT.read();
+
+    let client = ::reqwest::Client::new().unwrap();
+    let request = client.request(endpoint.method(), endpoint.url())
+        .header(UserAgent(user_agent.to_string()))
+        .header(SDAuthToken(token.token.to_owned()));
+
+    let mut result = try!(request.send());
+
+    let mut response = String::new();
+
+    try!(result.read_to_string(&mut response));
+
+    debug!("response: {}", response);
+
+    match result.status() {
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+
+        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+    }
+
+    Ok(())
+}
+
+pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> {
+    let endpoint = APIEndpoint::DeleteSyncSessions { timestamp: timestamp };
 
     let user_agent = &**USER_AGENT.read();
 
