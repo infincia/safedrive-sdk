@@ -10,6 +10,8 @@ extern crate lz4;
 
 #[macro_use] extern crate log;
 
+extern crate chrono;
+
 pub mod c_api;
 pub use c_api::*;
 

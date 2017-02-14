@@ -33,6 +33,7 @@ blake2-rfc = { version = "*", features = ["simd", "simd_opt", "simd_asm"] }
 bitflags = "^0.7"
 semver = "^0.6.0"
 lz4 = "*"
+chrono = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"

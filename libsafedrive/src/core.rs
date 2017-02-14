@@ -347,6 +347,97 @@ pub fn remove_sync_session(token: &Token,
     }
 }
 
+pub fn clean_sync_sessions(token: &Token, schedule: SyncCleaningSchedule) -> Result<(), SDError> {
+    use ::chrono::{Local, UTC, Timelike};
+
+    let utc_time = UTC::now();
+    let local_time = utc_time.with_timezone(&Local);
+    let midnight = local_time.with_hour(0).unwrap().with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap();
+
+    match schedule {
+        SyncCleaningSchedule::Auto => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::ExactDateRFC3339 { date } => {
+            let date = match ::chrono::DateTime::parse_from_rfc3339(&date) {
+                Ok(dt) => dt,
+                Err(e) => {
+                    return Err(SDError::Internal(format!("{}", e)));
+                }
+            };
+
+            remove_sync_sessions_before(token, ::util::timestamp_to_ms(date.timestamp(), date.timestamp_subsec_millis()))
+
+        },
+        SyncCleaningSchedule::ExactDateRFC2822 { date } => {
+            let date = match ::chrono::DateTime::parse_from_rfc2822(&date) {
+                Ok(dt) => dt,
+                Err(e) => {
+                    return Err(SDError::Internal(format!("{}", e)));
+                }
+            };
+
+            remove_sync_sessions_before(token, ::util::timestamp_to_ms(date.timestamp(), date.timestamp_subsec_millis()))
+
+        },
+        SyncCleaningSchedule::All => {
+
+            remove_sync_sessions_before(token, ::util::timestamp_to_ms(local_time.timestamp(), local_time.timestamp_subsec_millis()))
+
+        },
+        SyncCleaningSchedule::BeforeToday => {
+
+            remove_sync_sessions_before(token, ::util::timestamp_to_ms(midnight.timestamp(), midnight.timestamp_subsec_millis()))
+
+        },
+        SyncCleaningSchedule::BeforeThisWeek => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::BeforeThisMonth => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::BeforeThisYear => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::OneDay => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::OneWeek => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::OneMonth => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+        SyncCleaningSchedule::OneYear => {
+
+            return Err(SDError::Internal("not implemented".to_string()));
+
+        },
+    }
+}
+
+pub fn remove_sync_sessions_before(token: &Token,
+                                   timestamp: i64) -> Result<(), SDError> {
+    match delete_sessions(token, timestamp) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
 pub fn sync(token: &Token,
             session_name: &str,
             main_key: &Key,
