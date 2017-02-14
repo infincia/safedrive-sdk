@@ -13,7 +13,7 @@ pub enum SyncSchedule {
 }
 
 #[derive(Debug)]
-pub enum SyncCleaningSchedule<'a> {
+pub enum SyncCleaningSchedule {
     /// Clean sync sessions on a structured schedule.
     ///
     /// The goal is to keep frequent sessions for the recent past, and retain fewer of them as they
@@ -68,8 +68,8 @@ pub enum SyncCleaningSchedule<'a> {
 
     /// Clean all sessions older than an exact date
     ///
-    ExactDateRFC3339 { date: &'a str },
-    ExactDateRFC2822 { date: &'a str },
+    ExactDateRFC3339 { date: String },
+    ExactDateRFC2822 { date: String },
 
     /// The remaining schedules will clean all sync sessions older than a specific time period
     ///
@@ -84,7 +84,7 @@ pub enum SyncCleaningSchedule<'a> {
     OneYear,         // 365 days
 }
 
-impl<'a> std::fmt::Display for SyncCleaningSchedule<'a> {
+impl std::fmt::Display for SyncCleaningSchedule {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
             SyncCleaningSchedule::Auto => {
