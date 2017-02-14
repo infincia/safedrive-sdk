@@ -5,7 +5,7 @@ use ::nom::{IResult, rest, le_u32};
 use ::constants::*;
 
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug)]
 pub struct BinaryFormat<'a> {
     pub magic: &'a str,
     pub file_type: &'a str,
