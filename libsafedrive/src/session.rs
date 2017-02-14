@@ -290,7 +290,30 @@ impl WrappedSyncSession {
 
         let raw_session: BinaryFormat = match ::binformat::binary_parse(&body.chunk_data) {
             Done(_, o) => o,
-            Error(_) => return Err(SDError::SessionUnreadable),
+            Error(e) => {
+                debug!("session parsing failed: {}", &e);
+
+                match e {
+                    ::nom::verbose_errors::Err::Code(ref kind) => {
+                        debug!("session parsing failure kind: {:?}", kind);
+
+                    },
+                    ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
+                        debug!("session parsing failure node: {:?}, {}", kind, err);
+
+                    },
+                    ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
+                        debug!("session parsing failure position: {:?}: {:?}", kind, position);
+
+                    },
+                    ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
+                        debug!("session parsing failure kind: {:?}: {:?}, {}", kind, position, err);
+
+                    },
+                };
+
+                return Err(SDError::SessionUnreadable)
+            },
             Incomplete(_) => {
                 debug!("session file cannot be parsed, this should never happen");
                 return Err(SDError::SessionUnreadable)
