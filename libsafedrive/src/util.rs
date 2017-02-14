@@ -330,6 +330,10 @@ pub fn pad_4bytes() {
 
 // math helpers
 
+pub fn timestamp_to_ms(sec: i64, ms: u32) -> i64 {
+    (sec * 1000) + (ms as i64)
+}
+
 /// Get the next highest integer after `num` that is a multiple of `multiple`
 ///
 /// Parameters:
