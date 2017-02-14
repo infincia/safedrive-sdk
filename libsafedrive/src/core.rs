@@ -397,10 +397,6 @@ pub fn sync(token: &Token,
 
         let p = item.path();
 
-        let f = match File::open(p) {
-            Ok(file) => file,
-            Err(_) => { continue },
-        };
         let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
             Err(_) => { continue },
