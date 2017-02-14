@@ -29,7 +29,7 @@ pub struct Block {
 impl Block {
     pub fn new(version: SyncVersion, hmac: &Key, data: Vec<u8>) -> Block {
 
-        let real_size = data.len();
+        let real_size = data.len() as u64;
 
         // calculate hmac of the block
 
@@ -76,7 +76,12 @@ impl Block {
 
                 let compressed_size = compressed_data.len() as u64;
 
-                (true, compressed_data, Some(compressed_size))
+                // don't use the compressed data if it's not smaller, means lz4 couldn't compress it
+                if compressed_size < real_size {
+                    (true, compressed_data, Some(compressed_size))
+                } else {
+                    (false, data, None)
+                }
             },
             _ => {
                 panic!("Attempted to create invalid session version");
@@ -100,7 +105,7 @@ impl Block {
 
         let production = is_production();
 
-        Block { version: version, data: maybe_compressed_data, real_size: real_size as u64, compressed_size: maybe_compressed_size, hmac: block_hmac, compressed: compressed, channel: channel, production: production }
+        Block { version: version, data: maybe_compressed_data, real_size: real_size, compressed_size: maybe_compressed_size, hmac: block_hmac, compressed: compressed, channel: channel, production: production }
     }
 
     pub fn len(&self) -> usize {

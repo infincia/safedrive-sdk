@@ -34,7 +34,7 @@ pub struct SyncSession {
 
 impl SyncSession {
     pub fn new(version: SyncVersion, folder_id: u64, name: String, size: Option<u64>, time: Option<u64>, data: Vec<u8>) -> SyncSession {
-        let real_size = data.len();
+        let real_size = data.len() as u64;
 
         match version {
             SyncVersion::Version1 | SyncVersion::Version2 => {},
@@ -60,7 +60,12 @@ impl SyncSession {
 
                 let compressed_size = compressed_data.len() as u64;
 
-                (true, compressed_data, Some(compressed_size))
+                // don't use the compressed data if it's not smaller, means lz4 couldn't compress it
+                if compressed_size < real_size {
+                    (true, compressed_data, Some(compressed_size))
+                } else {
+                    (false, data, None)
+                }
             },
             _ => {
                 panic!("Attempted to create invalid session version");
@@ -83,7 +88,7 @@ impl SyncSession {
 
         let production = is_production();
 
-        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed, id: None, production: production, channel: channel, real_size: real_size as u64, compressed_size: maybe_compressed_size }
+        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed, id: None, production: production, channel: channel, real_size: real_size, compressed_size: maybe_compressed_size }
     }
 
 
