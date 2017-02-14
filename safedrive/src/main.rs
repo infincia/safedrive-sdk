@@ -770,7 +770,7 @@ fn main() {
         let mut table = Table::new();
 
         // Add a row
-        table.add_row(row!["Folder ID", "Time", "Size", "Name"]);
+        table.add_row(row!["Session ID", "Time", "Size", "Name", "Folder ID"]);
 
         let _ = match get_sync_folders(&token) {
             Ok(fl) => fl,
@@ -792,6 +792,7 @@ fn main() {
                 Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
             };
             let session_folder_id = format!("{}", &session.folder_id.unwrap());
+            let session_id = format!("{}", &session.id.unwrap());
 
             let session_time = format!("{}", {
                 let t = session.time.unwrap();
@@ -802,10 +803,12 @@ fn main() {
             });
 
             table.add_row(Row::new(vec![
-                Cell::new(&session_folder_id),
+                Cell::new(&session_id),
                 Cell::new(&session_time),
                 Cell::new(&session_size),
                 Cell::new(&session.name),
+                Cell::new(&session_folder_id),
+
             ]));
         }
         table.printstd();
