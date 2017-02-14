@@ -325,13 +325,11 @@ impl WrappedBlock {
         if self.production {
             flags.insert(Production);
         } else {
-            flags.insert(!Production);
         }
 
         if self.compressed() {
             flags.insert(Compressed);
         } else {
-            flags.insert(!Compressed);
         }
 
         let flag_ref: &[u8] = &[flags.bits()];
