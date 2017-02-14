@@ -1,12 +1,149 @@
 #![allow(dead_code)]
 
+use std;
+use std::path::{Path};
+use std::fs::File;
+use std::io::{BufReader, Read, Seek, SeekFrom};
+use std::cmp::{min, max};
+
 use ::cdc::Chunk;
 use ::byteorder::LittleEndian;
 use ::byteorder::ByteOrder;
 
 use ::models::SyncVersion;
 
+use ::error::{SDError};
+
+use ::block::{Block};
+
 use ::keys::{Key};
+
+pub struct BlockGeneratorStats {
+    pub item_size: u64,
+    pub processed_size: u64,
+    pub processed_size_compressed: u64,
+    pub discovered_chunk_count: u64,
+    pub discovered_chunk_size_average: usize,
+    pub discovered_chunk_expected_size: usize,
+    pub discovered_chunk_smallest_size: usize,
+    pub discovered_chunk_largest_size: usize,
+    pub discovered_chunk_size_variance: usize,
+}
+
+// block abstraction
+pub struct BlockGenerator<'a> {
+    iter: Box<Iterator<Item=Chunk> + 'a>,
+    chunk_file: File,
+    main_key: &'a Key,
+    hmac_key: &'a Key,
+    tweak_key: &'a Key,
+    // statistics generation
+    item_size: u64,
+    processed_size: u64,
+    processed_size_compressed: u64,
+    chunk_index: u64,
+    discovered_chunk_count: u64,
+    discovered_chunk_size_average: u64,
+    discovered_chunk_expected_size: u64,
+    discovered_chunk_smallest_size: u64,
+    discovered_chunk_largest_size: u64,
+    discovered_chunk_size_variance: i64,
+    version: SyncVersion,
+}
+
+impl<'a> BlockGenerator<'a> {
+    pub fn new(path: &Path, main_key: &'a Key, hmac_key: &'a Key, tweak_key: &'a Key, item_size: u64, version: SyncVersion) -> BlockGenerator<'a> {
+        let chunk_file = File::open(path).expect("failed to open file to retrieve chunk");
+        let search_file = File::open(path).expect("failed to open file to search for chunks");
+
+        let reader: BufReader<File> = BufReader::new(search_file);
+
+        let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap block data"));
+        let chunk_iter = ChunkGenerator::new(byte_iter, &tweak_key, item_size, version);
+
+        BlockGenerator {
+            iter: Box::new(chunk_iter),
+            chunk_file: chunk_file,
+            main_key: main_key,
+            hmac_key: hmac_key,
+            tweak_key: tweak_key,
+            item_size: item_size,
+            processed_size: 0,
+            processed_size_compressed: 0,
+            chunk_index: 0,
+            discovered_chunk_count: 0,
+            discovered_chunk_size_average: 0,
+            discovered_chunk_expected_size: 1 << version.leading_value_size(),
+            discovered_chunk_smallest_size: std::u64::MAX,
+            discovered_chunk_largest_size: 0,
+            discovered_chunk_size_variance: 0,
+            version: version
+        }
+    }
+
+    pub fn stats(&self) -> BlockGeneratorStats {
+        BlockGeneratorStats {
+            item_size: self.item_size,
+            processed_size: self.processed_size,
+            processed_size_compressed: self.processed_size_compressed,
+            discovered_chunk_count: self.discovered_chunk_count,
+            discovered_chunk_size_average: self.discovered_chunk_size_average as usize,
+            discovered_chunk_expected_size: self.discovered_chunk_expected_size as usize,
+            discovered_chunk_smallest_size: self.discovered_chunk_smallest_size as usize,
+            discovered_chunk_largest_size: self.discovered_chunk_largest_size as usize,
+            discovered_chunk_size_variance: self.discovered_chunk_size_variance as usize,
+        }
+    }
+}
+
+
+impl<'a> Iterator for BlockGenerator<'a> {
+
+    type Item = Result<::block::Block, SDError>;
+
+    fn next(&mut self) -> Option<Result<::block::Block, SDError>> {
+        match self.iter.next() {
+            Some(chunk) => {
+                self.discovered_chunk_count += 1;
+                self.processed_size += chunk.size;
+
+                debug!("creating chunk at {} of size {}", self.chunk_index, chunk.size);
+
+                self.discovered_chunk_smallest_size = min(self.discovered_chunk_smallest_size, chunk.size);
+                self.discovered_chunk_largest_size = max(self.discovered_chunk_largest_size, chunk.size);
+                self.discovered_chunk_size_variance += (chunk.size as i64 - self.discovered_chunk_expected_size as i64).pow(2);
+                self.chunk_file.seek(SeekFrom::Start(self.chunk_index)).expect("failed to seek chunk reader");
+
+                let mut buffer = BufReader::new(&self.chunk_file).take(chunk.size);
+                let mut data: Vec<u8> = Vec::with_capacity(self.discovered_chunk_expected_size as usize); //expected size of largest chunk
+
+                self.chunk_index = self.chunk_index + chunk.size;
+
+                if let Err(e) = buffer.read_to_end(&mut data) {
+                    return Some(Err(SDError::from(e)))
+                }
+
+                let block = Block::new(self.version, self.hmac_key, data);
+
+                match block.compressed_size() {
+                    Some(size) => {
+                        let ratio = (size as f64 / block.real_size() as f64) * 100.0;
+
+                        debug!("generated compressed block, size {}/{} ({}%)", size, block.real_size(), ratio);
+                        self.processed_size_compressed += size;
+                    },
+                    None => {
+                        debug!("generated uncompressed block, real size {}", block.real_size());
+                    },
+                };
+
+                Some(Ok(block))
+            },
+            None => None,
+        }
+    }
+}
+
 
 // chunk abstraction
 
