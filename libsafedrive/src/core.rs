@@ -393,7 +393,7 @@ pub fn sync(token: &Token,
             Ok(file) => file,
             Err(_) => { continue },
         };
-        let md = match f.metadata() {
+        let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
             Err(_) => { continue },
         };
@@ -423,7 +423,7 @@ pub fn sync(token: &Token,
             Ok(file) => file,
             Err(_) => { failed = failed +1; continue },
         };
-        let md = match f.metadata() {
+        let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
             Err(_) => { failed = failed +1; continue },
         };
