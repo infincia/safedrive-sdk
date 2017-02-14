@@ -21,6 +21,7 @@ use ::core::get_sync_folders;
 
 use ::core::get_sync_sessions;
 use ::core::remove_sync_session;
+use ::core::clean_sync_sessions;
 use ::core::sync;
 use ::core::restore;
 use ::core::load_keys;
@@ -28,7 +29,7 @@ use ::core::login;
 
 use ::constants::Configuration;
 
-use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification};
+use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule};
 
 use ::session::SyncSession;
 
@@ -311,6 +312,122 @@ impl From<str::Utf8Error> for SDDKError {
 impl From<String> for SDDKError {
     fn from(s: String) -> Self {
         SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", s)).unwrap().into_raw() }
+    }
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub enum SDDKSyncCleaningSchedule {
+    /// Clean sync sessions on a structured schedule.
+    ///
+    /// The goal is to keep frequent sessions for the recent past, and retain fewer of them as they
+    /// age. Will clean the sessions that would be considered redundant to keep around. Where possible
+    /// it will keep the oldest session available within a given time period.
+    ///
+    /// Within a 30 day period, it will keep:
+    ///
+    /// Hourly: at most 1 per hour for the past 24 hours
+    /// Daily:  at most 1 per day for the earlier 7 days
+    /// Weekly: at most 1 per week for the earlier 23 days
+    ///
+    /// Beyond that 30 day period, it will keep at most 1 per month
+    ///
+    ///
+    /// Example:
+    ///
+    /// For a new account created on January 1st, 2017, that had created 1 session at the start of
+    /// each hour (xx:00:00) for the past 3 months, after running a cleaning job on
+    /// April 1st at 00:30:00, the user would retain:
+    ///
+    /// Hourly: 1 session for each of the past 24 hours
+    ///
+    ///         1 - March 31st at 01:00:00
+    ///
+    ///         ...
+    ///
+    ///         24 - April 1st at 00:00:00
+    ///
+    /// Daily: 1 session for each of March 25th - 31st
+    ///        1 - March 25th at 00:00:00
+    ///        2 - March 26th at 00:00:00
+    ///        3 - March 27th at 00:00:00
+    ///        4 - March 28th at 00:00:00
+    ///        5 - March 29th at 00:00:00
+    ///        6 - March 30th at 00:00:00
+    ///        7 - March 31st at 00:00:00
+    ///
+    /// Weekly: 1 session within each 7 day period between March 1st at 00:00:00 and March 25th at 00:00:00.
+    ///        1 - March 1st at 00:00:00
+    ///        2 - March 8th at 00:00:00
+    ///        3 - March 15th at 00:00:00
+    ///        4 - March 22nd at 00:00:00
+    ///
+    /// Monthly: 1 session for each of January and February
+    ///        1 - January 1st at 00:00:00
+    ///        2 - February 1st at 00:00:00
+    ///
+    ///
+    ///
+    SDDKSyncCleaningScheduleAuto,
+
+    /// Clean all sessions older than an exact date
+    ///
+    SDDKSyncCleaningScheduleExactDateRFC3339,
+    SDDKSyncCleaningScheduleExactDateRFC2822,
+
+    /// The remaining schedules will clean all sync sessions older than a specific time period
+    ///
+    SDDKSyncCleaningScheduleAll,             // current time, should delete all of them
+    SDDKSyncCleaningScheduleBeforeToday,     // today at 00:00
+    SDDKSyncCleaningScheduleBeforeThisWeek,  // the first day of this week at 00:00
+    SDDKSyncCleaningScheduleBeforeThisMonth, // the first day of this month at 00:00
+    SDDKSyncCleaningScheduleBeforeThisYear,  // the first day of this year at 00:00
+    SDDKSyncCleaningScheduleOneDay,          // 24 hours
+    SDDKSyncCleaningScheduleOneWeek,         // 7 days
+    SDDKSyncCleaningScheduleOneMonth,        // 30 days
+    SDDKSyncCleaningScheduleOneYear,         // 365 days
+}
+
+impl SDDKSyncCleaningSchedule {
+    fn to_schedule(&self, date: Option<String>) -> SyncCleaningSchedule {
+        match *self {
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAuto => {
+                SyncCleaningSchedule::Auto
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleExactDateRFC3339 => {
+                SyncCleaningSchedule::ExactDateRFC3339 { date: date.unwrap() }
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleExactDateRFC2822 => {
+                SyncCleaningSchedule::ExactDateRFC2822 { date: date.unwrap() }
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAll => {
+                SyncCleaningSchedule::All
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeToday => {
+                SyncCleaningSchedule::BeforeToday
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisWeek => {
+                SyncCleaningSchedule::BeforeThisWeek
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisMonth => {
+                SyncCleaningSchedule::BeforeThisMonth
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisYear => {
+                SyncCleaningSchedule::BeforeThisYear
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneDay => {
+                SyncCleaningSchedule::OneDay
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneWeek => {
+                SyncCleaningSchedule::OneWeek
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneMonth => {
+                SyncCleaningSchedule::OneMonth
+            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneYear => {
+                SyncCleaningSchedule::OneYear
+            },
+        }
     }
 }
 
@@ -1408,6 +1525,90 @@ pub extern "C" fn sddk_remove_sync_session(state: *mut SDDKState,
 
 
     match remove_sync_session(c.0.get_api_token(), id) {
+        Ok(_) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Clean sync sessions according to the provided schedule type
+///
+/// Will return a failure code and set the error parameter if for any reason the sessions cannot be
+/// cleaned
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///  schedule: an SDDKSyncCleaningSchedule variant
+///
+///      date: the date string used for SDDKSyncCleaningSchedule.ExactDateRFC* variants. Should be
+///            null for other enum variants.
+///
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_clean_sync_sessions(&state, SDDKSyncCleaningSchedule.All, &error)) {
+///     printf("Failed to remove sessions");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Removed sessions");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
+                                           schedule: SDDKSyncCleaningSchedule,
+                                           date: *const std::os::raw::c_char,
+                                           mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+
+    let d: Option<String> = unsafe {
+        if date.is_null() {
+            None
+        } else {
+            let c_date: &CStr = unsafe { CStr::from_ptr(date) };
+            let d: String = match c_date.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            };
+
+            Some(d)
+        }
+    };
+
+    let sch = schedule.to_schedule(d);
+
+    match clean_sync_sessions(c.0.get_api_token(), sch) {
         Ok(_) => 0,
         Err(e) => {
             let c_err = SDDKError::from(e);
