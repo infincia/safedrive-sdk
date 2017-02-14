@@ -192,7 +192,8 @@ impl WrappedSyncSession {
                             },
                         };
 
-                        return Err(SDError::SessionUnreadable) },
+                        return Err(SDError::SessionUnreadable)
+                    },
                     Incomplete(_) => {
                         debug!("session data cannot be unpadded, this should never happen");
                         return Err(SDError::SessionUnreadable)
