@@ -127,6 +127,12 @@ impl AsRef<[u8]> for SyncSession {
     }
 }
 
+impl<'a> ::std::fmt::Display for SyncSession {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "SyncSession <version:{}, channel:{}, production:{}, compressed:{}>", self.version, self.channel, self.production, self.compressed)
+    }
+}
+
 
 
 pub struct WrappedSyncSession {
@@ -334,5 +340,11 @@ impl WrappedSyncSession {
 impl AsRef<[u8]> for WrappedSyncSession {
     fn as_ref(&self) -> &[u8] {
         self.wrapped_data.as_ref()
+    }
+}
+
+impl<'a> ::std::fmt::Display for WrappedSyncSession {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "WrappedSyncSession <version:{}, channel:{}, production:{}, compressed:{}>", self.version, self.channel, self.production, self.compressed)
     }
 }

@@ -185,6 +185,11 @@ impl AsRef<[u8]> for Block {
     }
 }
 
+impl<'a> ::std::fmt::Display for Block {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "Block <version:{}, channel:{}, production:{}, compressed:{}>", self.version, self.channel, self.production, self.compressed)
+    }
+}
 
 
 pub struct WrappedBlock {
@@ -414,6 +419,12 @@ impl WrappedBlock {
         Ok(wrapped_block)
     }
 
+}
+
+impl<'a> ::std::fmt::Display for WrappedBlock {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "WrappedBlock <version:{}, channel:{}, production:{}, compressed:{}>", self.version, self.channel, self.production, self.compressed)
+    }
 }
 
 #[allow(dead_code)]
