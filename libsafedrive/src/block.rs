@@ -413,7 +413,7 @@ impl WrappedBlock {
         let production = flags & Production == Production;
         let compressed = flags & Compressed == Compressed;
 
-        let wrapped_block = WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: false, channel: channel, production: production };
+        let wrapped_block = WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: compressed, channel: channel, production: production };
         debug!("got valid wrapped block: {}", &wrapped_block);
 
         Ok(wrapped_block)
