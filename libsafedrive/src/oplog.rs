@@ -4,9 +4,7 @@
 
 use std;
 
-use ::nom::{IResult, rest, le_u8, le_u16, le_u64};
-
-use ::constants::*;
+use ::nom::{IResult, rest, le_u8, le_u64};
 
 
 #[derive(Debug, PartialEq, Eq)]
