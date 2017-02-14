@@ -1,10 +1,8 @@
-use std;
 use std::str;
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-use std::cmp::{min, max};
 use std::{thread, time};
 
 // external crate imports
@@ -22,7 +20,6 @@ use ::block::*;
 use ::constants::*;
 use ::sdapi::*;
 use ::keys::*;
-use ::chunk::*;
 
 #[cfg(feature = "locking")]
 use ::lock::{FolderLock};
@@ -480,6 +477,7 @@ pub fn sync(token: &Token,
     let mut ar = Builder::new(archive_file);
 
     let mut processed_size: u64 = 0;
+    let mut processed_size_compressed: u64 = 0;
 
     let mut estimated_size: u64 = 0;
 
@@ -512,10 +510,6 @@ pub fn sync(token: &Token,
         let p = item.path();
         let p_relative = p.strip_prefix(&folder_path).expect("failed to unwrap relative path");
 
-        let f = match File::open(p) {
-            Ok(file) => file,
-            Err(_) => { failed = failed +1; continue },
-        };
         let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
             Err(_) => { failed = failed +1; continue },
@@ -539,47 +533,34 @@ pub fn sync(token: &Token,
         // chunk file if not a directory or socket
         if is_file {
             if stream_length > 0 {
-                let mut f_chunk = File::open(p).expect("failed to open file to retrieve chunk");
 
-                let reader: BufReader<File> = BufReader::new(f);
-                let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap block data"));
-                let chunk_iter = ChunkGenerator::new(byte_iter, &tweak_key, stream_length, SYNC_VERSION);
+                let mut block_generator = ::chunk::BlockGenerator::new(&p, main_key, hmac_key, tweak_key, stream_length, SYNC_VERSION);
 
-                let mut nb_chunk = 0;
-                let mut item_size = 0;
                 let mut skipped_blocks = 0;
-                let mut smallest_size = std::u64::MAX;
-                let mut largest_size = 0;
-                let expected_size = 1 << SYNC_VERSION.leading_value_size();
-                let mut size_variance = 0;
-                let mut chunks: Vec<u8> = Vec::new();
 
-                let mut chunk_start = 0;
+                let mut hmac_bag: Vec<u8> = Vec::new();
 
-                for chunk in chunk_iter {
-                    nb_chunk += 1;
-                    item_size += chunk.size;
-                    processed_size += chunk.size;
+                for block_result in block_generator.by_ref() {
+                    let block = match block_result {
+                        Ok(b) => b,
+                        Err(e) => {
+                            failed = failed +1; continue;
+                        }
+                    };
 
-                    debug!("creating chunk at {} of size {}", chunk_start, chunk.size);
-
-                    smallest_size = min(smallest_size, chunk.size);
-                    largest_size = max(largest_size, chunk.size);
-                    size_variance += (chunk.size as i64 - expected_size as i64).pow(2);
-                    f_chunk.seek(SeekFrom::Start(chunk_start)).expect("failed to seek chunk reader");
-
-                    let mut buffer = BufReader::new(&f_chunk).take(chunk.size);
-                    let mut data: Vec<u8> = Vec::with_capacity(100000); //expected size of largest block
-
-                    chunk_start = chunk_start + chunk.size;
-
-                    if let Err(e) = buffer.read_to_end(&mut data) {
-                        return Err(SDError::from(e))
-                    }
-
-                    let block = Block::new(SYNC_VERSION, hmac_key, data);
                     let block_name = block.name();
-                    chunks.extend_from_slice(&block.get_hmac());
+                    let block_real_size = block.real_size();
+
+                    processed_size += block_real_size;
+
+                    match block.compressed_size() {
+                        Some(size) => {
+                            processed_size_compressed += size;
+                        },
+                        None => {},
+                    };
+
+                    hmac_bag.extend_from_slice(&block.get_hmac());
 
                     let wrapped_block = match block.to_wrapped(main_key) {
                         Ok(wb) => wb,
@@ -617,7 +598,7 @@ pub fn sync(token: &Token,
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
                                 // allow caller to tick the progress display, if one exists
-                                progress(estimated_size as u32, processed_size as u32, chunk.size as u32, percent_completed, false, "");
+                                progress(estimated_size as u32, processed_size as u32, block_real_size as u32, percent_completed, false, "");
                                 should_retry = false
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
@@ -640,25 +621,29 @@ pub fn sync(token: &Token,
                         }
                     }
                 }
-                assert!(item_size == stream_length);
-                debug!("calculated {} bytes of blocks, matching stream size {}", item_size, stream_length);
-
-                let chunklist = BufReader::new(chunks.as_slice());
-                header.set_size(nb_chunk * HMAC_SIZE as u64); // hmac list size
-                header.set_cksum();
-                ar.append(&header, chunklist).expect("failed to append chunk archive header");
-
-
+                let stats = block_generator.stats();
                 if DEBUG_STATISTICS {
-                    debug!("{} chunks ({} new)", nb_chunk, nb_chunk - skipped_blocks);
-                    debug!("average size: {} bytes", item_size / nb_chunk);
+                    let compression_ratio = (stats.processed_size_compressed as f64 / stats.processed_size as f64 ) * 100.0;
 
-                    debug!("hmac bag has: {} ids <{} bytes>", chunks.len() / 32, nb_chunk * 32);
-                    debug!("expected chunk size: {} bytes", expected_size);
-                    debug!("smallest chunk: {} bytes", smallest_size);
-                    debug!("largest chunk: {} bytes", largest_size);
-                    debug!("standard size deviation: {} bytes", (size_variance as f64 / nb_chunk as f64).sqrt() as u64);
+                    debug!("{} chunks ({} new)", stats.discovered_chunk_count, stats.discovered_chunk_count - skipped_blocks);
+                    debug!("average size: {} bytes", stats.processed_size / stats.discovered_chunk_count);
+                    debug!("compression: {}/{} ({}%)", stats.processed_size_compressed, stats.processed_size, compression_ratio);
+
+                    debug!("hmac bag has: {} ids <{} bytes>", hmac_bag.len() / 32, stats.discovered_chunk_count * 32);
+                    debug!("expected chunk size: {} bytes", stats.discovered_chunk_expected_size);
+                    debug!("smallest chunk: {} bytes", stats.discovered_chunk_smallest_size);
+                    debug!("largest chunk: {} bytes", stats.discovered_chunk_largest_size);
+                    debug!("standard size deviation: {} bytes", (stats.discovered_chunk_size_variance as f64 / stats.discovered_chunk_count as f64).sqrt() as u64);
                 }
+
+                assert!(stats.processed_size == stream_length);
+                debug!("calculated {} real bytes of blocks, matching stream size {}", stats.processed_size, stream_length);
+
+                let chunklist = BufReader::new(hmac_bag.as_slice());
+                header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); // hmac list size
+                header.set_cksum();
+                ar.append(&header, chunklist).expect("failed to append session entry header");
+
             } else {
                 header.set_size(0); // hmac list size is zero when file has no actual data
                 let chunks: Vec<u8> = Vec::new();
