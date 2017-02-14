@@ -701,7 +701,16 @@ pub fn restore(token: &Token,
     let mut failed = 0;
 
     for item in ar.entries().unwrap() {
-        let mut file_entry = item.unwrap();
+        let mut file_entry = match item {
+            Ok(e) => e,
+            Err(e) => {
+                debug!("not restoring invalid session entry: {})", e);
+
+                failed + failed + 1;
+                continue // we do care about errors here, but we can't really recover from them for this item
+            }
+        };
+
         let mut full_p = PathBuf::from(&destination);
 
         match file_entry.path() {
