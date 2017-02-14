@@ -192,10 +192,10 @@ impl WrappedSyncSession {
                             },
                         };
 
-                        return Err(SDError::SessionMissing) },
+                        return Err(SDError::SessionUnreadable) },
                     Incomplete(_) => {
                         debug!("session data cannot be unpadded, this should never happen");
-                        return Err(SDError::SessionMissing)
+                        return Err(SDError::SessionUnreadable)
                     }
                 };
 
@@ -291,10 +291,10 @@ impl WrappedSyncSession {
 
         let raw_session: BinaryFormat = match ::binformat::binary_parse(&body.chunk_data) {
             Done(_, o) => o,
-            Error(_) => return Err(SDError::SessionMissing),
+            Error(_) => return Err(SDError::SessionUnreadable),
             Incomplete(_) => {
                 debug!("session file cannot be parsed, this should never happen");
-                return Err(SDError::SessionMissing)
+                return Err(SDError::SessionUnreadable)
             }
         };
 

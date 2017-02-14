@@ -252,10 +252,10 @@ impl WrappedBlock {
                             },
                         };
 
-                        return Err(SDError::BlockMissing) },
+                        return Err(SDError::BlockUnreadable) },
                     Incomplete(_) => {
                         debug!("block data cannot be unpadded, this should never happen");
-                        return Err(SDError::BlockMissing)
+                        return Err(SDError::BlockUnreadable)
                     }
                 };
 
@@ -382,11 +382,11 @@ impl WrappedBlock {
                     },
                 };
 
-                return Err(SDError::BlockMissing)
+                return Err(SDError::BlockUnreadable)
             },
             Incomplete(_) => {
                 debug!("block file cannot be parsed, this should never happen");
-                return Err(SDError::BlockMissing)
+                return Err(SDError::BlockUnreadable)
             }
         };
 
