@@ -31,7 +31,7 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
     file_type: map_res!(alt!(tag!("b") | tag!("s")), std::str::from_utf8)        ~
     version: map_res!(take!(2), std::str::from_utf8)                             ~
     flags: bits!(tuple!(take_bits!(u8, 3), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1) ))~
-    reserved: take!(2)                                                           ~
+    take!(2)                                                                     ~
     wrapped_key: take!(SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE)                  ~
     nonce: take!(SECRETBOX_NONCE_SIZE)                                           ~
     wrapped_data: rest                                                           ,
