@@ -61,6 +61,8 @@ use safedrive::core::add_sync_folder;
 use safedrive::core::remove_sync_folder;
 
 use safedrive::core::get_sync_sessions;
+use safedrive::core::remove_sync_session;
+use safedrive::core::clean_sync_sessions;
 
 #[cfg(target_os = "linux")]
 use safedrive::core::get_openssl_directory;
@@ -75,7 +77,7 @@ use safedrive::core::get_app_directory;
 use safedrive::core::get_current_os;
 
 
-use safedrive::models::{RegisteredFolder};
+use safedrive::models::{RegisteredFolder, SyncCleaningSchedule};
 use safedrive::session::SyncSession;
 use safedrive::constants::{Configuration, Channel};
 
@@ -165,6 +167,45 @@ fn main() {
         )
         .subcommand(SubCommand::with_name("sessions")
                         .about("list all sync sessions")
+        )
+        .subcommand(SubCommand::with_name("clean")
+            .about("clean sync sessions")
+            .arg(Arg::with_name("id")
+                .short("i")
+                .long("id")
+                .value_name("ID")
+                .help("session ID to remove")
+                .takes_value(true)
+                .conflicts_with_all(&["auto", "all", "before-today", "before-date"])
+                .required(true)
+            )
+            .arg(Arg::with_name("auto")
+                .long("auto")
+                .help("session ID to remove")
+                .conflicts_with_all(&["id", "all", "before-today", "before-date"])
+                .required(true)
+            )
+            .arg(Arg::with_name("all")
+                .long("all")
+                .help("remove all sessions")
+                .conflicts_with_all(&["id", "auto", "before-today", "before-date"])
+                .required(true)
+            )
+            .arg(Arg::with_name("before-today")
+                .short("t")
+                .long("before-today")
+                .help("remove all sessions before today at 00:00")
+                .conflicts_with_all(&["id", "auto", "all", "before-date"])
+                .required(true)
+            )
+            .arg(Arg::with_name("before-date")
+                .short("d")
+                .long("before-date")
+                .value_name("DATE")
+                .help("delete all sessions older than this date (RFC 3339 format)\n\n")
+                .conflicts_with_all(&["id", "auto", "all", "before-today"])
+                .required(true)
+            )
         )
         .subcommand(SubCommand::with_name("syncall")
             .about("sync all registered folder")
@@ -770,5 +811,50 @@ fn main() {
         }
         table.printstd();
 
+    } else if let Some(m) = matches.subcommand_matches("clean") {
+
+        // if we got a specific session id to delete, use that
+        if let Some(ids) = m.value_of("id") {
+            let id: u64 = ids.trim().parse().expect("Expected a number");
+
+            println!("Removing sync session {}", id);
+
+            match remove_sync_session(&token, id) {
+                Ok(()) => {},
+                Err(e) => {
+                    error!("failed to remove sync session: {}", e);
+                    std::process::exit(1);
+                }
+            };
+
+        } else {
+
+            let mut schedule = SyncCleaningSchedule::Auto;
+
+            if m.is_present("before-date") {
+                if let Some(date) = m.value_of("DATE") {
+                    schedule = SyncCleaningSchedule::ExactDateRFC3339 { date: date.to_string() }
+                } else {
+                    error!("no date given");
+                    std::process::exit(1);
+                }
+            } else if m.is_present("before-today") {
+                schedule = SyncCleaningSchedule::BeforeToday
+            } else if m.is_present("all") {
+                schedule = SyncCleaningSchedule::All
+            } else if m.is_present("auto") {
+                schedule = SyncCleaningSchedule::Auto
+            };
+
+            println!("Cleaning sync sessions with schedule: {}", schedule);
+
+            match clean_sync_sessions(&token, schedule) {
+                Ok(()) => {},
+                Err(e) => {
+                    error!("failed to clean sync sessions: {}", e);
+                    std::process::exit(1);
+                }
+            };
+        }
     }
 }
