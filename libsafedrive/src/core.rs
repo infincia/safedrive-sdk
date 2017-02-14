@@ -1041,12 +1041,32 @@ pub fn restore(token: &Token,
                     },
                 }
 
-                #[cfg(windows)]
-                match ::std::os::windows::fs::symlink_file(&src, full_p) {
-                    Ok(()) => {},
-                    Err(e) => {
-                        error!("failed to restore sym link: {})", e);
-                    },
+                #[cfg(windows)] {
+                    let md = match ::std::fs::metadata(&src) {
+                        Ok(m) => m,
+                        Err(e) => {
+                            debug!("not restoring symlink: {})", e);
+                            continue
+                        },
+                    };
+
+                    let is_dir = md.file_type().is_dir();
+                    
+                    if is_dir {
+                        match ::std::os::windows::fs::symlink_dir(&src, full_p) {
+                            Ok(()) => {},
+                            Err(e) => {
+                                error!("failed to restore directory symlink: {})", e);
+                            },
+                        }
+                    } else {
+                        match ::std::os::windows::fs::symlink_file(&src, full_p) {
+                            Ok(()) => {},
+                            Err(e) => {
+                                error!("failed to restore file symlink: {})", e);
+                            },
+                        }
+                    }
                 }
 
 
