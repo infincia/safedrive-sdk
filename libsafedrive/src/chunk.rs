@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use ::cdc::Chunk;
 use ::byteorder::LittleEndian;
 use ::byteorder::ByteOrder;
