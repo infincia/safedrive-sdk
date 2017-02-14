@@ -267,10 +267,10 @@ impl From<SDError> for SDDKError {
                 SDDKErrorType::Conflict
             },
             SDError::BlockMissing => {
-                SDDKErrorType::Internal
+                SDDKErrorType::BlockMissing
             },
             SDError::SessionMissing => {
-                SDDKErrorType::Internal
+                SDDKErrorType::SessionMissing
             },
             SDError::BlockUnreadable => {
                 SDDKErrorType::BlockUnreadable
