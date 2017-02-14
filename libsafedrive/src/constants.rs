@@ -1,12 +1,12 @@
 use ::CONFIGURATION;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Configuration {
     Staging,
     Production
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Channel {
     Stable,
     Beta,
