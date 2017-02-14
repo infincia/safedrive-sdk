@@ -650,13 +650,14 @@ pub fn sync(token: &Token,
 
 
                 if DEBUG_STATISTICS {
-                    debug!("{} chunks ({} skipped) with an average size of {} bytes.", nb_chunk, skipped_blocks, item_size / nb_chunk);
+                    debug!("{} chunks ({} new)", nb_chunk, nb_chunk - skipped_blocks);
+                    debug!("average size: {} bytes", item_size / nb_chunk);
 
-                    debug!("hmac list has {} ids <{} bytes>", chunks.len() / 32, nb_chunk * 32);
+                    debug!("hmac bag has: {} ids <{} bytes>", chunks.len() / 32, nb_chunk * 32);
                     debug!("expected chunk size: {} bytes", expected_size);
-                    debug!("smallest chunk: {} bytes.", smallest_size);
-                    debug!("largest chunk: {} bytes.", largest_size);
-                    debug!("standard size deviation: {} bytes.", (size_variance as f64 / nb_chunk as f64).sqrt() as u64);
+                    debug!("smallest chunk: {} bytes", smallest_size);
+                    debug!("largest chunk: {} bytes", largest_size);
+                    debug!("standard size deviation: {} bytes", (size_variance as f64 / nb_chunk as f64).sqrt() as u64);
                 }
             } else {
                 header.set_size(0); // hmac list size is zero when file has no actual data
