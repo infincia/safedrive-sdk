@@ -20,6 +20,7 @@ use ::core::get_sync_folder;
 use ::core::get_sync_folders;
 
 use ::core::get_sync_sessions;
+use ::core::remove_sync_session;
 use ::core::sync;
 use ::core::restore;
 use ::core::load_keys;
@@ -1358,6 +1359,69 @@ pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState,
 }
 
 
+/// Remove a sync session
+///
+/// Will return a failure code and set the error parameter if for any reason the session cannot be removed
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     session_id: an unsigned 64-bit integer representing the session ID
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_remove_sync_session(&state, 7, &error)) {
+///     printf("Failed to remove session");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Removed session");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remove_sync_session(state: *mut SDDKState,
+                                           session_id: std::os::raw::c_ulonglong,
+                                           mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let id = session_id as u64;
+
+
+    match remove_sync_session(c.0.get_api_token(), id) {
+        Ok(_) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
 
 
 

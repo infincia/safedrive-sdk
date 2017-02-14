@@ -339,6 +339,14 @@ pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
     Ok(v)
 }
 
+pub fn remove_sync_session(token: &Token,
+                           session_id: u64) -> Result<(), SDError> {
+    match delete_session(token, session_id) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
 pub fn sync(token: &Token,
             session_name: &str,
             main_key: &Key,
