@@ -54,7 +54,7 @@ impl SyncSession {
                 (true, compressed_data)
             },
             _ => {
-                panic!();
+                panic!("Attempted to create invalid session version");
             }
         };
 
