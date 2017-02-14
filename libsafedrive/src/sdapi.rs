@@ -582,8 +582,6 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
-
     match result.status() {
         &::reqwest::StatusCode::Ok => Ok(()),
         &::reqwest::StatusCode::Created => Ok(()),
@@ -756,8 +754,6 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
     let mut response = String::new();
 
     try!(result.read_to_string(&mut response));
-
-    debug!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => Ok(()),
