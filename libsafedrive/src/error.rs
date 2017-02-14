@@ -227,7 +227,7 @@ impl std::fmt::Display for SDError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
             SDError::Internal(ref message) => {
-                write!(f, "Internal error: {}", message)
+                write!(f, "{}", message)
             },
             SDError::IO(ref err) => {
                 write!(f, "IO failure ({})", err)
