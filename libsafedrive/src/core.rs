@@ -393,8 +393,6 @@ pub fn sync(token: &Token,
     let mut estimated_size: u64 = 0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
-        debug!("estimating size of {}...", item.path().display());
-
         let p = item.path();
 
         let md = match ::std::fs::symlink_metadata(&p) {
@@ -403,7 +401,7 @@ pub fn sync(token: &Token,
         };
 
         let stream_length = md.len();
-        debug!("stream: {}", stream_length);
+        debug!("estimating size of {}... OK, {}", item.path().display(), stream_length);
 
         estimated_size = estimated_size + stream_length;
     }
