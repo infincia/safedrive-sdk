@@ -17,6 +17,7 @@ pub struct SyncSession {
     pub name: String,
     pub size: Option<u64>,
     pub time: Option<u64>,
+    pub id: Option<u64>,
     #[serde(skip_deserializing)]
     data: Vec<u8>,
     #[serde(skip_deserializing)]
