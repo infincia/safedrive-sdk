@@ -5,6 +5,130 @@ use std;
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]
+pub enum SyncSchedule {
+    Hourly,
+    Daily,
+    Weekly,
+    Monthly,
+}
+
+#[derive(Debug)]
+pub enum SyncCleaningSchedule<'a> {
+    /// Clean sync sessions on a structured schedule.
+    ///
+    /// The goal is to keep frequent sessions for the recent past, and retain fewer of them as they
+    /// age. Will clean the sessions that would be considered redundant to keep around. Where possible
+    /// it will keep the oldest session available within a given time period.
+    ///
+    /// Within a 30 day period, it will keep:
+    ///
+    /// Hourly: at most 1 per hour for the past 24 hours
+    /// Daily:  at most 1 per day for the earlier 7 days
+    /// Weekly: at most 1 per week for the earlier 23 days
+    ///
+    /// Beyond that 30 day period, it will keep at most 1 per month
+    ///
+    ///
+    /// Example:
+    ///
+    /// For a new account created on January 1st, 2017, that had created 1 session at the start of
+    /// each hour (xx:00:00) for the past 3 months, after running a cleaning job on
+    /// April 1st at 00:30:00, the user would retain:
+    ///
+    /// Hourly: 1 session for each of the past 24 hours
+    ///
+    ///         1 - March 31st at 01:00:00
+    ///
+    ///         ...
+    ///
+    ///         24 - April 1st at 00:00:00
+    ///
+    /// Daily: 1 session for each of March 25th - 31st
+    ///        1 - March 25th at 00:00:00
+    ///        2 - March 26th at 00:00:00
+    ///        3 - March 27th at 00:00:00
+    ///        4 - March 28th at 00:00:00
+    ///        5 - March 29th at 00:00:00
+    ///        6 - March 30th at 00:00:00
+    ///        7 - March 31st at 00:00:00
+    ///
+    /// Weekly: 1 session within each 7 day period between March 1st at 00:00:00 and March 25th at 00:00:00.
+    ///        1 - March 1st at 00:00:00
+    ///        2 - March 8th at 00:00:00
+    ///        3 - March 15th at 00:00:00
+    ///        4 - March 22nd at 00:00:00
+    ///
+    /// Monthly: 1 session for each of January and February
+    ///        1 - January 1st at 00:00:00
+    ///        2 - February 1st at 00:00:00
+    ///
+    ///
+    ///
+    Auto,
+
+    /// Clean all sessions older than an exact date
+    ///
+    ExactDateRFC3339 { date: &'a str },
+    ExactDateRFC2822 { date: &'a str },
+
+    /// The remaining schedules will clean all sync sessions older than a specific time period
+    ///
+    All,             // current time, should delete all of them
+    BeforeToday,     // today at 00:00
+    BeforeThisWeek,  // the first day of this week at 00:00
+    BeforeThisMonth, // the first day of this month at 00:00
+    BeforeThisYear,  // the first day of this year at 00:00
+    OneDay,          // 24 hours
+    OneWeek,         // 7 days
+    OneMonth,        // 30 days
+    OneYear,         // 365 days
+}
+
+impl<'a> std::fmt::Display for SyncCleaningSchedule<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        match *self {
+            SyncCleaningSchedule::Auto => {
+                write!(f, "automatic")
+            },
+            SyncCleaningSchedule::ExactDateRFC3339 { .. } => {
+                write!(f, "from RFC3339 string")
+            },
+            SyncCleaningSchedule::ExactDateRFC2822 { .. } => {
+                write!(f, "from RFC 2822 string")
+            },
+            SyncCleaningSchedule::All => {
+                write!(f, "all")
+            },
+            SyncCleaningSchedule::BeforeToday => {
+                write!(f, "before today")
+            },
+            SyncCleaningSchedule::BeforeThisWeek => {
+                write!(f, "before this week")
+            },
+            SyncCleaningSchedule::BeforeThisMonth => {
+                write!(f, "before this month")
+            },
+            SyncCleaningSchedule::BeforeThisYear => {
+                write!(f, "before this year")
+            },
+            SyncCleaningSchedule::OneDay => {
+                write!(f, "older than 24 hours")
+            },
+            SyncCleaningSchedule::OneWeek => {
+                write!(f, "older than 7 days")
+            },
+            SyncCleaningSchedule::OneMonth => {
+                write!(f, "older than 30 days")
+            },
+            SyncCleaningSchedule::OneYear => {
+                write!(f, "older than 365 days")
+            },
+        }
+    }
+}
+
+#[derive(Debug)]
+#[derive(Copy, Clone)]
 pub enum CompressionType {
     None,
     Gzip,
