@@ -309,11 +309,9 @@ fn main() {
         let start = std::time::Instant::now();
 
         let mut nb_chunk = 0;
-        let mut processed_size = 0;
 
-        for chunk in chunk_iter {
+        for _ in chunk_iter {
             nb_chunk += 1;
-            processed_size += chunk.size;
         }
         println!("Benchmarking finished with {} chunks", nb_chunk);
 
