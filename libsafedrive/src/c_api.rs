@@ -234,6 +234,8 @@ pub enum SDDKErrorType {
     RestoreAlreadyInProgress = 0x000F,
     ExceededRetries = 0x0010,
     KeychainError = 0x0011,
+    BlockUnreadable = 0x0012,
+    SessionUnreadable = 0x0013,
 }
 
 #[derive(Debug)]
@@ -269,6 +271,12 @@ impl From<SDError> for SDDKError {
             },
             SDError::SessionMissing => {
                 SDDKErrorType::Internal
+            },
+            SDError::BlockUnreadable => {
+                SDDKErrorType::BlockUnreadable
+            },
+            SDError::SessionUnreadable => {
+                SDDKErrorType::SessionUnreadable
             },
             SDError::RecoveryPhraseIncorrect => {
                 SDDKErrorType::RecoveryPhraseIncorrect

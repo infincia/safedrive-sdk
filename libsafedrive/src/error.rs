@@ -164,6 +164,8 @@ pub enum SDError {
     Conflict(SDAPIError),
     BlockMissing,
     SessionMissing,
+    BlockUnreadable,
+    SessionUnreadable,
     RecoveryPhraseIncorrect,
     InsufficientFreeSpace,
     Authentication,
@@ -186,6 +188,8 @@ impl std::error::Error for SDError {
             SDError::Conflict(ref err) => err.description(),
             SDError::BlockMissing => "block file missing",
             SDError::SessionMissing => "session file missing",
+            SDError::BlockUnreadable => "block cannot be used",
+            SDError::SessionUnreadable => "session cannot be used",
             SDError::RecoveryPhraseIncorrect => "recovery phrase incorrect",
             SDError::InsufficientFreeSpace => "insufficient free space",
             SDError::Authentication => "authentication failed",
@@ -209,6 +213,8 @@ impl std::error::Error for SDError {
             SDError::Conflict(ref err) => Some(err),
             SDError::BlockMissing => None,
             SDError::SessionMissing => None,
+            SDError::BlockUnreadable => None,
+            SDError::SessionUnreadable => None,
             SDError::RecoveryPhraseIncorrect => None,
             SDError::InsufficientFreeSpace => None,
             SDError::Authentication => None,
@@ -249,6 +255,12 @@ impl std::fmt::Display for SDError {
             },
             SDError::SessionMissing => {
                 write!(f, "Session not found on server")
+            },
+            SDError::BlockUnreadable => {
+                write!(f, "Block cannot be used")
+            },
+            SDError::SessionUnreadable => {
+                write!(f, "Session cannot be used")
             },
             SDError::RecoveryPhraseIncorrect => {
                 write!(f, "Recovery phrase incorrect")
