@@ -296,6 +296,11 @@ pub struct SyncSessionResponse<'a> {
     pub chunk_data: Vec<u8>
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ServerErrorResponse {
+    pub message: String
+}
+
 
 /*
 Current sync folder model:
