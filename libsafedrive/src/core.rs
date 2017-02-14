@@ -673,6 +673,26 @@ pub fn sync(token: &Token,
 
 
     let session = SyncSession::new(SYNC_VERSION, folder_id, session_name.to_string(), Some(processed_size), None, raw_session);
+
+    if DEBUG_STATISTICS {
+        let compression_ratio = (processed_size_compressed as f64 / session.size.unwrap() as f64) * 100.0;
+        debug!("session data total: {}", session.size.unwrap());
+        debug!("session data compressed: {}", processed_size_compressed);
+        debug!("session data compression ratio: {}", compression_ratio);
+
+        debug!("session file total: {}", session.real_size());
+        match session.compressed_size() {
+            Some(size) => {
+                let compression_ratio = (size as f64 / session.real_size() as f64) * 100.0;
+
+                debug!("session file total compressed: {}", size);
+                debug!("session file compression ratio: {}", compression_ratio);
+            },
+            None => {}
+        }
+    }
+
+
     let wrapped_session = match session.to_wrapped(main_key) {
         Ok(ws) => ws,
         Err(e) => return Err(SDError::CryptoError(e)),
