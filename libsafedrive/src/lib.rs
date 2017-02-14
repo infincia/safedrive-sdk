@@ -34,6 +34,7 @@ mod block;
 pub mod session;
 mod lock;
 pub mod chunk;
+mod oplog;
 
 // external crates
 
