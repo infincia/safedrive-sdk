@@ -314,7 +314,6 @@ fn main() {
         for chunk in chunk_iter {
             nb_chunk += 1;
             processed_size += chunk.size;
-            println!("Benchmarking found chunk with {} bytes, {} of {} finished", chunk.size, processed_size, stream_length);
         }
         println!("Benchmarking finished with {} chunks", nb_chunk);
 
