@@ -337,19 +337,10 @@ impl WrappedSyncSession {
 
         let wrapped_session_key = WrappedKey::from(wrapped_session_key_raw, KeyType::Session);
 
-        let flags = ::models::BinaryFlags::from_bits_truncate(raw_session.flags[0]);
+        let channel = raw_session.channel;
 
-
-        let channel = if flags & Stable == Stable {
-            Channel::Stable
-        } else if flags & Beta == Beta {
-            Channel::Beta
-        } else {
-            Channel::Nightly
-        };
-
-        let production = flags & Production == Production;
-        let compressed = flags & Compressed == Compressed;
+        let production = raw_session.production;
+        let compressed = raw_session.compressed;
 
         let wrapped_session = WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce, compressed: compressed, channel: channel, production: production };
 

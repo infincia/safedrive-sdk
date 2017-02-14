@@ -405,18 +405,10 @@ impl WrappedBlock {
 
         let wrapped_block_key = WrappedKey::from(wrapped_block_key_raw, KeyType::Block);
 
-        let flags = ::models::BinaryFlags::from_bits_truncate(raw_block.flags[0]);
+        let channel = raw_block.channel;
 
-        let channel = if flags & Stable == Stable {
-            Channel::Stable
-        } else if flags & Beta == Beta {
-            Channel::Beta
-        } else {
-            Channel::Nightly
-        };
-
-        let production = flags & Production == Production;
-        let compressed = flags & Compressed == Compressed;
+        let production = raw_block.production;
+        let compressed = raw_block.compressed;
 
         let wrapped_block = WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: compressed, channel: channel, production: production };
         debug!("got valid wrapped block: {}", &wrapped_block);

@@ -10,7 +10,9 @@ pub struct BinaryFormat<'a> {
     pub magic: &'a str,
     pub file_type: &'a str,
     pub version: &'a str,
-    pub flags: &'a [u8],
+    pub compressed: bool,
+    pub channel: Channel,
+    pub production: bool,
     pub wrapped_key: &'a [u8],
     pub nonce: &'a [u8],
     pub wrapped_data: &'a [u8],
@@ -28,7 +30,7 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
     magic: map_res!(tag!("sd"), std::str::from_utf8)                             ~
     file_type: map_res!(alt!(tag!("b") | tag!("s")), std::str::from_utf8)        ~
     version: map_res!(take!(2), std::str::from_utf8)                             ~
-    flags: take!(1)                                                              ~
+    flags: bits!(tuple!(take_bits!(u8, 3), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1) ))~
     reserved: take!(2)                                                           ~
     wrapped_key: take!(SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE)                  ~
     nonce: take!(SECRETBOX_NONCE_SIZE)                                           ~
@@ -38,7 +40,19 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
         magic: magic,
         file_type: file_type,
         version: version,
-        flags: flags,
+        compressed: flags.1 == 1,
+        channel: {
+            if flags.2 == 1 {
+                Channel::Nightly
+            } else if flags.3 == 1 {
+                Channel::Beta
+            } else if flags.4 == 1 {
+                Channel::Stable
+            } else {
+                Channel::Nightly
+            }
+        },
+        production: flags.5 == 1,
         wrapped_key: wrapped_key,
         nonce: nonce,
         wrapped_data: wrapped_data,
