@@ -22,9 +22,9 @@ bip39 = "*"
 rand = "*"
 log = "*"
 nom = { version = "*", features= ["verbose-errors"] }
-lazy_static = "0.1.*"
+lazy_static = "^0.1.*"
 uuid = { version = "*", features = ["v4"] }
-regex = "0.2"
+regex = "^0.2"
 scopeguard = "*"
 parking_lot = "*"
 byteorder = "*"
@@ -37,7 +37,7 @@ chrono = "*"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 openssl = "*"
-secret-service = { version = "0.2.0", optional = true }
+secret-service = { version = "^0.2.0", optional = true }
 
 
 [target.'cfg(target_os = "macos")'.dependencies]

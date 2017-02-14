@@ -7,7 +7,7 @@ workspace = ".."
 
 [dependencies]
 clap = "*"
-pbr = "1.0.0-alpha.2"
+pbr = "^1.0.0-alpha.2"
 rpassword = "*"
 uuid = { version = "*", features = ["v4"] }
 serde = "^0.9"
@@ -16,7 +16,7 @@ serde_derive = "^0.9"
 env_logger = "*"
 log = "*"
 prettytable-rs = "*"
-chrono = "0.3"
+chrono = "^0.3"
 number_prefix = "*"
 
 [dependencies.libsafedrive]
