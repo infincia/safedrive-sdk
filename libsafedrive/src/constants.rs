@@ -13,6 +13,12 @@ pub enum Channel {
     Nightly,
 }
 
+impl ::std::default::Default for Channel {
+    fn default() -> Channel {
+        Channel::Nightly
+    }
+}
+
 impl ::std::fmt::Display for Channel {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
         match *self {
