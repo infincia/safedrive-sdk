@@ -12,3 +12,4 @@ openssl-*
 dep/x86_64-apple-darwin/*
 openssl.cnf
 openssl.cnf.dist
+libsafedrive/testdata
