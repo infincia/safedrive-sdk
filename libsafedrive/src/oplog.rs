@@ -37,12 +37,12 @@ pub enum FileType {
 #[derive(Debug, PartialEq, Eq)]
 pub struct Op<'a> {
     pub sequence: u64,
-    // a serialized OpType
+    /// a serialized OpType
     pub operation_type: u8,
-    // a serialized FileType
+    /// a serialized FileType
     pub file_type: u8,
     pub file_id: u64,
-    // pointers to any relevant data needed for this op, as block ID values
+    /// pointers to any relevant data needed for this op, as block ID values
     pub data_pointers: &'a [u8],
 }
 

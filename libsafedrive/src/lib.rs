@@ -38,7 +38,7 @@ mod lock;
 pub mod chunk;
 mod oplog;
 
-// external crates
+/// external crates
 
 extern crate rustc_serialize;
 extern crate libc;
@@ -99,7 +99,7 @@ extern crate scopeguard;
 
 pub static SYNC_VERSION: ::models::SyncVersion = ::models::SyncVersion::Version2;
 
-// global config, can only be set once at runtime
+/// global config, can only be set once at runtime
 
 lazy_static! {
     static ref CONFIGURATION: ::parking_lot::RwLock<constants::Configuration> = ::parking_lot::RwLock::new(constants::Configuration::Production);

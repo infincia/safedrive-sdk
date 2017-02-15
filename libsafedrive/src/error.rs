@@ -1,6 +1,6 @@
 use std;
 
-// external crate imports
+/// external crate imports
 
 use ::bip39::{Bip39Error};
 use ::rustc_serialize::hex::{FromHexError};
@@ -330,8 +330,8 @@ impl From<SDAPIError> for SDError {
             SDAPIError::BlockMissing => SDError::BlockMissing,
             SDAPIError::SessionMissing => SDError::SessionMissing,
             SDAPIError::Conflict => SDError::Conflict(e),
-            // we never actually construct an SDError from this variant so it should never be used,
-            // but the compiler requires it to exist or use a catch-all pattern
+            /// we never actually construct an SDError from this variant so it should never be used,
+            /// but the compiler requires it to exist or use a catch-all pattern
             SDAPIError::RetryUpload => SDError::RequestFailure(Box::new(e)),
         }
     }

@@ -4,7 +4,7 @@
 
 use std;
 
-// external crate imports
+/// external crate imports
 #[cfg(target_os = "linux")]
 use ::secret_service::SecretService;
 
@@ -12,12 +12,12 @@ use ::secret_service::SecretService;
 use ::secret_service::EncryptionType;
 
 
-// internal imports
+/// internal imports
 
 use ::error::KeychainError;
 use ::constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain};
 
-// keychain types
+/// keychain types
 
 pub enum KeychainService {
     Account,
@@ -84,7 +84,7 @@ impl KeychainService {
     }
 }
 
-// get
+/// get
 
 #[cfg(target_os = "macos")]
 pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
@@ -115,7 +115,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
             }
         }
     }
-    // need generic password support in security-framework to grab these easily
+    /// need generic password support in security-framework to grab these easily
     Err(KeychainError::KeychainUnavailable)
 }
 
@@ -123,7 +123,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
     let service_name = format!("{}", service);
 
-    // initialize secret service (dbus connection and encryption session)
+    /// initialize secret service (dbus connection and encryption session)
     let ss = match SecretService::new(EncryptionType::Dh) {
         Ok(ss) => ss,
         Err(e) => {
@@ -133,7 +133,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
         }
     };
 
-    // get default collection
+    /// get default collection
     let collection = match ss.get_default_collection() {
         Ok(c) => c,
         Err(e) => {
@@ -143,9 +143,9 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
         }
     };
 
-    // search items by properties
+    /// search items by properties
     let search_items = match ss.search_items(
-        vec![("account", account), ("service", &service_name)], // properties
+        vec![("account", account), ("service", &service_name)], /// properties
     ) {
         Ok(r) => r,
         Err(e) => {
@@ -165,7 +165,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 
     };
 
-    // retrieve secret from item
+    /// retrieve secret from item
     let secret = match item.get_secret() {
         Ok(s) => s,
         Err(e) => {
@@ -188,7 +188,7 @@ pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<Stri
 }
 
 
-// store
+/// store
 
 #[cfg(target_os = "macos")]
 pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
@@ -199,7 +199,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
 pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
     let service_name = format!("{}", service);
 
-    // initialize secret service (dbus connection and encryption session)
+    /// initialize secret service (dbus connection and encryption session)
     let ss = match SecretService::new(EncryptionType::Dh) {
         Ok(ss) => ss,
         Err(e) => {
@@ -209,7 +209,7 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
         }
     };
 
-    // get default collection
+    /// get default collection
     let collection = match ss.get_default_collection() {
         Ok(c) => c,
         Err(e) => {
@@ -219,13 +219,13 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
         }
     };
 
-    //create new item
+    /// create new item
     match collection.create_item(
-        &format!("safedrive"), // label
-        vec![("account", account), ("service", &service_name)], // properties
-        secret.as_bytes(), //secret
-        true, // replace item with same attributes
-        service.content_type() // secret content type
+        &format!("safedrive"), /// label
+        vec![("account", account), ("service", &service_name)], /// properties
+        secret.as_bytes(), /// secret
+        true, /// replace item with same attributes
+        service.content_type() /// secret content type
     ) {
         Ok(res) => { return Ok(())},
         Err(e) => {

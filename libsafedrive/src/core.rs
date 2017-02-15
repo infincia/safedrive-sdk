@@ -4,8 +4,7 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufWriter, Read, Write, Seek, SeekFrom};
 use std::{thread, time};
-
-// external crate imports
+/// external crate imports
 
 use ::rustc_serialize::hex::{ToHex, FromHex};
 use ::rand::distributions::{IndependentSample, Range};
@@ -13,7 +12,7 @@ use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::nom::IResult::*;
 
-// internal imports
+/// internal imports
 
 use ::models::*;
 use ::block::*;
@@ -36,13 +35,13 @@ use ::CHANNEL;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
-// crypto exports
+/// crypto exports
 
 pub fn sha256(input: &[u8]) -> String {
     ::util::sha256(input)
 }
 
-// helpers
+/// helpers
 
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     ::util::get_app_directory(config)
@@ -106,7 +105,7 @@ pub fn get_channel() -> Channel {
     }
 }
 
-// internal functions
+/// internal functions
 
 pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration) {
     let mut c = CONFIGURATION.write();
@@ -201,24 +200,24 @@ pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
 }
 
 pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<Keyset, SDError> {
-    // generate new keys in all cases, the account *may* already have some stored, we only
-    // find out for sure while trying to store them.
-    //
-    // we do this on purpose:
-    //
-    //    1. to eliminate possible race conditions where two clients generate valid keysets and try
-    //       to store them at the same time, only the server knows who won and we only need one HTTP
-    //       request to find out
-    //
-    //    2. clients are never allowed to supply their own recovery phrases and keys to the SDK.
-    //       either we actually need new keys, in which case the ones we safely generated internally
-    //       are stored on the server immediately, or we're wrong and the server tells us what
-    //       to use instead
-    //
-    //
-    // in all cases, the library will only use keys that have been returned by the server, this
-    // guarantees that the keys we actually use are correct as long as the server is correct
-    //
+    /// generate new keys in all cases, the account *may* already have some stored, we only
+    /// find out for sure while trying to store them.
+    ///
+    /// we do this on purpose:
+    ///
+    ///    1. to eliminate possible race conditions where two clients generate valid keysets and try
+    ///       to store them at the same time, only the server knows who won and we only need one HTTP
+    ///       request to find out
+    ///
+    ///    2. clients are never allowed to supply their own recovery phrases and keys to the SDK.
+    ///       either we actually need new keys, in which case the ones we safely generated internally
+    ///       are stored on the server immediately, or we're wrong and the server tells us what
+    ///       to use instead
+    ///
+    ///
+    /// in all cases, the library will only use keys that have been returned by the server, this
+    /// guarantees that the keys we actually use are correct as long as the server is correct
+    ///
     let new_wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
         Err(_) => return Err(SDError::from(CryptoError::KeyGenerationFailed))
@@ -227,9 +226,9 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 
     match account_key(token, &new_wrapped_keyset) {
         Ok(real_wrapped_keyset) => {
-            // now we check to see if the keys returned by the server match the existing phrase or not
+            /// now we check to see if the keys returned by the server match the existing phrase or not
 
-            // if we were given an existing phrase try it, otherwise try the new one
+            /// if we were given an existing phrase try it, otherwise try the new one
             debug!("got key set back from server, checking");
 
             if let Some(p) = recovery_phrase {
@@ -245,8 +244,8 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
             } else if let Some(p) = new_wrapped_keyset.recovery_phrase() {
                 match real_wrapped_keyset.to_keyset(&p) {
                     Ok(ks) => {
-                        // a new keyset was generated so we must return the phrase to the caller so it
-                        // can be stored and displayed
+                        /// a new keyset was generated so we must return the phrase to the caller so it
+                        /// can be stored and displayed
                         store_recovery_key(&p);
                         Ok(ks)
                     },
@@ -457,8 +456,8 @@ pub fn sync(token: &Token,
 
     #[cfg(feature = "locking")]
     defer!({
-        // try to ensure the folder goes back to unlocked state, but if not there isn't anything
-        // we can do about it
+        /// try to ensure the folder goes back to unlocked state, but if not there isn't anything
+        /// we can do about it
         flock.unlock();
     });
 
@@ -505,7 +504,7 @@ pub fn sync(token: &Token,
 
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
-        // call out to the library user with progress
+        /// call out to the library user with progress
         progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
         let p = item.path();
@@ -521,7 +520,7 @@ pub fn sync(token: &Token,
         let is_dir = md.file_type().is_dir();
         let is_symlink = md.file_type().is_symlink();
 
-        // store metadata for directory or file
+        /// store metadata for directory or file
         let mut header = Header::new_gnu();
         if let Err(err) = header.set_path(p_relative) {
             debug!("not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
@@ -591,32 +590,32 @@ pub fn sync(token: &Token,
                     let mut should_upload = false;
 
                     while should_retry {
-                        // allow caller to tick the progress display, if one exists
+                        /// allow caller to tick the progress display, if one exists
                         progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
                         let failed_count = 15.0 - retries_left;
                         let mut rng = ::rand::thread_rng();
 
-                        // we pick a multiplier randomly to avoid a bunch of clients trying again
-                        // at the same 2/4/8/16 backoff times time over and over if the server
-                        // is overloaded or down
+                        /// we pick a multiplier randomly to avoid a bunch of clients trying again
+                        /// at the same 2/4/8/16 backoff times time over and over if the server
+                        /// is overloaded or down
                         let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
                         if failed_count >= 2.0 && retries_left > 0.0 {
-                            // back off significantly every time a call fails but only after the
-                            // second try, the first failure could be us not including the data
-                            // when we should have
+                            /// back off significantly every time a call fails but only after the
+                            /// second try, the first failure could be us not including the data
+                            /// when we should have
                             let backoff_time = backoff_multiplier * (failed_count * failed_count);
                             let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
                             thread::sleep(delay);
                         }
 
-                        // tell the server to mark this block without the data first, if that fails we try uploading
+                        /// tell the server to mark this block without the data first, if that fails we try uploading
 
                         match write_block(&token, session_name, &block_name, &wrapped_block, should_upload) {
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
-                                // allow caller to tick the progress display, if one exists
+                                /// allow caller to tick the progress display, if one exists
                                 progress(estimated_size as u32, processed_size as u32, block_real_size as u32, percent_completed, false, "");
                                 should_retry = false
                             },
@@ -625,7 +624,7 @@ pub fn sync(token: &Token,
 
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
-                                    // TODO: pass better error info up the call chain here rather than a failure
+                                    /// TODO: pass better error info up the call chain here rather than a failure
                                     return Err(SDError::RequestFailure(err))
                                 }
                             },
@@ -666,24 +665,24 @@ pub fn sync(token: &Token,
                 assert!(stats.processed_size == stream_length);
                 debug!("calculated {} real bytes of blocks, matching stream size {}", stats.processed_size, stream_length);
 
-                header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); // hmac list size
+                header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); /// hmac list size
                 header.set_cksum();
                 ar.append(&header, hmac_bag.as_slice()).expect("failed to append session entry header");
 
             } else {
-                header.set_size(0); // hmac list size is zero when file has no actual data
+                header.set_size(0); /// hmac list size is zero when file has no actual data
                 header.set_cksum();
                 ar.append(&header, hmac_bag.as_slice()).expect("failed to append zero length archive header");
             }
         } else if is_dir {
-            // folder
-            header.set_size(0); // hmac list size is zero when file has no actual data
+            /// folder
+            header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append(&header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
         } else if is_symlink {
-            // symlink
+            /// symlink
 
-            // get the src
+            /// get the src
             match ::std::fs::read_link(&p) {
                 Ok(path) => {
                     match  header.set_link_name(path) {
@@ -700,13 +699,16 @@ pub fn sync(token: &Token,
                 }
             };
 
-            header.set_size(0); // hmac list size is zero when file has no actual data
+            header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append(&header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
         }
     }
 
-    // since we're writing to a buffer in memory there shouldn't be any errors here
+    /// since we're writing to a buffer in memory there shouldn't be any errors here...
+    /// unless the system is also completely out of memory, but there's nothing we can do about that,
+    /// so if it proves to be an issue we'll have to look for anything else that might use a lot of
+    /// memory and use temp files instead, where possible
     let raw_session = ar.into_inner().unwrap();
 
 
@@ -748,19 +750,19 @@ pub fn sync(token: &Token,
     let mut retries_left = 15.0;
 
     while should_retry {
-        // allow caller to tick the progress display, if one exists
+        /// allow caller to tick the progress display, if one exists
         progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
         let failed_count = 15.0 - retries_left;
         let mut rng = ::rand::thread_rng();
 
-        // we pick a multiplier randomly to avoid a bunch of clients trying again
-        // at the same 2/4/8/16 backoff times time over and over if the server
-        // is overloaded or down
+        /// we pick a multiplier randomly to avoid a bunch of clients trying again
+        /// at the same 2/4/8/16 backoff times time over and over if the server
+        /// is overloaded or down
         let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
         if failed_count >= 1.0 {
-            // back off significantly every time a call fails
+            /// back off significantly every time a call fails
             let backoff_time = backoff_multiplier * (failed_count * failed_count);
             let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
             thread::sleep(delay);
@@ -807,8 +809,8 @@ pub fn restore(token: &Token,
 
     #[cfg(feature = "locking")]
     defer!({
-        // try to ensure the folder goes back to unlocked state, but if not there isn't anything
-        // we can do about it
+        /// try to ensure the folder goes back to unlocked state, but if not there isn't anything
+        /// we can do about it
         flock.unlock();
     });
 
@@ -867,14 +869,14 @@ pub fn restore(token: &Token,
 
         let percent_completed: f64 = (processed_size as f64 / session_size as f64) * 100.0;
 
-        // call out to the library user with progress
+        /// call out to the library user with progress
         progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
 
 
         let entry_type = file_entry.header().entry_type();
 
-        // process if not a directory or socket
+        /// process if not a directory or socket
         match entry_type {
             EntryType::Regular => {
                 let f = match File::create(&full_p) {
@@ -909,7 +911,7 @@ pub fn restore(token: &Token,
 
                     for block_hmac in block_hmac_list.iter() {
 
-                        // allow caller to tick the progress display, if one exists
+                        /// allow caller to tick the progress display, if one exists
                         progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, true, "");
 
                         let mut should_retry = true;
@@ -926,21 +928,21 @@ pub fn restore(token: &Token,
                             let failed_count = 15.0 - retries_left;
                             let mut rng = ::rand::thread_rng();
 
-                            // we pick a multiplier randomly to avoid a bunch of clients trying again
-                            // at the same 2/4/8/16 back off time over and over if the server
-                            // is overloaded or down
+                            /// we pick a multiplier randomly to avoid a bunch of clients trying again
+                            /// at the same 2/4/8/16 back off time over and over if the server
+                            /// is overloaded or down
                             let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
                             if failed_count >= 2.0 && retries_left > 0.0 {
-                                // back off significantly every time a call fails but only after the
-                                // second try, the first failure could be us not including the data
-                                // when we should have
+                                /// back off significantly every time a call fails but only after the
+                                /// second try, the first failure could be us not including the data
+                                /// when we should have
                                 let backoff_time = backoff_multiplier * (failed_count * failed_count);
                                 let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
                                 thread::sleep(delay);
                             }
 
-                            // get block from cache if possible
+                            /// get block from cache if possible
                             match ::cache::read_block(&block_hmac_hex) {
                                 Ok(br) => {
                                     wrapped_block = Some(br);
@@ -950,11 +952,11 @@ pub fn restore(token: &Token,
                                 _ => {}
                             };
 
-                            // get block from the server
+                            /// get block from the server
 
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
                                 Ok(rb) => {
-                                    // allow caller to tick the progress display, if one exists
+                                    /// allow caller to tick the progress display, if one exists
                                     progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
                                     should_retry = false;
@@ -981,7 +983,7 @@ pub fn restore(token: &Token,
 
 
                                     if retries_left <= 0.0 {
-                                        // TODO: pass better error info up the call chain here rather than a failure
+                                        /// TODO: pass better error info up the call chain here rather than a failure
                                         return Err(SDError::RequestFailure(err))
                                     }
                                 },

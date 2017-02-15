@@ -217,7 +217,7 @@ impl std::fmt::Display for SyncVersion {
     }
 }
 
-// binary flags
+/// binary flags
 
 
 bitflags! {
@@ -231,25 +231,25 @@ bitflags! {
     }
 }
 
-// responses
+/// responses
 
-//private final String token
+///private final String token
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token {
     pub token: String,
 }
 
-//private final int id
+///private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
     pub id: u64,
 }
 
-//private final String status;
-//private final String host;
-//private final int port;
-//private final String userName;
-//private final Long time;
+///private final String status;
+///private final String host;
+///private final int port;
+///private final String userName;
+///private final Long time;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountStatus {
     pub status: Option<String>,
@@ -261,11 +261,11 @@ pub struct AccountStatus {
 
 
 
-//private final long assignedStorage;
-//private final long usedStorage;
-//private final int lowFreeStorageThreshold;
-//private final long expirationDate;
-//private final Set<NotificationTO> notifications;
+///private final long assignedStorage;
+///private final long usedStorage;
+///private final int lowFreeStorageThreshold;
+///private final long expirationDate;
+///private final Set<NotificationTO> notifications;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountDetails {
     pub assignedStorage: u64,

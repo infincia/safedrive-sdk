@@ -7,8 +7,7 @@ use std::str;
 use std::path::{Path, PathBuf};
 
 use std::u64;
-
-// internal imports
+/// internal imports
 
 use ::state::State;
 
@@ -43,7 +42,7 @@ use ::core::send_error_report;
 
 use ::error::SDError;
 
-// exports
+/// exports
 
 #[derive(Debug)]
 #[repr(C)]
@@ -756,7 +755,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
     };
 
     let keyset = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
-        // call back to C to store phrase
+        /// call back to C to store phrase
         let mut c_new_phrase = CString::new(new_phrase).unwrap();
         store_recovery_key(context, c_new_phrase.into_raw());
     }) {

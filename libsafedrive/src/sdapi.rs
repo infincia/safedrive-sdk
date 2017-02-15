@@ -3,11 +3,11 @@
 use std::io::Read;
 use std::collections::HashMap;
 
-// external crate imports
+/// external crate imports
 
 use ::rustc_serialize::hex::{ToHex};
 
-// internal imports
+/// internal imports
 
 use ::error::SDAPIError;
 use ::models::*;
@@ -207,7 +207,7 @@ impl<'a> APIEndpoint<'a> {
     }
 }
 
-// SD API
+/// SD API
 #[allow(dead_code)]
 pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operatingSystem: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
 
@@ -487,7 +487,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     Ok(())
 }
 
-// sync session handling
+/// sync session handling
 
 pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<SyncSession>>>, SDAPIError> {
 
@@ -696,7 +696,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
     Ok(())
 }
 
-// block handling
+/// block handling
 #[allow(dead_code)]
 pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError> {
 
@@ -853,7 +853,7 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -
 
     let mut body: Vec<u8> = Vec::new();
 
-    // these are compile time optimizations
+    /// these are compile time optimizations
     let rn: &'static [u8; 2] = b"\r\n";
     let body_boundary: &'static [u8; 22] = br"-------SAFEDRIVEBINARY";
     let end_boundary: &'static [u8; 24] =  br"-------SAFEDRIVEBINARY--";

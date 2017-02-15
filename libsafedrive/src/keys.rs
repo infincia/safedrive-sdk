@@ -1,10 +1,10 @@
 
-// external crate imports
+/// external crate imports
 
 use ::bip39::{Bip39, Language};
 use ::rustc_serialize::hex::{ToHex, FromHex};
 
-// internal imports
+/// internal imports
 
 use ::error::CryptoError;
 use ::models::WrappedKeysetBody;
@@ -52,30 +52,30 @@ pub struct WrappedKeyset {
 
 impl WrappedKeyset {
     pub fn new() -> Result<WrappedKeyset, CryptoError> {
-        // generate a recovery phrase that will be used to encrypt the master key
+        /// generate a recovery phrase that will be used to encrypt the master key
         let mnemonic_keytype = ::bip39::KeyType::Key128;
         let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
         let recovery_phrase = { mnemonic.mnemonic.clone() };
         let recovery_key = Key::from(mnemonic);
         debug!("phrase: {}", recovery_phrase);
 
-        // generate a master key and encrypt it with the recovery phrase and static nonce
-        // We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
+        /// generate a master key and encrypt it with the recovery phrase and static nonce
+        /// We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
         let master_key_type = KeyType::Master;
         let master_key = Key::new(master_key_type);
         let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key, None));
 
-        // generate a main key and encrypt it with the master key and static nonce
+        /// generate a main key and encrypt it with the master key and static nonce
         let main_key_type = KeyType::Main;
         let main_key = Key::new(main_key_type);
         let main_key_wrapped = try!(main_key.to_wrapped(&master_key, None));
 
-        // generate an hmac key and encrypt it with the master key and static nonce
+        /// generate an hmac key and encrypt it with the master key and static nonce
         let hmac_key_type = KeyType::HMAC;
         let hmac_key = Key::new(hmac_key_type);
         let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key, None));
 
-        // generate a tweak key and encrypt it with the master key and static nonce
+        /// generate a tweak key and encrypt it with the master key and static nonce
         let tweak_key_type = KeyType::Tweak;
         let tweak_key = Key::new(tweak_key_type);
         let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key, None));
@@ -156,17 +156,17 @@ impl WrappedKey {
             KeyType::Main |
             KeyType::HMAC |
             KeyType::Tweak => {
-                // all use a static nonce when wrapping their key type, MUST NOT use a random nonce
+                /// all use a static nonce when wrapping their key type, MUST NOT use a random nonce
                 self.key_type.key_wrapping_nonce()
             },
             KeyType::Block | KeyType::Session => {
-                // use a non-static nonce when wrapping their key type, MUST NOT use a static nonce
+                /// use a non-static nonce when wrapping their key type, MUST NOT use a static nonce
                 nonce.expect("attempted to unwrap a block or session key without an external random nonce").clone()
             },
             _ => { panic!("other key types cannot be wrapped");  }
         };
 
-        // decrypt the key with the wrapping key and nonce
+        /// decrypt the key with the wrapping key and nonce
         let wrapping_key_s = wrapping_key.as_sodium_secretbox_key();
 
         let key_raw = match ::sodiumoxide::crypto::secretbox::open(&self.bytes, &n, &wrapping_key_s) {
@@ -298,11 +298,11 @@ impl Key {
             KeyType::Main |
             KeyType::HMAC |
             KeyType::Tweak => {
-                // use a static nonce when wrapping this key type, MUST NOT use a random nonce
+                /// use a static nonce when wrapping this key type, MUST NOT use a random nonce
                 self.key_type.key_wrapping_nonce()
             },
             KeyType::Block | KeyType::Session => {
-                // use a random nonce when wrapping this key type, MUST NOT use a static nonce
+                /// use a random nonce when wrapping this key type, MUST NOT use a static nonce
                 nonce.expect("attempted to wrap a block or session key without an external random nonce").clone()
             },
             _ => { panic!("other key types cannot be wrapped");  }

@@ -31,13 +31,13 @@ impl Block {
 
         let real_size = data.len() as u64;
 
-        // calculate hmac of the block
+        /// calculate hmac of the block
 
         let block_hmac = match version {
             SyncVersion::Version1 => {
                 let raw_chunk = data.as_slice();
 
-                // use HMACSHA256
+                /// use HMACSHA256
                 let hmac_key = hmac.as_sodium_auth_key();
 
                 let tag = ::sodiumoxide::crypto::auth::authenticate(raw_chunk, &hmac_key);
@@ -47,7 +47,7 @@ impl Block {
             SyncVersion::Version2 => {
                 let raw_chunk = data.as_slice();
 
-                // use blake2b
+                /// use blake2b
                 let hmac_key = hmac.as_blake2_256();
 
                 let hash = blake2b(HMAC_SIZE, hmac_key, raw_chunk);
@@ -61,7 +61,7 @@ impl Block {
 
         let (compressed, maybe_compressed_data, maybe_compressed_size) = match version {
             SyncVersion::Version1 => {
-                // no compression
+                /// no compression
 
                 (false, data, None)
             },
@@ -142,25 +142,25 @@ impl Block {
 
     pub fn to_wrapped(self, main: &Key) -> Result<WrappedBlock, CryptoError> {
 
-        // generate a new block key
+        /// generate a new block key
         let block_key = Key::new(KeyType::Block);
 
-        // we use the same nonce both while wrapping the block key, and the block data itself
-        // this is safe because using the same nonce with 2 different keys is not nonce reuse
+        /// we use the same nonce both while wrapping the block key, and the block data itself
+        /// this is safe because using the same nonce with 2 different keys is not nonce reuse
         let block_nonce = match self.version {
             SyncVersion::Version1 => {
-                // We use the first 24 bytes of the block hmac value as nonce for wrapping
-                // the block key and encrypting the block itself.
-                //
-                // This is cryptographically safe but still deterministic: encrypting
-                // the same block twice with a specific key will always produce the same
-                // output block, which is critical for versioning and deduplication
-                // across all backups of all sync folders
+                /// We use the first 24 bytes of the block hmac value as nonce for wrapping
+                /// the block key and encrypting the block itself.
+                ///
+                /// This is cryptographically safe but still deterministic: encrypting
+                /// the same block twice with a specific key will always produce the same
+                /// output block, which is critical for versioning and deduplication
+                /// across all backups of all sync folders
                 ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&self.hmac.as_slice()[0..SECRETBOX_NONCE_SIZE as usize])
                     .expect("failed to get nonce")
             },
             SyncVersion::Version2 => {
-                // We use the blake2 hash function to generate exactly 192-bits/24 bytes
+                /// We use the blake2 hash function to generate exactly 192-bits/24 bytes
                 let hash = blake2b(SECRETBOX_NONCE_SIZE, &[], &self.hmac.as_slice());
 
                 ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&hash.as_ref())
@@ -171,14 +171,14 @@ impl Block {
             },
         };
 
-        // get the block data, padded and prefixed with a u32 length as little endian
+        /// get the block data, padded and prefixed with a u32 length as little endian
         let to_encrypt = match self.version {
             SyncVersion::Version1 => {
-                // version 1 directly inserts the data before encryption
+                /// version 1 directly inserts the data before encryption
                 self.data
             },
             SyncVersion::Version2 => {
-                // version 2 has padded and prefixed data segments
+                /// version 2 has padded and prefixed data segments
                 ::util::pad_and_prefix_length(self.data.as_slice())
             },
             _ => {
@@ -187,10 +187,10 @@ impl Block {
         };
 
 
-        // encrypt the block data using the block key
+        /// encrypt the block data using the block key
         let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(to_encrypt.as_slice(), &block_nonce, &block_key.as_sodium_secretbox_key());
 
-        // wrap the block key with the main encryption key
+        /// wrap the block key with the main encryption key
         let wrapped_block_key = match block_key.to_wrapped(main, Some(&block_nonce)) {
             Ok(wk) => wk,
             Err(e) => return Err(e),
@@ -336,7 +336,7 @@ impl WrappedBlock {
     pub fn to_binary(&self) -> Vec<u8> {
         let mut binary_data = Vec::new();
 
-        // first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
+        /// first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
         let magic: &'static [u8; 2] = br"sd";
         let file_type: &'static [u8; 1] = br"b";
         let version = self.version.as_ref();
@@ -374,15 +374,15 @@ impl WrappedBlock {
         binary_data.extend(flag_ref);
         binary_data.extend(reserved.as_ref());
 
-        // next 48 bytes will be the wrapped block key
+        /// next 48 bytes will be the wrapped block key
         binary_data.extend(self.wrapped_key.as_ref());
 
-        // next 24 bytes will be the nonce
+        /// next 24 bytes will be the nonce
         let n: &[u8] = self.nonce.as_ref();
         binary_data.extend(n);
         assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
-        // remainder will be the encrypted block data
+        /// remainder will be the encrypted block data
         binary_data.extend(self.wrapped_data.as_slice());
 
         binary_data

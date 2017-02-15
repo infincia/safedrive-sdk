@@ -98,7 +98,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         let p = PathBuf::from(s);
 
         let _: () = msg_send![fm, release];
-        // these cause a segfault right now, but technically you would release these to avoid a leak
+        /// these cause a segfault right now, but technically you would release these to avoid a leak
         //let _: () = msg_send![groupContainerURL, release];
         //let _: () = msg_send![groupContainerPath, release];
 
@@ -110,7 +110,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     }
     match fs::create_dir_all(&storage_path) {
         Ok(()) => {},
-        Err(_) => {}, //ignore this for the moment, it's primarily going to be the directory existing already
+        Err(_) => {}, // ignore this for the moment, it's primarily going to be the directory existing already
     }
     return Ok(storage_path)
 
@@ -125,7 +125,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     if cfg!(target_os="windows") {
         evar = "APPDATA";
     } else {
-        // probably linux, use home dir
+        /// probably linux, use home dir
         evar = "HOME";
     }
     let m = format!("failed to get {} environment variable", evar);
@@ -149,7 +149,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     }
     match fs::create_dir_all(&storage_path) {
         Ok(()) => {},
-        Err(_) => {}, //ignore this for the moment, it's primarily going to be the directory existing already
+        Err(_) => {}, // ignore this for the moment, it's primarily going to be the directory existing already
     }
 
     return Ok(storage_path)
@@ -309,11 +309,11 @@ pub fn pad_and_prefix_length(input: &[u8]) -> Vec<u8> {
         _ => 512,            // less than 7.69%, average closer to 1-2%
     };
 
-    // check to see how much padding we need
+    /// check to see how much padding we need
     let nearest = nearest_to(input_length, round);
     let padding_needed = nearest - input_length;
 
-    // pad the end of the data with zeros if needed
+    /// pad the end of the data with zeros if needed
     buf.resize(size_buf.len() + input_length + padding_needed, 0u8);
 
     buf
@@ -330,7 +330,7 @@ pub fn pad_4bytes() {
     assert!(padded_v.len() == 4 + 128);
 }
 
-// format helpers
+/// format helpers
 
 pub fn pretty_bytes(input: f64) -> String {
     match binary_prefix(input) {
@@ -339,7 +339,7 @@ pub fn pretty_bytes(input: f64) -> String {
     }
 }
 
-// math helpers
+/// math helpers
 
 pub fn timestamp_to_ms(sec: i64, ms: u32) -> i64 {
     (sec * 1000) + (ms as i64)
