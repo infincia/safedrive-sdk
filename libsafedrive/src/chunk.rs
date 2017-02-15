@@ -277,7 +277,7 @@ pub struct RollingBlake2b {
     window_size_mask: usize,
     window_data: Vec<u8>,
     window_index: usize,
-    pub hash: ::cdc::Polynom64,
+    hash: ::cdc::Polynom64,
     _h: [u8; 8],
 }
 
