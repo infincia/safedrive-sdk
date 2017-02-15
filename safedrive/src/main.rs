@@ -766,6 +766,8 @@ fn main() {
         if let Some(ids) = m.value_of("id") {
             let id: u64 = ids.trim().parse().expect("Expected a number");
 
+            let (token, _) = sign_in(&app_directory);
+
             println!("Removing sync session {}", id);
 
             match remove_sync_session(&token, id) {
@@ -795,15 +797,9 @@ fn main() {
                 schedule = SyncCleaningSchedule::Auto
             };
 
-            println!("Cleaning sync sessions with schedule: {}", schedule);
+            let (token, _) = sign_in(&app_directory);
 
-            match clean_sync_sessions(&token, schedule) {
-                Ok(()) => {},
-                Err(e) => {
-                    error!("failed to clean sync sessions: {}", e);
-                    std::process::exit(1);
-                }
-            };
+            clean_sessions(token, schedule);
         }
     }
 }
