@@ -337,10 +337,8 @@ fn main() {
 
         benchmark(version, p);
 
+    } else if let Some(m) = matches.subcommand_matches("add") {
 
-    }
-
-    if let Some(m) = matches.subcommand_matches("add") {
         let p = match m.value_of("path") {
             Some(p) => p,
             None => {
