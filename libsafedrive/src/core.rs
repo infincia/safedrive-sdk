@@ -2,7 +2,7 @@ use std::str;
 use std::path::{Path, PathBuf};
 use std::fs;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
+use std::io::{BufWriter, Read, Write, Seek, SeekFrom};
 use std::{thread, time};
 
 // external crate imports
@@ -530,6 +530,8 @@ pub fn sync(token: &Token,
         }
         header.set_metadata(&md);
 
+        let mut hmac_bag: Vec<u8> = Vec::new();
+
         // chunk file if not a directory or socket
         if is_file {
             if stream_length > 0 {
@@ -538,7 +540,6 @@ pub fn sync(token: &Token,
 
                 let mut skipped_blocks = 0;
 
-                let mut hmac_bag: Vec<u8> = Vec::new();
 
                 for block_result in block_generator.by_ref() {
                     let block = match block_result {
@@ -639,32 +640,25 @@ pub fn sync(token: &Token,
                 assert!(stats.processed_size == stream_length);
                 debug!("calculated {} real bytes of blocks, matching stream size {}", stats.processed_size, stream_length);
 
-                let chunklist = BufReader::new(hmac_bag.as_slice());
                 header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); // hmac list size
                 header.set_cksum();
-                ar.append(&header, chunklist).expect("failed to append session entry header");
+                ar.append(&header, hmac_bag.as_slice()).expect("failed to append session entry header");
 
             } else {
                 header.set_size(0); // hmac list size is zero when file has no actual data
-                let chunks: Vec<u8> = Vec::new();
-                let chunklist = BufReader::new(chunks.as_slice());
                 header.set_cksum();
-                ar.append(&header, chunklist).expect("failed to append zero length archive header");
+                ar.append(&header, hmac_bag.as_slice()).expect("failed to append zero length archive header");
             }
         } else if is_dir {
             // folder
             header.set_size(0); // hmac list size is zero when file has no actual data
-            let chunks: Vec<u8> = Vec::new();
-            let chunklist = BufReader::new(chunks.as_slice());
             header.set_cksum();
-            ar.append(&header, chunklist).expect("failed to append folder to archive header");
+            ar.append(&header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
         } else if is_symlink {
             // symlink
             header.set_size(0); // hmac list size is zero when file has no actual data
-            let chunks: Vec<u8> = Vec::new();
-            let chunklist = BufReader::new(chunks.as_slice());
             header.set_cksum();
-            ar.append(&header, chunklist).expect("failed to append folder to archive header");
+            ar.append(&header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
         }
     }
 
