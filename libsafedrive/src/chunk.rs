@@ -134,6 +134,8 @@ impl<'a> Iterator for BlockGenerator<'a> {
                     },
                     None => {
                         debug!("generated uncompressed block, real size {}", block.real_size());
+                        self.processed_size_compressed += block.real_size();
+
                     },
                 };
 

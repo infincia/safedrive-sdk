@@ -551,14 +551,21 @@ pub fn sync(token: &Token,
 
                     let block_name = block.name();
                     let block_real_size = block.real_size();
+                    let compressed = block.compressed();
 
                     processed_size += block_real_size;
 
-                    match block.compressed_size() {
+                    let block_compressed_size = match block.compressed_size() {
                         Some(size) => {
                             processed_size_compressed += size;
+
+                            size
                         },
-                        None => {},
+                        None => {
+                            processed_size_compressed += block_real_size;
+
+                            0
+                        },
                     };
 
                     hmac_bag.extend_from_slice(&block.get_hmac());
