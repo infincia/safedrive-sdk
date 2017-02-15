@@ -15,6 +15,8 @@ use ::rustc_serialize::hex::{ToHex};
 
 use uuid::Uuid;
 
+use ::number_prefix::{binary_prefix, Standalone, Prefixed};
+
 #[cfg(target_os = "macos")]
 use ::objc_foundation::{NSObject, NSString, INSString};
 
@@ -326,6 +328,15 @@ pub fn pad_4bytes() {
     let padded_v = pad_and_prefix_length(v.as_slice());
 
     assert!(padded_v.len() == 4 + 128);
+}
+
+// format helpers
+
+pub fn pretty_bytes(input: f64) -> String {
+    match binary_prefix(input) {
+        Standalone(bytes)   => format!("{} bytes", bytes),
+        Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+    }
 }
 
 // math helpers
