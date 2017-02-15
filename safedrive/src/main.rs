@@ -546,57 +546,16 @@ fn main() {
         mb.listen();
 
     } else if let Some(m) = matches.subcommand_matches("sync") {
+
         let id: u64 = m.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
 
-        let folder = match get_sync_folder(&token, id) {
-            Ok(f) => f,
-            Err(e) => {
-                error!("Read folder error: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let (token, keyset) = sign_in(&app_directory);
 
-        //TODO: this is not portable to windows, must be fixed before use there
-        println!("Syncing folder \"{}\"", &folder.folderName);
+        sync_one(token, keyset, id);
 
-        let mut pb = ProgressBar::new(0);
-        pb.format("╢▌▌░╟");
-        pb.set_units(Units::Bytes);
-
-        let sync_uuid = Uuid::new_v4().hyphenated().to_string();
-
-        match sync(&token,
-                   &sync_uuid,
-                   &keyset.main,
-                   &keyset.hmac,
-                   &keyset.tweak,
-                   folder.id,
-                   &mut |total, _, new, _, tick, message| {
-                       if message.len() > 0 {
-                           let message = format!("{}: stalled", &folder.folderName);
-                           pb.message(&message);
-                       }
-                       if tick {
-                           pb.tick();
-                       } else {
-                           pb.total = total as u64;
-                           pb.add(new as u64);
-                       }
-                   }
-        ) {
-            Ok(_) => {
-                let message = format!("{}: finished", &folder.folderName);
-                pb.finish_println(&message);
-            },
-            Err(e) => {
-                let message = format!("{}: sync failed: {}", &folder.folderName, e);
-                pb.finish_println(&message);
-                std::process::exit(1);
-            }
-        }
     } else if let Some(m) = matches.subcommand_matches("restore") {
 
         let destination = m.value_of("destination").unwrap();
