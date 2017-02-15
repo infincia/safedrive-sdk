@@ -25,7 +25,7 @@ use std::thread;
 #[cfg(target_os = "linux")]
 use std::env;
 
-use std::path::{PathBuf};
+use std::path::{PathBuf, Path};
 use std::io::{Read};
 
 extern crate clap;
@@ -77,7 +77,8 @@ use safedrive::core::get_app_directory;
 use safedrive::core::get_current_os;
 
 
-use safedrive::models::{RegisteredFolder, SyncCleaningSchedule};
+use safedrive::models::{RegisteredFolder, SyncCleaningSchedule, Token};
+use safedrive::keys::Keyset;
 use safedrive::session::SyncSession;
 use safedrive::constants::{Configuration, Channel};
 
@@ -861,4 +862,509 @@ fn main() {
             };
         }
     }
+}
+
+
+
+pub fn find_credentials(storage_path: &Path) -> (String, String, Option<String>) {
+
+    let mut credential_file_path = PathBuf::from(&storage_path);
+    credential_file_path.push("credentials.json");
+
+    let mut credential_file = match File::open(credential_file_path) {
+        Ok(file) => file,
+        Err(e) => {
+            error!("Error reading account info in credentials.json: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let mut cs = String::new();
+
+    match credential_file.read_to_string(&mut cs) {
+        Ok(file) => file,
+        Err(e) => {
+            error!("Error reading account info in credentials.json: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let credentials: Credentials = match serde_json::from_str(&cs) {
+        Ok(c) => c,
+        Err(e) =>  {
+            error!("Couldn't parse credentials.json: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let username = match credentials.email {
+        Some(email) => email,
+        None => {
+            error!("No email found in credentials.json");
+            std::process::exit(1);
+        }
+    };
+
+    let password = match credentials.password {
+        Some(pass) => pass,
+        None => {
+            error!("No password found in credentials.json");
+            std::process::exit(1);
+        }
+    };
+
+    #[cfg(feature = "keychain")]
+    let s = match ::safedrive::core::get_keychain_item(&username, ::safedrive::keychain::KeychainService::Account) {
+        Ok(s) => s,
+        Err(e) => {
+            error!("Error getting keychain item: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    (username, password, credentials.phrase)
+}
+
+pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
+
+    println!("Signing in to SafeDrive...");
+
+    let (username, password, phrase) = find_credentials(app_directory);
+
+    let uid = match get_unique_client_id(app_directory) {
+        Ok(uid) => uid,
+        Err(_) => {
+            #[cfg(target_os = "macos")]
+            let uid = match unique_client_hash(&username) {
+                Ok(hash) => hash,
+                Err(e) => {
+                    error!("Error generating client ID: {}", e);
+                    std::process::exit(1);
+                },
+            };
+
+            #[cfg(not(target_os = "macos"))]
+            let uid = generate_unique_client_id();
+
+            uid
+        },
+    };
+
+    let (token, _) = match login(&uid, app_directory, &username, &password) {
+        Ok((t, a)) => (t, a),
+        Err(e) => {
+            error!("Login error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    println!("Loading keys...");
+
+    let keyset = match load_keys(&token, phrase, &|new_phrase| {
+        // store phrase in keychain and display
+        println!("NOTE: a recovery phrase has been generated for your account, please write it down somewhere safe");
+        println!();
+        println!("If you lose your recovery phrase you will lose access to your data!!!");
+        println!("---------------------------------------------------------------------");
+        println!("Recovery phrase: {}", new_phrase);
+        println!("---------------------------------------------------------------------");
+    }) {
+        Ok(keyset) => keyset,
+        Err(e) => {
+            error!("Key error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    (token, keyset)
+}
+
+pub fn add(token: Token, path: &str) {
+
+    let pa = PathBuf::from(path);
+
+    //TODO: this is not portable to windows, must be fixed before use there
+    println!("Adding new sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+
+    match add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), path) {
+        Ok(_) => {},
+        Err(e) => {
+            error!("failed to add new sync folder: {}", e);
+        }
+    }
+}
+
+pub fn remove(token: Token, id: u64) {
+
+    if let Ok(folder) = get_sync_folder(&token, id) {
+
+        println!("Removing sync folder {} ({})",  &folder.folderName, &folder.folderPath);
+
+        match remove_sync_folder(&token, id) {
+            Ok(_) => {},
+            Err(e) => {
+                error!("failed to remove sync folder: {}", e);
+            }
+        }
+    }
+        else {
+            println!("Could not find a registered folder for ID {}", id);
+        }
+}
+
+pub fn sync_all(token: Token, keyset: Keyset) {
+
+    let folder_list = match get_sync_folders(&token) {
+        Ok(fl) => fl,
+        Err(e) => {
+            error!("Read folders error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let encrypted_folders: Vec<RegisteredFolder> = folder_list.into_iter().filter(|f| f.encrypted).collect();
+
+    let mut mb = MultiBar::new();
+
+    mb.println("Syncing all folders");
+
+    for folder in encrypted_folders {
+        let mut pb = mb.create_bar(0);
+
+        let message = format!("{}: ", folder.folderName);
+        pb.message(&message);
+
+        pb.format("╢▌▌░╟");
+        pb.set_units(Units::Bytes);
+        let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+        let local_token = token.clone();
+        let local_main = keyset.main.clone();
+        let local_hmac = keyset.hmac.clone();
+        let local_tweak = keyset.tweak.clone();
+        let local_folder_name = folder.folderName.clone();
+
+        let _ = thread::spawn(move || {
+            match sync(&local_token,
+                       &sync_uuid,
+                       &local_main,
+                       &local_hmac,
+                       &local_tweak,
+                       folder.id,
+                       &mut |total, _, new, _, tick, message| {
+                           if message.len() > 0 {
+                               let message = format!("{}: stalled", local_folder_name);
+                               pb.message(&message);
+                           } else {
+                               let message = format!("{}: ", local_folder_name);
+                               pb.message(&message);
+                           }
+                           if tick {
+                               pb.tick();
+                           } else {
+                               pb.total = total as u64;
+                               pb.add(new as u64);
+                           }
+                       }
+            ) {
+                Ok(_) => {
+                    let message = format!("{}: finished", local_folder_name);
+                    pb.finish_println(&message);
+                },
+                Err(e) => {
+                    let message = format!("{}: sync failed: {}", local_folder_name, e);
+                    pb.finish_println(&message);
+                }
+            }
+        });
+    }
+
+    mb.listen();
+}
+
+pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
+
+    let folder = match get_sync_folder(&token, id) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Read folder error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    //TODO: this is not portable to windows, must be fixed before use there
+    println!("Syncing folder \"{}\"", &folder.folderName);
+
+    let mut pb = ProgressBar::new(0);
+    pb.format("╢▌▌░╟");
+    pb.set_units(Units::Bytes);
+
+    let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+
+    match sync(&token,
+               &sync_uuid,
+               &keyset.main,
+               &keyset.hmac,
+               &keyset.tweak,
+               folder.id,
+               &mut |total, _, new, _, tick, message| {
+                   if message.len() > 0 {
+                       let message = format!("{}: stalled", &folder.folderName);
+                       pb.message(&message);
+                   }
+                   if tick {
+                       pb.tick();
+                   } else {
+                       pb.total = total as u64;
+                       pb.add(new as u64);
+                   }
+               }
+    ) {
+        Ok(_) => {
+            let message = format!("{}: finished", &folder.folderName);
+            pb.finish_println(&message);
+        },
+        Err(e) => {
+            let message = format!("{}: sync failed: {}", &folder.folderName, e);
+            pb.finish_println(&message);
+            std::process::exit(1);
+        }
+    }
+}
+
+pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, session_name: Option<&str>) {
+
+    let path = PathBuf::from(destination);
+
+    let session_list = match get_sync_sessions(&token) {
+        Ok(sl) => sl,
+        Err(e) => {
+            error!("Read sessions error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let folder = match get_sync_folder(&token, id) {
+        Ok(f) => f,
+        Err(e) => {
+            error!("Read folder error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let mut sessions: Vec<SyncSession> = session_list.into_iter().filter(|ses| ses.folder_id.unwrap() == id).collect();
+
+    sessions.sort_by(|a, b| a.time.unwrap().cmp(&b.time.unwrap()));
+
+    // if we got a session argument, use that one
+    let mut filtered = match session_name {
+        Some(m) => {
+            let sessions: Vec<SyncSession> = sessions.into_iter().filter(|ses| ses.name == m).collect();
+
+            sessions
+        },
+        None => {
+
+            sessions
+        },
+    };
+
+    let ref session = match filtered.pop() {
+        Some(ses) => ses,
+        None => {
+            error!("No session found");
+            std::process::exit(1);
+        },
+    };
+
+    let t = session.time.unwrap();
+    let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+    let local_time = utc_time.with_timezone(&Local);
+
+    //TODO: this is not portable to windows, must be fixed before use there
+    println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &local_time, &path.to_str().unwrap());
+
+    let mut pb = ProgressBar::new(0);
+    pb.format("╢▌▌░╟");
+    pb.set_units(Units::Bytes);
+
+    match restore(&token,
+                  &session.name,
+                  &keyset.main,
+                  folder.id,
+                  path,
+                  session.size.unwrap(),
+                  &mut |total, _, new, _, tick, message| {
+                      if message.len() > 0 {
+                          let message = format!("{}: stalled", &folder.folderName);
+                          pb.message(&message);
+                      }
+                      if tick {
+                          pb.tick();
+                      } else {
+                          pb.total = total as u64;
+                          pb.add(new as u64);
+                      }
+                  }
+    ) {
+        Ok(_) => {
+            let message = format!("{}: finished", &folder.folderName);
+            pb.finish_println(&message);
+        },
+        Err(e) => {
+            let message = format!("{}: restore failed: {}", &folder.folderName, e);
+            pb.finish_println(&message);
+            std::process::exit(1);
+        }
+    }
+}
+
+pub fn list_folders(token: Token) {
+
+    let mut table = Table::new();
+
+    // Add a row
+    table.add_row(row!["Name", "Path", "Encrypted", "ID"]);
+
+    let folder_list = match get_sync_folders(&token) {
+        Ok(fl) => fl,
+        Err(e) => {
+            error!("Read folders error: {}", e);
+            std::process::exit(1);
+        }
+    };
+    for folder in folder_list {
+        table.add_row(Row::new(vec![
+            Cell::new(&folder.folderName),
+            Cell::new(&folder.folderPath),
+            Cell::new(if folder.encrypted { "Yes" } else { "No" }),
+            Cell::new(&format!("{}", &folder.id))])
+        );
+    }
+    table.printstd();
+}
+
+pub fn list_sessions(token: Token) {
+
+    let mut table = Table::new();
+
+    // Add a row
+    table.add_row(row!["Session ID", "Time", "Size", "Name", "Folder ID"]);
+
+    let _ = match get_sync_folders(&token) {
+        Ok(fl) => fl,
+        Err(e) => {
+            error!("Read folders error: {}", e);
+            std::process::exit(1);
+        }
+    };
+    let session_list = match get_sync_sessions(&token) {
+        Ok(sl) => sl,
+        Err(e) => {
+            error!("Read sessions error: {}", e);
+            std::process::exit(1);
+        }
+    };
+    for session in session_list {
+        let session_size = match binary_prefix(session.size.unwrap() as f64) {
+            Standalone(bytes)   => format!("{} bytes", bytes),
+            Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+        };
+        let session_folder_id = format!("{}", &session.folder_id.unwrap());
+        let session_id = format!("{}", &session.id.unwrap());
+
+        let session_time = format!("{}", {
+            let t = session.time.unwrap();
+            let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+            let local_time = utc_time.with_timezone(&Local);
+
+            local_time
+        });
+
+        table.add_row(Row::new(vec![
+            Cell::new(&session_id),
+            Cell::new(&session_time),
+            Cell::new(&session_size),
+            Cell::new(&session.name),
+            Cell::new(&session_folder_id),
+
+        ]));
+    }
+    table.printstd();
+}
+
+pub fn clean_sessions(token: Token, schedule: SyncCleaningSchedule) {
+
+    println!("Cleaning sync sessions with schedule: {}", schedule);
+
+    match clean_sync_sessions(&token, schedule) {
+        Ok(()) => {},
+        Err(e) => {
+            error!("failed to clean sync sessions: {}", e);
+            std::process::exit(1);
+        }
+    };
+}
+
+
+pub fn benchmark(version: ::safedrive::models::SyncVersion, path: &str) {
+
+    let pa = PathBuf::from(path);
+
+    //TODO: this is not portable to windows, must be fixed before use there
+    println!("Benchmarking file {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+
+    use std::io::{BufReader, Read};
+
+    let f = match File::open(&pa) {
+        Ok(m) => m,
+        Err(e) => {
+            println!("Failed to open file: {}", e);
+
+            std::process::exit(1);
+        }
+    };
+
+    let md = match f.metadata() {
+        Ok(m) => m,
+        Err(e) => {
+            println!("Failed to open file metadata: {}", e);
+
+            std::process::exit(1);
+        },
+    };
+
+    let stream_length = md.len();
+
+
+    let reader: BufReader<File> = BufReader::new(f);
+    let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap test data"));
+    let tweak_key = ::safedrive::keys::Key::new(::safedrive::keys::KeyType::Tweak);
+
+    let chunk_iter = ::safedrive::chunk::ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
+
+    let start = std::time::Instant::now();
+
+    let mut nb_chunk = 0;
+
+    for _ in chunk_iter {
+        nb_chunk += 1;
+    }
+    println!("Benchmarking finished with {} chunks", nb_chunk);
+
+    let avg = match binary_prefix(stream_length as f64 / nb_chunk as f64) {
+        Standalone(bytes)   => format!("{} bytes", bytes),
+        Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+    };
+
+    println!("Benchmarking average chunk size: {} bytes", avg);
+
+    let speed = match binary_prefix(stream_length as f64 / start.elapsed().as_secs() as f64) {
+        Standalone(bytes)   => format!("{} bytes", bytes),
+        Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
+    };
+
+    println!("Benchmarking took {} seconds", start.elapsed().as_secs());
+    println!("Benchmarking throughput average: {} per second", speed);
+
+    std::process::exit(0);
 }
