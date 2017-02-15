@@ -48,39 +48,8 @@ extern crate number_prefix;
 use ::number_prefix::{binary_prefix, Standalone, Prefixed};
 
 extern crate safedrive;
-use safedrive::core::initialize;
-use safedrive::core::login;
-use safedrive::core::load_keys;
-use safedrive::core::sync;
-use safedrive::core::restore;
+use safedrive::*;
 
-use safedrive::core::get_sync_folders;
-use safedrive::core::get_sync_folder;
-
-use safedrive::core::add_sync_folder;
-use safedrive::core::remove_sync_folder;
-
-use safedrive::core::get_sync_sessions;
-use safedrive::core::remove_sync_session;
-use safedrive::core::clean_sync_sessions;
-
-#[cfg(target_os = "linux")]
-use safedrive::core::get_openssl_directory;
-
-#[cfg(target_os = "macos")]
-use safedrive::core::unique_client_hash;
-
-use safedrive::core::generate_unique_client_id;
-use safedrive::core::get_unique_client_id;
-use safedrive::core::get_app_directory;
-
-use safedrive::core::get_current_os;
-
-
-use safedrive::models::{RegisteredFolder, SyncCleaningSchedule, Token};
-use safedrive::keys::Keyset;
-use safedrive::session::SyncSession;
-use safedrive::constants::{Configuration, Channel};
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -293,7 +262,7 @@ fn main() {
         println!("Environment: staging");
     }
 
-    let channel = ::safedrive::core::get_channel();
+    let channel = ::safedrive::get_channel();
     println!("Channel: {}", channel);
 
     match channel {
@@ -318,11 +287,11 @@ fn main() {
         let version = match m.is_present("versiontwo") {
             true => {
                 println!("Benchmark: version2");
-                ::safedrive::models::SyncVersion::Version2
+                ::safedrive::SyncVersion::Version2
             },
             false => {
                 println!("Benchmark: version1");
-                ::safedrive::models::SyncVersion::Version1
+                ::safedrive::SyncVersion::Version1
             }
 
         };
@@ -500,7 +469,7 @@ pub fn find_credentials(storage_path: &Path) -> (String, String, Option<String>)
     };
 
     #[cfg(feature = "keychain")]
-    let s = match ::safedrive::core::get_keychain_item(&username, ::safedrive::keychain::KeychainService::Account) {
+    let s = match ::safedrive::get_keychain_item(&username, ::safedrive::keychain::KeychainService::Account) {
         Ok(s) => s,
         Err(e) => {
             error!("Error getting keychain item: {}", e);
@@ -892,7 +861,7 @@ pub fn clean_sessions(token: Token, schedule: SyncCleaningSchedule) {
 }
 
 
-pub fn benchmark(version: ::safedrive::models::SyncVersion, path: &str) {
+pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
 
     let pa = PathBuf::from(path);
 
@@ -924,9 +893,9 @@ pub fn benchmark(version: ::safedrive::models::SyncVersion, path: &str) {
 
     let reader: BufReader<File> = BufReader::new(f);
     let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap test data"));
-    let tweak_key = ::safedrive::keys::Key::new(::safedrive::keys::KeyType::Tweak);
+    let tweak_key = ::safedrive::Key::new(::safedrive::KeyType::Tweak);
 
-    let chunk_iter = ::safedrive::chunk::ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
+    let chunk_iter = ::safedrive::ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
 
     let start = std::time::Instant::now();
 
