@@ -279,6 +279,39 @@ fn main() {
 
     let matches = app.get_matches();
 
+    println!("{} {}", NAME, VERSION);
+    println!("{}", COPYRIGHT);
+    println!();
+
+    let mut config: Configuration = Configuration::Staging;
+
+    if matches.is_present("production") {
+        println!("Environment: production");
+        config = Configuration::Production;
+    } else {
+        println!("Environment: staging");
+    }
+
+    let channel = ::safedrive::core::get_channel();
+    println!("Channel: {}", channel);
+
+    match channel {
+        Channel::Nightly => {
+            println!("Warning: data synced using nightly version of SafeDrive may not restore properly on stable channel");
+        },
+        _ => {},
+    }
+    println!();
+
+    let app_directory = get_app_directory(&config).expect("Error: could not determine local storage directory");
+    debug!("Using local dir: {:?}", &app_directory);
+
+    let client_version = format!("{} {}", NAME, VERSION);
+
+    let operating_system = get_current_os();
+
+    initialize(&client_version, operating_system, "en_US", config);
+
     if let Some(m) = matches.subcommand_matches("bench") {
 
         let version = match m.is_present("versiontwo") {
@@ -362,28 +395,9 @@ fn main() {
 
     }
 
-    println!("{} {}", NAME, VERSION);
-    println!("{}", COPYRIGHT);
-    println!();
-    let mut config: Configuration = Configuration::Staging;
 
 
-    if matches.is_present("production") {
-        println!("Environment: production");
-        config = Configuration::Production;
-    } else {
-        println!("Environment: staging");
-    }
-    let channel = ::safedrive::core::get_channel();
-    println!("Channel: {}", channel);
 
-    match channel {
-        Channel::Nightly => {
-            println!("Warning: data synced using nightly version of SafeDrive may not restore properly on stable channel");
-        },
-        _ => {},
-    }
-    println!();
 
 
 
@@ -392,11 +406,9 @@ fn main() {
 
     }
 
-    let app_directory = get_app_directory(&config).expect("Error: could not determine local storage directory");
     let mut credential_file_path = PathBuf::from(&app_directory);
     credential_file_path.push("credentials.json");
 
-    debug!("Using local dir: {:?}", &app_directory);
 
     let mut credential_file = match File::open(credential_file_path) {
         Ok(file) => file,
@@ -466,11 +478,6 @@ fn main() {
         },
     };
 
-    let client_version = format!("{} {}", NAME, VERSION);
-
-    let operating_system = get_current_os();
-
-    initialize(&client_version, operating_system, "en_US", config);
 
     let (token, _) = match login(&uid, &app_directory, &username, &password) {
         Ok((t, a)) => (t, a),
