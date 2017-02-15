@@ -461,24 +461,15 @@ fn main() {
             }
         }
     } else if let Some(m) = matches.subcommand_matches("remove") {
+
         let id: u64 = m.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
-        if let Ok(folder) = get_sync_folder(&token, id) {
-            println!("Removing sync folder {} ({})",  &folder.folderName, &folder.folderPath);
 
-            match remove_sync_folder(&token, id) {
-                Ok(_) => {},
-                Err(e) => {
-                    error!("failed to remove sync folder: {}", e);
-                }
-            }
-        }
-        else {
-            println!("Could not find a registered folder for ID {}", id);
-        }
+        let (token, _) = sign_in(&app_directory);
 
+        remove(token, id);
 
     } else if let Some(_) = matches.subcommand_matches("syncall") {
 
