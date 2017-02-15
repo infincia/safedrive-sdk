@@ -335,64 +335,8 @@ fn main() {
             }
         };
 
-        let pa = PathBuf::from(&p);
-        //TODO: this is not portable to windows, must be fixed before use there
-        println!("Benchmarking file {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+        benchmark(version, p);
 
-        use std::io::{BufReader, Read};
-
-        let f = match File::open(&pa) {
-            Ok(m) => m,
-            Err(e) => {
-                println!("Failed to open file: {}", e);
-
-                std::process::exit(1);
-            }
-        };
-
-        let md = match f.metadata() {
-            Ok(m) => m,
-            Err(e) => {
-                println!("Failed to open file metadata: {}", e);
-
-                std::process::exit(1);
-            },
-        };
-
-        let stream_length = md.len();
-
-
-        let reader: BufReader<File> = BufReader::new(f);
-        let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap test data"));
-        let tweak_key = ::safedrive::keys::Key::new(::safedrive::keys::KeyType::Tweak);
-
-        let chunk_iter = ::safedrive::chunk::ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
-
-        let start = std::time::Instant::now();
-
-        let mut nb_chunk = 0;
-
-        for _ in chunk_iter {
-            nb_chunk += 1;
-        }
-        println!("Benchmarking finished with {} chunks", nb_chunk);
-
-        let avg = match binary_prefix(stream_length as f64 / nb_chunk as f64) {
-            Standalone(bytes)   => format!("{} bytes", bytes),
-            Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
-        };
-
-        println!("Benchmarking average chunk size: {} bytes", avg);
-
-        let speed = match binary_prefix(stream_length as f64 / start.elapsed().as_secs() as f64) {
-            Standalone(bytes)   => format!("{} bytes", bytes),
-            Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
-        };
-
-        println!("Benchmarking took {} seconds", start.elapsed().as_secs());
-        println!("Benchmarking throughput average: {} per second", speed);
-
-        std::process::exit(0);
 
     }
 
