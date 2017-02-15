@@ -395,17 +395,6 @@ fn main() {
 
     }
 
-
-
-
-
-
-
-
-
-
-    }
-
     let mut credential_file_path = PathBuf::from(&app_directory);
     credential_file_path.push("credentials.json");
 
