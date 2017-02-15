@@ -481,69 +481,10 @@ fn main() {
 
 
     } else if let Some(_) = matches.subcommand_matches("syncall") {
-        let folder_list = match get_sync_folders(&token) {
-            Ok(fl) => fl,
-            Err(e) => {
-                error!("Read folders error: {}", e);
-                std::process::exit(1);
-            }
-        };
-        let encrypted_folders: Vec<RegisteredFolder> = folder_list.into_iter().filter(|f| f.encrypted).collect();
 
-        let mut mb = MultiBar::new();
-        mb.println("Syncing all folders");
+        let (token, keyset) = sign_in(&app_directory);
 
-        for folder in encrypted_folders {
-            let mut pb = mb.create_bar(0);
-
-            let message = format!("{}: ", folder.folderName);
-            pb.message(&message);
-
-            pb.format("╢▌▌░╟");
-            pb.set_units(Units::Bytes);
-            let sync_uuid = Uuid::new_v4().hyphenated().to_string();
-            let local_token = token.clone();
-            let local_main = keyset.main.clone();
-            let local_hmac = keyset.hmac.clone();
-            let local_tweak = keyset.tweak.clone();
-            let local_folder_name = folder.folderName.clone();
-
-            let _ = thread::spawn(move || {
-                match sync(&local_token,
-                           &sync_uuid,
-                           &local_main,
-                           &local_hmac,
-                           &local_tweak,
-                           folder.id,
-                           &mut |total, _, new, _, tick, message| {
-                               if message.len() > 0 {
-                                   let message = format!("{}: stalled", local_folder_name);
-                                   pb.message(&message);
-                               } else {
-                                   let message = format!("{}: ", local_folder_name);
-                                   pb.message(&message);
-                               }
-                               if tick {
-                                   pb.tick();
-                               } else {
-                                   pb.total = total as u64;
-                                   pb.add(new as u64);
-                               }
-                           }
-                ) {
-                    Ok(_) => {
-                        let message = format!("{}: finished", local_folder_name);
-                        pb.finish_println(&message);
-                    },
-                    Err(e) => {
-                        let message = format!("{}: sync failed: {}", local_folder_name, e);
-                        pb.finish_println(&message);
-                    }
-                }
-            });
-        }
-
-        mb.listen();
+        sync_all(token, keyset);
 
     } else if let Some(m) = matches.subcommand_matches("sync") {
 
