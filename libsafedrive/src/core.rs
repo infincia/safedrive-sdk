@@ -105,6 +105,10 @@ pub fn get_channel() -> Channel {
     }
 }
 
+pub fn pretty_bytes(input: f64) -> String {
+    ::util::pretty_bytes(input)
+}
+
 /// internal functions
 
 pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration) {
