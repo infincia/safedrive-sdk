@@ -450,16 +450,10 @@ fn main() {
             }
         };
 
-        let pa = PathBuf::from(&p);
-        //TODO: this is not portable to windows, must be fixed before use there
-        println!("Adding new sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
+        let (token, _) = sign_in(&app_directory);
 
-        match add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), p) {
-            Ok(_) => {},
-            Err(e) => {
-                error!("failed to add new sync folder: {}", e);
-            }
-        }
+        add(token, p);
+
     } else if let Some(m) = matches.subcommand_matches("remove") {
 
         let id: u64 = m.value_of("id").unwrap()
