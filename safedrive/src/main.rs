@@ -598,97 +598,19 @@ fn main() {
             }
         }
     } else if let Some(m) = matches.subcommand_matches("restore") {
-        let p = m.value_of("destination").unwrap();
-        let pa = PathBuf::from(&p);
 
-
-        let session_list = match get_sync_sessions(&token) {
-            Ok(sl) => sl,
-            Err(e) => {
-                error!("Read sessions error: {}", e);
-                std::process::exit(1);
-            }
-        };
-
+        let destination = m.value_of("destination").unwrap();
 
         let id: u64 = m.value_of("id").unwrap()
             .trim()
             .parse()
             .expect("Expected a number");
 
-        let folder = match get_sync_folder(&token, id) {
-            Ok(f) => f,
-            Err(e) => {
-                error!("Read folder error: {}", e);
-                std::process::exit(1);
-            }
-        };
+        let session_name = m.value_of("session");
 
-        let mut sessions: Vec<SyncSession> = session_list.into_iter().filter(|ses| ses.folder_id.unwrap() == id).collect();
+        let (token, keyset) = sign_in(&app_directory);
 
-        sessions.sort_by(|a, b| a.time.unwrap().cmp(&b.time.unwrap()));
-
-        // if we got a session argument, use that one
-        let mut filtered = match m.value_of("session") {
-            Some(m) => {
-                let sessions: Vec<SyncSession> = sessions.into_iter().filter(|ses| ses.name == m).collect();
-
-                sessions
-            },
-            None => {
-
-                sessions
-            },
-        };
-
-        let ref session = match filtered.pop() {
-            Some(ses) => ses,
-            None => {
-                error!("No session found");
-                std::process::exit(1);
-            },
-        };
-
-        let t = session.time.unwrap();
-        let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
-        let local_time = utc_time.with_timezone(&Local);
-
-        //TODO: this is not portable to windows, must be fixed before use there
-        println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &local_time, &pa.to_str().unwrap());
-
-        let mut pb = ProgressBar::new(0);
-        pb.format("╢▌▌░╟");
-        pb.set_units(Units::Bytes);
-
-        match restore(&token,
-                      &session.name,
-                      &keyset.main,
-                      folder.id,
-                      pa,
-                      session.size.unwrap(),
-                      &mut |total, _, new, _, tick, message| {
-                          if message.len() > 0 {
-                              let message = format!("{}: stalled", &folder.folderName);
-                              pb.message(&message);
-                          }
-                          if tick {
-                              pb.tick();
-                          } else {
-                              pb.total = total as u64;
-                              pb.add(new as u64);
-                          }
-                      }
-        ) {
-            Ok(_) => {
-                let message = format!("{}: finished", &folder.folderName);
-                pb.finish_println(&message);
-            },
-            Err(e) => {
-                let message = format!("{}: restore failed: {}", &folder.folderName, e);
-                pb.finish_println(&message);
-                std::process::exit(1);
-            }
-        }
+        restore_one(token, keyset, id, destination, session_name);
 
     } else if let Some(_) = matches.subcommand_matches("list") {
 
