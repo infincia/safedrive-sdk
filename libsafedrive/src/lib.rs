@@ -95,7 +95,7 @@ extern crate lazy_static;
 #[macro_use(defer)]
 extern crate scopeguard;
 
-pub static SYNC_VERSION: ::models::SyncVersion = ::models::SyncVersion::Version1;
+pub static SYNC_VERSION: ::models::SyncVersion = ::models::SyncVersion::Version2;
 
 // global config, can only be set once at runtime
 
