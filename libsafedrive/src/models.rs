@@ -5,6 +5,7 @@ use std;
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]
+#[allow(dead_code)]
 pub enum SyncSchedule {
     Hourly,
     Daily,
