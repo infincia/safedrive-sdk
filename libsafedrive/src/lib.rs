@@ -14,29 +14,40 @@ extern crate chrono;
 
 extern crate number_prefix;
 
-pub mod c_api;
-pub use c_api::*;
-
-pub mod core;
-pub mod models;
-pub mod error;
-pub mod keys;
-
-#[cfg(feature = "keychain")]
-pub mod keychain;
-
-pub mod constants;
-
+mod c_api;
+mod core;
+mod constants;
+mod models;
+mod error;
+mod keys;
 mod util;
 mod sdapi;
 mod state;
 mod binformat;
 mod cache;
 mod block;
-pub mod session;
+mod session;
 mod lock;
-pub mod chunk;
+mod chunk;
 mod oplog;
+#[cfg(feature = "keychain")]
+mod keychain;
+
+/// public API
+///
+pub use c_api::*;
+pub use core::*;
+pub use constants::*;
+pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder};
+pub use keys::{Key, Keyset, KeyType};
+pub use session::SyncSession;
+pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
+#[cfg(feature = "keychain")]
+pub use keychain::{get_keychain_item, set_keychain_item};
+
+
+
+
 
 /// external crates
 
