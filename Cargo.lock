@@ -1,11 +1,11 @@
 [root]
 name = "safedrived"
-version = "0.3.18"
+version = "0.4.0"
 dependencies = [
  "clap 2.20.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.3.18",
+ "libsafedrive 0.4.0",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.9.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -418,7 +418,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "libsafedrive"
-version = "0.3.18"
+version = "0.4.0"
 dependencies = [
  "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -923,12 +923,12 @@ dependencies = [
 
 [[package]]
 name = "safedrive"
-version = "0.3.18"
+version = "0.4.0"
 dependencies = [
  "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.20.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "env_logger 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.3.18",
+ "libsafedrive 0.4.0",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "number_prefix 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "pbr 1.0.0-alpha.2 (registry+https://github.com/rust-lang/crates.io-index)",
