@@ -656,6 +656,24 @@ pub fn sync(token: &Token,
             ar.append(&header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
         } else if is_symlink {
             // symlink
+
+            // get the src
+            match ::std::fs::read_link(&p) {
+                Ok(path) => {
+                    match  header.set_link_name(path) {
+                        Ok(()) => {
+
+                        },
+                        Err(e) => {
+                            error!("failed to set symlink: {}", e);
+                        }
+                    };
+                },
+                Err(e) => {
+                    error!("failed to set symlink: {}", e);
+                }
+            };
+
             header.set_size(0); // hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append(&header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
