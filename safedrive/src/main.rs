@@ -713,52 +713,11 @@ fn main() {
         }
         table.printstd();
 
-    } else if let Some(_) = matches.subcommand_matches("sessions") {
-        let mut table = Table::new();
+    } else if let Some(m) = matches.subcommand_matches("sessions") {
 
-        // Add a row
-        table.add_row(row!["Session ID", "Time", "Size", "Name", "Folder ID"]);
+        let (token, _) = sign_in(&app_directory);
 
-        let _ = match get_sync_folders(&token) {
-            Ok(fl) => fl,
-            Err(e) => {
-                error!("Read folders error: {}", e);
-                std::process::exit(1);
-            }
-        };
-        let session_list = match get_sync_sessions(&token) {
-            Ok(sl) => sl,
-            Err(e) => {
-                error!("Read sessions error: {}", e);
-                std::process::exit(1);
-            }
-        };
-        for session in session_list {
-            let session_size = match binary_prefix(session.size.unwrap() as f64) {
-                Standalone(bytes)   => format!("{} bytes", bytes),
-                Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
-            };
-            let session_folder_id = format!("{}", &session.folder_id.unwrap());
-            let session_id = format!("{}", &session.id.unwrap());
-
-            let session_time = format!("{}", {
-                let t = session.time.unwrap();
-                let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
-                let local_time = utc_time.with_timezone(&Local);
-
-                local_time
-            });
-
-            table.add_row(Row::new(vec![
-                Cell::new(&session_id),
-                Cell::new(&session_time),
-                Cell::new(&session_size),
-                Cell::new(&session.name),
-                Cell::new(&session_folder_id),
-
-            ]));
-        }
-        table.printstd();
+        list_sessions(token);
 
     } else if let Some(m) = matches.subcommand_matches("clean") {
 
