@@ -44,9 +44,6 @@ use uuid::Uuid;
 extern crate chrono;
 use ::chrono::{Local, UTC, TimeZone};
 
-extern crate number_prefix;
-use ::number_prefix::{binary_prefix, Standalone, Prefixed};
-
 extern crate safedrive;
 use safedrive::*;
 
@@ -820,10 +817,8 @@ pub fn list_sessions(token: Token) {
         }
     };
     for session in session_list {
-        let session_size = match binary_prefix(session.size.unwrap() as f64) {
-            Standalone(bytes)   => format!("{} bytes", bytes),
-            Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
-        };
+        let session_size = ::safedrive::pretty_bytes(session.size.unwrap() as f64);
+
         let session_folder_id = format!("{}", &session.folder_id.unwrap());
         let session_id = format!("{}", &session.id.unwrap());
 
@@ -906,17 +901,11 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
     }
     println!("Benchmarking finished with {} chunks", nb_chunk);
 
-    let avg = match binary_prefix(stream_length as f64 / nb_chunk as f64) {
-        Standalone(bytes)   => format!("{} bytes", bytes),
-        Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
-    };
+    let avg = ::safedrive::pretty_bytes(stream_length as f64 / nb_chunk as f64);
 
     println!("Benchmarking average chunk size: {} bytes", avg);
 
-    let speed = match binary_prefix(stream_length as f64 / start.elapsed().as_secs() as f64) {
-        Standalone(bytes)   => format!("{} bytes", bytes),
-        Prefixed(prefix, n) => format!("{:.2} {}B", n, prefix),
-    };
+    let speed = ::safedrive::pretty_bytes(stream_length as f64 / start.elapsed().as_secs() as f64);
 
     println!("Benchmarking took {} seconds", start.elapsed().as_secs());
     println!("Benchmarking throughput average: {} per second", speed);
