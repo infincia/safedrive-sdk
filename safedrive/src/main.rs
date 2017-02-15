@@ -400,7 +400,7 @@ fn main() {
 
         list_folders(token);
 
-    } else if let Some(m) = matches.subcommand_matches("sessions") {
+    } else if let Some(_) = matches.subcommand_matches("sessions") {
 
         let (token, _) = sign_in(&app_directory);
 
