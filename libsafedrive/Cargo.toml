@@ -30,7 +30,7 @@ parking_lot = "*"
 byteorder = "*"
 #blake2-rfc = { version = "*" }
 blake2-rfc = { version = "*", features = ["simd", "simd_opt", "simd_asm"] }
-bitflags = "^0.7"
+bitflags = "^0.8"
 semver = "^0.6.0"
 lz4 = "*"
 chrono = "*"
