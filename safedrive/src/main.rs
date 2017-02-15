@@ -691,27 +691,10 @@ fn main() {
         }
 
     } else if let Some(_) = matches.subcommand_matches("list") {
-        let mut table = Table::new();
 
-        // Add a row
-        table.add_row(row!["Name", "Path", "Encrypted", "ID"]);
+        let (token, _) = sign_in(&app_directory);
 
-        let folder_list = match get_sync_folders(&token) {
-            Ok(fl) => fl,
-            Err(e) => {
-                error!("Read folders error: {}", e);
-                std::process::exit(1);
-            }
-        };
-        for folder in folder_list {
-            table.add_row(Row::new(vec![
-                Cell::new(&folder.folderName),
-                Cell::new(&folder.folderPath),
-                Cell::new(if folder.encrypted { "Yes" } else { "No" }),
-                Cell::new(&format!("{}", &folder.id))])
-            );
-        }
-        table.printstd();
+        list_folders(token);
 
     } else if let Some(m) = matches.subcommand_matches("sessions") {
 
