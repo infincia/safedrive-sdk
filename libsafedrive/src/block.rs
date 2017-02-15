@@ -325,6 +325,14 @@ impl WrappedBlock {
         self.compressed
     }
 
+    pub fn len(&self) -> usize {
+        self.wrapped_data.len()
+    }
+
+    pub fn real_size(&self) -> u64 {
+        panic!("can't retrieve real size of a wrapped block");
+    }
+
     pub fn to_binary(&self) -> Vec<u8> {
         let mut binary_data = Vec::new();
 

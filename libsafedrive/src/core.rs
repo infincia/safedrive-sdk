@@ -478,6 +478,7 @@ pub fn sync(token: &Token,
 
     let mut processed_size: u64 = 0;
     let mut processed_size_compressed: u64 = 0;
+    let mut processed_size_padding: u64 = 0;
 
     let mut estimated_size: u64 = 0;
 
@@ -540,6 +541,7 @@ pub fn sync(token: &Token,
 
                 let mut skipped_blocks = 0;
 
+                let mut item_padding: u64 = 0;
 
                 for block_result in block_generator.by_ref() {
                     let block = match block_result {
@@ -574,6 +576,15 @@ pub fn sync(token: &Token,
                         Ok(wb) => wb,
                         Err(e) => return Err(SDError::CryptoError(e)),
                     };
+                    let block_padded_size = wrapped_block.len() as u64;
+
+                    let padding_overhead = if compressed {
+                        block_padded_size - block_compressed_size
+                    } else {
+                        block_padded_size - block_real_size
+                    };
+
+                    item_padding += padding_overhead;
 
                     let mut should_retry = true;
                     let mut retries_left = 15.0;
@@ -629,6 +640,10 @@ pub fn sync(token: &Token,
                         }
                     }
                 }
+
+                processed_size_padding += item_padding;
+
+
                 let stats = block_generator.stats();
                 if DEBUG_STATISTICS {
                     let compression_ratio = (stats.processed_size_compressed as f64 / stats.processed_size as f64 ) * 100.0;
@@ -636,6 +651,10 @@ pub fn sync(token: &Token,
                     debug!("{} chunks ({} new)", stats.discovered_chunk_count, stats.discovered_chunk_count - skipped_blocks);
                     debug!("average size: {} bytes", stats.processed_size / stats.discovered_chunk_count);
                     debug!("compression: {}/{} ({}%)", stats.processed_size_compressed, stats.processed_size, compression_ratio);
+
+                    let padding_ratio = (item_padding as f64 / stats.processed_size_compressed as f64 ) * 100.0;
+
+                    debug!("padding overhead: {} ({}%)", item_padding, padding_ratio);
 
                     debug!("hmac bag has: {} ids <{} bytes>", hmac_bag.len() / 32, stats.discovered_chunk_count * 32);
                     debug!("expected chunk size: {} bytes", stats.discovered_chunk_expected_size);
@@ -698,6 +717,9 @@ pub fn sync(token: &Token,
         debug!("session data total: {}", session.size.unwrap());
         debug!("session data compressed: {}", processed_size_compressed);
         debug!("session data compression ratio: {}", compression_ratio);
+        let padding_ratio = (processed_size_padding as f64 / processed_size_compressed as f64 ) * 100.0;
+
+        debug!("session data padding overhead: {} ({}%)", processed_size_padding, padding_ratio);
 
         debug!("session file total: {}", session.real_size());
         match session.compressed_size() {
