@@ -26,9 +26,9 @@ public struct Folder {
 
 public struct SDSyncSession {
     public let name: String
-	public let size: UInt64;
-	public let date: Date;
-	public let folder_id: UInt64;
+	public let size: UInt64
+	public let date: Date
+	public let folder_id: UInt64
 }
 
 public struct AccountStatus {
