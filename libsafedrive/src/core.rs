@@ -840,7 +840,7 @@ pub fn restore(token: &Token,
                 full_p.push(p);
             }
             Err(e) => {
-                debug!("not restoring invalid path: {})", e);
+                debug!("not restoring invalid path: {}", e);
 
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
