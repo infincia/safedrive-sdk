@@ -519,13 +519,13 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, sessionSize: UInt64, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
         
             var error: UnsafeMutablePointer<SDDKError>? = nil
 
-            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, destination.path, { (context, total, current, percent, tick, message) in
+            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, destination.path, sessionSize, { (context, total, current, percent, tick, message) in
                 // call back to Swift to report progress
                 let m = String(cString: message!)
                 
