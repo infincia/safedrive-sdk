@@ -183,10 +183,6 @@ public class SafeDriveSDK: NSObject {
 
     var state: OpaquePointer? = nil
 
-    var folders = [Folder]()
-    
-    var sessions = [SyncSession]()
-
     public override init() {
         super.init()
     }
@@ -443,7 +439,6 @@ public class SafeDriveSDK: NSObject {
                     new_array.append(new_folder)
                 }
                 
-                self.folders = new_array
                 queue.async { success(new_array) }
 
             }
@@ -484,7 +479,7 @@ public class SafeDriveSDK: NSObject {
                     let new_session = SyncSession(name: name, size: size, date: date, folder_id: id)
                     new_array.append(new_session)
                 }
-                self.sessions = new_array
+
                 queue.async { success(new_array) }
             }
         }
