@@ -43,33 +43,15 @@ pub fn sha256(input: &[u8]) -> String {
 
 /// helpers
 
-pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
-    ::util::get_app_directory(config)
-}
+pub use ::util::pretty_bytes;
 
-pub fn get_openssl_directory() -> Result<PathBuf, ()> {
-    ::util::get_openssl_directory()
-}
-
-pub fn unique_client_hash(email: &str) -> Result<String, String> {
-    ::util::unique_client_hash(email)
-}
-
-pub fn generate_unique_client_id() -> String {
-    ::util::generate_uuid()
-}
-
-pub fn get_unique_client_id(local_storage_path: &Path) -> Result<String, SDError> {
-    ::util::get_unique_client_id(local_storage_path)
-}
-
-pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -> Result<(), SDError> {
-    ::util::set_unique_client_id(unique_client_id, local_storage_path)
-}
-
-pub fn get_current_os() -> &'static str {
-    ::util::get_current_os()
-}
+pub use ::util::get_app_directory;
+pub use ::util::generate_uuid as generate_unique_client_id;
+pub use ::util::get_unique_client_id;
+pub use ::util::set_unique_client_id;
+pub use ::util::get_current_os;
+pub use ::util::unique_client_hash;
+pub use ::util::get_openssl_directory;
 
 #[cfg(feature = "keychain")]
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
@@ -103,9 +85,7 @@ pub fn get_channel() -> Channel {
     }
 }
 
-pub fn pretty_bytes(input: f64) -> String {
-    ::util::pretty_bytes(input)
-}
+
 
 /// internal functions
 
