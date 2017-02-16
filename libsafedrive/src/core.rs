@@ -50,8 +50,9 @@ pub use ::util::generate_uuid as generate_unique_client_id;
 pub use ::util::get_unique_client_id;
 pub use ::util::set_unique_client_id;
 pub use ::util::get_current_os;
-pub use ::util::unique_client_hash;
 pub use ::util::get_openssl_directory;
+#[cfg(target_os = "macos")]
+pub use ::util::unique_client_hash;
 
 #[cfg(feature = "keychain")]
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
