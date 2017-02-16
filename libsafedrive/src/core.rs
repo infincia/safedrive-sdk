@@ -841,16 +841,15 @@ pub fn restore(token: &Token,
             }
             Err(e) => {
                 debug!("not restoring invalid path: {}", e);
+                progress(session_size, processed_size, 0, percent_completed, false, &format!("not restoring invalid path: {}", e));
 
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
             }
         };
 
-        let percent_completed: f64 = (processed_size as f64 / session_size as f64) * 100.0;
 
         /// call out to the library user with progress
-        progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
 
 
 
