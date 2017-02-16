@@ -118,7 +118,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     if cfg!(target_os="windows") {
         evar = "APPDATA";
     } else {
-        /// probably linux, use home dir
+        // probably linux, use home dir
         evar = "HOME";
     }
     let m = format!("failed to get {} environment variable", evar);
