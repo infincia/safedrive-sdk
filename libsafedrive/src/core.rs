@@ -55,18 +55,12 @@ pub use ::util::get_openssl_directory;
 
 #[cfg(feature = "keychain")]
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
-    match ::keychain::get_keychain_item(account, service) {
-        Ok(i) => Ok(i),
-        Err(e) => Err(SDError::from(e))
-    }
+    ::keychain::get_keychain_item(account, service)?
 }
 
 #[cfg(feature = "keychain")]
 pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, secret: &str) -> Result<(), SDError> {
-    match ::keychain::set_keychain_item(account, service, secret) {
-        Ok(()) => Ok(()),
-        Err(e) => Err(SDError::from(e))
-    }
+    ::keychain::set_keychain_item(account, service, secret)?
 }
 
 pub fn get_channel() -> Channel {
