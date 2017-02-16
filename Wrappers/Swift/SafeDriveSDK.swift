@@ -29,6 +29,7 @@ public struct SDSyncSession {
 	public let size: UInt64
 	public let date: Date
 	public let folder_id: UInt64
+    public let session_id: UInt64
 }
 
 public struct AccountStatus {
@@ -476,6 +477,7 @@ public class SafeDriveSDK: NSObject {
                     let ti = (session.date / UInt64(1000))
                     let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
                     let id = session.folder_id
+                    let session_id = session.session_id
                     let new_session = SDSyncSession(name: name, size: size, date: date, folder_id: id, session_id: session_id)
                     new_array.append(new_session)
                 }
