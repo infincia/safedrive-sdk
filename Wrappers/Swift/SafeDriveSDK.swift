@@ -24,7 +24,7 @@ public struct Folder {
     
 }
 
-public struct SyncSession {
+public struct SDSyncSession {
     public let name: String
 	public let size: UInt64;
 	public let date: Date;
@@ -446,7 +446,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func getSessions(completionQueue queue: DispatchQueue, success: @escaping (_ sessions: [SyncSession]) -> Void, failure: @escaping SDKFailure) {
+    public func getSessions(completionQueue queue: DispatchQueue, success: @escaping (_ sessions: [SDSyncSession]) -> Void, failure: @escaping SDKFailure) {
     
         DispatchQueue.global(priority: .default).async {
 
@@ -469,14 +469,14 @@ public class SafeDriveSDK: NSObject {
             default:
                 let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
                 let a = Array(buffer)
-                var new_array = [SyncSession]()
+                var new_array = [SDSyncSession]()
                 for session in a {
                     let name = String(cString: session.name)
                     let size = session.size
                     let ti = (session.date / UInt64(1000))
                     let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
                     let id = session.folder_id
-                    let new_session = SyncSession(name: name, size: size, date: date, folder_id: id)
+                    let new_session = SDSyncSession(name: name, size: size, date: date, folder_id: id, session_id: session_id)
                     new_array.append(new_session)
                 }
 
