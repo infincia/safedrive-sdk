@@ -200,6 +200,7 @@ pub struct SDDKSyncSession {
     pub size: u64,
     pub date: u64,
     pub folder_id: u64,
+    pub session_id: u64,
 }
 
 impl From<SyncSession> for SDDKSyncSession {
@@ -209,6 +210,7 @@ impl From<SyncSession> for SDDKSyncSession {
             size: session.size.unwrap(),
             name: CString::new(session.name.as_str()).unwrap().into_raw(),
             date: session.time.unwrap(),
+            session_id: session.id.unwrap(),
         }
     }
 }
