@@ -417,7 +417,7 @@ pub fn sync(token: &Token,
             hmac_key: &Key,
             tweak_key: &Key,
             folder_id: u64,
-            progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
+            progress: &mut FnMut(u64, u64, u64, f64, bool, &str)) -> Result<(), SDError> {
     debug!("creating version {} sync session", SYNC_VERSION);
 
     let folder = match get_sync_folder(token, folder_id) {
@@ -482,7 +482,7 @@ pub fn sync(token: &Token,
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
         /// call out to the library user with progress
-        progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
+        progress(estimated_size, processed_size, 0, percent_completed, false, "");
 
         let p = item.path();
         let p_relative = p.strip_prefix(&folder_path).expect("failed to unwrap relative path");
@@ -568,7 +568,7 @@ pub fn sync(token: &Token,
 
                     while should_retry {
                         /// allow caller to tick the progress display, if one exists
-                        progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
+                        progress(estimated_size, processed_size, 0, percent_completed, false, "");
 
                         let failed_count = 15.0 - retries_left;
                         let mut rng = ::rand::thread_rng();
@@ -593,11 +593,11 @@ pub fn sync(token: &Token,
                             Ok(()) => {
                                 skipped_blocks = skipped_blocks + 1;
                                 /// allow caller to tick the progress display, if one exists
-                                progress(estimated_size as u32, processed_size as u32, block_real_size as u32, percent_completed, false, "");
+                                progress(estimated_size, processed_size, block_real_size as u64, percent_completed, false, "");
                                 should_retry = false
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
-                                progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, err.description());
+                                progress(estimated_size, processed_size, 0, percent_completed, false, err.description());
 
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
@@ -728,7 +728,7 @@ pub fn sync(token: &Token,
 
     while should_retry {
         /// allow caller to tick the progress display, if one exists
-        progress(estimated_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
+        progress(estimated_size, processed_size, 0, percent_completed, false, "");
 
         let failed_count = 15.0 - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -759,7 +759,7 @@ pub fn sync(token: &Token,
     }
 
 
-    progress(estimated_size as u32, processed_size as u32, 0 as u32, 100.0, false, "");
+    progress(estimated_size, processed_size, 0, 100.0, false, "");
 
     Ok(())
 }
@@ -771,7 +771,7 @@ pub fn restore(token: &Token,
                folder_id: u64,
                destination: PathBuf,
                session_size: u64,
-               progress: &mut FnMut(u32, u32, u32, f64, bool, &str)) -> Result<(), SDError> {
+               progress: &mut FnMut(u64, u64, u64, f64, bool, &str)) -> Result<(), SDError> {
     try!(fs::create_dir_all(&destination));
 
     let folder = match get_sync_folder(token, folder_id) {
@@ -818,6 +818,9 @@ pub fn restore(token: &Token,
     let mut failed = 0;
 
     for item in ar.entries().unwrap() {
+        let percent_completed: f64 = (processed_size as f64 / session_size as f64) * 100.0;
+
+
         let mut file_entry = match item {
             Ok(e) => e,
             Err(e) => {
@@ -889,7 +892,7 @@ pub fn restore(token: &Token,
                     for block_hmac in block_hmac_list.iter() {
 
                         /// allow caller to tick the progress display, if one exists
-                        progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, true, "");
+                        progress(session_size, processed_size, 0, percent_completed, true, "");
 
                         let mut should_retry = true;
                         let mut retries_left = 15.0;
@@ -934,7 +937,7 @@ pub fn restore(token: &Token,
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
                                 Ok(rb) => {
                                     /// allow caller to tick the progress display, if one exists
-                                    progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, "");
+                                    progress(session_size, processed_size, 0, percent_completed, false, "");
 
                                     should_retry = false;
                                     debug!("server provided block: {}", &block_hmac_hex);
@@ -956,7 +959,7 @@ pub fn restore(token: &Token,
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
 
-                                    progress(session_size as u32, processed_size as u32, 0 as u32, percent_completed, false, err.description());
+                                    progress(session_size, processed_size, 0, percent_completed, false, err.description());
 
 
                                     if retries_left <= 0.0 {
@@ -993,7 +996,7 @@ pub fn restore(token: &Token,
                         }
 
                         processed_size += block.len() as u64;
-                        progress(session_size as u32, processed_size as u32, block.len() as u32, percent_completed, false, "");
+                        progress(session_size, processed_size, block.len() as u64, percent_completed, false, "");
 
                     }
 
@@ -1126,7 +1129,7 @@ pub fn restore(token: &Token,
 
     debug!("restoring session finished");
 
-    progress(session_size as u32, processed_size as u32, 0 as u32, 100.0, false, "");
+    progress(session_size, processed_size, 0, 100.0, false, "");
 
     Ok(())
 }

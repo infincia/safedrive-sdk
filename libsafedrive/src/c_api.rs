@@ -1725,8 +1725,9 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                             name: *const std::os::raw::c_char,
                             folder_id: std::os::raw::c_ulonglong,
                             progress: extern fn(context: *mut std::os::raw::c_void,
-                                                total: std::os::raw::c_uint,
-                                                current: std::os::raw::c_uint,
+                                                total: std::os::raw::c_ulonglong,
+                                                current: std::os::raw::c_ulonglong,
+                                                new: std::os::raw::c_ulonglong,
                                                 percent: std::os::raw::c_double,
                                                 tick: std::os::raw::c_uint,
                                                 message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
@@ -1751,13 +1752,13 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                tweak_key,
                id,
                &mut |total, current, new, progress_percent, tick, message| {
-                   let c_total: std::os::raw::c_uint = total;
-                   let c_current: std::os::raw::c_uint = current;
-                   let c_new: std::os::raw::c_uint = new;
+                   let c_total: std::os::raw::c_ulonglong = total;
+                   let c_current: std::os::raw::c_ulonglong = current;
+                   let c_new: std::os::raw::c_ulonglong = new;
                    let c_percent: std::os::raw::c_double = progress_percent;
                    let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
                    let c_message = CString::new(message).expect("failed to get sync message");
-                   progress(context, c_total, c_current, c_percent, c_tick, c_message.as_ptr());
+                   progress(context, c_total, c_current, c_new, c_percent, c_tick, c_message.as_ptr());
                }) {
         Ok(_) => 0,
         Err(e) => {
@@ -1828,8 +1829,9 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                destination: *const std::os::raw::c_char,
                                session_size: std::os::raw::c_ulonglong,
                                progress: extern fn(context: *mut std::os::raw::c_void,
-                                                   total: std::os::raw::c_uint,
-                                                   current: std::os::raw::c_uint,
+                                                   total: std::os::raw::c_ulonglong,
+                                                   current: std::os::raw::c_ulonglong,
+                                                   new: std::os::raw::c_ulonglong,
                                                    percent: std::os::raw::c_double,
                                                    tick: std::os::raw::c_uint,
                                                    message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
@@ -1863,13 +1865,13 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                   p,
                   ses_size,
                   &mut |total, current, new, progress_percent, tick, message| {
-                      let c_total: std::os::raw::c_uint = total;
-                      let c_current: std::os::raw::c_uint = current;
+                      let c_total: std::os::raw::c_ulonglong = total;
+                      let c_current: std::os::raw::c_ulonglong = current;
                       let c_percent: std::os::raw::c_double = progress_percent;
-                      let c_new: std::os::raw::c_uint = new;
+                      let c_new: std::os::raw::c_ulonglong = new;
                       let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
                       let c_message = CString::new(message).expect("failed to get sync message");
-                      progress(context, c_total, c_current, c_percent, c_tick, c_message.as_ptr());
+                      progress(context, c_total, c_current, c_new, c_percent, c_tick, c_message.as_ptr());
                   }) {
         Ok(_) => 0,
         Err(e) => {
