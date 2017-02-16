@@ -47,12 +47,10 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     ::util::get_app_directory(config)
 }
 
-#[cfg(target_os = "linux")]
 pub fn get_openssl_directory() -> Result<PathBuf, ()> {
     ::util::get_openssl_directory()
 }
 
-#[cfg(target_os = "macos")]
 pub fn unique_client_hash(email: &str) -> Result<String, String> {
     ::util::unique_client_hash(email)
 }

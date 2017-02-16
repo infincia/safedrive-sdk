@@ -2,11 +2,8 @@ use std::path::{PathBuf, Path};
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
-
-#[cfg(target_os = "linux")]
 use std::process::Command;
 
-#[cfg(not(target_os = "macos"))]
 use std::env;
 
 // external crate imports
@@ -155,7 +152,6 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     return Ok(storage_path)
 }
 
-#[cfg(target_os = "linux")]
 pub fn get_openssl_directory() -> Result<PathBuf, ()> {
     let output = match Command::new("openssl")
         .arg("version")
