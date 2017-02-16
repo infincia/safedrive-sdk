@@ -4,13 +4,9 @@ use std::fs::File;
 use std::io::{Read, Write};
 use std::process::Command;
 
-use std::env;
-
 // external crate imports
 
 use ::rustc_serialize::hex::{ToHex};
-
-use uuid::Uuid;
 
 use ::number_prefix::{binary_prefix, Standalone, Prefixed};
 
@@ -29,7 +25,7 @@ use ::constants::*;
 use ::error::SDError;
 
 pub fn generate_uuid() -> String {
-    let sync_uuid = Uuid::new_v4().simple().to_string();
+    let sync_uuid = ::uuid::Uuid::new_v4().simple().to_string();
 
     sync_uuid
 }
@@ -126,7 +122,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         evar = "HOME";
     }
     let m = format!("failed to get {} environment variable", evar);
-    let path = match env::var(evar) {
+    let path = match ::std::env::var(evar) {
         Ok(e) => e,
         Err(_) => { return Err(m) }
     };
