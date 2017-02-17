@@ -13,10 +13,10 @@ uuid = { version = "*", features = ["v4"] }
 serde = "^0.9"
 serde_json = "^0.9"
 serde_derive = "^0.9"
-env_logger = "*"
 log = "*"
 prettytable-rs = "*"
 chrono = "^0.3"
+simplelog = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"

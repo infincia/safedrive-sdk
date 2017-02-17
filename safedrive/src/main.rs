@@ -2,7 +2,9 @@
 extern crate alloc_system;
 
 #[macro_use] extern crate log;
-extern crate env_logger;
+extern crate simplelog;
+
+use ::simplelog::{Config, TermLogger};
 
 #[macro_use] extern crate prettytable;
 use prettytable::Table;
@@ -62,8 +64,6 @@ pub struct Credentials {
 
 
 fn main() {
-    env_logger::init().unwrap();
-
     #[cfg(target_os = "linux")]
     {
         match get_openssl_directory() {
@@ -120,10 +120,9 @@ fn main() {
             .help("sets a custom config file")
             .takes_value(true)
         )
-        .arg(Arg::with_name("verbose")
-            .short("v")
-            .multiple(true)
-            .help("sets the level of verbosity")
+        .arg(Arg::with_name("debug")
+            .short("d")
+            .help("debug logging")
         )
         .arg(Arg::with_name("production")
             .short("p")
@@ -245,6 +244,13 @@ fn main() {
         );
 
     let matches = app.get_matches();
+
+    let log_level = match matches.occurrences_of("debug") {
+        0 => ::log::LogLevelFilter::Warn,
+        1 | _ => ::log::LogLevelFilter::Debug,
+    };
+
+    let _ = TermLogger::init(log_level, Config::default()).unwrap();
 
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);

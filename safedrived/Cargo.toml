@@ -10,12 +10,12 @@ clap = "*"
 serde = "^0.9"
 serde_json = "^0.9"
 serde_derive = "^0.9"
-env_logger = "*"
 log = "*"
 prettytable-rs = "*"
 tokio-inotify = "*"
 futures = "*"
 tokio-core = "*"
+simplelog = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"
