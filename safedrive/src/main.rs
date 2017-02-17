@@ -270,7 +270,7 @@ fn main() {
 
     match channel {
         Channel::Nightly => {
-            println!("Warning: data synced using nightly version of SafeDrive may not restore properly on stable channel");
+            warn!("data synced using nightly version of SafeDrive may not restore properly on stable channel");
         },
         _ => {},
     }
