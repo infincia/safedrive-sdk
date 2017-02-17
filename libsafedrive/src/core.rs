@@ -54,6 +54,9 @@ pub use ::util::get_openssl_directory;
 #[cfg(target_os = "macos")]
 pub use ::util::unique_client_hash;
 
+pub use ::cache::clean_cache;
+pub use ::cache::clear_cache;
+
 #[cfg(feature = "keychain")]
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
     ::keychain::get_keychain_item(account, service)?
