@@ -488,7 +488,10 @@ impl SDDKSyncCleaningSchedule {
 pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                                   operating_system: *const std::os::raw::c_char,
                                   language_code: *const std::os::raw::c_char,
-                                  config: SDDKConfiguration) -> *mut SDDKState {
+                                  config: SDDKConfiguration,
+                                  local_storage_path: *const std::os::raw::c_char,
+                                  mut state: *mut *mut SDDKState,
+                                  mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
     let cvs: &CStr = unsafe {
         assert!(!client_version.is_null());
@@ -525,15 +528,44 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    initialize(&cv, &os, &langc, c);
+    let lstorage: &CStr = unsafe {
+        assert!(!local_storage_path.is_null());
+        CStr::from_ptr(local_storage_path)
+    };
 
-    let sstate = State::new();
-    let c_state = SDDKState(sstate);
+    let storage_directory: String = match lstorage.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
 
-    let b = Box::new(c_state);
-    let ptr = Box::into_raw(b);
+    let storage_path = Path::new(&storage_directory);
 
-    ptr
+    match initialize(&cv, &os, &langc, c, storage_path) {
+        Ok(()) => {
+
+            let sstate = State::new();
+            let c_state = SDDKState(sstate);
+
+            let b = Box::new(c_state);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *state = ptr;
+            }
+            0
+        },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        }
+    }
 }
 
 /// Login to SafeDrive, must be called before any other function that interacts with the SFTP server

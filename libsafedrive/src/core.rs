@@ -84,7 +84,7 @@ pub fn get_channel() -> Channel {
 
 /// internal functions
 
-pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration) {
+pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration, local_storage_path: &Path) -> Result<(), SDError> {
     let mut c = CONFIGURATION.write();
     *c = config;
 
@@ -100,31 +100,11 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
     let mut lc = LANGUAGE_CODE.write();
     *lc = language_code.to_string();
 
-    if !::sodiumoxide::init() == true {
-        panic!("sodium initialization failed, cannot continue");
-    }
-
-    let sodium_version = ::sodiumoxide::version::version_string();
-    debug!("libsodium {}", sodium_version);
-
-    #[cfg(target_os = "linux")]
-    let ssl_version = ::openssl::version::version();
-    #[cfg(target_os = "linux")]
-    debug!("{}", ssl_version);
-
-    debug!("ready");
-}
-
-pub fn login(unique_client_id: &str,
-             local_storage_path: &Path,
-             username: &str,
-             password:  &str) -> Result<(Token, AccountStatus), SDError> {
-
-
     if let Err(e) = fs::create_dir_all(local_storage_path) {
         debug!("failed to create local directories: {}", e);
         return Err(SDError::from(e))
     }
+
     let mut p = PathBuf::from(local_storage_path);
     p.push("cache");
 
@@ -138,6 +118,31 @@ pub fn login(unique_client_id: &str,
     }
     let mut cd = CACHE_DIR.write();
     *cd = cache_s;
+
+    if !::sodiumoxide::init() == true {
+        panic!("sodium initialization failed, cannot continue");
+    }
+
+    let sodium_version = ::sodiumoxide::version::version_string();
+    debug!("libsodium {}", sodium_version);
+
+    #[cfg(target_os = "linux")]
+    let ssl_version = ::openssl::version::version();
+    #[cfg(target_os = "linux")]
+    debug!("{}", ssl_version);
+
+    debug!("ready");
+
+    Ok(())
+}
+
+pub fn login(unique_client_id: &str,
+             local_storage_path: &Path,
+             username: &str,
+             password:  &str) -> Result<(Token, AccountStatus), SDError> {
+
+
+
 
     match ::util::set_unique_client_id(unique_client_id, local_storage_path) {
         Ok(()) => {},
