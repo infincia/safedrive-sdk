@@ -64,33 +64,6 @@ pub struct Credentials {
 
 
 fn main() {
-    #[cfg(target_os = "linux")]
-    {
-        match get_openssl_directory() {
-            Ok(ssldir) => {
-                debug!("Using openssl dir: {:?}", &ssldir);
-
-                let mut cert_dir = PathBuf::from(&ssldir);
-                cert_dir.push("certs");
-                let cert_dir_r: &OsStr = cert_dir.as_ref();
-
-                let mut cert_file = PathBuf::from(&ssldir);
-                cert_file.push("certs");
-                cert_file.push("ca-certificates.crt");
-                let cert_file_r: &OsStr = cert_file.as_ref();
-
-                env::set_var("SSL_CERT_DIR", cert_dir_r);
-
-                env::set_var("SSL_CERT_FILE", cert_file_r);
-
-            },
-            Err(_) => {
-                error!("Could not find openssl certificate store");
-                std::process::exit(1);
-            }
-        };
-    }
-
     let app = App::new(NAME)
         .version(VERSION)
         .about(COPYRIGHT)
@@ -251,6 +224,33 @@ fn main() {
     };
 
     let _ = TermLogger::init(log_level, Config::default()).unwrap();
+
+    #[cfg(target_os = "linux")]
+    {
+        match get_openssl_directory() {
+            Ok(ssldir) => {
+                debug!("Using openssl dir: {:?}", &ssldir);
+
+                let mut cert_dir = PathBuf::from(&ssldir);
+                cert_dir.push("certs");
+                let cert_dir_r: &OsStr = cert_dir.as_ref();
+
+                let mut cert_file = PathBuf::from(&ssldir);
+                cert_file.push("certs");
+                cert_file.push("ca-certificates.crt");
+                let cert_file_r: &OsStr = cert_file.as_ref();
+
+                env::set_var("SSL_CERT_DIR", cert_dir_r);
+
+                env::set_var("SSL_CERT_FILE", cert_file_r);
+
+            },
+            Err(_) => {
+                error!("Could not find openssl certificate store");
+                std::process::exit(1);
+            }
+        };
+    }
 
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
