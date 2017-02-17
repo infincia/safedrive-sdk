@@ -86,6 +86,25 @@ fn main() {
                 .required(false)
             )
         )
+        .subcommand(SubCommand::with_name("cache")
+            .about("clean the local cache")
+            .arg(Arg::with_name("clean")
+                .short("c")
+                .long("clean")
+                .help("clean up old cache items if cache is > 512MiB")
+                .required(true)
+                .conflicts_with("remove")
+
+            )
+            .arg(Arg::with_name("remove")
+                .short("r")
+                .long("remove")
+                .help("remove all cache items")
+                .required(true)
+                .conflicts_with("clean")
+
+            )
+        )
         .arg(Arg::with_name("config")
             .short("c")
             .long("config")
@@ -314,6 +333,28 @@ fn main() {
         };
 
         benchmark(version, p);
+
+    }  else if let Some(m) = matches.subcommand_matches("cache") {
+
+        let mut result = Ok(0);
+
+        if m.is_present("remove") {
+            result = ::safedrive::clear_cache();
+        } else if m.is_present("clean") {
+            result = ::safedrive::clean_cache(512_000_000);
+        }
+
+        match result {
+            Ok(deleted) => {
+                let deleted_size = ::safedrive::pretty_bytes(deleted as f64);
+
+                println!("cache cleaned: {}", deleted_size);
+            },
+            Err(e) => {
+                println!("cache cleaning error: {}", e);
+            }
+        }
+
 
     } else if let Some(m) = matches.subcommand_matches("add") {
 
