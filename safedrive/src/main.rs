@@ -283,7 +283,13 @@ fn main() {
 
     let operating_system = get_current_os();
 
-    initialize(&client_version, operating_system, "en_US", config);
+    match initialize(&client_version, operating_system, "en_US", config, &app_directory) {
+        Ok(()) => {},
+        Err(e) => {
+            error!("failed to initialize libsafedrive: {}", e);
+            std::process::exit(1);
+        }
+    }
 
     if let Some(m) = matches.subcommand_matches("bench") {
 
