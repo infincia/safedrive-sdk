@@ -188,7 +188,7 @@ public class SafeDriveSDK: NSObject {
         super.init()
     }
 
-    public func setUp(client_version: String, operating_system: String, language_code: String, config: SDKConfiguration) {
+    public func setUp(client_version: String, operating_system: String, language_code: String, config: SDKConfiguration, local_storage_path: String) throws {
         var sddk_config: SDDKConfiguration
         switch config {
         case .Production:
@@ -196,7 +196,22 @@ public class SafeDriveSDK: NSObject {
         case .Staging:
             sddk_config = SDDKConfigurationStaging
         }
-        self.state = sddk_initialize(client_version, operating_system, language_code, sddk_config)
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+        var state: OpaquePointer? = nil
+            
+        let res = sddk_initialize(client_version, operating_system, language_code, sddk_config, local_storage_path, &state, &error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        switch res {
+        case 0:
+            self.state = state
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
+        
     }
     
     deinit {
