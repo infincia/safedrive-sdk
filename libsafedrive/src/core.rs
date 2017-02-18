@@ -530,7 +530,7 @@ pub fn sync(token: &Token,
                 for block_result in block_generator.by_ref() {
                     let block = match block_result {
                         Ok(b) => b,
-                        Err(e) => {
+                        Err(_) => {
                             failed = failed +1; continue;
                         }
                     };
