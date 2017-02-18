@@ -111,7 +111,8 @@ fn main() {
         )
         .arg(Arg::with_name("debug")
             .short("d")
-            .help("debug logging")
+            .help("debug logging, use twice for trace logging")
+            .multiple(true)
         )
         .arg(Arg::with_name("production")
             .short("p")
@@ -236,7 +237,8 @@ fn main() {
 
     let log_level = match matches.occurrences_of("debug") {
         0 => ::log::LogLevelFilter::Warn,
-        1 | _ => ::log::LogLevelFilter::Debug,
+        1 => ::log::LogLevelFilter::Debug,
+        2 | _ => ::log::LogLevelFilter::Trace,
     };
 
     let _ = TermLogger::init(log_level, Config::default()).unwrap();
