@@ -237,6 +237,7 @@ pub enum SDDKErrorType {
     KeychainError = 0x0011,
     BlockUnreadable = 0x0012,
     SessionUnreadable = 0x0013,
+    ServiceUnavailable = 0x0014,
 }
 
 #[derive(Debug)]
@@ -305,6 +306,9 @@ impl From<SDError> for SDDKError {
             },
             SDError::ExceededRetries(_) => {
                 SDDKErrorType::ExceededRetries
+            },
+            SDError::ServiceUnavailable => {
+                SDDKErrorType::ServiceUnavailable
             },
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }

@@ -161,6 +161,7 @@ pub enum SDError {
     KeychainError(KeychainError),
     RequestFailure(Box<std::error::Error + Send + Sync>),
     NetworkFailure(Box<std::error::Error + Send + Sync>),
+    ServiceUnavailable,
     Conflict(SDAPIError),
     BlockMissing,
     SessionMissing,
@@ -185,6 +186,7 @@ impl std::error::Error for SDError {
             SDError::KeychainError(ref err) => err.description(),
             SDError::RequestFailure(ref err) => err.description(),
             SDError::NetworkFailure(ref err) => err.description(),
+            SDError::ServiceUnavailable => "service unavailable",
             SDError::Conflict(ref err) => err.description(),
             SDError::BlockMissing => "block file missing",
             SDError::SessionMissing => "session file missing",
@@ -210,6 +212,7 @@ impl std::error::Error for SDError {
             SDError::KeychainError(ref err) => Some(err),
             SDError::RequestFailure(ref err) => Some(&**err),
             SDError::NetworkFailure(ref err) => Some(&**err),
+            SDError::ServiceUnavailable => None,
             SDError::Conflict(ref err) => Some(err),
             SDError::BlockMissing => None,
             SDError::SessionMissing => None,
@@ -246,6 +249,9 @@ impl std::fmt::Display for SDError {
             },
             SDError::NetworkFailure(ref err) => {
                 write!(f, "Network unavailable: {}", err)
+            },
+            SDError::ServiceUnavailable => {
+                write!(f, "Service unavailable")
             },
             SDError::Conflict(ref err) => {
                 write!(f, "API parameter conflict: {}", err)
@@ -326,6 +332,7 @@ impl From<SDAPIError> for SDError {
             SDAPIError::IO(err) => SDError::IO(err),
             SDAPIError::RequestFailed(_) => SDError::RequestFailure(Box::new(e)),
             SDAPIError::NetworkFailure => SDError::NetworkFailure(Box::new(e)),
+            SDAPIError::ServiceUnavailable => SDError::ServiceUnavailable,
             SDAPIError::Authentication => SDError::Authentication,
             SDAPIError::BlockMissing => SDError::BlockMissing,
             SDAPIError::SessionMissing => SDError::SessionMissing,
@@ -344,6 +351,7 @@ pub enum SDAPIError {
     IO(std::io::Error),
     RequestFailed(Box<std::error::Error + Send + Sync>),
     NetworkFailure,
+    ServiceUnavailable,
     Authentication,
     RetryUpload,
     Conflict,
@@ -365,6 +373,9 @@ impl std::fmt::Display for SDAPIError {
             },
             SDAPIError::NetworkFailure => {
                 write!(f, "Network failure")
+            },
+            SDAPIError::ServiceUnavailable => {
+                write!(f, "SafeDrive unavailable")
             },
             SDAPIError::Authentication => {
                 write!(f, "API authentication failed")
@@ -392,6 +403,7 @@ impl std::error::Error for SDAPIError {
             SDAPIError::IO(ref err) => err.description(),
             SDAPIError::RequestFailed(ref err) => err.description(),
             SDAPIError::NetworkFailure => "network error",
+            SDAPIError::ServiceUnavailable => "service unavailable",
             SDAPIError::Authentication => "authentication failed",
             SDAPIError::RetryUpload => "retry upload",
             SDAPIError::Conflict => "api parameter conflict",
@@ -407,6 +419,7 @@ impl std::error::Error for SDAPIError {
             SDAPIError::IO(ref err) => Some(err),
             SDAPIError::RequestFailed(ref err) => Some(&**err),
             SDAPIError::NetworkFailure => None,
+            SDAPIError::ServiceUnavailable => None,
             SDAPIError::Authentication => None,
             SDAPIError::RetryUpload => None,
             SDAPIError::Conflict => None,
