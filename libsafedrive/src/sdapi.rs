@@ -234,6 +234,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -267,6 +268,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -302,6 +304,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -339,6 +342,7 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -375,6 +379,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -410,6 +415,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -446,6 +452,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -480,6 +487,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -515,6 +523,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -551,6 +560,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -590,6 +600,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -620,6 +631,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
@@ -656,6 +668,7 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -689,6 +702,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -726,6 +740,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -761,6 +776,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         &::reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
         &::reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
         &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -807,6 +823,7 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
         &::reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
         &::reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
         &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
@@ -837,6 +854,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
+        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
