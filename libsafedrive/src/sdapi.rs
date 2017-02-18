@@ -217,6 +217,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .json(&endpoint);
 
@@ -251,6 +252,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .json(&endpoint);
 
@@ -288,6 +290,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -327,6 +330,7 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -365,6 +369,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .json(&endpoint)
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -402,6 +407,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -440,6 +446,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .json(&endpoint)
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -476,6 +483,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -513,6 +521,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -550,6 +559,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -591,6 +601,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
         .body(body)
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()))
         .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
@@ -625,6 +636,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
     let client = ::reqwest::Client::new().unwrap();
 
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -665,6 +677,7 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -700,6 +713,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -739,6 +753,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
     let client = ::reqwest::Client::new().unwrap();
 
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
@@ -773,6 +788,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
 
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
@@ -814,6 +830,7 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
 
     let client = ::reqwest::Client::new().unwrap();
     let mut request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
@@ -862,6 +879,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
+        .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
