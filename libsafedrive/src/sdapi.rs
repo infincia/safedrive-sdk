@@ -227,7 +227,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -261,7 +261,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -298,7 +298,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -337,7 +337,7 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -375,7 +375,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -412,7 +412,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -450,7 +450,7 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -486,7 +486,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -523,7 +523,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -560,7 +560,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -584,7 +584,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     let (body, content_length) = multipart_for_bytes(session_data, name, true, true);
 
-    //debug!("body: {}", String::from_utf8_lossy(&body));
+    //trace!("body: {}", String::from_utf8_lossy(&body));
 
     let user_agent = &**USER_AGENT.read();
 
@@ -675,7 +675,7 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -710,7 +710,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -749,7 +749,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => Ok(true),
@@ -777,7 +777,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         .header(SDAuthToken(token.token.to_owned()));
     if should_upload {
         let (body, content_length) = multipart_for_bytes(&block.to_binary(), name, true, true);
-        //debug!("body: {}", String::from_utf8_lossy(&body));
+        //trace!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(body)
         .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
@@ -826,7 +826,7 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
             total_size += content_length;
             multipart_body.extend(body);
         }
-        //debug!("body: {}", String::from_utf8_lossy(&body));
+        //trace!("body: {}", String::from_utf8_lossy(&body));
 
         request = request.body(multipart_body)
             .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
@@ -840,7 +840,7 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
     trace!("reading response");
     try!(result.read_to_string(&mut response));
 
-    debug!("response: {}", response);
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => Ok(()),
