@@ -919,6 +919,16 @@ pub fn restore(token: &Token,
 
 
                         let mut wrapped_block: Option<WrappedBlock> = None;
+                        /// get block from cache if possible
+                        match ::cache::read_block(&block_hmac_hex) {
+                            Ok(br) => {
+                                should_retry = false;
+                                wrapped_block = Some(br);
+                                debug!("cache provided block: {}", &block_hmac_hex);
+                                break;
+                            },
+                            _ => {}
+                        };
 
                         while should_retry {
 
@@ -940,16 +950,6 @@ pub fn restore(token: &Token,
 
                                 thread::sleep(delay);
                             }
-
-                            /// get block from cache if possible
-                            match ::cache::read_block(&block_hmac_hex) {
-                                Ok(br) => {
-                                    wrapped_block = Some(br);
-                                    debug!("cache provided block: {}", &block_hmac_hex);
-                                    break;
-                                },
-                                _ => {}
-                            };
 
                             /// get block from the server
 
