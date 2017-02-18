@@ -73,7 +73,7 @@ impl<'a> APIEndpoint<'a> {
             },
             _ => {}
         }
-
+        trace!("constructed url request: {}", url);
         url
     }
 
@@ -220,10 +220,11 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
         .header(UserAgent(user_agent.to_string()))
         .json(&endpoint);
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -253,10 +254,11 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         .header(UserAgent(user_agent.to_string()))
         .json(&endpoint);
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -289,10 +291,11 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -327,10 +330,11 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -364,10 +368,11 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -400,10 +405,11 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -437,10 +443,11 @@ pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted:
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -472,10 +479,11 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -508,10 +516,11 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -544,10 +553,11 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -586,10 +596,11 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
         .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
         .header(ContentLength(content_length));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     match result.status() {
@@ -617,7 +628,9 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
+    trace!("response received");
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -635,10 +648,13 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 
         _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
     };
+
     let mut buffer = Vec::new();
 
+    trace!("reading data");
     try!(result.read_to_end(&mut buffer));
 
+    trace!("returning data");
     Ok(SyncSessionResponse { name: name, chunk_data: buffer, folder_id: folder_id })
 }
 
@@ -652,10 +668,11 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -686,10 +703,11 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -724,10 +742,11 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -764,11 +783,15 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
         .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
         .header(ContentLength(content_length));
     }
+
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
+
+    trace!("response: {}", response);
 
     match result.status() {
         &::reqwest::StatusCode::Ok => Ok(()),
@@ -809,10 +832,12 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
             .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
             .header(ContentLength(total_size));
     }
+
+    trace!("sending request");
     let mut result = try!(request.send());
-
+    trace!("response received");
     let mut response = String::new();
-
+    trace!("reading response");
     try!(result.read_to_string(&mut response));
 
     debug!("response: {}", response);
@@ -840,7 +865,9 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
+    trace!("sending request");
     let mut result = try!(request.send());
+    trace!("response received");
 
     match result.status() {
         &::reqwest::StatusCode::Ok => {},
@@ -861,8 +888,11 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
 
     let mut buffer = Vec::new();
 
+    trace!("reading data");
+
     try!(result.read_to_end(&mut buffer));
 
+    trace!("returning data");
 
     Ok(buffer)
 }
