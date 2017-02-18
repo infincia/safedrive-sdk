@@ -907,7 +907,7 @@ pub fn restore(token: &Token,
 
                 let stream_length = file_entry.header().size().unwrap();
 
-                debug!("entry has {} blocks", stream_length / 32);
+                trace!("entry has {} blocks", stream_length / 32);
                 
                 if stream_length > 0 {
                     let mut stream = BufWriter::new(f);
@@ -1043,17 +1043,17 @@ pub fn restore(token: &Token,
 
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
-                            debug!("write start {:?}", new_position);
+                            trace!("write start {:?}", new_position);
 
                         }
-                        debug!("writing block segment of {} bytes", block.len());
+                        trace!("writing block segment of {} bytes", block.len());
 
                         {
                             try!(stream.write_all(block.as_ref()));
                         }
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
-                            debug!("new position {:?}", new_position);
+                            trace!("new position {:?}", new_position);
 
                         }
                         trace!("Block write took {} seconds", block_write_time.elapsed().as_secs());
