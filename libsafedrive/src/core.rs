@@ -574,6 +574,8 @@ pub fn sync(token: &Token,
                     let mut retries_left = 15.0;
                     let mut should_upload = false;
 
+                    let block_write_start_time = ::std::time::Instant::now();
+
                     while should_retry {
                         /// allow caller to tick the progress display, if one exists
                         progress(estimated_size, processed_size, 0, percent_completed, false, "");
@@ -601,6 +603,8 @@ pub fn sync(token: &Token,
 
                         match write_block(&token, session_name, &block_name, &wrapped_block, should_upload) {
                             Ok(()) => {
+                                trace!("Block writing took {} seconds", block_write_start_time.elapsed().as_secs());
+
                                 skipped_blocks = skipped_blocks + 1;
                                 /// allow caller to tick the progress display, if one exists
                                 progress(estimated_size, processed_size, block_real_size as u64, percent_completed, false, "");
