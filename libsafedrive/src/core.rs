@@ -918,9 +918,9 @@ pub fn restore(token: &Token,
                     let block_hmac_list = match ::binformat::parse_hmacs(&block_hmac_bag) {
                         Done(_, o) => o,
                         Error(e) => {
-                            debug!("hmac bag parsing failed: {}", e);
+                            error!("hmac bag parsing failed: {}", e);
 
-                            return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+                            return Err(SDError::SessionUnreadable)
                         },
                         Incomplete(_) => panic!("should never happen")
                     };
