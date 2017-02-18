@@ -592,6 +592,8 @@ pub fn sync(token: &Token,
                             /// when we should have
                             let backoff_time = backoff_multiplier * (failed_count * failed_count);
                             let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+                            debug!("backing off for {:?}", delay);
+
                             thread::sleep(delay);
                         }
 
@@ -753,6 +755,8 @@ pub fn sync(token: &Token,
             /// back off significantly every time a call fails
             let backoff_time = backoff_multiplier * (failed_count * failed_count);
             let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            debug!("backing off for {:?}", delay);
+
             thread::sleep(delay);
         }
 
@@ -932,6 +936,8 @@ pub fn restore(token: &Token,
                                 /// when we should have
                                 let backoff_time = backoff_multiplier * (failed_count * failed_count);
                                 let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+                                debug!("backing off for {:?}", delay);
+
                                 thread::sleep(delay);
                             }
 
