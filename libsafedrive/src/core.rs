@@ -790,6 +790,8 @@ pub fn restore(token: &Token,
                destination: PathBuf,
                session_size: u64,
                progress: &mut FnMut(u64, u64, u64, f64, bool, &str)) -> Result<(), SDError> {
+    let restore_start_time = ::std::time::Instant::now();
+
     try!(fs::create_dir_all(&destination));
 
     let folder = match get_sync_folder(token, folder_id) {
@@ -809,25 +811,35 @@ pub fn restore(token: &Token,
         flock.unlock();
     });
 
+    let read_session_start_time = ::std::time::Instant::now();
+
     let session_body = match read_session(token, folder_id, session_name, true) {
         Ok(session_data) => session_data,
         Err(e) => return Err(SDError::from(e))
     };
+    trace!("Session reading took {} seconds", read_session_start_time.elapsed().as_secs());
 
 
     debug!("restoring session for: {} (folder id {})", folder_name, folder_id);
 
 
+    let session_processing_start_time = ::std::time::Instant::now();
 
     let w_session = match WrappedSyncSession::from(session_body) {
         Ok(ws) => ws,
         Err(e) => return Err(e),
     };
+    trace!("Session processing took {} seconds", session_processing_start_time.elapsed().as_secs());
+
+
+    let session_unwrap_start_time = ::std::time::Instant::now();
 
     let session = match w_session.to_session(main_key) {
         Ok(s) => s,
         Err(e) => return Err(e),
     };
+
+    trace!("Session unwrapping took {} seconds", session_unwrap_start_time.elapsed().as_secs());
 
     let mut processed_size: u64 = 0;
 
@@ -835,7 +847,11 @@ pub fn restore(token: &Token,
 
     let mut failed = 0;
 
+    let archive_reading_start_time = ::std::time::Instant::now();
+
     for item in ar.entries().unwrap() {
+        let restore_item_start_time = ::std::time::Instant::now();
+
         let percent_completed: f64 = (processed_size as f64 / session_size as f64) * 100.0;
 
 
@@ -907,6 +923,7 @@ pub fn restore(token: &Token,
 
 
                     for block_hmac in block_hmac_list.iter() {
+                        let block_start_time = ::std::time::Instant::now();
 
                         /// allow caller to tick the progress display, if one exists
                         progress(session_size, processed_size, 0, percent_completed, true, "");
@@ -919,6 +936,8 @@ pub fn restore(token: &Token,
 
 
                         let mut wrapped_block: Option<WrappedBlock> = None;
+                        let block_read_start_time = ::std::time::Instant::now();
+
                         /// get block from cache if possible
                         match ::cache::read_block(&block_hmac_hex) {
                             Ok(br) => {
@@ -955,11 +974,15 @@ pub fn restore(token: &Token,
 
                             match ::sdapi::read_block(&token, &block_hmac_hex) {
                                 Ok(rb) => {
+                                    trace!("Block read took {} seconds", block_read_start_time.elapsed().as_secs());
+
                                     /// allow caller to tick the progress display, if one exists
                                     progress(session_size, processed_size, 0, percent_completed, false, "");
 
                                     should_retry = false;
                                     debug!("server provided block: {}", &block_hmac_hex);
+                                    let block_processing_start_time = ::std::time::Instant::now();
+
                                     let wb = match WrappedBlock::from(rb, (&block_hmac_hex).from_hex().unwrap()) {
                                         Ok(wb) => wb,
                                         Err(e) => {
@@ -968,11 +991,17 @@ pub fn restore(token: &Token,
                                             return Err(e)
                                         },
                                     };
+                                    trace!("Block processing took {} seconds", block_processing_start_time.elapsed().as_secs());
+
                                     debug!("block processed: {}", &block_hmac_hex);
+
+                                    let block_cache_write_time = ::std::time::Instant::now();
 
                                     match ::cache::write_block(&wb) {
                                         _ => {}
                                     };
+                                    trace!("Block write to cache took {} seconds", block_cache_write_time.elapsed().as_secs());
+
                                     wrapped_block = Some(wb);
                                 },
                                 Err(SDAPIError::Authentication) => {
@@ -991,15 +1020,22 @@ pub fn restore(token: &Token,
                                 },
                                 _ => {}
                             };
+
+
                         }
 
                         let wrapped_block_s = wrapped_block.unwrap();
+                        let block_unwrap_time = ::std::time::Instant::now();
 
                         let block = match wrapped_block_s.to_block(main_key) {
                             Ok(b) => b,
                             Err(e) => return Err(e),
                         };
+                        trace!("Block unwrapping took {} seconds", block_unwrap_time.elapsed().as_secs());
+
                         debug!("block unwrapped");
+
+                        let block_write_time = ::std::time::Instant::now();
 
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
@@ -1016,6 +1052,9 @@ pub fn restore(token: &Token,
                             debug!("new position {:?}", new_position);
 
                         }
+                        trace!("Block write took {} seconds", block_write_time.elapsed().as_secs());
+
+                        trace!("Block total handling time took {} seconds", block_start_time.elapsed().as_secs());
 
                         processed_size += block.len() as u64;
                         progress(session_size, processed_size, block.len() as u64, percent_completed, false, "");
@@ -1147,7 +1186,12 @@ pub fn restore(token: &Token,
 
             },
         }
+
+        trace!("Restore item total handling time took {} seconds", restore_item_start_time.elapsed().as_secs());
     }
+    trace!("Archive read total time took {} seconds", archive_reading_start_time.elapsed().as_secs());
+
+    trace!("Restore total time took {} seconds", restore_start_time.elapsed().as_secs());
 
     debug!("restoring session finished");
 
