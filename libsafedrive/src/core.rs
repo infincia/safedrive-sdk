@@ -620,6 +620,9 @@ pub fn sync(token: &Token,
                                 }
                                 should_upload = true;
                             },
+                            Err(SDAPIError::Authentication) => {
+                                return Err(SDError::Authentication)
+                            },
                             _ => {}
                         }
                     }
@@ -756,6 +759,9 @@ pub fn sync(token: &Token,
         match finish_sync_session(&token, folder_id, session_name, true, &binary_data, processed_size as usize) {
             Ok(()) => {
                 should_retry = false;
+            },
+            Err(SDAPIError::Authentication) => {
+                return Err(SDError::Authentication)
             },
             Err(e) => {
                 retries_left = retries_left - 1.0;
@@ -962,6 +968,9 @@ pub fn restore(token: &Token,
                                         _ => {}
                                     };
                                     wrapped_block = Some(wb);
+                                },
+                                Err(SDAPIError::Authentication) => {
+                                    return Err(SDError::Authentication)
                                 },
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
