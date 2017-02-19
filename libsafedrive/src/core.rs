@@ -948,7 +948,6 @@ pub fn restore(token: &Token,
                                 should_retry = false;
                                 wrapped_block = Some(br);
                                 debug!("cache provided block: {}", &block_hmac_hex);
-                                break;
                             },
                             _ => {}
                         };
