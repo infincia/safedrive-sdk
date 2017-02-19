@@ -635,8 +635,8 @@ pub fn sync_all(token: Token, keyset: Keyset) {
 
     mb.println("Syncing all folders");
 
-    for folder in encrypted_folders {
-        let mut pb = mb.create_bar(0);
+    for (index, folder) in encrypted_folders.into_iter().enumerate() {
+        let mut pb = mb.create_bar(index as u64);
 
         let message = format!("{}: ", folder.folderName);
         pb.message(&message);
