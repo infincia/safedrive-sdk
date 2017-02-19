@@ -497,6 +497,9 @@ pub fn sync(token: &Token,
         progress(estimated_size, processed_size, 0, percent_completed, false);
 
         let full_path = item.path();
+        if &full_path == &folder_path {
+            continue; // don't bother doing anything more for the root directory of the folder
+        }
         let relative_path = full_path.strip_prefix(&folder_path).expect("failed to unwrap relative path");
 
         let md = match ::std::fs::symlink_metadata(&full_path) {
