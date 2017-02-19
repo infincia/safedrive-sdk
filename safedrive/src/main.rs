@@ -736,6 +736,11 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                    }
                },
                &mut |message| {
+                   let mut pb = pbt.lock().unwrap();
+
+                   let message = format!("{}: {}", &folder.folderName, message);
+
+                   pb.message_print(&message);
                }
     ) {
         Ok(_) => {
@@ -832,6 +837,11 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                       }
                   },
                   &mut |message| {
+                      let mut pb = pbt.lock().unwrap();
+
+                      let message = format!("{}: {}", &folder.folderName, message);
+
+                      pb.message_print(&message);
                   }
     ) {
         Ok(_) => {
