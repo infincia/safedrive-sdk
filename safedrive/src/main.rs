@@ -829,6 +829,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   session.size.unwrap(),
                   &mut |total, _, new, _, tick| {
                       let mut pb = pbt.lock().unwrap();
+
                       if tick {
                           pb.tick();
                       } else {
