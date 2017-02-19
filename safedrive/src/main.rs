@@ -640,6 +640,8 @@ pub fn sync_all(token: Token, keyset: Keyset) {
 
         pb.format("╢▌▌░╟");
         pb.set_units(Units::Bytes);
+        let message = format!("{}: ", &folder.folderName);
+        pb.message(&message);
         let sync_uuid = Uuid::new_v4().hyphenated().to_string();
         let local_token = token.clone();
         let local_main = keyset.main.clone();
@@ -655,13 +657,6 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                        &local_tweak,
                        folder.id,
                        &mut |total, _, new, _, tick, message| {
-                           if message.len() > 0 {
-                               let message = format!("{}: stalled", local_folder_name);
-                               pb.message(&message);
-                           } else {
-                               let message = format!("{}: ", local_folder_name);
-                               pb.message(&message);
-                           }
                            if tick {
                                pb.tick();
                            } else {
@@ -701,6 +696,8 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
     let mut pb = ProgressBar::new(0);
     pb.format("╢▌▌░╟");
     pb.set_units(Units::Bytes);
+    let message = format!("{}: ", &folder.folderName);
+    pb.message(&message);
 
     let sync_uuid = Uuid::new_v4().hyphenated().to_string();
 
@@ -711,10 +708,6 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                &keyset.tweak,
                folder.id,
                &mut |total, _, new, _, tick, message| {
-                   if message.len() > 0 {
-                       let message = format!("{}: stalled", &folder.folderName);
-                       pb.message(&message);
-                   }
                    if tick {
                        pb.tick();
                    } else {
@@ -790,6 +783,8 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
     let mut pb = ProgressBar::new(0);
     pb.format("╢▌▌░╟");
     pb.set_units(Units::Bytes);
+    let message = format!("{}: ", &folder.folderName);
+    pb.message(&message);
 
     match restore(&token,
                   &session.name,
@@ -798,10 +793,6 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   path,
                   session.size.unwrap(),
                   &mut |total, _, new, _, tick, message| {
-                      if message.len() > 0 {
-                          let message = format!("{}: stalled", &folder.folderName);
-                          pb.message(&message);
-                      }
                       if tick {
                           pb.tick();
                       } else {
