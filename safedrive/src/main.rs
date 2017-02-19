@@ -741,6 +741,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                    let message = format!("{}: {}", &folder.folderName, message);
 
                    pb.message_print(&message);
+                   //pb.log(::log::LogLevel::Warn, &message);
                }
     ) {
         Ok(_) => {
@@ -843,6 +844,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                       let message = format!("{}: {}", &folder.folderName, message);
 
                       pb.message_print(&message);
+                      //pb.log(::log::LogLevel::Warn, &message);
                   }
     ) {
         Ok(_) => {
