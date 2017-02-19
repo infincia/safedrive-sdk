@@ -656,13 +656,15 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                        &local_hmac,
                        &local_tweak,
                        folder.id,
-                       &mut |total, _, new, _, tick, message| {
+                       &mut |total, _, new, _, tick| {
                            if tick {
                                pb.tick();
                            } else {
                                pb.total = total as u64;
                                pb.add(new as u64);
                            }
+                       },
+                       &mut |message| {
                        }
             ) {
                 Ok(_) => {
@@ -707,13 +709,15 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                &keyset.hmac,
                &keyset.tweak,
                folder.id,
-               &mut |total, _, new, _, tick, message| {
+               &mut |total, _, new, _, tick| {
                    if tick {
                        pb.tick();
                    } else {
                        pb.total = total as u64;
                        pb.add(new as u64);
                    }
+               },
+               &mut |message| {
                }
     ) {
         Ok(_) => {
@@ -799,6 +803,8 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                           pb.total = total as u64;
                           pb.add(new as u64);
                       }
+                  },
+                  &mut |message| {
                   }
     ) {
         Ok(_) => {
