@@ -669,11 +669,11 @@ pub fn sync_all(token: Token, keyset: Keyset) {
             ) {
                 Ok(_) => {
                     let message = format!("{}: finished", local_folder_name);
-                    pb.finish_println(&message);
+                    pb.finish_print(&message);
                 },
                 Err(e) => {
                     let message = format!("{}: sync failed: {}", local_folder_name, e);
-                    pb.finish_println(&message);
+                    pb.finish_print(&message);
                 }
             }
         });
@@ -722,11 +722,11 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
     ) {
         Ok(_) => {
             let message = format!("{}: finished", &folder.folderName);
-            pb.finish_println(&message);
+            pb.finish_print(&message);
         },
         Err(e) => {
             let message = format!("{}: sync failed: {}", &folder.folderName, e);
-            pb.finish_println(&message);
+            pb.finish_print(&message);
             std::process::exit(1);
         }
     }
@@ -809,11 +809,11 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
     ) {
         Ok(_) => {
             let message = format!("{}: finished", &folder.folderName);
-            pb.finish_println(&message);
+            pb.finish_print(&message);
         },
         Err(e) => {
             let message = format!("{}: restore failed: {}", &folder.folderName, e);
-            pb.finish_println(&message);
+            pb.finish_print(&message);
             std::process::exit(1);
         }
     }
