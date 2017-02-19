@@ -531,11 +531,14 @@ pub fn sync(token: &Token,
 
                 let mut item_padding: u64 = 0;
 
+                let mut block_failed = false;
+
                 for block_result in block_generator.by_ref() {
                     let block = match block_result {
                         Ok(b) => b,
                         Err(_) => {
-                            failed = failed +1; continue;
+                            block_failed = true;
+                            break;
                         }
                     };
 
@@ -636,6 +639,13 @@ pub fn sync(token: &Token,
                             _ => {}
                         }
                     }
+                }
+
+                if block_failed {
+                    issue(&format!("not able to sync file {}: could not read from file", full_path.display()));
+
+                    failed = failed +1;
+                    continue;
                 }
 
                 processed_size_padding += item_padding;
