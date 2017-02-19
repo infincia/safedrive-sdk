@@ -1166,33 +1166,6 @@ pub fn restore(token: &Token,
 
 
             },
-            EntryType::Char => {
-
-            },
-            EntryType::Block => {
-
-            },
-            EntryType::Fifo => {
-
-            },
-            EntryType::Continuous => {
-
-            },
-            EntryType::GNULongLink => {
-
-            },
-            EntryType::GNULongName => {
-
-            },
-            EntryType::GNUSparse => {
-
-            },
-            EntryType::XGlobalHeader => {
-
-            },
-            EntryType::XHeader => {
-
-            },
             _ => {
                 issue(&format!("not able to restore {:?} file {}: unsupported file type", entry_type, full_path.display()));
             },
