@@ -2,32 +2,26 @@ environment:
   global:
     PROJECT_NAME: safedrive-sdk
   matrix:
-    # Stable channel
-    #- TARGET: i686-pc-windows-msvc
-    #  CHANNEL: stable
-    #  ARCH: x86
-    #  VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
-    #  TOOLSET: v120
-    #  ESCRIPT: v120_xp.bat
-    #- TARGET: i686-pc-windows-msvc
-    #  CHANNEL: beta
-    #  ARCH: x86
-    #  VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
-    #  TOOLSET: v120
-    #  ESCRIPT: v120_xp.bat
-    #- TARGET: i686-pc-windows-msvc
-    #  CHANNEL: nightly
-    #  ARCH: x86
-    #  VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
-    #  TOOLSET: v120
-    #  ESCRIPT: v120_xp.bat
-    #  LINKTYPE: mt
+    - TARGET: i686-pc-windows-msvc
+      CHANNEL: beta
+      ARCH: x86
+      VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
+      TOOLSET: v120
+      ESCRIPT: v120_xp.bat
+      LINKTYPE: dll
     - TARGET: i686-pc-windows-msvc
       CHANNEL: nightly
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
       ESCRIPT: v120_xp.bat
+      LINKTYPE: dll
+    - TARGET: x86_64-pc-windows-msvc
+      CHANNEL: beta
+      ARCH: x64
+      VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
+      TOOLSET: v120
+      ESCRIPT: v120_xp64.bat
       LINKTYPE: dll
     - TARGET: x86_64-pc-windows-msvc
       CHANNEL: nightly
@@ -85,7 +79,7 @@ deploy:
     # channel to use to produce the release artifacts
     # NOTE make sure you only release *once* per target
     # TODO you may want to pick a different channel
-    CHANNEL: nightly
+    CHANNEL: beta
     appveyor_repo_tag: true
 
 branches:
