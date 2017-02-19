@@ -174,7 +174,9 @@ func SDDKAccountDetailsToAccountDetails(account_details: SDDKAccountDetails) -> 
 public typealias SDKSuccess = () -> Void
 public typealias SDKFailure = (_ error: SDKError) -> Void
 
-public typealias SyncSessionProgress = @convention(block) (_ total: UInt64, _ current: UInt64, _ new: UInt64,  _ percent: Double, _ message: String) -> Void
+public typealias SyncSessionProgress = @convention(block) (_ total: UInt64, _ current: UInt64, _ new: UInt64,  _ percent: Double) -> Void
+
+public typealias SyncSessionIssue = @convention(block) (_ message: String) -> Void
 
 public typealias SaveRecoveryPhrase = @convention(block) (_ phrase: String) -> Void
 
@@ -526,17 +528,26 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, issue: @escaping SyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
             var error: UnsafeMutablePointer<SDDKError>? = nil
 
-            let res = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, { (context, total, current, new, percent, tick, message) in
+            let res = sddk_sync(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self),
+                                unsafeBitCast(issue, to: UnsafeMutableRawPointer.self),
+                                self.state!,
+                                &error,
+                                sessionName,
+                                folderID,
+                                { (context, context2, total, current, new, percent, tick) in
                 // call back to Swift to report progress
+                let b = unsafeBitCast(context, to: SyncSessionProgress.self)
+                b(total, current, new, percent)
+            }, { (context, context2, message) in
                 let m = String(cString: message!)
 
-                let b = unsafeBitCast(context, to: SyncSessionProgress.self)
-                b(total, current, new, percent, m)
+                let b = unsafeBitCast(context2, to: SyncSessionIssue.self)
+                b(m)
             })
             defer {
                 if res == -1 {
@@ -554,18 +565,29 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, sessionSize: UInt64, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, sessionSize: UInt64, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, issue: @escaping SyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
         
             var error: UnsafeMutablePointer<SDDKError>? = nil
 
-            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self), self.state!, &error, sessionName, folderID, destination.path, sessionSize, { (context, total, current, new, percent, tick, message) in
+            let res = sddk_restore(unsafeBitCast(progress, to: UnsafeMutableRawPointer.self),
+                                   unsafeBitCast(issue, to: UnsafeMutableRawPointer.self),
+                                   self.state!,
+                                   &error,
+                                   sessionName,
+                                   folderID,
+                                   destination.path,
+                                   sessionSize,
+                                   { (context, context2, total, current, new, percent, tick) in
                 // call back to Swift to report progress
-                let m = String(cString: message!)
-                
                 let b = unsafeBitCast(context, to: SyncSessionProgress.self)
-                b(total, current, new, percent, m)
+                b(total, current, new, percent)
+            }, { (context, context2, message) in
+                let m = String(cString: message!)
+
+                let b = unsafeBitCast(context2, to: SyncSessionIssue.self)
+                b(m)
             })
             defer {
                 if res == -1 {
