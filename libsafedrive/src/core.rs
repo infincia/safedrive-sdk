@@ -467,15 +467,15 @@ pub fn sync(token: &Token,
     let mut estimated_size: u64 = 0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
-        let p = item.path();
+        let item_path = item.path();
 
-        let md = match ::std::fs::symlink_metadata(&p) {
+        let md = match ::std::fs::symlink_metadata(&item_path) {
             Ok(m) => m,
             Err(_) => { continue },
         };
 
         let stream_length = md.len();
-        debug!("estimating size of {}... OK, {}", item.path().display(), stream_length);
+        debug!("estimating size of {}... OK, {}", item_path.display(), stream_length);
 
         estimated_size = estimated_size + stream_length;
     }
@@ -492,10 +492,10 @@ pub fn sync(token: &Token,
         /// call out to the library user with progress
         progress(estimated_size, processed_size, 0, percent_completed, false, "");
 
-        let p = item.path();
-        let p_relative = p.strip_prefix(&folder_path).expect("failed to unwrap relative path");
+        let full_path = item.path();
+        let relative_path = full_path.strip_prefix(&folder_path).expect("failed to unwrap relative path");
 
-        let md = match ::std::fs::symlink_metadata(&p) {
+        let md = match ::std::fs::symlink_metadata(&full_path) {
             Ok(m) => m,
             Err(_) => { failed = failed +1; continue },
         };
@@ -507,8 +507,7 @@ pub fn sync(token: &Token,
 
         /// store metadata for directory or file
         let mut header = Header::new_gnu();
-        if let Err(err) = header.set_path(p_relative) {
-            debug!("not adding invalid path: '{}' (reason: {})", p_relative.display(), err);
+        if let Err(e) = header.set_path(relative_path) {
 
             failed + failed + 1;
             continue // we don't care about errors here, they'll only happen for truly invalid paths
@@ -521,7 +520,7 @@ pub fn sync(token: &Token,
         if is_file {
             if stream_length > 0 {
 
-                let mut block_generator = ::chunk::BlockGenerator::new(&p, main_key, hmac_key, tweak_key, stream_length, SYNC_VERSION);
+                let mut block_generator = ::chunk::BlockGenerator::new(&full_path, main_key, hmac_key, tweak_key, stream_length, SYNC_VERSION);
 
                 let mut skipped_blocks = 0;
 
@@ -677,7 +676,7 @@ pub fn sync(token: &Token,
             /// symlink
 
             /// get the src
-            match ::std::fs::read_link(&p) {
+            match ::std::fs::read_link(&full_path) {
                 Ok(path) => {
                     match  header.set_link_name(path) {
                         Ok(()) => {
@@ -869,13 +868,13 @@ pub fn restore(token: &Token,
             }
         };
 
-        let mut full_p = PathBuf::from(&destination);
+        let mut full_path = PathBuf::from(&destination);
 
         match file_entry.path() {
-            Ok(ref p) => {
-                debug!("examining {}", &p.display());
+            Ok(ref entry_path) => {
+                debug!("examining {}", &entry_path.display());
 
-                full_p.push(p);
+                full_path.push(entry_path);
             }
             Err(e) => {
                 debug!("not restoring invalid path: {}", e);
@@ -896,7 +895,7 @@ pub fn restore(token: &Token,
         /// process if not a directory or socket
         match entry_type {
             EntryType::Regular => {
-                let f = match File::create(&full_p) {
+                let f = match File::create(&full_path) {
                     Ok(file) => file,
                     Err(err) => {
                         debug!("not able to create file at path: {})", err);
@@ -1070,7 +1069,7 @@ pub fn restore(token: &Token,
                 }
             },
             EntryType::Directory => {
-                try!(fs::create_dir_all(&full_p));
+                try!(fs::create_dir_all(&full_path));
             },
             EntryType::Link => {
                 let src = match file_entry.link_name() {
@@ -1090,7 +1089,7 @@ pub fn restore(token: &Token,
                 };
 
 
-                match ::std::fs::hard_link(&src, full_p) {
+                match ::std::fs::hard_link(&src, &full_path) {
                     Ok(()) => {},
                     Err(e) => {
                         error!("failed to restore hard link: {})", e);
@@ -1121,7 +1120,7 @@ pub fn restore(token: &Token,
                 }
 
                 #[cfg(unix)]
-                match ::std::os::unix::fs::symlink(&src, full_p) {
+                match ::std::os::unix::fs::symlink(&src, &full_path) {
                     Ok(()) => {},
                     Err(e) => {
                         error!("failed to restore symlink: {})", e);
@@ -1140,14 +1139,14 @@ pub fn restore(token: &Token,
                     let is_dir = md.file_type().is_dir();
                     
                     if is_dir {
-                        match ::std::os::windows::fs::symlink_dir(&src, full_p) {
+                        match ::std::os::windows::fs::symlink_dir(&src, full_path) {
                             Ok(()) => {},
                             Err(e) => {
                                 error!("failed to restore directory symlink: {})", e);
                             },
                         }
                     } else {
-                        match ::std::os::windows::fs::symlink_file(&src, full_p) {
+                        match ::std::os::windows::fs::symlink_file(&src, full_path) {
                             Ok(()) => {},
                             Err(e) => {
                                 error!("failed to restore file symlink: {})", e);
