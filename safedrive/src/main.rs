@@ -717,6 +717,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
     pb.message(&message);
 
     let sync_uuid = Uuid::new_v4().hyphenated().to_string();
+    let pbt = ::std::sync::Mutex::new(pb);
 
     match sync(&token,
                &sync_uuid,
@@ -725,6 +726,8 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                &keyset.tweak,
                folder.id,
                &mut |total, _, new, _, tick| {
+                   let mut pb = pbt.lock().unwrap();
+
                    if tick {
                        pb.tick();
                    } else {
@@ -736,10 +739,14 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                }
     ) {
         Ok(_) => {
+            let mut pb = pbt.lock().unwrap();
+
             let message = format!("{}: finished", &folder.folderName);
             pb.finish_print(&message);
         },
         Err(e) => {
+            let mut pb = pbt.lock().unwrap();
+
             let message = format!("{}: sync failed: {}", &folder.folderName, e);
             pb.finish_print(&message);
             std::process::exit(1);
@@ -807,6 +814,8 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
     let message = format!("{}: ", &folder.folderName);
     pb.message(&message);
 
+    let pbt = ::std::sync::Mutex::new(pb);
+
     match restore(&token,
                   &session.name,
                   &keyset.main,
@@ -814,6 +823,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   path,
                   session.size.unwrap(),
                   &mut |total, _, new, _, tick, message| {
+                      let mut pb = pbt.lock().unwrap();
                       if tick {
                           pb.tick();
                       } else {
@@ -825,10 +835,14 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   }
     ) {
         Ok(_) => {
+            let mut pb = pbt.lock().unwrap();
+
             let message = format!("{}: finished", &folder.folderName);
             pb.finish_print(&message);
         },
         Err(e) => {
+            let mut pb = pbt.lock().unwrap();
+
             let message = format!("{}: restore failed: {}", &folder.folderName, e);
             pb.finish_print(&message);
             std::process::exit(1);
