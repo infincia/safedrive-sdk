@@ -472,7 +472,10 @@ pub fn sync(token: &Token,
 
         let md = match ::std::fs::symlink_metadata(&item_path) {
             Ok(m) => m,
-            Err(_) => { continue },
+            Err(e) => {
+                issue(&format!("not able to sync file {}: {}", item_path.display(), e));
+                continue
+            },
         };
 
         let stream_length = md.len();
@@ -509,6 +512,7 @@ pub fn sync(token: &Token,
         /// store metadata for directory or file
         let mut header = Header::new_gnu();
         if let Err(e) = header.set_path(relative_path) {
+            issue(&format!("not able to sync file {}: {}", relative_path.display(), e));
 
             failed + failed + 1;
             continue // we don't care about errors here, they'll only happen for truly invalid paths
@@ -615,7 +619,7 @@ pub fn sync(token: &Token,
 
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
-                                    /// TODO: pass better error info up the call chain here rather than a failure
+                                    issue(&format!("not able to sync file {}: too many retries ({})", full_path.display(), err));
                                     return Err(SDError::ExceededRetries(15))
                                 }
                             },
@@ -684,12 +688,12 @@ pub fn sync(token: &Token,
 
                         },
                         Err(e) => {
-                            error!("failed to set symlink: {}", e);
+                            issue(&format!("failed to set symlink for {}: {}", full_path.display(), e));
                         }
                     };
                 },
                 Err(e) => {
-                    error!("failed to set symlink: {}", e);
+                    issue(&format!("failed to set symlink for {}: {}", full_path.display(), e));
                 }
             };
 
@@ -774,6 +778,7 @@ pub fn sync(token: &Token,
             Err(e) => {
                 retries_left = retries_left - 1.0;
                 if retries_left <= 0.0 {
+                    issue(&format!("not able to finish sync: too many retries ({})", e));
                     return Err(SDError::ExceededRetries(15));
                 }
             }
@@ -863,8 +868,7 @@ pub fn restore(token: &Token,
         let mut file_entry = match item {
             Ok(e) => e,
             Err(e) => {
-                debug!("not restoring invalid session entry: {})", e);
-
+                issue(&format!("not able to restore session entry: {}", e));
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
             }
@@ -900,7 +904,8 @@ pub fn restore(token: &Token,
                 let f = match File::create(&full_path) {
                     Ok(file) => file,
                     Err(err) => {
-                        debug!("not able to create file at path: {})", err);
+                        issue(&format!("not able to create file at {}: {}", full_path.display(), err));
+
                         failed = failed +1;
                         continue
                     },
@@ -1018,7 +1023,8 @@ pub fn restore(token: &Token,
 
 
                                     if retries_left <= 0.0 {
-                                        /// TODO: pass better error info up the call chain here rather than a failure
+                                        issue(&format!("not able to retrieve part of {}: {}", full_path.display(), err.description()));
+
                                         return Err(SDError::RequestFailure(err))
                                     }
                                 },
@@ -1079,13 +1085,13 @@ pub fn restore(token: &Token,
                         match op {
                             Some(pa) => pa,
                             None => {
-                                debug!("not restoring invalid hard link: no link name found");
+                                issue(&format!("not able to restore hard link {}: no link destination found", full_path.display()));
                                 continue;
                             },
                         }
                     },
                     Err(e) => {
-                        debug!("not restoring invalid hard link: {})", e);
+                        issue(&format!("not able to restore hard link {}: {}", full_path.display(), e));
                         continue;
                     }
                 };
@@ -1094,7 +1100,7 @@ pub fn restore(token: &Token,
                 match ::std::fs::hard_link(&src, &full_path) {
                     Ok(()) => {},
                     Err(e) => {
-                        error!("failed to restore hard link: {})", e);
+                        issue(&format!("not able to restore hard link {}: {}", full_path.display(), e));
                     },
                 }
 
@@ -1105,19 +1111,19 @@ pub fn restore(token: &Token,
                         match op {
                             Some(pa) => pa,
                             None => {
-                                debug!("not restoring invalid symlink: no link name found");
+                                issue(&format!("not able to restore symlink {}: no link destination found", full_path.display()));
                                 continue;
                             },
                         }
                     },
                     Err(e) => {
-                        debug!("not restoring invalid symlink: {})", e);
+                        issue(&format!("not able to restore symlink {}: {}", full_path.display(), e));
                         continue;
                     }
                 };
 
                 if src.iter().count() == 0 {
-                    debug!("not restoring invalid symlink: destination not found");
+                    issue(&format!("not able to restore symlink {}: no link destination found", full_path.display()));
                     continue;
                 }
 
@@ -1125,7 +1131,8 @@ pub fn restore(token: &Token,
                 match ::std::os::unix::fs::symlink(&src, &full_path) {
                     Ok(()) => {},
                     Err(e) => {
-                        error!("failed to restore symlink: {})", e);
+                        issue(&format!("not able to restore symlink {}: {}", full_path.display(), e));
+
                     },
                 }
 
@@ -1133,7 +1140,7 @@ pub fn restore(token: &Token,
                     let md = match ::std::fs::metadata(&src) {
                         Ok(m) => m,
                         Err(e) => {
-                            debug!("not restoring symlink: {})", e);
+                            issue(&format!("not able to restore symlink {}: {}", full_path.display(), e));
                             continue
                         },
                     };
@@ -1144,14 +1151,14 @@ pub fn restore(token: &Token,
                         match ::std::os::windows::fs::symlink_dir(&src, full_path) {
                             Ok(()) => {},
                             Err(e) => {
-                                error!("failed to restore directory symlink: {})", e);
+                                issue(&format!("not able to restore directory symlink {}: {}", full_path.display(), e));
                             },
                         }
                     } else {
                         match ::std::os::windows::fs::symlink_file(&src, full_path) {
                             Ok(()) => {},
                             Err(e) => {
-                                error!("failed to restore file symlink: {})", e);
+                                issue(&format!("not able to restore file symlink {}: {}", full_path.display(), e));
                             },
                         }
                     }
@@ -1187,7 +1194,7 @@ pub fn restore(token: &Token,
 
             },
             _ => {
-
+                issue(&format!("not able to restore {:?} file {}: unsupported file type", entry_type, full_path.display()));
             },
         }
 
