@@ -425,7 +425,8 @@ pub fn sync(token: &Token,
             hmac_key: &Key,
             tweak_key: &Key,
             folder_id: u64,
-            progress: &mut FnMut(u64, u64, u64, f64, bool, &str)) -> Result<(), SDError> {
+            progress: &mut FnMut(u64, u64, u64, f64, bool),
+            issue: &mut FnMut(&str)) -> Result<(), SDError> {
     debug!("creating version {} sync session", SYNC_VERSION);
 
     let folder = match get_sync_folder(token, folder_id) {
@@ -490,7 +491,7 @@ pub fn sync(token: &Token,
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
         /// call out to the library user with progress
-        progress(estimated_size, processed_size, 0, percent_completed, false, "");
+        progress(estimated_size, processed_size, 0, percent_completed, false);
 
         let full_path = item.path();
         let relative_path = full_path.strip_prefix(&folder_path).expect("failed to unwrap relative path");
@@ -577,7 +578,7 @@ pub fn sync(token: &Token,
 
                     while should_retry {
                         /// allow caller to tick the progress display, if one exists
-                        progress(estimated_size, processed_size, 0, percent_completed, false, "");
+                        progress(estimated_size, processed_size, 0, percent_completed, false);
 
                         let failed_count = 15.0 - retries_left;
                         let mut rng = ::rand::thread_rng();
@@ -606,11 +607,11 @@ pub fn sync(token: &Token,
 
                                 skipped_blocks = skipped_blocks + 1;
                                 /// allow caller to tick the progress display, if one exists
-                                progress(estimated_size, processed_size, block_real_size as u64, percent_completed, false, "");
+                                progress(estimated_size, processed_size, block_real_size as u64, percent_completed, false);
                                 should_retry = false
                             },
                             Err(SDAPIError::RequestFailed(err)) => {
-                                progress(estimated_size, processed_size, 0, percent_completed, false, err.description());
+                                progress(estimated_size, processed_size, 0, percent_completed, false);
 
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
@@ -744,7 +745,7 @@ pub fn sync(token: &Token,
 
     while should_retry {
         /// allow caller to tick the progress display, if one exists
-        progress(estimated_size, processed_size, 0, percent_completed, false, "");
+        progress(estimated_size, processed_size, 0, percent_completed, false);
 
         let failed_count = 15.0 - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -780,7 +781,7 @@ pub fn sync(token: &Token,
     }
 
 
-    progress(estimated_size, processed_size, 0, 100.0, false, "");
+    progress(estimated_size, processed_size, 0, 100.0, false);
 
     Ok(())
 }
@@ -792,7 +793,8 @@ pub fn restore(token: &Token,
                folder_id: u64,
                destination: PathBuf,
                session_size: u64,
-               progress: &mut FnMut(u64, u64, u64, f64, bool, &str)) -> Result<(), SDError> {
+               progress: &mut FnMut(u64, u64, u64, f64, bool),
+               issue: &mut FnMut(&str)) -> Result<(), SDError> {
     let restore_start_time = ::std::time::Instant::now();
 
     try!(fs::create_dir_all(&destination));
@@ -877,8 +879,8 @@ pub fn restore(token: &Token,
                 full_path.push(entry_path);
             }
             Err(e) => {
-                debug!("not restoring invalid path: {}", e);
-                progress(session_size, processed_size, 0, percent_completed, false, &format!("not restoring invalid path: {}", e));
+                issue(&format!("cannot restore invalid path in session {}:", e));
+                progress(session_size, processed_size, 0, percent_completed, false);
 
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
@@ -929,7 +931,7 @@ pub fn restore(token: &Token,
                         let block_start_time = ::std::time::Instant::now();
 
                         /// allow caller to tick the progress display, if one exists
-                        progress(session_size, processed_size, 0, percent_completed, true, "");
+                        progress(session_size, processed_size, 0, percent_completed, true);
 
                         let mut should_retry = true;
                         let mut retries_left = 15.0;
@@ -979,7 +981,7 @@ pub fn restore(token: &Token,
                                     trace!("Block read took {} seconds", block_read_start_time.elapsed().as_secs());
 
                                     /// allow caller to tick the progress display, if one exists
-                                    progress(session_size, processed_size, 0, percent_completed, false, "");
+                                    progress(session_size, processed_size, 0, percent_completed, false);
 
                                     should_retry = false;
                                     debug!("server provided block: {}", &block_hmac_hex);
@@ -1012,7 +1014,7 @@ pub fn restore(token: &Token,
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
 
-                                    progress(session_size, processed_size, 0, percent_completed, false, err.description());
+                                    progress(session_size, processed_size, 0, percent_completed, false);
 
 
                                     if retries_left <= 0.0 {
@@ -1059,7 +1061,7 @@ pub fn restore(token: &Token,
                         trace!("Block total handling time took {} seconds", block_start_time.elapsed().as_secs());
 
                         processed_size += block.len() as u64;
-                        progress(session_size, processed_size, block.len() as u64, percent_completed, false, "");
+                        progress(session_size, processed_size, block.len() as u64, percent_completed, false);
 
                     }
 
@@ -1197,7 +1199,7 @@ pub fn restore(token: &Token,
 
     debug!("restoring session finished");
 
-    progress(session_size, processed_size, 0, 100.0, false, "");
+    progress(session_size, processed_size, 0, 100.0, false);
 
     Ok(())
 }
