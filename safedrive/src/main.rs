@@ -680,6 +680,8 @@ pub fn sync_all(token: Token, keyset: Keyset) {
     }
 
     mb.listen();
+
+    println!();
 }
 
 pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
@@ -730,6 +732,8 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
             std::process::exit(1);
         }
     }
+
+    println!();
 }
 
 pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, session_name: Option<&str>) {
@@ -817,6 +821,8 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
             std::process::exit(1);
         }
     }
+
+    println!();
 }
 
 pub fn list_folders(token: Token) {
