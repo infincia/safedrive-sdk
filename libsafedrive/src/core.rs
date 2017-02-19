@@ -616,7 +616,7 @@ pub fn sync(token: &Token,
                                 retries_left = retries_left - 1.0;
                                 if retries_left <= 0.0 {
                                     /// TODO: pass better error info up the call chain here rather than a failure
-                                    return Err(SDError::RequestFailure(err))
+                                    return Err(SDError::ExceededRetries(15))
                                 }
                             },
                             Err(SDAPIError::RetryUpload) => {
@@ -774,7 +774,7 @@ pub fn sync(token: &Token,
             Err(e) => {
                 retries_left = retries_left - 1.0;
                 if retries_left <= 0.0 {
-                    return Err(SDError::RequestFailure(Box::new(e)))
+                    return Err(SDError::ExceededRetries(15));
                 }
             }
         };
