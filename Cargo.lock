@@ -754,7 +754,7 @@ dependencies = [
 [[package]]
 name = "pbr"
 version = "1.0.0-alpha.2"
-source = "git+https://github.com/infincia/pb.git?branch=logging#1618773d4fdb2a6074e1a9bdf00ea0d77354d450"
+source = "git+https://github.com/infincia/pb.git?branch=logging#2e4d00904450dc3faabfee85aefd55907d94363d"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
