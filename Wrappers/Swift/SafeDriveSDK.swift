@@ -183,6 +183,22 @@ public typealias SaveRecoveryPhrase = @convention(block) (_ phrase: String) -> V
 public class SafeDriveSDK: NSObject {
 
     public static let sharedSDK = SafeDriveSDK()
+    
+    public static var sddk_channel: String {
+        var ch = sddk_get_channel()
+        defer {
+            sddk_free_string(&ch)
+        }
+        return String(cString: ch!)
+    }
+    
+    public static var sddk_version: String {
+        var ver = sddk_get_version()
+        defer {
+            sddk_free_string(&ver)
+        }
+        return String(cString: ver!)
+    }
 
     var state: OpaquePointer? = nil
 
