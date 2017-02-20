@@ -572,6 +572,45 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
     }
 }
 
+/// Get SDK channel
+///
+/// Returned string must be passed back to the SDK to free it
+///
+/// # Examples
+///
+/// ```c
+/// char *channel = sddk_get_channel();
+/// // do something with channel here, store it somewhere, then free it later on
+/// sddk_free_string(&channel);
+/// ```
+///
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_channel() -> *mut std::os::raw::c_char {
+    let channel = ::core::get_channel();
+    CString::new(format!("{}", channel).as_str()).unwrap().into_raw()
+}
+
+/// Get SDK version
+///
+/// Returned string must be pased back to the SDK to free it
+///
+/// # Examples
+///
+/// ```c
+/// char *version = sddk_get_version();
+/// // do something with version here, store it somewhere, then free it later on
+/// sddk_free_string(&version);
+/// ```
+///
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
+    let version = ::core::get_version();
+    CString::new(version.as_str()).unwrap().into_raw()
+}
+
+
 /// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
 ///
 /// Will assert non-null on `state`, `username`, and `password`
