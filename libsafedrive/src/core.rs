@@ -83,7 +83,11 @@ pub fn get_channel() -> Channel {
     }
 }
 
+pub fn get_version() -> String {
+    let version: &str = env!("CARGO_PKG_VERSION");
 
+    version.to_owned()
+}
 
 /// internal functions
 
