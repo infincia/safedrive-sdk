@@ -630,9 +630,6 @@ pub fn sync_all(token: Token, keyset: Keyset) {
 
     let mut mb = MultiBar::new();
 
-    let warnings_t: ::std::sync::Arc<::std::sync::Mutex<Vec<String>>> = ::std::sync::Arc::new(::std::sync::Mutex::new(Vec::new()));
-
-
     mb.println("Syncing all folders");
 
     for (index, folder) in encrypted_folders.into_iter().enumerate() {
@@ -651,7 +648,8 @@ pub fn sync_all(token: Token, keyset: Keyset) {
         let local_hmac = keyset.hmac.clone();
         let local_tweak = keyset.tweak.clone();
         let local_folder_name = folder.folderName.clone();
-        let warnings_t = warnings_t.clone();
+
+        let pbt = ::std::sync::Mutex::new(pb);
 
         let _ = thread::spawn(move || {
             match sync(&local_token,
@@ -661,6 +659,8 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                        &local_tweak,
                        folder.id,
                        &mut |total, _, new, _, tick| {
+                           let mut pb = pbt.lock().unwrap();
+
                            if tick {
                                pb.tick();
                            } else {
@@ -669,16 +669,21 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                            }
                        },
                        &mut |message| {
-                           let mut warnings = warnings_t.lock().unwrap();
+                           let mut pb = pbt.lock().unwrap();
+
                            let message = format!("{}: {}", local_folder_name, message);
-                           warnings.push(message);
+                           pb.log(&message);
                        }
             ) {
                 Ok(_) => {
+                    let mut pb = pbt.lock().unwrap();
+
                     let message = format!("{}: finished", local_folder_name);
                     pb.finish_print(&message);
                 },
                 Err(e) => {
+                    let mut pb = pbt.lock().unwrap();
+
                     let message = format!("{}: sync failed: {}", local_folder_name, e);
                     pb.finish_print(&message);
                 }
@@ -689,12 +694,6 @@ pub fn sync_all(token: Token, keyset: Keyset) {
     mb.listen();
 
     println!();
-
-    let warnings = warnings_t.lock().unwrap();
-
-    for warning in &**warnings {
-        warn!("{}", warning);
-    }
 }
 
 pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
@@ -740,7 +739,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
 
                    let message = format!("{}: {}", &folder.folderName, message);
 
-                   pb.message_print(&message);
+                   pb.log(&message);
                    //pb.log(::log::LogLevel::Warn, &message);
                }
     ) {
@@ -843,7 +842,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
 
                       let message = format!("{}: {}", &folder.folderName, message);
 
-                      pb.message_print(&message);
+                      pb.log(&message);
                       //pb.log(::log::LogLevel::Warn, &message);
                   }
     ) {
