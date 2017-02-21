@@ -184,6 +184,26 @@ public class SafeDriveSDK: NSObject {
 
     public static let sharedSDK = SafeDriveSDK()
     
+    fileprivate let readyQueue = DispatchQueue(label: "io.safedrive.readyQueue", attributes: DispatchQueue.Attributes.concurrent)
+    
+    fileprivate var _ready = false
+
+
+    public var ready: Bool {
+        get {
+            var r: Bool?
+            readyQueue.sync {
+                r = self._ready
+            }
+            return r!
+        }
+        set (newValue) {
+            readyQueue.sync(flags: .barrier, execute: {
+                self._ready = newValue
+            })
+        }
+    }
+    
     public static var sddk_channel: String {
         var ch = sddk_get_channel()
         defer {
@@ -282,8 +302,10 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
+                queue.sync { self.ready = true }
                 queue.async { success() }
             default:
+                queue.sync { self.ready = false }
                 let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
