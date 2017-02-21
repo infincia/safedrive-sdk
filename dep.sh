@@ -67,7 +67,7 @@ fi
 #fi
 
 if [ ! -f dep/$TARGET/lib/libssl.a ]; then
-    export OPENSSL_VER=1.1.0d
+    export OPENSSL_VER=1.1.0e
 
     wget https://www.openssl.org/source/openssl-$OPENSSL_VER.tar.gz > /dev/null
     tar xvzf openssl-$OPENSSL_VER.tar.gz > /dev/null
