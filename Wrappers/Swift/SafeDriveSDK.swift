@@ -71,6 +71,10 @@ public enum SDKErrorType {
     case SyncAlreadyInProgress
     case RestoreAlreadyInProgress
     case ExceededRetries
+    case KeychainError
+    case BlockUnreadable
+    case SessionUnreadable
+    case ServiceUnavailable
 }
 
 public struct SDKError: Error {
@@ -117,6 +121,14 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
         type = SDKErrorType.RestoreAlreadyInProgress
     case ExceededRetries:
         type = SDKErrorType.ExceededRetries
+    case KeychainError:
+        type = SDKErrorType.KeychainError
+    case BlockUnreadable:
+        type = SDKErrorType.BlockUnreadable
+    case SessionUnreadable:
+        type = SDKErrorType.SessionUnreadable
+    case ServiceUnavailable:
+        type = SDKErrorType.ServiceUnavailable
     default:
         fatalError("no error type for \(sdkError.error_type)")
         break
