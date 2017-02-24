@@ -327,10 +327,6 @@ impl WrappedBlock {
         self.compressed
     }
 
-    pub fn len(&self) -> usize {
-        self.wrapped_data.len()
-    }
-
     pub fn real_size(&self) -> u64 {
         panic!("can't retrieve real size of a wrapped block");
     }
@@ -413,6 +409,10 @@ impl ::binformat::BinaryWriter for WrappedBlock {
 
     fn name(&self) -> String {
         self.hmac.to_hex()
+    }
+
+    fn len(&self) -> usize {
+        self.wrapped_data.len()
     }
 
     fn should_include_data(&self) -> bool {

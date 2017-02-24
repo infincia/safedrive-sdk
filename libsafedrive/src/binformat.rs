@@ -8,6 +8,7 @@ pub trait BinaryWriter {
     fn name(&self) -> String;
     fn as_binary(&self) -> Vec<u8>;
     fn should_include_data(&self) -> bool;
+    fn len(&self) -> usize;
 }
 
 

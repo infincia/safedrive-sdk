@@ -334,6 +334,10 @@ impl ::binformat::BinaryWriter for WrappedSyncSession {
         self.name.clone()
     }
 
+    fn len(&self) -> usize {
+        self.wrapped_data.len()
+    }
+
     fn should_include_data(&self) -> bool {
         true
     }
