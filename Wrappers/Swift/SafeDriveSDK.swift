@@ -118,7 +118,7 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
     case ExceededRetries:
         type = SDKErrorType.ExceededRetries
     default:
-        exit(1)
+        fatalError("no error type for \(sdkError.error_type)")
         break
     }
 
