@@ -213,7 +213,7 @@ impl<'a> ::std::fmt::Display for Block {
     }
 }
 
-
+#[derive(Debug, Clone)]
 pub struct WrappedBlock {
     version: SyncVersion,
     hmac: Vec<u8>,

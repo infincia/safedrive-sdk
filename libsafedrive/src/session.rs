@@ -156,7 +156,7 @@ impl<'a> ::std::fmt::Display for SyncSession {
 }
 
 
-
+#[derive(Debug, Clone)]
 pub struct WrappedSyncSession {
     version: SyncVersion,
     pub folder_id: Option<u64>,
