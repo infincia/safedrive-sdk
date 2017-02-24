@@ -926,7 +926,7 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -
     let content_type = br"Content-Type: application/octet-stream";
 
 
-    let disp = format!("content-disposition: form-data; name=file; filename={}", name);
+    let disp = format!("content-disposition: form-data; name=\"file\"; filename=\"{}\"", name);
     let enc = br"Content-Transfer-Encoding: binary";
 
     if first {
