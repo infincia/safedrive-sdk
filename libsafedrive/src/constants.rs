@@ -53,8 +53,7 @@ pub static SECRETBOX_NONCE_SIZE: usize = ::sodiumoxide::crypto::secretbox::NONCE
 pub static SECRETBOX_MAC_SIZE: usize = ::sodiumoxide::crypto::secretbox::MACBYTES;
 
 /// API constants
-
-pub static MULTIPART_BOUNDARY: &'static str = "-----SAFEDRIVEBINARY";
+pub static MULTIPART_BOUNDARY: &'static str = "SAFEDRIVEBINARY";
 
 /// keychain constants
 

@@ -921,9 +921,9 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -
 
     /// these are compile time optimizations
     let rn: &'static [u8; 2] = b"\r\n";
-    let body_boundary: &'static [u8; 22] = br"-------SAFEDRIVEBINARY";
-    let end_boundary: &'static [u8; 24] =  br"-------SAFEDRIVEBINARY--";
     let content_type: &'static [u8; 38] = br"Content-Type: application/octet-stream";
+    let body_boundary = br"--SAFEDRIVEBINARY";
+    let end_boundary =  br"--SAFEDRIVEBINARY--";
 
 
     let disp = format!("content-disposition: form-data; name=file; filename={}", name);
