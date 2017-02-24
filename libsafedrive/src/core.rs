@@ -483,7 +483,7 @@ pub fn sync(token: &Token,
         };
 
         let stream_length = md.len();
-        debug!("estimating size of {}... OK, {}", item_path.display(), stream_length);
+        trace!("estimating size of {}... OK, {}", item_path.display(), stream_length);
 
         estimated_size = estimated_size + stream_length;
     }
