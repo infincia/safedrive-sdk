@@ -920,14 +920,14 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -
     let mut body: Vec<u8> = Vec::new();
 
     /// these are compile time optimizations
-    let rn: &'static [u8; 2] = b"\r\n";
-    let content_type: &'static [u8; 38] = br"Content-Type: application/octet-stream";
+    let rn = b"\r\n";
     let body_boundary = br"--SAFEDRIVEBINARY";
     let end_boundary =  br"--SAFEDRIVEBINARY--";
+    let content_type = br"Content-Type: application/octet-stream";
 
 
     let disp = format!("content-disposition: form-data; name=file; filename={}", name);
-    let enc: &'static [u8; 33] = br"Content-Transfer-Encoding: binary";
+    let enc = br"Content-Transfer-Encoding: binary";
 
     if first {
         body.extend(rn);
