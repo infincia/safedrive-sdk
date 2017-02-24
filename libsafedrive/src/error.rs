@@ -9,7 +9,7 @@ use ::rustc_serialize::hex::{FromHexError};
 pub enum KeychainError {
     KeychainUnavailable,
     KeychainItemMissing,
-    KeychainInsertFailed(Box<std::error::Error>),
+    KeychainInsertFailed(Box<std::error::Error + Send + Sync>),
 }
 
 impl std::fmt::Display for KeychainError {
@@ -54,7 +54,7 @@ impl std::error::Error for KeychainError {
 pub enum CryptoError {
     KeyInvalid,
     KeyMissing,
-    RecoveryPhraseInvalid(Bip39Error),
+    RecoveryPhraseInvalid(Box<std::error::Error + Send + Sync>),
     RecoveryPhraseIncorrect,
     KeyGenerationFailed,
     KeyWrapFailed,
@@ -122,7 +122,7 @@ impl std::error::Error for CryptoError {
         match *self {
             CryptoError::KeyInvalid => None,
             CryptoError::KeyMissing => None,
-            CryptoError::RecoveryPhraseInvalid(ref err) => Some(err),
+            CryptoError::RecoveryPhraseInvalid(ref err) => Some(&**err),
             CryptoError::RecoveryPhraseIncorrect => None,
             CryptoError::KeyGenerationFailed => None,
             CryptoError::KeyWrapFailed => None,
@@ -144,12 +144,12 @@ impl From<FromHexError> for CryptoError {
 impl From<Bip39Error> for CryptoError {
     fn from(e: Bip39Error) -> CryptoError {
         match e {
-            Bip39Error::InvalidChecksum => CryptoError::RecoveryPhraseInvalid(e),
+            Bip39Error::InvalidChecksum => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
             Bip39Error::EntropyUnavailable(_) => CryptoError::KeyGenerationFailed,
-            Bip39Error::InvalidKeysize => CryptoError::RecoveryPhraseInvalid(e),
-            Bip39Error::InvalidWordLength => CryptoError::RecoveryPhraseInvalid(e),
-            Bip39Error::InvalidWord => CryptoError::RecoveryPhraseInvalid(e),
-            Bip39Error::LanguageUnavailable => CryptoError::RecoveryPhraseInvalid(e),
+            Bip39Error::InvalidKeysize => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            Bip39Error::InvalidWordLength => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            Bip39Error::InvalidWord => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            Bip39Error::LanguageUnavailable => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
         }
     }
 }
@@ -157,12 +157,12 @@ impl From<Bip39Error> for CryptoError {
 #[derive(Debug)]
 pub enum SDError {
     Internal(String),
-    IO(std::io::Error),
-    KeychainError(KeychainError),
+    IO(Box<std::error::Error + Send + Sync>),
+    KeychainError(Box<std::error::Error + Send + Sync>),
     RequestFailure(Box<std::error::Error + Send + Sync>),
     NetworkFailure(Box<std::error::Error + Send + Sync>),
     ServiceUnavailable,
-    Conflict(SDAPIError),
+    Conflict(Box<std::error::Error + Send + Sync>),
     BlockMissing,
     SessionMissing,
     BlockUnreadable,
@@ -172,7 +172,7 @@ pub enum SDError {
     Authentication,
     UnicodeError,
     TokenExpired,
-    CryptoError(CryptoError),
+    CryptoError(Box<std::error::Error + Send + Sync>),
     SyncAlreadyInProgress,
     RestoreAlreadyInProgress,
     ExceededRetries(u64),
@@ -208,12 +208,12 @@ impl std::error::Error for SDError {
     fn cause(&self) -> Option<&std::error::Error> {
         match *self {
             SDError::Internal(_) => None,
-            SDError::IO(ref err) => Some(err),
-            SDError::KeychainError(ref err) => Some(err),
+            SDError::IO(ref err) => Some(&**err),
+            SDError::KeychainError(ref err) => Some(&**err),
             SDError::RequestFailure(ref err) => Some(&**err),
             SDError::NetworkFailure(ref err) => Some(&**err),
             SDError::ServiceUnavailable => None,
-            SDError::Conflict(ref err) => Some(err),
+            SDError::Conflict(ref err) => Some(&**err),
             SDError::BlockMissing => None,
             SDError::SessionMissing => None,
             SDError::BlockUnreadable => None,
@@ -223,7 +223,7 @@ impl std::error::Error for SDError {
             SDError::Authentication => None,
             SDError::UnicodeError => None,
             SDError::TokenExpired => None,
-            SDError::CryptoError(ref err) => Some(err),
+            SDError::CryptoError(ref err) => Some(&**err),
             SDError::SyncAlreadyInProgress => None,
             SDError::RestoreAlreadyInProgress => None,
             SDError::ExceededRetries(_) => None,
@@ -302,7 +302,7 @@ impl std::fmt::Display for SDError {
 impl From<KeychainError> for SDError {
     fn from(e: KeychainError) -> SDError {
         match e {
-            _ => SDError::KeychainError(e)
+            _ => SDError::KeychainError(Box::new(e))
         }
     }
 }
@@ -310,7 +310,7 @@ impl From<KeychainError> for SDError {
 impl From<std::io::Error> for SDError {
     fn from(e: std::io::Error) -> SDError {
         match e {
-            _ => SDError::IO(e)
+            _ => SDError::IO(Box::new(e))
         }
     }
 }
@@ -320,7 +320,7 @@ impl From<CryptoError> for SDError {
         match e {
             CryptoError::RecoveryPhraseIncorrect => SDError::RecoveryPhraseIncorrect,
 
-            _ =>  SDError::CryptoError(e)
+            _ =>  SDError::CryptoError(Box::new(e))
         }
     }
 }
@@ -336,7 +336,7 @@ impl From<SDAPIError> for SDError {
             SDAPIError::Authentication => SDError::Authentication,
             SDAPIError::BlockMissing => SDError::BlockMissing,
             SDAPIError::SessionMissing => SDError::SessionMissing,
-            SDAPIError::Conflict => SDError::Conflict(e),
+            SDAPIError::Conflict => SDError::Conflict(Box::new(e)),
             /// we never actually construct an SDError from this variant so it should never be used,
             /// but the compiler requires it to exist or use a catch-all pattern
             SDAPIError::RetryUpload => SDError::RequestFailure(Box::new(e)),
@@ -348,7 +348,7 @@ impl From<SDAPIError> for SDError {
 #[derive(Debug)]
 pub enum SDAPIError {
     Internal(String),
-    IO(std::io::Error),
+    IO(Box<std::error::Error + Send + Sync>),
     RequestFailed(Box<std::error::Error + Send + Sync>),
     NetworkFailure,
     ServiceUnavailable,
@@ -416,7 +416,7 @@ impl std::error::Error for SDAPIError {
     fn cause(&self) -> Option<&std::error::Error> {
         match *self {
             SDAPIError::Internal(_) => None,
-            SDAPIError::IO(ref err) => Some(err),
+            SDAPIError::IO(ref err) => Some(&**err),
             SDAPIError::RequestFailed(ref err) => Some(&**err),
             SDAPIError::NetworkFailure => None,
             SDAPIError::ServiceUnavailable => None,
@@ -432,7 +432,7 @@ impl std::error::Error for SDAPIError {
 impl From<std::io::Error> for SDAPIError {
     fn from(e: std::io::Error) -> SDAPIError {
         match e {
-            _ => SDAPIError::IO(e)
+            _ => SDAPIError::IO(Box::new(e))
         }
     }
 }

@@ -572,7 +572,7 @@ pub fn sync(token: &Token,
 
                     let wrapped_block = match block.to_wrapped(main_key) {
                         Ok(wb) => wb,
-                        Err(e) => return Err(SDError::CryptoError(e)),
+                        Err(e) => return Err(SDError::CryptoError(Box::new(e))),
                     };
                     let block_padded_size = wrapped_block.len() as u64;
 
@@ -753,7 +753,7 @@ pub fn sync(token: &Token,
 
     let wrapped_session = match session.to_wrapped(main_key) {
         Ok(ws) => ws,
-        Err(e) => return Err(SDError::CryptoError(e)),
+        Err(e) => return Err(SDError::CryptoError(Box::new(e))),
     };
 
     let binary_data = wrapped_session.to_binary();

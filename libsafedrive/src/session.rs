@@ -177,12 +177,12 @@ impl WrappedSyncSession {
 
         let session_key = match self.wrapped_key.to_key(main, Some(&self.nonce)) {
             Ok(k) => k,
-            Err(_) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+            Err(_) => return Err(SDError::CryptoError(Box::new(CryptoError::SessionDecryptFailed)))
         };
 
         let session_raw = match ::sodiumoxide::crypto::secretbox::open(&self.wrapped_data, &self.nonce, &session_key.as_sodium_secretbox_key()) {
             Ok(s) => s,
-            Err(_) => return Err(SDError::CryptoError(CryptoError::SessionDecryptFailed))
+            Err(_) => return Err(SDError::CryptoError(Box::new(CryptoError::SessionDecryptFailed)))
         };
 
         let unpadded_data = match self.version {

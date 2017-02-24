@@ -234,7 +234,7 @@ impl WrappedBlock {
             Ok(k) => k,
             Err(e) => {
                 debug!("block key unwrap failed: {:?}", e);
-                return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+                return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)))
             }
         };
 
@@ -242,7 +242,7 @@ impl WrappedBlock {
             Ok(s) => s,
             Err(e) => {
                 debug!("block decrypt failed: {:?}", e);
-                return Err(SDError::CryptoError(CryptoError::BlockDecryptFailed))
+                return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)))
             }
         };
 
