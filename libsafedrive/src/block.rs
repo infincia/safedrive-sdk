@@ -275,7 +275,8 @@ impl WrappedBlock {
                             },
                         };
 
-                        return Err(SDError::BlockUnreadable) },
+                        return Err(SDError::BlockUnreadable)
+                    },
                     Incomplete(_) => {
                         debug!("block data cannot be unpadded, this should never happen");
                         return Err(SDError::BlockUnreadable)
