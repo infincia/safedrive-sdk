@@ -302,10 +302,10 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                queue.sync { self.ready = true }
+                self.ready = true
                 queue.async { success() }
             default:
-                queue.sync { self.ready = false }
+                self.ready = false
                 let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
