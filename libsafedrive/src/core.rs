@@ -1023,7 +1023,7 @@ pub fn restore(token: &Token,
 
                                     let block_cache_write_time = ::std::time::Instant::now();
 
-                                    match ::cache::write_block(&wb) {
+                                    match ::cache::write_binary(&wb) {
                                         _ => {}
                                     };
                                     trace!("Block write to cache took {} seconds", block_cache_write_time.elapsed().as_secs());

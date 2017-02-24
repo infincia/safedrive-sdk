@@ -1,7 +1,7 @@
 use std::fs::File;
-use std::path::{PathBuf};
+use std::path::{PathBuf, Path};
 use std::io::{Read, Write};
-use ::rustc_serialize::hex::{ToHex, FromHex};
+use ::rustc_serialize::hex::{FromHex};
 use ::walkdir::WalkDir;
 
 use ::CACHE_DIR;
@@ -75,10 +75,10 @@ pub fn clear_cache() -> Result<u64, SDError> {
     debug!("estimating size of cache at {}", bp.display());
 
 
-    for block in WalkDir::new(&bp).into_iter().filter_map(|e| e.ok()) {
-        let p = block.path();
+    for item in WalkDir::new(&bp).into_iter().filter_map(|e| e.ok()) {
+        let p = item.path();
 
-        debug!("deleting block from cache {}", p.display());
+        debug!("deleting item from cache {}", p.display());
 
         let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
@@ -87,10 +87,10 @@ pub fn clear_cache() -> Result<u64, SDError> {
 
         let stream_length = md.len();
 
-        match ::std::fs::remove_file(block.path()) {
+        match ::std::fs::remove_file(item.path()) {
             Ok(()) => {},
             Err(e) => {
-                debug!("block could not be deleted: {}", e);
+                debug!("item could not be deleted: {}", e);
             }
         }
 
@@ -119,15 +119,15 @@ pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
 
 }
 
-pub fn write_block<'a>(block: &WrappedBlock) -> Result<(), SDError> {
+pub fn write_binary<'a, T>(item: &T) -> Result<(), SDError> where T: ::binformat::BinaryWriter {
     let cd = CACHE_DIR.read();
-    let mut bp = PathBuf::from(&*cd);
-    let h = block.get_hmac().to_hex();
+    let mut item_path = PathBuf::from(&*cd);
+    let name = item.name();
 
-    bp.push(h);
+    item_path.push(name);
 
-    let mut f = try!(File::create(&bp));
-    try!(f.write_all(&block.to_binary()));
+    let mut f = try!(File::create(&item_path));
+    try!(f.write_all(&item.as_binary()));
 
     Ok(())
 }
