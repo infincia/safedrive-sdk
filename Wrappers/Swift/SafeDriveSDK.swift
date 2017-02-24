@@ -184,7 +184,7 @@ public class SafeDriveSDK: NSObject {
 
     public static let sharedSDK = SafeDriveSDK()
     
-    fileprivate let readyQueue = DispatchQueue(label: "io.safedrive.readyQueue", attributes: DispatchQueue.Attributes.concurrent)
+    fileprivate let readyQueue = DispatchQueue(label: "io.safedrive.readyQueue")
     
     fileprivate var _ready = false
 
