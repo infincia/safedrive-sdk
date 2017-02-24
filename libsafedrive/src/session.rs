@@ -258,61 +258,6 @@ impl WrappedSyncSession {
         Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, real_size: real_size as u64, compressed_size: maybe_compressed_size, time: self.time, data: maybe_uncompressed_data, compressed: self.compressed, id: None, production: self.production, channel: self.channel })
     }
 
-    pub fn to_binary(self) -> Vec<u8> {
-
-        let mut binary_data = Vec::new();
-
-        /// first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
-        let magic: &'static [u8; 2] = br"sd";
-        let file_type: &'static [u8; 1] = br"s";
-        let version = self.version.as_ref();
-        let reserved: &'static [u8; 2] = br"00";
-
-        let mut flags = Empty;
-
-        match self.channel {
-            Channel::Stable => {
-                flags.insert(Stable)
-            },
-            Channel::Beta => {
-                flags.insert(Beta);
-            },
-            Channel::Nightly => {
-                flags.insert(Nightly);
-            },
-        };
-
-        if self.production {
-            flags.insert(Production);
-        } else {
-        }
-
-        if self.compressed() {
-            flags.insert(Compressed);
-        } else {
-        }
-
-        let flag_ref: &[u8] = &[flags.bits()];
-
-        binary_data.extend(magic.as_ref());
-        binary_data.extend(file_type.as_ref());
-        binary_data.extend(version);
-        binary_data.extend(flag_ref);
-        binary_data.extend(reserved.as_ref());
-
-        /// next 48 bytes will be the wrapped session key
-        binary_data.extend(self.wrapped_key.as_ref());
-
-        /// next 24 bytes will be the nonce
-        binary_data.extend(self.nonce.as_ref());
-        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
-
-        /// remainder will be the encrypted session data
-        binary_data.extend(self.wrapped_data);
-
-        binary_data
-    }
-
     pub fn from(body: SyncSessionResponse) -> Result<WrappedSyncSession, SDError> {
 
         let raw_session: BinaryFormat = match ::binformat::binary_parse(&body.chunk_data) {
@@ -381,6 +326,72 @@ impl WrappedSyncSession {
         self.compressed
     }
 
+}
+
+impl ::binformat::BinaryWriter for WrappedSyncSession {
+
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+
+    fn should_include_data(&self) -> bool {
+        true
+    }
+
+    fn as_binary(&self) -> Vec<u8> {
+
+        let mut binary_data = Vec::new();
+
+        /// first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
+        let magic: &'static [u8; 2] = br"sd";
+        let file_type: &'static [u8; 1] = br"s";
+        let version = self.version.as_ref();
+        let reserved: &'static [u8; 2] = br"00";
+
+        let mut flags = Empty;
+
+        match self.channel {
+            Channel::Stable => {
+                flags.insert(Stable)
+            },
+            Channel::Beta => {
+                flags.insert(Beta);
+            },
+            Channel::Nightly => {
+                flags.insert(Nightly);
+            },
+        };
+
+        if self.production {
+            flags.insert(Production);
+        } else {
+        }
+
+        if self.compressed() {
+            flags.insert(Compressed);
+        } else {
+        }
+
+        let flag_ref: &[u8] = &[flags.bits()];
+
+        binary_data.extend(magic.as_ref());
+        binary_data.extend(file_type.as_ref());
+        binary_data.extend(version);
+        binary_data.extend(flag_ref);
+        binary_data.extend(reserved.as_ref());
+
+        /// next 48 bytes will be the wrapped session key
+        binary_data.extend(self.wrapped_key.as_ref());
+
+        /// next 24 bytes will be the nonce
+        binary_data.extend(self.nonce.as_ref());
+        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
+
+        /// remainder will be the encrypted session data
+        binary_data.extend(self.wrapped_data.as_slice());
+
+        binary_data
+    }
 }
 
 impl AsRef<[u8]> for WrappedSyncSession {
