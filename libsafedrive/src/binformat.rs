@@ -4,6 +4,12 @@ use ::nom::{IResult, rest, le_u32};
 
 use ::constants::*;
 
+pub trait BinaryWriter {
+    fn name(&self) -> String;
+    fn as_binary(&self) -> Vec<u8>;
+    fn should_include_data(&self) -> bool;
+}
+
 
 #[derive(Debug)]
 pub struct BinaryFormat<'a> {
