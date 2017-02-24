@@ -915,7 +915,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
     Ok(buffer)
 }
 
-fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -> (Vec<u8>, usize) {
+fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
 
     let mut body: Vec<u8> = Vec::new();
 
@@ -929,10 +929,9 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -
     let disp = format!("content-disposition: form-data; name=\"file\"; filename=\"{}\"", name);
     let enc = br"Content-Transfer-Encoding: binary";
 
-    if first {
-        body.extend(rn);
-        body.extend(rn);
-    }
+
+    body.extend(rn);
+    body.extend(rn);
 
     body.extend(body_boundary.as_ref());
     body.extend(rn);
@@ -950,11 +949,10 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str, first: bool, last: bool) -
     body.extend(chunk_data);
     body.extend(rn);
 
-    if last {
-        body.extend(end_boundary.as_ref());
-        body.extend(rn);
-        body.extend(rn);
-    }
+
+    body.extend(end_boundary.as_ref());
+    body.extend(rn);
+    body.extend(rn);
 
 
     let content_length = body.len();
