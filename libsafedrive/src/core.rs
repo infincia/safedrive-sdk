@@ -724,6 +724,8 @@ pub fn sync(token: &Token,
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
         if is_sync_task_cancelled(session_name.to_owned()) {
+            issue(&format!("sync cancelled ({})", session_name));
+
             let cache_message = ::cache::WriteCacheMessage::new(None, true, None);
 
             match block_send.send(cache_message) {
@@ -784,6 +786,8 @@ pub fn sync(token: &Token,
 
                 for block_result in block_generator.by_ref() {
                     if is_sync_task_cancelled(session_name.to_owned()) {
+                        issue(&format!("sync cancelled ({})", session_name));
+
                         let cache_message = ::cache::WriteCacheMessage::new(None, true, None);
 
                         match block_send.send(cache_message) {
@@ -1147,6 +1151,8 @@ pub fn restore(token: &Token,
 
     for item in ar.entries().unwrap() {
         if is_sync_task_cancelled(session_name.to_owned()) {
+            issue(&format!("sync cancelled ({})", session_name));
+
             return Err(SDError::Cancelled)
         }
         let restore_item_start_time = ::std::time::Instant::now();
@@ -1223,6 +1229,8 @@ pub fn restore(token: &Token,
 
                     for block_hmac in block_hmac_list.iter() {
                         if is_sync_task_cancelled(session_name.to_owned()) {
+                            issue(&format!("sync cancelled ({})", session_name));
+
                             return Err(SDError::Cancelled)
                         }
 
@@ -1253,6 +1261,8 @@ pub fn restore(token: &Token,
 
                         while should_retry {
                             if is_sync_task_cancelled(session_name.to_owned()) {
+                                issue(&format!("sync cancelled ({})", session_name));
+
                                 return Err(SDError::Cancelled)
                             }
 
