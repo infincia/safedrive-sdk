@@ -586,6 +586,27 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    public func cancelSyncTask(sessionName: String, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+
+            let res = sddk_cancel_sync_task(sessionName, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
+        }
+    }
+    
     public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, issue: @escaping SyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
