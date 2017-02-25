@@ -861,6 +861,9 @@ pub fn sync(token: &Token,
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append(&header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
+        }
+    }
+
     debug!("signaling write cache we're finished");
 
     let cache_message = ::cache::WriteCacheMessage::new(None, false, None);
