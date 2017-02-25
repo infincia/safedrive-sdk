@@ -126,7 +126,7 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
     }
 
     pub fn full(&self) -> bool {
-        self.data_waiting >= self.data_limit
+        self.data_waiting >= self.data_limit || self.items_waiting() >= self.item_limit
     }
 }
 
