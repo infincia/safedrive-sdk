@@ -8,6 +8,22 @@ use ::CACHE_DIR;
 use ::block::WrappedBlock;
 use ::error::SDError;
 
+pub struct WriteCacheMessage<T> {
+    pub item: Option<T>,
+    pub stop: bool,
+    pub error: Option<SDError>,
+}
+
+impl<T> WriteCacheMessage<T> where T: ::binformat::BinaryWriter {
+    pub fn new(item: Option<T>, stop: bool, error: Option<SDError>) -> WriteCacheMessage<T> {
+        WriteCacheMessage {
+            item: item,
+            stop: stop,
+            error: error,
+        }
+    }
+}
+
 pub struct WriteCache<T> {
     waiting: Vec<T>,
     item_limit: usize,
