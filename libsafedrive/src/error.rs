@@ -16,13 +16,13 @@ impl std::fmt::Display for KeychainError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
             KeychainError::KeychainUnavailable => {
-                write!(f, "Keychain unavailable")
+                write!(f, "{}", localized_str!("Keychain unavailable", ""))
             },
             KeychainError::KeychainItemMissing => {
-                write!(f, "Keychain item missing")
+                write!(f, "{}", localized_str!("Keychain item missing", ""))
             },
             KeychainError::KeychainInsertFailed(ref err) => {
-                write!(f, "Keychain insert failed: {}", err)
+                write!(f, "{}: {}", localized_str!("Keychain insert failed", ""), err)
             },
         }
     }
@@ -32,8 +32,8 @@ impl std::fmt::Display for KeychainError {
 impl std::error::Error for KeychainError {
     fn description(&self) -> &str {
         match *self {
-            KeychainError::KeychainUnavailable => "keychain unavailable",
-            KeychainError::KeychainItemMissing => "keychain item missing",
+            KeychainError::KeychainUnavailable => localized_str!("keychain unavailable", ""),
+            KeychainError::KeychainItemMissing => localized_str!("keychain item missing", ""),
             KeychainError::KeychainInsertFailed(ref err) => err.description(),
 
         }
@@ -68,34 +68,34 @@ impl std::fmt::Display for CryptoError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
             CryptoError::KeyInvalid => {
-                write!(f, "Invalid key used")
+                write!(f, "{}", localized_str!("Invalid key used", ""))
             },
             CryptoError::KeyMissing => {
-                write!(f, "Missing key")
+                write!(f, "{}", localized_str!("Missing key", ""))
             },
             CryptoError::RecoveryPhraseInvalid(ref err) => {
-                write!(f, "Recovery phrase incorrect: {}", err)
+                write!(f, "{}: {}", localized_str!("Recovery phrase incorrect", ""), err)
             },
             CryptoError::RecoveryPhraseIncorrect => {
-                write!(f, "Recovery phrase incorrect")
+                write!(f, "{}", localized_str!("Recovery phrase incorrect", ""))
             },
             CryptoError::KeyGenerationFailed => {
-                write!(f, "Key generation failed")
+                write!(f, "{}", localized_str!("Key generation failed", ""))
             },
             CryptoError::KeyWrapFailed => {
-                write!(f, "Key wrapping failed")
+                write!(f, "{}", localized_str!("Key wrapping failed", ""))
             },
             CryptoError::BlockDecryptFailed => {
-                write!(f, "Block decrypt failed")
+                write!(f, "{}", localized_str!("Block decrypt failed", ""))
             },
             CryptoError::BlockEncryptFailed => {
-                write!(f, "Block encrypt failed")
+                write!(f, "{}", localized_str!("Block encrypt failed", ""))
             },
             CryptoError::SessionDecryptFailed => {
-                write!(f, "Session decrypt failed")
+                write!(f, "{}", localized_str!("Session decrypt failed", ""))
             },
             CryptoError::SessionEncryptFailed => {
-                write!(f, "Session encrypt failed")
+                write!(f, "{}", localized_str!("Session encrypt failed", ""))
             },
         }
     }
@@ -105,16 +105,16 @@ impl std::fmt::Display for CryptoError {
 impl std::error::Error for CryptoError {
     fn description(&self) -> &str {
         match *self {
-            CryptoError::KeyInvalid => "invalid key found",
-            CryptoError::KeyMissing => "key missing",
+            CryptoError::KeyInvalid => localized_str!("invalid key found", ""),
+            CryptoError::KeyMissing => localized_str!("key missing", ""),
             CryptoError::RecoveryPhraseInvalid(ref err) => err.description(),
-            CryptoError::RecoveryPhraseIncorrect => "recovery phrase incorrect",
-            CryptoError::KeyGenerationFailed => "key generation failed",
-            CryptoError::KeyWrapFailed => "wrapping key failed",
-            CryptoError::BlockDecryptFailed => "decrypting block failed",
-            CryptoError::BlockEncryptFailed => "encrypting block failed",
-            CryptoError::SessionDecryptFailed => "decrypting session failed",
-            CryptoError::SessionEncryptFailed => "encrypting session failed",
+            CryptoError::RecoveryPhraseIncorrect => localized_str!("recovery phrase incorrect", ""),
+            CryptoError::KeyGenerationFailed => localized_str!("key generation failed", ""),
+            CryptoError::KeyWrapFailed => localized_str!("wrapping key failed", ""),
+            CryptoError::BlockDecryptFailed => localized_str!("decrypting block failed", ""),
+            CryptoError::BlockEncryptFailed => localized_str!("encrypting block failed", ""),
+            CryptoError::SessionDecryptFailed => localized_str!("decrypting session failed", ""),
+            CryptoError::SessionEncryptFailed => localized_str!("encrypting session failed", ""),
         }
     }
 
@@ -186,21 +186,21 @@ impl std::error::Error for SDError {
             SDError::KeychainError(ref err) => err.description(),
             SDError::RequestFailure(ref err) => err.description(),
             SDError::NetworkFailure(ref err) => err.description(),
-            SDError::ServiceUnavailable => "service unavailable",
+            SDError::ServiceUnavailable => localized_str!("service unavailable", ""),
             SDError::Conflict(ref err) => err.description(),
-            SDError::BlockMissing => "block file missing",
-            SDError::SessionMissing => "session file missing",
-            SDError::BlockUnreadable => "block cannot be used",
-            SDError::SessionUnreadable => "session cannot be used",
-            SDError::RecoveryPhraseIncorrect => "recovery phrase incorrect",
-            SDError::InsufficientFreeSpace => "insufficient free space",
-            SDError::Authentication => "authentication failed",
-            SDError::UnicodeError => "not valid unicode",
-            SDError::TokenExpired => "authentication token expired",
+            SDError::BlockMissing => localized_str!("block file missing", ""),
+            SDError::SessionMissing => localized_str!("session file missing", ""),
+            SDError::BlockUnreadable => localized_str!("block cannot be used", ""),
+            SDError::SessionUnreadable => localized_str!("session cannot be used", ""),
+            SDError::RecoveryPhraseIncorrect => localized_str!("recovery phrase incorrect", ""),
+            SDError::InsufficientFreeSpace => localized_str!("insufficient free space", ""),
+            SDError::Authentication => localized_str!("authentication failed", ""),
+            SDError::UnicodeError => localized_str!("not valid unicode", ""),
+            SDError::TokenExpired => localized_str!("authentication token expired", ""),
             SDError::CryptoError(ref err) => err.description(),
-            SDError::SyncAlreadyInProgress => "folder currently being synced",
-            SDError::RestoreAlreadyInProgress => "folder currently being restored",
-            SDError::ExceededRetries(_) => "exceeded retry count",
+            SDError::SyncAlreadyInProgress => localized_str!("folder currently being synced", ""),
+            SDError::RestoreAlreadyInProgress => localized_str!("folder currently being restored", ""),
+            SDError::ExceededRetries(_) => localized_str!("exceeded retry count", ""),
 
         }
     }
@@ -239,61 +239,61 @@ impl std::fmt::Display for SDError {
                 write!(f, "{}", message)
             },
             SDError::IO(ref err) => {
-                write!(f, "IO failure ({})", err)
+                write!(f, "{} ({})", localized_str!("IO failure", ""), err)
             },
             SDError::KeychainError(ref err) => {
-                write!(f, "Keychain error ({})", err)
+                write!(f, "{} ({})", localized_str!("Keychain error", ""), err)
             },
             SDError::RequestFailure(ref err) => {
-                write!(f, "API request failed: {}", err)
+                write!(f, "{}: {}", localized_str!("API request failed", ""), err)
             },
             SDError::NetworkFailure(ref err) => {
-                write!(f, "Network unavailable: {}", err)
+                write!(f, "{}: {}", localized_str!("Network unavailable", ""), err)
             },
             SDError::ServiceUnavailable => {
-                write!(f, "Service unavailable")
+                write!(f, "{}", localized_str!("Service unavailable", ""))
             },
             SDError::Conflict(ref err) => {
-                write!(f, "API parameter conflict: {}", err)
+                write!(f, "{}: {}", localized_str!("API parameter conflict", ""), err)
             },
             SDError::BlockMissing => {
-                write!(f, "Block not found on server")
+                write!(f, "{}", localized_str!("Block not found on server", ""))
             },
             SDError::SessionMissing => {
-                write!(f, "Session not found on server")
+                write!(f, "{}", localized_str!("Session not found on server", ""))
             },
             SDError::BlockUnreadable => {
-                write!(f, "Block cannot be used")
+                write!(f, "{}", localized_str!("Block cannot be used", ""))
             },
             SDError::SessionUnreadable => {
-                write!(f, "Session cannot be used")
+                write!(f, "{}", localized_str!("Session cannot be used", ""))
             },
             SDError::RecoveryPhraseIncorrect => {
-                write!(f, "Recovery phrase incorrect")
+                write!(f, "{}", localized_str!("Recovery phrase incorrect", ""))
             },
             SDError::InsufficientFreeSpace => {
-                write!(f, "Insufficient free space")
+                write!(f, "{}", localized_str!("Insufficient free space", ""))
             },
             SDError::Authentication => {
-                write!(f, "Authentication failed")
+                write!(f, "{}", localized_str!("Authentication failed", ""))
             },
             SDError::UnicodeError => {
-                write!(f, "Invalid Unicode")
+                write!(f, "{}", localized_str!("Invalid Unicode", ""))
             },
             SDError::TokenExpired => {
-                write!(f, "SafeDrive authentication token expired")
+                write!(f, "{}", localized_str!("SafeDrive authentication token expired", ""))
             },
             SDError::CryptoError(ref err) => {
-                write!(f, "Crypto error: {}", err)
+                write!(f, "{}: {}", localized_str!("Crypto error", ""), err)
             },
             SDError::SyncAlreadyInProgress => {
-                write!(f, "Sync already in progress")
+                write!(f, "{}", localized_str!("Sync already in progress", ""))
             },
             SDError::RestoreAlreadyInProgress => {
-                write!(f, "Restore already in progress")
+                write!(f, "{}", localized_str!("Restore already in progress", ""))
             },
             SDError::ExceededRetries(retries) => {
-                write!(f, "Exceeded retry count ({})", retries)
+                write!(f, "{} ({})", localized_str!("Exceeded retry count", ""), retries)
             },
         }
     }
@@ -372,25 +372,25 @@ impl std::fmt::Display for SDAPIError {
                 write!(f, "{}", err)
             },
             SDAPIError::NetworkFailure => {
-                write!(f, "Network failure")
+                write!(f, "{}", localized_str!("Network failure", ""))
             },
             SDAPIError::ServiceUnavailable => {
-                write!(f, "SafeDrive unavailable")
+                write!(f, "{}", localized_str!("SafeDrive unavailable", ""))
             },
             SDAPIError::Authentication => {
-                write!(f, "API authentication failed")
+                write!(f, "{}", localized_str!("API authentication failed", ""))
             },
             SDAPIError::RetryUpload => {
-                write!(f, "Retry upload")
+                write!(f, "{}", localized_str!("Retry upload", ""))
             },
             SDAPIError::Conflict => {
-                write!(f, "API parameter conflict")
+                write!(f, "{}", localized_str!("API parameter conflict", ""))
             },
             SDAPIError::BlockMissing => {
-                write!(f, "Block not found on server")
+                write!(f, "{}", localized_str!("Block not found on server", ""))
             },
             SDAPIError::SessionMissing => {
-                write!(f, "Session not found on server")
+                write!(f, "{}", localized_str!("Session not found on server", ""))
             },
         }
     }
@@ -402,13 +402,13 @@ impl std::error::Error for SDAPIError {
             SDAPIError::Internal(ref message) => message,
             SDAPIError::IO(ref err) => err.description(),
             SDAPIError::RequestFailed(ref err) => err.description(),
-            SDAPIError::NetworkFailure => "network error",
-            SDAPIError::ServiceUnavailable => "service unavailable",
-            SDAPIError::Authentication => "authentication failed",
-            SDAPIError::RetryUpload => "retry upload",
-            SDAPIError::Conflict => "api parameter conflict",
-            SDAPIError::BlockMissing => "block file missing",
-            SDAPIError::SessionMissing => "session file missing",
+            SDAPIError::NetworkFailure => localized_str!("network error", ""),
+            SDAPIError::ServiceUnavailable => localized_str!("service unavailable", ""),
+            SDAPIError::Authentication => localized_str!("authentication failed", ""),
+            SDAPIError::RetryUpload => localized_str!("retry upload", ""),
+            SDAPIError::Conflict => localized_str!("api parameter conflict", ""),
+            SDAPIError::BlockMissing => localized_str!("block file missing", ""),
+            SDAPIError::SessionMissing => localized_str!("session file missing", ""),
 
         }
     }
