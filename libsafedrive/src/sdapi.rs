@@ -869,51 +869,6 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
     Ok(buffer)
 }
 
-fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
-
-    let mut body: Vec<u8> = Vec::new();
-
-    /// these are compile time optimizations
-    let rn = b"\r\n";
-    let body_boundary = br"--SAFEDRIVEBINARY";
-    let end_boundary =  br"--SAFEDRIVEBINARY--";
-    let content_type = br"Content-Type: application/octet-stream";
-
-
-    let disp = format!("content-disposition: form-data; name=\"file\"; filename=\"{}\"", name);
-    let enc = br"Content-Transfer-Encoding: binary";
-
-
-    body.extend(rn);
-    body.extend(rn);
-
-    body.extend(body_boundary.as_ref());
-    body.extend(rn);
-
-    body.extend(disp.as_bytes());
-    body.extend(rn);
-
-    body.extend(content_type.as_ref());
-    body.extend(rn);
-
-    body.extend(enc.as_ref());
-    body.extend(rn);
-    body.extend(rn);
-
-    body.extend(chunk_data);
-    body.extend(rn);
-
-
-    body.extend(end_boundary.as_ref());
-    body.extend(rn);
-    body.extend(rn);
-
-
-    let content_length = body.len();
-
-    (body, content_length)
-}
-
 fn multipart_for_binary<T>(items: &[T]) -> (Vec<u8>, usize) where T: ::binformat::BinaryWriter {
     let mut body = Vec::new();
     /// these are compile time optimizations
