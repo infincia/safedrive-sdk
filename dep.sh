@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 case $TARGET in
     x86_64-apple-darwin)
         export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
