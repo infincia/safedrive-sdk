@@ -43,7 +43,6 @@ pub enum APIEndpoint<'a> {
     DeleteSyncSession { session_id: u64 },
     DeleteSyncSessions { timestamp: i64 },
     CheckBlock { name: &'a str },
-    WriteBlock { session: &'a str, name: &'a str },
     WriteBlocks { session: &'a str },
     ReadBlock { name: &'a str },
 }
@@ -133,9 +132,6 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::CheckBlock { .. } => {
                 ::reqwest::Method::Head
             },
-            APIEndpoint::WriteBlock { .. } => {
-                ::reqwest::Method::Post
-            },
             APIEndpoint::WriteBlocks { .. } => {
                 ::reqwest::Method::Post
             },
@@ -191,9 +187,6 @@ impl<'a> APIEndpoint<'a> {
             },
             APIEndpoint::CheckBlock { name, .. } => {
                 format!("/api/1/sync/block/{}", name)
-            },
-            APIEndpoint::WriteBlock { session, name, .. } => {
-                format!("/api/1/sync/block/{}/{}", name, session)
             },
             APIEndpoint::WriteBlocks { session } => {
                 format!("/api/1/sync/blocks/multi/{}", session)
@@ -777,47 +770,6 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
             let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
             return Err(SDAPIError::Internal(error.message))
         },
-        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
-
-        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
-    }
-}
-
-pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBlock, should_upload: bool) -> Result<(), SDAPIError> {
-
-    let endpoint = APIEndpoint::WriteBlock { name: name, session: session };
-
-    let user_agent = &**USER_AGENT.read();
-
-    let client = ::reqwest::Client::new().unwrap();
-    let mut request = client.request(endpoint.method(), endpoint.url())
-        .header(::reqwest::header::Connection::close())
-        .header(UserAgent(user_agent.to_string()))
-        .header(SDAuthToken(token.token.to_owned()));
-    if should_upload {
-        let (body, content_length) = multipart_for_bytes(&block.to_binary(), name, true, true);
-        //trace!("body: {}", String::from_utf8_lossy(&body));
-
-        request = request.body(body)
-        .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
-        .header(ContentLength(content_length));
-    }
-
-    trace!("sending request");
-    let mut result = try!(request.send());
-    trace!("response received");
-    let mut response = String::new();
-    trace!("reading response");
-    try!(result.read_to_string(&mut response));
-
-    trace!("response: {}", response);
-
-    match result.status() {
-        &::reqwest::StatusCode::Ok => Ok(()),
-        &::reqwest::StatusCode::Created => Ok(()),
-        &::reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
-        &::reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
-        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
         &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
