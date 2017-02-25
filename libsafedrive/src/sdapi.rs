@@ -36,7 +36,8 @@ pub enum APIEndpoint<'a> {
     CreateFolder { folderPath: &'a str, folderName: &'a str, encrypted: bool },
     DeleteFolder { folder_id: u64 },
     RegisterSyncSession { folder_id: u64, name: &'a str, encrypted: bool },
-    FinishSyncSession { folder_id: u64, name: &'a str, encrypted: bool, size: usize, session_data: &'a [u8] },
+    #[serde(skip_serializing)]
+    FinishSyncSession { folder_id: u64, encrypted: bool, size: usize, session: &'a WrappedSyncSession },
     ReadSyncSession { name: &'a str, encrypted: bool },
     ReadSyncSessions { encrypted: bool },
     DeleteSyncSession { session_id: u64 },
@@ -173,8 +174,8 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::RegisterSyncSession { folder_id, name, .. } => {
                 format!("/api/1/sync/session/register/{}/{}", folder_id, name)
             },
-            APIEndpoint::FinishSyncSession { name, size, .. } => {
-                format!("/api/1/sync/session/{}/{}", name, size)
+            APIEndpoint::FinishSyncSession { size, session, .. } => {
+                format!("/api/1/sync/session/{}/{}", session.name(), size)
             },
             APIEndpoint::ReadSyncSession { name, .. } => {
                 format!("/api/1/sync/session/{}", name)
@@ -588,11 +589,12 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
     Ok(())
 }
 
-pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool, session_data: &[u8], size: usize) -> Result<(), SDAPIError> {
+pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, session: &[WrappedSyncSession], size: usize) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, name: name, encrypted: encrypted, size: size, session_data: session_data };
+    let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, encrypted: encrypted, size: size, session: &session[0] };
 
-    let (body, content_length) = multipart_for_bytes(session_data, name, true, true);
+    let (multipart_body, content_length) = multipart_for_binary(session);
+
 
     //trace!("body: {}", String::from_utf8_lossy(&body));
 
@@ -600,7 +602,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, enc
 
     let client = ::reqwest::Client::new().unwrap();
     let request = client.request(endpoint.method(), endpoint.url())
-        .body(body)
+        .body(multipart_body)
         .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()))

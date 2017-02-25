@@ -756,8 +756,9 @@ pub fn sync(token: &Token,
         Err(e) => return Err(SDError::CryptoError(Box::new(e))),
     };
 
-    let binary_data = wrapped_session.to_binary();
+    let mut s: Vec<WrappedSyncSession> = Vec::new();
 
+    s.push(wrapped_session);
 
     debug!("finishing sync session");
 
@@ -785,7 +786,7 @@ pub fn sync(token: &Token,
             thread::sleep(delay);
         }
 
-        match finish_sync_session(&token, folder_id, session_name, true, &binary_data, processed_size as usize) {
+        match finish_sync_session(&token, folder_id, true, &s, processed_size as usize) {
             Ok(()) => {
                 should_retry = false;
             },
