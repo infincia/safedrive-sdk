@@ -75,6 +75,7 @@ public enum SDKErrorType {
     case BlockUnreadable
     case SessionUnreadable
     case ServiceUnavailable
+    case Cancelled
 }
 
 public struct SDKError: Error {
@@ -134,6 +135,8 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
         type = SDKErrorType.SessionUnreadable
     case ServiceUnavailable:
         type = SDKErrorType.ServiceUnavailable
+    case Cancelled:
+        type = SDKErrorType.Cancelled
     default:
         fatalError("no error type for \(sdkError.error_type)")
         break
