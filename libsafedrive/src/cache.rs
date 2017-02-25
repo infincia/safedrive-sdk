@@ -8,6 +8,108 @@ use ::CACHE_DIR;
 use ::block::WrappedBlock;
 use ::error::SDError;
 
+pub struct WriteCache<T> {
+    waiting: Vec<T>,
+    item_limit: usize,
+    data_limit: usize,
+    data_waiting: usize,
+    received_final_item: bool,
+}
+
+
+impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
+    pub fn new(item_limit: usize, data_limit: usize) -> WriteCache<T> where T: ::binformat::BinaryWriter {
+        let waiting_list: Vec<T> = Vec::new();
+
+        WriteCache {
+            waiting: waiting_list,
+            item_limit: item_limit,
+            data_limit: data_limit,
+            data_waiting: 0,
+            received_final_item: false,
+        }
+    }
+    pub fn add(&mut self, block: T) {
+        self.data_waiting += block.len();
+
+        self.waiting.push(block);
+    }
+
+    pub fn add_many(&mut self, blocks: Vec<T>) {
+        for block in blocks {
+            self.data_waiting += block.len();
+            self.waiting.push(block);
+        }
+    }
+
+    pub fn remove(&mut self) -> Option<T> {
+        match self.waiting.pop() {
+            Some(block) => {
+                self.data_waiting -= block.len();
+
+                Some(block)
+            },
+            None => None,
+        }
+    }
+
+    pub fn request_waiting_items(&mut self) -> Option<Vec<T>> {
+        if self.full() || self.received_final_item {
+            let pretty_size_limit = ::util::pretty_bytes(self.data_limit as f64);
+
+            debug!("requesting items from the write cache (limit: {} or {})", self.item_limit, pretty_size_limit);
+            let mut r: Vec<T> = Vec::new();
+
+            let mut taken_count = 0;
+            let mut taken_size = 0;
+
+            // limit request to `self.desired_group_size` or 100 items, whichever we hit first
+            while taken_size < self.data_limit && taken_count < self.item_limit {
+                match self.remove() {
+                    Some(item) => {
+                        taken_size += item.len();
+                        taken_count += 1;
+
+                        r.push(item)
+                    },
+                    None => break,
+                }
+            }
+            let pretty = ::util::pretty_bytes(taken_size as f64);
+
+            debug!("write cache provided {} items ({})", taken_count, pretty);
+
+            return Some(r)
+        }
+
+        None
+    }
+
+    pub fn received_final_item(&self) -> bool {
+        self.received_final_item
+    }
+
+    pub fn set_received_final_item(&mut self, value: bool) {
+        self.received_final_item = value;
+    }
+
+    pub fn item_limit(&self) -> usize {
+        self.item_limit
+    }
+
+    pub fn data_limit(&self) -> usize {
+        self.data_limit
+    }
+
+    pub fn items_waiting(&self) -> usize {
+        self.waiting.len()
+    }
+
+    pub fn full(&self) -> bool {
+        self.data_waiting >= self.data_limit
+    }
+}
+
 pub fn clean_cache(limit: u64) -> Result<u64, SDError> {
     let cd = CACHE_DIR.read();
     let bp = PathBuf::from(&*cd);
