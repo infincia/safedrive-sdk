@@ -882,6 +882,7 @@ pub fn sync(token: &Token,
             debug!("thread join failed");
         }
     }
+    debug!("processing session and statistics");
 
     /// since we're writing to a buffer in memory there shouldn't be any errors here...
     /// unless the system is also completely out of memory, but there's nothing we can do about that,
