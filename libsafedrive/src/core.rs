@@ -1050,6 +1050,10 @@ pub fn sync(token: &Token,
         let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
         if failed_count >= 1.0 {
+            if is_sync_task_cancelled(session_name.to_owned()) {
+                issue(&format!("sync cancelled ({})", session_name));
+                return Err(SDError::Cancelled)
+            }
             /// back off significantly every time a call fails
             let backoff_time = backoff_multiplier * (failed_count * failed_count);
             let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
