@@ -53,29 +53,29 @@ public struct SafeDriveNotification {
     public let message: String
 }
 
-public enum SDKErrorType {
-    case StateMissing
-    case Internal
-    case RequestFailure
-    case NetworkFailure
-    case Conflict
-    case BlockMissing
-    case SessionMissing
-    case RecoveryPhraseIncorrect
-    case InsufficientFreeSpace
-    case Authentication
-    case UnicodeError
-    case TokenExpired
-    case CryptoError
-    case IO
-    case SyncAlreadyInProgress
-    case RestoreAlreadyInProgress
-    case ExceededRetries
-    case KeychainError
-    case BlockUnreadable
-    case SessionUnreadable
-    case ServiceUnavailable
-    case Cancelled
+public enum SDKErrorType: Int {
+    case StateMissing = 0x0000
+    case Internal = 0x0001
+    case RequestFailure = 0x0002
+    case NetworkFailure = 0x0003
+    case Conflict = 0x0004
+    case BlockMissing = 0x0005
+    case SessionMissing = 0x0006
+    case RecoveryPhraseIncorrect = 0x0007
+    case InsufficientFreeSpace = 0x0008
+    case Authentication = 0x0009
+    case UnicodeError = 0x000A
+    case TokenExpired = 0x000B
+    case CryptoError = 0x000C
+    case IO = 0x000D
+    case SyncAlreadyInProgress = 0x000E
+    case RestoreAlreadyInProgress = 0x000F
+    case ExceededRetries = 0x0010
+    case KeychainError = 0x0011
+    case BlockUnreadable = 0x0012
+    case SessionUnreadable = 0x0013
+    case ServiceUnavailable = 0x0014
+    case Cancelled = 0x0015
 }
 
 public struct SDKError: Error {
@@ -98,56 +98,12 @@ public struct SDKError: Error {
 
 
 
+
+
 func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
     let s = String(cString: sdkError.message!)
-    var type: SDKErrorType
-    
-    switch sdkError.error_type {
-    case Internal:
-        type = SDKErrorType.Internal
-    case RequestFailure:
-        type = SDKErrorType.RequestFailure
-    case NetworkFailure:
-        type = SDKErrorType.NetworkFailure
-    case Conflict:
-        type = SDKErrorType.Conflict
-    case BlockMissing:
-        type = SDKErrorType.BlockMissing
-    case SessionMissing:
-        type = SDKErrorType.SessionMissing
-    case RecoveryPhraseIncorrect:
-        type = SDKErrorType.RecoveryPhraseIncorrect
-    case InsufficientFreeSpace:
-        type = SDKErrorType.InsufficientFreeSpace
-    case Authentication:
-        type = SDKErrorType.Authentication
-    case UnicodeError:
-        type = SDKErrorType.UnicodeError
-    case TokenExpired:
-        type = SDKErrorType.TokenExpired
-    case CryptoError:
-        type = SDKErrorType.CryptoError
-    case IO:
-        type = SDKErrorType.IO
-    case SyncAlreadyInProgress:
-        type = SDKErrorType.SyncAlreadyInProgress
-    case RestoreAlreadyInProgress:
-        type = SDKErrorType.RestoreAlreadyInProgress
-    case ExceededRetries:
-        type = SDKErrorType.ExceededRetries
-    case KeychainError:
-        type = SDKErrorType.KeychainError
-    case BlockUnreadable:
-        type = SDKErrorType.BlockUnreadable
-    case SessionUnreadable:
-        type = SDKErrorType.SessionUnreadable
-    case ServiceUnavailable:
-        type = SDKErrorType.ServiceUnavailable
-    case Cancelled:
-        type = SDKErrorType.Cancelled
-    default:
+    guard let type = SDKErrorType(rawValue: Int(sdkError.error_type.rawValue)) else {
         fatalError("no error type for \(sdkError.error_type)")
-        break
     }
 
     return SDKError(message: s, kind: type)
