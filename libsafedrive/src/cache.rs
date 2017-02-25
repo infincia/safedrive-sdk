@@ -121,6 +121,10 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
         self.waiting.len()
     }
 
+    pub fn data_waiting(&self) -> usize {
+        self.data_waiting
+    }
+
     pub fn full(&self) -> bool {
         self.data_waiting >= self.data_limit
     }
