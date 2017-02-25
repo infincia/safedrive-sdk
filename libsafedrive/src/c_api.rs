@@ -1820,6 +1820,8 @@ pub extern "C" fn sddk_cancel_sync_task(name: *const std::os::raw::c_char,
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
 ///
+///     issue: a C function pointer that will be called periodically to report sync issues
+///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
 ///
@@ -1927,6 +1929,8 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 ///     destination: a stack-allocated, NULL-terminated UTF-8 string representing the path the sync session will be restored to
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
+///
+///     issue: a C function pointer that will be called periodically to report restore issues
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
