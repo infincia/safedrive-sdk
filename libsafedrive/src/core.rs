@@ -739,7 +739,7 @@ pub fn sync(token: &Token,
             return Err(SDError::Cancelled)
         }
 
-        debug!("examining {}", item.path().display());
+        trace!("examining {}", item.path().display());
 
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
 
@@ -891,23 +891,23 @@ pub fn sync(token: &Token,
                 if DEBUG_STATISTICS {
                     let compression_ratio = (stats.processed_size_compressed as f64 / stats.processed_size as f64 ) * 100.0;
 
-                    debug!("{} chunks", stats.discovered_chunk_count);
-                    debug!("average size: {} bytes", stats.processed_size / stats.discovered_chunk_count);
-                    debug!("compression: {}/{} ({}%)", stats.processed_size_compressed, stats.processed_size, compression_ratio);
+                    trace!("{} chunks", stats.discovered_chunk_count);
+                    trace!("average size: {} bytes", stats.processed_size / stats.discovered_chunk_count);
+                    trace!("compression: {}/{} ({}%)", stats.processed_size_compressed, stats.processed_size, compression_ratio);
 
                     let padding_ratio = (item_padding as f64 / stats.processed_size_compressed as f64 ) * 100.0;
 
-                    debug!("padding overhead: {} ({}%)", item_padding, padding_ratio);
+                    trace!("padding overhead: {} ({}%)", item_padding, padding_ratio);
 
-                    debug!("hmac bag has: {} ids <{} bytes>", hmac_bag.len() / 32, stats.discovered_chunk_count * 32);
-                    debug!("expected chunk size: {} bytes", stats.discovered_chunk_expected_size);
-                    debug!("smallest chunk: {} bytes", stats.discovered_chunk_smallest_size);
-                    debug!("largest chunk: {} bytes", stats.discovered_chunk_largest_size);
-                    debug!("standard size deviation: {} bytes", (stats.discovered_chunk_size_variance as f64 / stats.discovered_chunk_count as f64).sqrt() as u64);
+                    trace!("hmac bag has: {} ids <{} bytes>", hmac_bag.len() / 32, stats.discovered_chunk_count * 32);
+                    trace!("expected chunk size: {} bytes", stats.discovered_chunk_expected_size);
+                    trace!("smallest chunk: {} bytes", stats.discovered_chunk_smallest_size);
+                    trace!("largest chunk: {} bytes", stats.discovered_chunk_largest_size);
+                    trace!("standard size deviation: {} bytes", (stats.discovered_chunk_size_variance as f64 / stats.discovered_chunk_count as f64).sqrt() as u64);
                 }
 
                 assert!(stats.processed_size == stream_length);
-                debug!("calculated {} real bytes of blocks, matching stream size {}", stats.processed_size, stream_length);
+                trace!("calculated {} real bytes of blocks, matching stream size {}", stats.processed_size, stream_length);
 
                 header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); /// hmac list size
                 header.set_cksum();
