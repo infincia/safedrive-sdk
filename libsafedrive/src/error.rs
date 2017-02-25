@@ -176,6 +176,7 @@ pub enum SDError {
     SyncAlreadyInProgress,
     RestoreAlreadyInProgress,
     ExceededRetries(u64),
+    Cancelled,
 }
 
 impl std::error::Error for SDError {
@@ -201,6 +202,8 @@ impl std::error::Error for SDError {
             SDError::SyncAlreadyInProgress => localized_str!("folder currently being synced", ""),
             SDError::RestoreAlreadyInProgress => localized_str!("folder currently being restored", ""),
             SDError::ExceededRetries(_) => localized_str!("exceeded retry count", ""),
+            SDError::Cancelled => localized_str!("cancelled sync/restore", ""),
+
 
         }
     }
@@ -227,7 +230,7 @@ impl std::error::Error for SDError {
             SDError::SyncAlreadyInProgress => None,
             SDError::RestoreAlreadyInProgress => None,
             SDError::ExceededRetries(_) => None,
-
+            SDError::Cancelled => None,
         }
     }
 }
@@ -294,6 +297,9 @@ impl std::fmt::Display for SDError {
             },
             SDError::ExceededRetries(retries) => {
                 write!(f, "{} ({})", localized_str!("Exceeded retry count", ""), retries)
+            },
+            SDError::Cancelled => {
+                write!(f, "{}", localized_str!("Cancelled sync/restore", ""))
             },
         }
     }

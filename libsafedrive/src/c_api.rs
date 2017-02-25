@@ -238,6 +238,7 @@ pub enum SDDKErrorType {
     BlockUnreadable = 0x0012,
     SessionUnreadable = 0x0013,
     ServiceUnavailable = 0x0014,
+    Cancelled = 0x0015,
 }
 
 #[derive(Debug)]
@@ -309,6 +310,9 @@ impl From<SDError> for SDDKError {
             },
             SDError::ServiceUnavailable => {
                 SDDKErrorType::ServiceUnavailable
+            },
+            SDError::Cancelled => {
+                SDDKErrorType::Cancelled
             },
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
