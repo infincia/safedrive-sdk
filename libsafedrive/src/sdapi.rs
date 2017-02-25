@@ -595,6 +595,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, s
 
     let (multipart_body, content_length) = multipart_for_binary(session);
 
+    trace!("session body: {}", String::from_utf8_lossy(&multipart_body));
 
     //trace!("body: {}", String::from_utf8_lossy(&body));
 
