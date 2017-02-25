@@ -11,6 +11,12 @@ extern crate chrono;
 
 extern crate number_prefix;
 
+macro_rules! localized_str {
+    ($key:expr, $comment:expr) => {{
+        $key
+    }};
+}
+
 mod c_api;
 mod core;
 mod constants;
