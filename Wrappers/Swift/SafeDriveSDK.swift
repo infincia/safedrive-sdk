@@ -82,6 +82,14 @@ public struct SDKError: Error {
     public var message: String
     public var kind: SDKErrorType
     
+    var localizedDescription: String {
+        return self.message
+    }
+    
+    var code: Int {
+        return self.kind.rawValue
+    }
+    
     public init(message: String, kind: SDKErrorType) {
         self.message = message
         self.kind = kind
