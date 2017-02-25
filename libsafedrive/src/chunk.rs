@@ -107,7 +107,7 @@ impl<'a> Iterator for BlockGenerator<'a> {
                 self.discovered_chunk_count += 1;
                 self.processed_size += chunk.size;
 
-                debug!("creating chunk at {} of size {}", self.chunk_index, chunk.size);
+                trace!("creating chunk at {} of size {}", self.chunk_index, chunk.size);
 
                 self.discovered_chunk_smallest_size = min(self.discovered_chunk_smallest_size, chunk.size);
                 self.discovered_chunk_largest_size = max(self.discovered_chunk_largest_size, chunk.size);
@@ -129,11 +129,11 @@ impl<'a> Iterator for BlockGenerator<'a> {
                     Some(size) => {
                         let ratio = (size as f64 / block.real_size() as f64) * 100.0;
 
-                        debug!("generated compressed block, size {}/{} ({}%)", size, block.real_size(), ratio);
+                        trace!("generated compressed block, size {}/{} ({}%)", size, block.real_size(), ratio);
                         self.processed_size_compressed += size;
                     },
                     None => {
-                        debug!("generated uncompressed block, real size {}", block.real_size());
+                        trace!("generated uncompressed block, real size {}", block.real_size());
                         self.processed_size_compressed += block.real_size();
 
                     },
