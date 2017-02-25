@@ -825,7 +825,7 @@ pub fn write_block(token: &Token, session: &str, name: &str, block: &WrappedBloc
 }
 
 #[allow(dead_code)]
-pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedBlock], should_upload: bool) -> Result<(), SDAPIError> {
+pub fn write_blocks(token: &Token, session: &str, blocks: &[WrappedBlock]) -> Result<Vec<String>, SDAPIError> {
 
     let endpoint = APIEndpoint::WriteBlocks { session: session };
 
@@ -836,22 +836,17 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
         .header(::reqwest::header::Connection::close())
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
-    if should_upload {
-        let mut multipart_body = Vec::new();
-        let mut total_size = 0 as usize;
-        for (i, block) in blocks.iter().enumerate() {
-            let first = i == 0;
-            let last = i == blocks.len() -1;
-            let (body, content_length) = multipart_for_bytes(&block.to_binary(), name, first, last);
-            total_size += content_length;
-            multipart_body.extend(body);
-        }
-        //trace!("body: {}", String::from_utf8_lossy(&body));
 
-        request = request.body(multipart_body)
-            .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
-            .header(ContentLength(total_size));
-    }
+    let (multipart_body, content_length) = multipart_for_binary(blocks);
+
+    trace!("multiblock body: {}", String::from_utf8_lossy(&multipart_body));
+
+    request = request.body(multipart_body)
+        .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
+        .header(ContentLength(content_length));
+
+
+
 
     trace!("sending request");
     let mut result = try!(request.send());
@@ -863,15 +858,19 @@ pub fn write_blocks(token: &Token, session: &str, name: &str, blocks: &[WrappedB
     trace!("response: {}", response);
 
     match result.status() {
-        &::reqwest::StatusCode::Ok => Ok(()),
-        &::reqwest::StatusCode::Created => Ok(()),
-        &::reqwest::StatusCode::BadRequest => Err(SDAPIError::RetryUpload),
-        &::reqwest::StatusCode::NotFound => Err(SDAPIError::RetryUpload),
+        &::reqwest::StatusCode::Ok => {},
+        &::reqwest::StatusCode::Created => {},
+        &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::RetryUpload),
+        &::reqwest::StatusCode::NotFound => return Err(SDAPIError::RetryUpload),
         &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
         &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
 
         _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
     }
+
+    let missing: Vec<String> = try!(::serde_json::from_str(&response));
+
+    Ok(missing)
 }
 
 
