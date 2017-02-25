@@ -441,14 +441,14 @@ pub fn is_sync_task_cancelled(name: String) -> bool {
     cancelled
 }
 
-fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandle<()>, ::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage<WrappedBlock>>, ::std::sync::mpsc::Receiver<Result<usize, SDError>>) {
+fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandle<()>, ::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage<WrappedBlock>>, ::std::sync::mpsc::Receiver<Result<(bool, usize), SDError>>) {
     let item_limit = 300;
     let size_limit = 10_000_000;
 
     let mut write_cache: ::cache::WriteCache<WrappedBlock> = ::cache::WriteCache::new(item_limit, size_limit);
 
     let (block_send, block_receive) = ::std::sync::mpsc::sync_channel::<::cache::WriteCacheMessage<WrappedBlock>>(0);
-    let (status_send, status_receive) = ::std::sync::mpsc::channel::<Result<usize, SDError>>();
+    let (status_send, status_receive) = ::std::sync::mpsc::channel::<Result<(bool, usize), SDError>>();
 
     let local_token = token.clone();
 
@@ -539,6 +539,16 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
             let mut retries_left = 15.0;
 
             while should_retry {
+                if is_sync_task_cancelled(local_session_name.to_owned()) {
+                    match status_send.send(Err(SDError::Cancelled)) {
+                        Ok(()) => {},
+                        Err(e) => {
+                            debug!("channel exited: {}", e);
+                            break;
+                        },
+                    }
+                }
+
                 let failed_count = 15.0 - retries_left;
                 let mut rng = ::rand::thread_rng();
 
@@ -548,11 +558,27 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                 let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
                 if retries_left > 0.0 {
-                    let backoff_time = backoff_multiplier * (failed_count * failed_count);
-                    let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
-                    debug!("backing off for {} seconds", delay.as_secs());
+                    let mut backoff_time = backoff_multiplier * (failed_count * failed_count) * 1000.0;
 
-                    thread::sleep(delay);
+
+                    while backoff_time > 0.0 {
+                        debug!("backed off for {} seconds", backoff_time);
+
+                        if is_sync_task_cancelled(local_session_name.to_owned()) {
+                            match status_send.send(Err(SDError::Cancelled)) {
+                                Ok(()) => {
+                                    return;
+                                },
+                                Err(e) => {
+                                    debug!("channel exited: {}", e);
+                                    break;
+                                },
+                            }
+                        }
+
+                        backoff_time -= 1000.0;
+                        thread::sleep_ms(1000);
+                    }
                 }
 
                 match write_blocks(&local_token, &local_session_name, &block_batch) {
@@ -576,8 +602,7 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                             }
                         }
 
-
-                        match status_send.send(Ok(total_length - missing_length)) {
+                        match status_send.send(Ok((false, total_length - missing_length))) {
                             Ok(()) => {},
                             Err(e) => {
                                 debug!("channel exited: {}", e);
@@ -612,6 +637,15 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
             }
 
         }
+
+        match status_send.send(Ok((true, 0))) {
+            Ok(()) => {},
+            Err(e) => {
+                debug!("channel exited: {}", e);
+                return;
+            },
+        }
+
     });
 
     (write_thread, block_send, status_receive)
@@ -766,7 +800,7 @@ pub fn sync(token: &Token,
                     match status_receive.try_recv() {
                         Ok(msg) => {
                             match msg {
-                                Ok(sent) => {
+                                Ok((_, sent)) => {
                                     processed_size += sent as u64;
 
                                     progress(estimated_size, processed_size, sent as u64, percent_completed, false);
@@ -925,13 +959,33 @@ pub fn sync(token: &Token,
     }
 
     debug!("waiting for write cache to finish");
+    issue(&format!("waiting for write cache to finish"));
 
-    match write_thread.join() {
-        Ok(()) => {},
-        Err(_) => {
-            debug!("thread join failed");
-        }
+    loop {
+        match status_receive.try_recv() {
+            Ok(msg) => {
+                match msg {
+                    Ok((finished, _)) => {
+                        if finished {
+                            break;
+                        }
+                    },
+                    Err(e) => return Err(e)
+                };
+            },
+            Err(e) => {
+                match e {
+                    ::std::sync::mpsc::TryRecvError::Empty => {
+                        break;
+                    },
+                    ::std::sync::mpsc::TryRecvError::Disconnected => {
+                        break;
+                    },
+                }
+            },
+        };
     }
+
     debug!("processing session and statistics");
 
     /// since we're writing to a buffer in memory there shouldn't be any errors here...
