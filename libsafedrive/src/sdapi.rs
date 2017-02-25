@@ -196,7 +196,7 @@ impl<'a> APIEndpoint<'a> {
                 format!("/api/1/sync/block/{}/{}", name, session)
             },
             APIEndpoint::WriteBlocks { session } => {
-                format!("/api/1/sync/blocks/{}", session)
+                format!("/api/1/sync/blocks/multi/{}", session)
             },
             APIEndpoint::ReadBlock { name, .. } => {
                 format!("/api/1/sync/block/{}", name)
