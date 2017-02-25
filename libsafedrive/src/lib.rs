@@ -157,6 +157,10 @@ lazy_static! {
     static ref LANGUAGE_CODE: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 
+lazy_static! {
+    static ref CANCEL_LIST: ::parking_lot::RwLock<Vec<String>> = ::parking_lot::RwLock::new(Vec::new());
+}
+
 
 
 

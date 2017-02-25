@@ -25,6 +25,7 @@ use ::core::sync;
 use ::core::restore;
 use ::core::load_keys;
 use ::core::login;
+use ::core::cancel_sync_task;
 
 use ::constants::Configuration;
 
@@ -1752,6 +1753,54 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
 pub extern "C" fn sddk_gc(state: *mut SDDKState,
                           mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let _ = unsafe{ assert!(!state.is_null()); &mut * state };
+    0
+}
+
+/// Cancel a sync or restore by name
+///
+///
+/// Parameters:
+///
+///     name: a NULL-terminated UUIDv4 string representing the name of the sync session
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+/// # Examples
+///
+/// ```c
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_cancel_sync_task("02c0dc9c-6217-407b-a3ef-0d7ac5f288b1", &error)) {
+///     printf("Failed to cancel sync task");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Cancelled sync task");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_cancel_sync_task(name: *const std::os::raw::c_char,
+                                        mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let c_name: &CStr = unsafe { CStr::from_ptr(name) };
+    let n: String = match c_name.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    cancel_sync_task(&n);
+
     0
 }
 

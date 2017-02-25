@@ -33,6 +33,7 @@ use ::OPERATING_SYSTEM;
 use ::LANGUAGE_CODE;
 use ::SYNC_VERSION;
 use ::CHANNEL;
+use ::CANCEL_LIST;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
@@ -424,6 +425,22 @@ pub fn remove_sync_sessions_before(token: &Token,
     }
 }
 
+pub fn cancel_sync_task(name: &str) {
+    let mut cl = CANCEL_LIST.write();
+    cl.push(name.to_owned());
+}
+
+pub fn is_sync_task_cancelled(name: String) -> bool {
+    let mut cl = CANCEL_LIST.write();
+    let mut cancelled = false;
+
+    { if cl.contains(&name) { cancelled = true; } }
+
+    { if cancelled { cl.retain(|&ref x| x != &name); }}
+
+    cancelled
+}
+
 fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandle<()>, ::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage<WrappedBlock>>, ::std::sync::mpsc::Receiver<Result<usize, SDError>>) {
     let item_limit = 100;
     let size_limit = 25_000_000;
@@ -670,6 +687,20 @@ pub fn sync(token: &Token,
     let mut percent_completed: f64 = (processed_size as f64 / estimated_size as f64) * 100.0;
 
     for item in WalkDir::new(&folder_path).into_iter().filter_map(|e| e.ok()) {
+        if is_sync_task_cancelled(session_name.to_owned()) {
+            let cache_message = ::cache::WriteCacheMessage::new(None, true, None);
+
+            match block_send.send(cache_message) {
+                Ok(()) => {
+
+                },
+                Err(e) => {
+                    issue(&format!("not able to cancel upload: ({})", e));
+                },
+            }
+            return Err(SDError::Cancelled)
+        }
+
         debug!("examining {}", item.path().display());
 
         percent_completed = (processed_size as f64 / estimated_size as f64) * 100.0;
@@ -716,6 +747,20 @@ pub fn sync(token: &Token,
                 let mut block_failed = false;
 
                 for block_result in block_generator.by_ref() {
+                    if is_sync_task_cancelled(session_name.to_owned()) {
+                        let cache_message = ::cache::WriteCacheMessage::new(None, true, None);
+
+                        match block_send.send(cache_message) {
+                            Ok(()) => {
+
+                            },
+                            Err(e) => {
+                                issue(&format!("not able to cancel upload: ({})", e));
+                            },
+                        }
+                        return Err(SDError::Cancelled)
+                    }
+
                     match status_receive.try_recv() {
                         Ok(msg) => {
                             match msg {
@@ -1045,6 +1090,9 @@ pub fn restore(token: &Token,
     let archive_reading_start_time = ::std::time::Instant::now();
 
     for item in ar.entries().unwrap() {
+        if is_sync_task_cancelled(session_name.to_owned()) {
+            return Err(SDError::Cancelled)
+        }
         let restore_item_start_time = ::std::time::Instant::now();
 
         let percent_completed: f64 = (processed_size as f64 / session_size as f64) * 100.0;
@@ -1118,6 +1166,10 @@ pub fn restore(token: &Token,
 
 
                     for block_hmac in block_hmac_list.iter() {
+                        if is_sync_task_cancelled(session_name.to_owned()) {
+                            return Err(SDError::Cancelled)
+                        }
+
                         let block_start_time = ::std::time::Instant::now();
 
                         /// allow caller to tick the progress display, if one exists
@@ -1144,6 +1196,9 @@ pub fn restore(token: &Token,
                         };
 
                         while should_retry {
+                            if is_sync_task_cancelled(session_name.to_owned()) {
+                                return Err(SDError::Cancelled)
+                            }
 
                             let failed_count = 15.0 - retries_left;
                             let mut rng = ::rand::thread_rng();
