@@ -442,8 +442,8 @@ pub fn is_sync_task_cancelled(name: String) -> bool {
 }
 
 fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandle<()>, ::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage<WrappedBlock>>, ::std::sync::mpsc::Receiver<Result<usize, SDError>>) {
-    let item_limit = 100;
-    let size_limit = 25_000_000;
+    let item_limit = 300;
+    let size_limit = 10_000_000;
 
     let mut write_cache: ::cache::WriteCache<WrappedBlock> = ::cache::WriteCache::new(item_limit, size_limit);
 
