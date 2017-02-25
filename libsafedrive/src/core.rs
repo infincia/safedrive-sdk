@@ -19,6 +19,7 @@ use ::block::*;
 use ::constants::*;
 use ::sdapi::*;
 use ::keys::*;
+use ::binformat::BinaryWriter;
 
 #[cfg(feature = "locking")]
 use ::lock::{FolderLock};
@@ -421,6 +422,180 @@ pub fn remove_sync_sessions_before(token: &Token,
         Ok(()) => Ok(()),
         Err(e) => Err(SDError::from(e))
     }
+}
+
+fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandle<()>, ::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage<WrappedBlock>>, ::std::sync::mpsc::Receiver<Result<usize, SDError>>) {
+    let item_limit = 100;
+    let size_limit = 25_000_000;
+
+    let mut write_cache: ::cache::WriteCache<WrappedBlock> = ::cache::WriteCache::new(item_limit, size_limit);
+
+    let (block_send, block_receive) = ::std::sync::mpsc::sync_channel::<::cache::WriteCacheMessage<WrappedBlock>>(0);
+    let (status_send, status_receive) = ::std::sync::mpsc::channel::<Result<usize, SDError>>();
+
+    let local_token = token.clone();
+
+    let local_session_name = session_name.to_owned();
+
+    let write_thread: ::std::thread::JoinHandle<()> = thread::spawn(move || {
+
+        loop {
+
+            // check to see if we're finished, we need to ensure that we have already put the last
+            // block in the cache and that the cache is now empty before exiting
+            if write_cache.received_final_item() == true && write_cache.items_waiting() == 0 {
+                return;
+            }
+
+
+            // if the cache is not full, receive a new message from the block iteration thread,
+            // this should keep the cache close to full most of the time without stuttering
+
+            if !write_cache.full() {
+                debug!("write cache not full");
+
+                let cache_message = match block_receive.recv() {
+                    Ok(message) => message,
+                    Err(e) => {
+                        debug!("WriteCacheMessage: end of channel {}", e);
+                        break;
+                    },
+                };
+
+                // if we were told to stop processing blocks, just stop immediately
+                if cache_message.stop {
+                    return;
+                }
+
+                // check to see if we were given a new block, if so store it in the cache. if we don't
+                // get a block here, it will be because the block iterator thread is completely done
+                // and waiting for this thread to finish uploading them
+                match cache_message.item {
+                    Some(block) => {
+                        write_cache.add(block);
+                    },
+                    None => {
+                        write_cache.set_received_final_item(true);
+                    }
+                };
+            } else {
+                debug!("write cache full");
+            }
+
+            debug!("{} blocks waiting", write_cache.items_waiting());
+
+            // The write cache has both size and item limits, because we need to avoid sending
+            // too many blocks or too little data with each request. We try to achieve a balance,
+            // sending more blocks if they are very small, fewer if they are very large.
+            //
+            // For example:
+            //
+            // A group of 100x 256KiB blocks is 25MiB
+            // a group of 100x 256B blocks is 25KiB
+            //
+            // The tiny group is not worth the HTTP request unless we have no more waiting, but even
+            // sending 5x more of the smaller blocks will still only get us a 1MiB request
+
+            let block_batch = match write_cache.request_waiting_items() {
+                Some(block_batch) => block_batch,
+                None => {
+                    debug!("not enough in cache to pop a group, waiting");
+                    continue
+                },
+            };
+
+            if block_batch.len() <= 0 {
+                debug!("cache returned a zero length group, skipping request");
+
+                continue; // failsafe to prevent sending requests with no blocks
+            }
+
+            debug!("sending {} blocks", block_batch.len());
+
+            let block_write_start_time = ::std::time::Instant::now();
+
+
+
+            let mut should_retry = true;
+            let mut retries_left = 15.0;
+
+            while should_retry {
+                let failed_count = 15.0 - retries_left;
+                let mut rng = ::rand::thread_rng();
+
+                /// pick a random multiplier, avoid letting a bunch of clients retry the request
+                /// at the same 2/4/8/16 backoff times to limit server load spikes
+
+                let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+                if retries_left > 0.0 {
+                    let backoff_time = backoff_multiplier * (failed_count * failed_count);
+                    let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+                    debug!("backing off for {} seconds", delay.as_secs());
+
+                    thread::sleep(delay);
+                }
+
+                match write_blocks(&local_token, &local_session_name, &block_batch) {
+                    Ok(missing) => {
+                        debug!("sending group took {} seconds", block_write_start_time.elapsed().as_secs());
+                        should_retry = false;
+
+                        let mut total_length = 0;
+                        let mut missing_length = 0;
+
+                        for block in &block_batch {
+                            total_length += block.len();
+                            let bn = &block.name();
+                            if missing.contains(bn) {
+                                debug!("server missing block, returning to the cache: {}", bn);
+                                missing_length += block.len();
+
+                                let mut c = block.clone();
+                                c.needs_upload();
+                                write_cache.add(c);
+                            }
+                        }
+
+
+                        match status_send.send(Ok(total_length - missing_length)) {
+                            Ok(()) => {},
+                            Err(e) => {
+                                debug!("channel exited: {}", e);
+                                break;
+                            },
+                        }
+                    },
+                    Err(SDAPIError::RequestFailed(_)) => {
+                        retries_left = retries_left - 1.0;
+                        if retries_left <= 0.0 {
+                            match status_send.send(Err(SDError::ExceededRetries(15))) {
+                                Ok(()) => {},
+                                Err(e) => {
+                                    debug!("channel exited: {}", e);
+                                    break;
+                                },
+                            }
+                        }
+                    },
+                    Err(SDAPIError::Authentication) => {
+                        match status_send.send(Err(SDError::Authentication)) {
+                            Ok(()) => {},
+                            Err(e) => {
+                                debug!("channel exited: {}", e);
+                                break;
+                            },
+                        }
+                    },
+                    _ => {}
+                }
+
+            }
+
+        }
+    });
+
+    (write_thread, block_send, status_receive)
 }
 
 pub fn sync(token: &Token,
