@@ -499,7 +499,9 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                 debug!("write cache full");
             }
 
-            debug!("{} blocks waiting", write_cache.items_waiting());
+            let pretty_size = ::util::pretty_bytes(write_cache.data_waiting() as f64);
+
+            debug!("{} blocks waiting ({})", write_cache.items_waiting(), pretty_size);
 
             // The write cache has both size and item limits, because we need to avoid sending
             // too many blocks or too little data with each request. We try to achieve a balance,
