@@ -16,7 +16,7 @@ use ::session::*;
 use ::keys::*;
 use ::constants::*;
 use ::USER_AGENT;
-
+use ::binformat::BinaryWriter;
 
 
 header! { (UserAgent, "User-Agent") => [String] }
@@ -960,3 +960,44 @@ fn multipart_for_bytes(chunk_data: &[u8], name: &str) -> (Vec<u8>, usize) {
     (body, content_length)
 }
 
+fn multipart_for_binary<T>(items: &[T]) -> (Vec<u8>, usize) where T: ::binformat::BinaryWriter {
+    let mut body = Vec::new();
+    /// these are compile time optimizations
+    let rn = b"\r\n";
+    let body_boundary = br"--SAFEDRIVEBINARY";
+    let end_boundary =  br"--SAFEDRIVEBINARY--";
+    let enc = br"Content-Transfer-Encoding: binary";
+
+    body.extend(rn);
+    body.extend(rn);
+
+    for item in items {
+        let name = item.name();
+        let data = item.as_binary();
+        let disp = format!("Content-Disposition: form-data; name=\"files\"; filename=\"{}\"", name);
+        let content_type = br"Content-Type: application/octet-stream";
+
+        body.extend(body_boundary.as_ref());
+        body.extend(rn);
+        body.extend(disp.as_bytes());
+        body.extend(rn);
+        body.extend(content_type.as_ref());
+        body.extend(rn);
+        body.extend(enc.as_ref());
+        body.extend(rn);
+        body.extend(rn);
+        if item.should_include_data() {
+            body.extend(data.as_slice());
+        } else {
+            body.extend(&[]);
+        }
+        body.extend(rn);
+    }
+    body.extend(end_boundary.as_ref());
+    body.extend(rn);
+    body.extend(rn);
+
+    let content_length = body.len();
+
+    (body, content_length)
+}
