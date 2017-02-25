@@ -663,6 +663,8 @@ pub fn sync(token: &Token,
         estimated_size = estimated_size + stream_length;
     }
 
+    let (write_thread, block_send, status_receive) = upload_thread(token, session_name);
+
     let mut failed = 0;
 
     let mut percent_completed: f64 = (processed_size as f64 / estimated_size as f64) * 100.0;
@@ -709,13 +711,33 @@ pub fn sync(token: &Token,
 
                 let mut block_generator = ::chunk::BlockGenerator::new(&full_path, main_key, hmac_key, tweak_key, stream_length, SYNC_VERSION);
 
-                let mut skipped_blocks = 0;
-
                 let mut item_padding: u64 = 0;
 
                 let mut block_failed = false;
 
                 for block_result in block_generator.by_ref() {
+                    match status_receive.try_recv() {
+                        Ok(msg) => {
+                            match msg {
+                                Ok(sent) => {
+                                    processed_size += sent as u64;
+
+                                    progress(estimated_size, processed_size, sent as u64, percent_completed, false);
+                                },
+                                Err(e) => return Err(e)
+                            };
+                        },
+                        Err(e) => {
+                            match e {
+                                ::std::sync::mpsc::TryRecvError::Empty => {},
+                                ::std::sync::mpsc::TryRecvError::Disconnected => {
+                                    debug!("Result<(), SDError>: end of channel {}", e);
+                                    return Err(SDError::Internal(format!("end of channel: {}", e)));
+                                },
+                            }
+                        },
+                    };
+
                     let block = match block_result {
                         Ok(b) => b,
                         Err(_) => {
@@ -724,11 +746,8 @@ pub fn sync(token: &Token,
                         }
                     };
 
-                    let block_name = block.name();
                     let block_real_size = block.real_size();
                     let compressed = block.compressed();
-
-                    processed_size += block_real_size;
 
                     let block_compressed_size = match block.compressed_size() {
                         Some(size) => {
@@ -759,67 +778,17 @@ pub fn sync(token: &Token,
 
                     item_padding += padding_overhead;
 
-                    let mut should_retry = true;
-                    let mut retries_left = 15.0;
-                    let mut should_upload = false;
+                    let cache_message = ::cache::WriteCacheMessage::new(Some(wrapped_block), false, None);
 
-                    let block_write_start_time = ::std::time::Instant::now();
+                    match block_send.send(cache_message) {
+                        Ok(()) => {
 
-                    while should_retry {
-                        /// allow caller to tick the progress display, if one exists
-                        progress(estimated_size, processed_size, 0, percent_completed, false);
-
-                        let failed_count = 15.0 - retries_left;
-                        let mut rng = ::rand::thread_rng();
-
-                        /// we pick a multiplier randomly to avoid a bunch of clients trying again
-                        /// at the same 2/4/8/16 backoff times time over and over if the server
-                        /// is overloaded or down
-                        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
-
-                        if failed_count >= 2.0 && retries_left > 0.0 {
-                            /// back off significantly every time a call fails but only after the
-                            /// second try, the first failure could be us not including the data
-                            /// when we should have
-                            let backoff_time = backoff_multiplier * (failed_count * failed_count);
-                            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
-                            debug!("backing off for {:?}", delay);
-
-                            thread::sleep(delay);
-                        }
-
-                        /// tell the server to mark this block without the data first, if that fails we try uploading
-
-                        match write_block(&token, session_name, &block_name, &wrapped_block, should_upload) {
-                            Ok(()) => {
-                                trace!("Block writing took {} seconds", block_write_start_time.elapsed().as_secs());
-
-                                skipped_blocks = skipped_blocks + 1;
-                                /// allow caller to tick the progress display, if one exists
-                                progress(estimated_size, processed_size, block_real_size as u64, percent_completed, false);
-                                should_retry = false
-                            },
-                            Err(SDAPIError::RequestFailed(err)) => {
-                                progress(estimated_size, processed_size, 0, percent_completed, false);
-
-                                retries_left = retries_left - 1.0;
-                                if retries_left <= 0.0 {
-                                    issue(&format!("not able to sync file {}: too many retries ({})", full_path.display(), err));
-                                    return Err(SDError::ExceededRetries(15))
-                                }
-                            },
-                            Err(SDAPIError::RetryUpload) => {
-                                retries_left = retries_left - 1.0;
-                                if retries_left <= 0.0 {
-                                    return Err(SDError::ExceededRetries(15))
-                                }
-                                should_upload = true;
-                            },
-                            Err(SDAPIError::Authentication) => {
-                                return Err(SDError::Authentication)
-                            },
-                            _ => {}
-                        }
+                        },
+                        Err(e) => {
+                            issue(&format!("not able to sync file {}: writing failed ({})", full_path.display(), e));
+                            block_failed = true;
+                            break;
+                        },
                     }
                 }
 
@@ -837,7 +806,7 @@ pub fn sync(token: &Token,
                 if DEBUG_STATISTICS {
                     let compression_ratio = (stats.processed_size_compressed as f64 / stats.processed_size as f64 ) * 100.0;
 
-                    debug!("{} chunks ({} new)", stats.discovered_chunk_count, stats.discovered_chunk_count - skipped_blocks);
+                    debug!("{} chunks", stats.discovered_chunk_count);
                     debug!("average size: {} bytes", stats.processed_size / stats.discovered_chunk_count);
                     debug!("compression: {}/{} ({}%)", stats.processed_size_compressed, stats.processed_size, compression_ratio);
 
@@ -892,6 +861,25 @@ pub fn sync(token: &Token,
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append(&header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
+    debug!("signaling write cache we're finished");
+
+    let cache_message = ::cache::WriteCacheMessage::new(None, false, None);
+
+    match block_send.send(cache_message) {
+        Ok(()) => {
+
+        },
+        Err(e) => {
+            issue(&format!("not able to signal write cache to finish: {}", e));
+        },
+    }
+
+    debug!("waiting for write cache to finish");
+
+    match write_thread.join() {
+        Ok(()) => {},
+        Err(_) => {
+            debug!("thread join failed");
         }
     }
 
