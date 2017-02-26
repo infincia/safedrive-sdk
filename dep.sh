@@ -93,8 +93,6 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
 
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${LIBDBUS_PREFIX}"
 
-        echo ${LIBDBUS_VER} > ${LIBDBUS_VER_FILE}
-
         wget https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         tar xvzf dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         pushd dbus-${LIBDBUS_VER}
@@ -103,6 +101,7 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
         make install > /dev/null
         popd
         rm -rf dbus*
+        echo ${LIBDBUS_VER} > ${LIBDBUS_VER_FILE}
     else
         echo "Not building libdbus"
     fi
@@ -116,8 +115,6 @@ if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(
 
         echo "Building OpenSSL ${OPENSSL_VER} for ${TARGET} in ${OPENSSL_PREFIX}"
 
-        echo ${OPENSSL_VER} > ${OPENSSL_VER_FILE}
-
         wget https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz > /dev/null
         tar xvzf openssl-${OPENSSL_VER}.tar.gz > /dev/null
         pushd openssl-${OPENSSL_VER}
@@ -127,6 +124,8 @@ if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(
         make install > /dev/null
         popd
         rm -rf openssl*
+        echo ${OPENSSL_VER} > ${OPENSSL_VER_FILE}
+
     else
         echo "Not building openssl"
     fi
@@ -140,8 +139,6 @@ if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! 
 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${SODIUM_PREFIX}"
 
-        echo ${SODIUM_VER} > ${SODIUM_VER_FILE}
-
         wget https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz > /dev/null
         tar xvfz libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
@@ -151,6 +148,8 @@ if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! 
         make install > /dev/null
         popd
         rm -rf libsodium*
+        echo ${SODIUM_VER} > ${SODIUM_VER_FILE}
+
     else
         echo "Not building libsodium"
     fi
