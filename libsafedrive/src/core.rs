@@ -979,9 +979,7 @@ pub fn sync(token: &Token,
             },
             Err(e) => {
                 match e {
-                    ::std::sync::mpsc::TryRecvError::Empty => {
-                        break;
-                    },
+                    ::std::sync::mpsc::TryRecvError::Empty => {},
                     ::std::sync::mpsc::TryRecvError::Disconnected => {
                         break;
                     },
