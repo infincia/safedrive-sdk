@@ -586,7 +586,7 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, s
 
     let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, encrypted: encrypted, size: size, session: &session[0] };
 
-    let (multipart_body, content_length) = multipart_for_binary(session);
+    let (multipart_body, content_length) = multipart_for_binary(session, "file");
 
     trace!("session body: {}", String::from_utf8_lossy(&multipart_body));
 
@@ -789,7 +789,7 @@ pub fn write_blocks(token: &Token, session: &str, blocks: &[WrappedBlock]) -> Re
         .header(UserAgent(user_agent.to_string()))
         .header(SDAuthToken(token.token.to_owned()));
 
-    let (multipart_body, content_length) = multipart_for_binary(blocks);
+    let (multipart_body, content_length) = multipart_for_binary(blocks, "files");
 
     trace!("multiblock body: {}", String::from_utf8_lossy(&multipart_body));
 
@@ -869,7 +869,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
     Ok(buffer)
 }
 
-fn multipart_for_binary<T>(items: &[T]) -> (Vec<u8>, usize) where T: ::binformat::BinaryWriter {
+fn multipart_for_binary<T>(items: &[T], field_name: &str) -> (Vec<u8>, usize) where T: ::binformat::BinaryWriter {
     let mut body = Vec::new();
     /// these are compile time optimizations
     let rn = b"\r\n";
@@ -883,7 +883,7 @@ fn multipart_for_binary<T>(items: &[T]) -> (Vec<u8>, usize) where T: ::binformat
     for item in items {
         let name = item.name();
         let data = item.as_binary();
-        let disp = format!("Content-Disposition: form-data; name=\"files\"; filename=\"{}\"", name);
+        let disp = format!("Content-Disposition: form-data; name=\"{}\"; filename=\"{}\"", field_name, name);
         let content_type = br"Content-Type: application/octet-stream";
 
         body.extend(body_boundary.as_ref());
