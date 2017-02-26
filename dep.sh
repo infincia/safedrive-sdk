@@ -21,6 +21,9 @@ export SODIUM_VER_FILE=$PWD/dep/${TARGET}/lib/.sodium_ver
 export LIBDBUS_VER=1.10.14
 export LIBDBUS_VER_FILE=$PWD/dep/${TARGET}/lib/.dbus_ver
 
+export EXPAT_VER=2.2.0
+export EXPAT_VER_FILE=$PWD/dep/${TARGET}/lib/.expat_ver
+
 export BUILD_DBUS=false
 
 export BUILD_OPENSSL=false
@@ -37,6 +40,7 @@ case ${TARGET} in
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes"
+        export EXPAT_ARGS="--enable-shared=yes"
         BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-gnu)
@@ -45,6 +49,7 @@ case ${TARGET} in
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes"
+        export EXPAT_ARGS="--enable-shared=yes"
         BUILD_DBUS=true
         BUILD_OPENSSL=true
         BUILD_LIBSODIUM=true
@@ -55,6 +60,7 @@ case ${TARGET} in
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes"
+        export EXPAT_ARGS="--enable-shared=yes"
         export PKG_CONFIG_ALLOW_CROSS=1
         BUILD_DBUS=true
         BUILD_OPENSSL=true
@@ -67,6 +73,7 @@ case ${TARGET} in
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=no"
+        export EXPAT_ARGS="--enable-shared=no"
         BUILD_DBUS=true
         BUILD_OPENSSL=true
         BUILD_LIBSODIUM=true
@@ -78,6 +85,7 @@ case ${TARGET} in
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=no"
+        export EXPAT_ARGS="--enable-shared=no"
         export PKG_CONFIG_ALLOW_CROSS=1
         BUILD_DBUS=true
         BUILD_OPENSSL=true
@@ -89,6 +97,24 @@ esac
 
 if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
     if [ ${BUILD_DBUS} = true ]; then
+
+        EXPAT_PREFIX=$PWD/dep/${TARGET}
+
+        echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${EXPAT_PREFIX}"
+
+
+        wget "https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2" > /dev/null
+        tar xvzf expat-${EXPAT_VER}.tar.bz2 > /dev/null
+        pushd expat-${EXPAT_VER}
+        ./configure --prefix=${EXPAT_PREFIX} ${EXPAT_ARGS} > /dev/null
+        make > /dev/null
+        make install > /dev/null
+        popd
+        rm -rf expat*
+        echo ${EXPAT_VER} > ${EXPAT_VER_FILE}
+
+
+
         LIBDBUS_PREFIX=$PWD/dep/${TARGET}
 
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${LIBDBUS_PREFIX}"
