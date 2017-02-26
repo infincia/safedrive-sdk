@@ -38,6 +38,8 @@ extern crate number_prefix;
 
 extern crate reed_solomon;
 
+extern crate btree;
+
 #[macro_use]
 mod localized;
 

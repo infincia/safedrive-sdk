@@ -579,6 +579,8 @@ pub fn sync(token: &Token,
     };
 
 
+    //let mut session_cache = ::oplog::SessionCache::new(Path::new("/Users/steve/"), format!("test-session"));
+
 
     let archive_file = Vec::new();
 
@@ -814,16 +816,22 @@ pub fn sync(token: &Token,
                 header.set_cksum();
                 ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append session entry header");
 
+                //session_cache.add(&full_path, hmac_bag);
+
             } else {
                 header.set_size(0); /// hmac list size is zero when file has no actual data
                 header.set_cksum();
                 ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append zero length archive header");
+
+                //session_cache.add(&full_path, hmac_bag);
             }
         } else if is_dir {
             /// folder
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
+
+            //session_cache.add(&full_path, hmac_bag);
         } else if is_symlink {
             /// symlink
 
@@ -847,6 +855,8 @@ pub fn sync(token: &Token,
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
             ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
+
+            //session_cache.add(&full_path, hmac_bag);
         }
     }
 

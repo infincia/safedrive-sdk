@@ -5,6 +5,7 @@
 use std;
 
 use nom::{IResult, rest, le_u8, le_u64};
+use std::path::{Path, PathBuf};
 
 
 #[derive(Debug, PartialEq, Eq)]
@@ -69,4 +70,37 @@ pub fn op_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], Op<'a>> {
             data_pointers: data_pointers,
         }
     })
+}
+
+use ::btree::BTree;
+
+pub struct SessionCache {
+    pub btree: BTree<String, Vec<u8>>,
+    pub name: String,
+    pub location: PathBuf,
+}
+
+impl SessionCache {
+    pub fn new(storage_path: &Path, name: String) -> Result<SessionCache, Box<::std::error::Error>> {
+        let mut t = PathBuf::from(storage_path);
+        t.push(&name);
+
+        let btree = match BTree::new(&format!("{:?}", &t), 256, 256) {
+            Ok(btree) => btree,
+            Err(e) => {
+                error!("failed to create btree: {}", e);
+                return Err(e);
+            }
+        };
+
+        Ok(SessionCache {
+            btree: btree,
+            name: name,
+            location: storage_path.to_owned(),
+        })
+    }
+
+    pub fn add(&mut self, path: &Path, data: Vec<u8>) -> Result<(), Box<::std::error::Error>> {
+        self.btree.insert(format!("{:?}", path), data)
+    }
 }

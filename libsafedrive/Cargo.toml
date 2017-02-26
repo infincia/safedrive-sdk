@@ -41,6 +41,7 @@ keyring = { version = "*", git = "https://github.com/infincia/keyring-rs.git", b
 fuse_mt = { version = "*", optional = true }
 time = "*"
 reed-solomon = "*"
+btree = { git = "https://github.com/infincia/btree.git", branch = "master" }
 
 clippy = { version = "*", optional = true }
 
