@@ -999,6 +999,7 @@ pub fn sync(token: &Token,
                 match msg {
                     Ok(finished) => {
                         if finished {
+                            debug!("write thread says it's finished, continuing");
                             break;
                         }
                     },
@@ -1009,6 +1010,8 @@ pub fn sync(token: &Token,
                 match e {
                     ::std::sync::mpsc::TryRecvError::Empty => {},
                     ::std::sync::mpsc::TryRecvError::Disconnected => {
+                        debug!("write thread has disconnected, continuing");
+
                         break;
                     },
                 }
