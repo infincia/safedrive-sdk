@@ -541,7 +541,9 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
             while should_retry {
                 if is_sync_task_cancelled(local_session_name.to_owned()) {
                     match status_send.send(Err(SDError::Cancelled)) {
-                        Ok(()) => {},
+                        Ok(()) => {
+                            return;
+                        },
                         Err(e) => {
                             debug!("channel exited: {}", e);
                             break;
@@ -614,7 +616,9 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                         retries_left = retries_left - 1.0;
                         if retries_left <= 0.0 {
                             match status_send.send(Err(SDError::ExceededRetries(15))) {
-                                Ok(()) => {},
+                                Ok(()) => {
+                                    return;
+                                },
                                 Err(e) => {
                                     debug!("channel exited: {}", e);
                                     break;
@@ -624,7 +628,9 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                     },
                     Err(SDAPIError::Authentication) => {
                         match status_send.send(Err(SDError::Authentication)) {
-                            Ok(()) => {},
+                            Ok(()) => {
+                                return;
+                            },
                             Err(e) => {
                                 debug!("channel exited: {}", e);
                                 break;
