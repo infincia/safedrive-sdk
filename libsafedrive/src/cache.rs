@@ -51,6 +51,7 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
         self.waiting.push(block);
     }
 
+    #[allow(dead_code)]
     pub fn add_many(&mut self, blocks: Vec<T>) {
         for block in blocks {
             self.data_waiting += block.len();
@@ -109,10 +110,12 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
         self.received_final_item = value;
     }
 
+    #[allow(dead_code)]
     pub fn item_limit(&self) -> usize {
         self.item_limit
     }
 
+    #[allow(dead_code)]
     pub fn data_limit(&self) -> usize {
         self.data_limit
     }
