@@ -292,6 +292,9 @@ fn main() {
         },
         _ => {},
     }
+    warn!("sync progress/speed currently represents disk access, not upload progress");
+
+
     println!();
 
     let app_directory = get_app_directory(&config).expect("Error: could not determine local storage directory");
