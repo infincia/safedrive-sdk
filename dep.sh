@@ -129,7 +129,7 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
         rm -rf dbus*
         echo ${LIBDBUS_VER} > ${LIBDBUS_VER_FILE}
     else
-        echo "Not building libdbus"
+        echo "Not set to build libdbus"
     fi
 else
     echo "Not building libdbus"
@@ -153,7 +153,7 @@ if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(
         echo ${OPENSSL_VER} > ${OPENSSL_VER_FILE}
 
     else
-        echo "Not building openssl"
+        echo "Not set to build openssl"
     fi
 else
     echo "Not building openssl"
@@ -177,7 +177,7 @@ if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! 
         echo ${SODIUM_VER} > ${SODIUM_VER_FILE}
 
     else
-        echo "Not building libsodium"
+        echo "Not set to build libsodium"
     fi
 else
     echo "Not building libsodium"
