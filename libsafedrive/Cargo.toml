@@ -25,7 +25,7 @@ nom = { version = "*", features= ["verbose-errors"] }
 lazy_static = "^0.1.*"
 uuid = { version = "*", features = ["v4"] }
 regex = "^0.2"
-scopeguard = "*"
+scopeguard = { version = "*", optional = true }
 parking_lot = "*"
 byteorder = "*"
 blake2-rfc = { version = "*" }
@@ -59,7 +59,7 @@ doctest = false
 [features]
 default = []
 
-locking = []
+locking = ["scopeguard"]
 keychain = []
 mac-keychain = ["security-framework"]
 linux-keychain = ["secret-service"]
