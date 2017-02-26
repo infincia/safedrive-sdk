@@ -986,6 +986,7 @@ pub fn sync(token: &Token,
                 }
             },
         };
+        thread::sleep_ms(500);
     }
 
     debug!("processing session and statistics");
