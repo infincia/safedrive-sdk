@@ -46,8 +46,8 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -flto"
-        export LDFLAGS="-flto"
+        export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
+        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes"
@@ -57,8 +57,8 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -flto -m32"
-        export LDFLAGS="-flto"
+        export CFLAGS="-O2 -g -flto -m32 -I${BUILD_PREFIX}/include"
+        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes"
@@ -69,8 +69,8 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-musl)
-        export CFLAGS="-O2 -g -flto"
-        export LDFLAGS="-flto"
+        export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
+        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
@@ -81,8 +81,8 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-musl)
-        export CFLAGS="-O2 -g -flto -m32"
-        export LDFLAGS="-flto"
+        export CFLAGS="-O2 -g -flto -m32 -I${BUILD_PREFIX}/include"
+        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
