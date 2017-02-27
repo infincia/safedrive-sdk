@@ -73,9 +73,6 @@ extern crate blake2_rfc;
 #[cfg(target_os = "macos")]
 extern crate interfaces;
 
-#[cfg(target_os = "linux")]
-extern crate openssl;
-
 #[cfg(feature = "keychain")]
 #[cfg(feature = "linux-keychain")]
 #[cfg(target_os = "linux")]

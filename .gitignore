@@ -8,9 +8,6 @@ SyncEngine
 SyncEngineTests
 test-osx
 libsodium-*
-openssl-*
 dbus-*
 dep/x86_64-apple-darwin/*
-openssl.cnf
-openssl.cnf.dist
 libsafedrive/testdata

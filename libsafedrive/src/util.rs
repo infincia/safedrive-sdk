@@ -2,7 +2,6 @@ use std::path::{PathBuf, Path};
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::process::Command;
 
 // external crate imports
 
@@ -147,40 +146,6 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
     return Ok(storage_path)
 }
-
-pub fn get_openssl_directory() -> Result<PathBuf, ()> {
-    let output = match Command::new("openssl")
-        .arg("version")
-        .arg("-d")
-        .output() {
-        Ok(o) => o,
-        Err(_) => return Err(()),
-    };
-
-    let out = output.stdout;
-
-    let s = match String::from_utf8(out) {
-        Ok(s) => s,
-        Err(_) => return Err(()),
-    };
-
-    let re = match ::regex::Regex::new(r#"OPENSSLDIR: "(.*)""#) {
-        Ok(re) => re,
-        Err(_) => return Err(()),
-    };
-
-    let cap = match re.captures(&s) {
-        Some(cap) => cap,
-        None => return Err(()),
-    };
-
-    let r = &cap[1];
-
-    let path = PathBuf::from(r);
-
-    return Ok(path)
-}
-
 
 pub fn get_current_os() -> &'static str {
 
@@ -363,18 +328,6 @@ fn nearest_to_405() {
 fn nearest_to_1890() {
     assert!(nearest_to(1890, 512) == 2048);
 }
-
-
-#[cfg(target_os = "linux")]
-#[test]
-fn openssl_directory_test() {
-    match get_openssl_directory() {
-        Ok(p) => p,
-        Err(_) => { assert!(true == false); return }
-    };
-}
-
-
 
 #[test]
 fn staging_directory_test() {

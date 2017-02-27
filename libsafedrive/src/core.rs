@@ -52,7 +52,6 @@ pub use ::util::generate_uuid as generate_unique_client_id;
 pub use ::util::get_unique_client_id;
 pub use ::util::set_unique_client_id;
 pub use ::util::get_current_os;
-pub use ::util::get_openssl_directory;
 #[cfg(target_os = "macos")]
 pub use ::util::unique_client_hash;
 
@@ -134,11 +133,6 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
 
     let sodium_version = ::sodiumoxide::version::version_string();
     debug!("libsodium {}", sodium_version);
-
-    #[cfg(target_os = "linux")]
-    let ssl_version = ::openssl::version::version();
-    #[cfg(target_os = "linux")]
-    debug!("{}", ssl_version);
 
     debug!("ready");
 

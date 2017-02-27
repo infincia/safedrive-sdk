@@ -12,9 +12,6 @@ mkdir -p dep/$TARGET/bin
 
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
-export OPENSSL_VER=1.1.0e
-export OPENSSL_VER_FILE=$PWD/dep/${TARGET}/lib/.openssl_ver
-
 export SODIUM_VER=1.0.11
 export SODIUM_VER_FILE=$PWD/dep/${TARGET}/lib/.sodium_ver
 
@@ -28,8 +25,6 @@ export BUILD_PREFIX=$PWD/dep/${TARGET}
 
 export BUILD_DBUS=false
 
-export BUILD_OPENSSL=false
-
 export BUILD_LIBSODIUM=false
 
 case ${TARGET} in
@@ -40,7 +35,6 @@ case ${TARGET} in
         export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-launchd --disable-libaudit"
         export EXPAT_ARGS="--enable-shared=yes"
         BUILD_LIBSODIUM=true
@@ -49,7 +43,6 @@ case ${TARGET} in
         export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=yes"
         BUILD_DBUS=true
@@ -59,7 +52,6 @@ case ${TARGET} in
         export CFLAGS="-O2 -g -flto -m32 -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=yes"
-        export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=yes"
         export PKG_CONFIG_ALLOW_CROSS=1
@@ -71,7 +63,6 @@ case ${TARGET} in
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
-        export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=no"
         BUILD_DBUS=true
@@ -82,7 +73,6 @@ case ${TARGET} in
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
-        export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=no"
         export PKG_CONFIG_ALLOW_CROSS=1
@@ -125,29 +115,6 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
     fi
 else
     echo "Not building libdbus"
-fi
-
-if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(<${OPENSSL_VER_FILE}) = ${OPENSSL_VER} ]; then
-    if [ ${BUILD_OPENSSL} = true ]; then
-
-        echo "Building OpenSSL ${OPENSSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
-        wget https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz > /dev/null
-        tar xf openssl-${OPENSSL_VER}.tar.gz > /dev/null
-        pushd openssl-${OPENSSL_VER}
-        ./config --openssldir=${BUILD_PREFIX} ${OPENSSL_ARGS} > /dev/null
-        make clean > /dev/null
-        make > /dev/null
-        make install_sw > /dev/null
-        popd
-        rm -rf openssl*
-        echo ${OPENSSL_VER} > ${OPENSSL_VER_FILE}
-
-    else
-        echo "Not set to build openssl"
-    fi
-else
-    echo "Not building openssl"
 fi
 
 if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
