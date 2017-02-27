@@ -104,7 +104,7 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
 
 
         wget "https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2" > /dev/null
-        tar xvzf expat-${EXPAT_VER}.tar.bz2 > /dev/null
+        tar xvf expat-${EXPAT_VER}.tar.bz2 > /dev/null
         pushd expat-${EXPAT_VER}
         ./configure --prefix=${EXPAT_PREFIX} ${EXPAT_ARGS} > /dev/null
         make > /dev/null
@@ -120,7 +120,7 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${LIBDBUS_PREFIX}"
 
         wget https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
-        tar xvzf dbus-${LIBDBUS_VER}.tar.gz > /dev/null
+        tar xvf dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         pushd dbus-${LIBDBUS_VER}
         ./configure --prefix=${LIBDBUS_PREFIX} ${LIBDBUS_ARGS} > /dev/null
         make > /dev/null
@@ -142,7 +142,7 @@ if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(
         echo "Building OpenSSL ${OPENSSL_VER} for ${TARGET} in ${OPENSSL_PREFIX}"
 
         wget https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz > /dev/null
-        tar xvzf openssl-${OPENSSL_VER}.tar.gz > /dev/null
+        tar xvf openssl-${OPENSSL_VER}.tar.gz > /dev/null
         pushd openssl-${OPENSSL_VER}
         ./config --prefix=${OPENSSL_PREFIX} --openssldir=/usr/lib/ssl ${OPENSSL_ARGS} > /dev/null
         make clean > /dev/null
@@ -166,7 +166,7 @@ if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${SODIUM_PREFIX}"
 
         wget https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz > /dev/null
-        tar xvfz libsodium-${SODIUM_VER}.tar.gz > /dev/null
+        tar xvf libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
         ./configure --prefix=${SODIUM_PREFIX} ${SODIUM_ARGS} > /dev/null
         make clean > /dev/null
