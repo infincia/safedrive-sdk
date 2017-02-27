@@ -41,7 +41,7 @@ case ${TARGET} in
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        export LIBDBUS_ARGS="--enable-shared=yes"
+        export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-launchd --disable-libaudit"
         export EXPAT_ARGS="--enable-shared=yes"
         BUILD_LIBSODIUM=true
         ;;
@@ -50,7 +50,7 @@ case ${TARGET} in
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        export LIBDBUS_ARGS="--enable-shared=yes"
+        export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=yes"
         BUILD_DBUS=true
         BUILD_OPENSSL=true
@@ -61,7 +61,7 @@ case ${TARGET} in
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=yes"
         export OPENSSL_ARGS="no-deprecated shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        export LIBDBUS_ARGS="--enable-shared=yes"
+        export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=yes"
         export PKG_CONFIG_ALLOW_CROSS=1
         BUILD_DBUS=true
@@ -74,7 +74,7 @@ case ${TARGET} in
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        export LIBDBUS_ARGS="--enable-shared=no"
+        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=no"
         BUILD_DBUS=true
         BUILD_OPENSSL=true
@@ -86,7 +86,7 @@ case ${TARGET} in
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
         export OPENSSL_ARGS="no-deprecated no-shared no-ssl3 no-weak-ssl-ciphers no-engine no-afalgeng no-async"
-        export LIBDBUS_ARGS="--enable-shared=no"
+        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=no"
         export PKG_CONFIG_ALLOW_CROSS=1
         BUILD_DBUS=true
