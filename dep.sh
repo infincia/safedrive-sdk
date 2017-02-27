@@ -139,7 +139,7 @@ if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(
         wget https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz > /dev/null
         tar xf openssl-${OPENSSL_VER}.tar.gz > /dev/null
         pushd openssl-${OPENSSL_VER}
-        ./config --prefix=${BUILD_PREFIX} --openssldir=/usr/lib/ssl ${OPENSSL_ARGS} > /dev/null
+        ./config --openssldir=${BUILD_PREFIX} ${OPENSSL_ARGS} > /dev/null
         make clean > /dev/null
         make > /dev/null
         make install_sw > /dev/null
