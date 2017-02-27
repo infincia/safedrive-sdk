@@ -142,7 +142,7 @@ if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(
         ./config --prefix=${BUILD_PREFIX} --openssldir=/usr/lib/ssl ${OPENSSL_ARGS} > /dev/null
         make clean > /dev/null
         make > /dev/null
-        make install > /dev/null
+        make install_sw > /dev/null
         popd
         rm -rf openssl*
         echo ${OPENSSL_VER} > ${OPENSSL_VER_FILE}
