@@ -24,6 +24,8 @@ export LIBDBUS_VER_FILE=$PWD/dep/${TARGET}/lib/.dbus_ver
 export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=$PWD/dep/${TARGET}/lib/.expat_ver
 
+export BUILD_PREFIX=$PWD/dep/${TARGET}
+
 export BUILD_DBUS=false
 
 export BUILD_OPENSSL=false
@@ -98,31 +100,25 @@ esac
 if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
     if [ ${BUILD_DBUS} = true ]; then
 
-        EXPAT_PREFIX=$PWD/dep/${TARGET}
-
-        echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${EXPAT_PREFIX}"
+        echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
 
         wget "https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2" > /dev/null
         tar xf expat-${EXPAT_VER}.tar.bz2 > /dev/null
         pushd expat-${EXPAT_VER}
-        ./configure --prefix=${EXPAT_PREFIX} ${EXPAT_ARGS} > /dev/null
+        ./configure --prefix=${BUILD_PREFIX} ${EXPAT_ARGS} > /dev/null
         make > /dev/null
         make install > /dev/null
         popd
         rm -rf expat*
         echo ${EXPAT_VER} > ${EXPAT_VER_FILE}
 
-
-
-        LIBDBUS_PREFIX=$PWD/dep/${TARGET}
-
-        echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${LIBDBUS_PREFIX}"
+        echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         wget https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         tar xf dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         pushd dbus-${LIBDBUS_VER}
-        ./configure --prefix=${LIBDBUS_PREFIX} ${LIBDBUS_ARGS} > /dev/null
+        ./configure --prefix=${BUILD_PREFIX} ${LIBDBUS_ARGS} > /dev/null
         make > /dev/null
         make install > /dev/null
         popd
@@ -137,14 +133,13 @@ fi
 
 if [ ! -f dep/${TARGET}/lib/libssl.a ] || [ ! -f ${OPENSSL_VER_FILE} ] || [ ! $(<${OPENSSL_VER_FILE}) = ${OPENSSL_VER} ]; then
     if [ ${BUILD_OPENSSL} = true ]; then
-        OPENSSL_PREFIX=$PWD/dep/${TARGET}
 
-        echo "Building OpenSSL ${OPENSSL_VER} for ${TARGET} in ${OPENSSL_PREFIX}"
+        echo "Building OpenSSL ${OPENSSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         wget https://www.openssl.org/source/openssl-${OPENSSL_VER}.tar.gz > /dev/null
         tar xf openssl-${OPENSSL_VER}.tar.gz > /dev/null
         pushd openssl-${OPENSSL_VER}
-        ./config --prefix=${OPENSSL_PREFIX} --openssldir=/usr/lib/ssl ${OPENSSL_ARGS} > /dev/null
+        ./config --prefix=${BUILD_PREFIX} --openssldir=/usr/lib/ssl ${OPENSSL_ARGS} > /dev/null
         make clean > /dev/null
         make > /dev/null
         make install > /dev/null
@@ -161,14 +156,13 @@ fi
 
 if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
     if [ ${BUILD_LIBSODIUM} = true ]; then
-        SODIUM_PREFIX=$PWD/dep/${TARGET}
 
-        echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${SODIUM_PREFIX}"
+        echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         wget https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz > /dev/null
         tar xf libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
-        ./configure --prefix=${SODIUM_PREFIX} ${SODIUM_ARGS} > /dev/null
+        ./configure --prefix=${BUILD_PREFIX} ${SODIUM_ARGS} > /dev/null
         make clean > /dev/null
         make > /dev/null
         make install > /dev/null
