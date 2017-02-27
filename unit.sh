@@ -19,4 +19,4 @@ esac
 bash dep.sh
 export DEP_OPENSSL_VERSION="110"
 
-cargo test --release -p libsafedrive --target $TARGET
+RUST_BACKTRACE=1 cargo test --release -p libsafedrive --target $TARGET
