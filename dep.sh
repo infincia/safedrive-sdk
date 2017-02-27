@@ -53,7 +53,6 @@ case ${TARGET} in
         export LIBDBUS_ARGS="--enable-shared=yes --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=yes"
         BUILD_DBUS=true
-        BUILD_OPENSSL=true
         BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-gnu)
@@ -65,7 +64,6 @@ case ${TARGET} in
         export EXPAT_ARGS="--enable-shared=yes"
         export PKG_CONFIG_ALLOW_CROSS=1
         BUILD_DBUS=true
-        BUILD_OPENSSL=true
         BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-musl)
@@ -77,7 +75,6 @@ case ${TARGET} in
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
         export EXPAT_ARGS="--enable-shared=no"
         BUILD_DBUS=true
-        BUILD_OPENSSL=true
         BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-musl)
@@ -90,7 +87,6 @@ case ${TARGET} in
         export EXPAT_ARGS="--enable-shared=no"
         export PKG_CONFIG_ALLOW_CROSS=1
         BUILD_DBUS=true
-        BUILD_OPENSSL=true
         BUILD_LIBSODIUM=true
         ;;
     *)
