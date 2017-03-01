@@ -13,7 +13,7 @@ walkdir = "*"
 cdc = "*"
 tar = "*"
 rustc-serialize = "*"
-reqwest = { version = "*", default-features = false, features = ["rustls"], git = "https://github.com/infincia/reqwest.git", branch = "rustls"  }
+reqwest = { version = "*", git = "https://github.com/infincia/reqwest.git", branch = "rustls"  }
 hyper = { version = "*" , default-features = false }
 serde = "^0.9"
 serde_json = "^0.9"
