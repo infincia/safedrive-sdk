@@ -179,6 +179,13 @@ pub fn login(unique_client_id: &str,
     }
 }
 
+pub fn get_software_clients(token: &Token) -> Result<Vec<SoftwareClient>, SDError> {
+    match list_clients(token) {
+        Ok(clients) => Ok(clients),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
 pub fn get_account_status(token: &Token) -> Result<AccountStatus, SDError> {
     match account_status(&token) {
         Ok(s) => return Ok(s),
