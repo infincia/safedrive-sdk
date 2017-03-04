@@ -41,6 +41,8 @@ use ::core::get_current_user;
 use ::core::get_account_status;
 use ::core::get_account_details;
 
+use ::core::remove_software_client;
+
 use ::core::get_software_clients;
 
 use ::core::send_error_report;
@@ -779,6 +781,66 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 
 
 
+/// Remove client
+///
+/// Will assert non-null on the `state` parameter only
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_remove_client(&state, &error)) {
+///     printf("Removing client failed");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Removing client successful");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
+                                     mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+    let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    match remove_software_client(c.0.get_api_token()) {
+        Ok(()) => {},
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        }
+    };
+
+    c.0.set_api_token(None);
+    0
+}
 
 
 
