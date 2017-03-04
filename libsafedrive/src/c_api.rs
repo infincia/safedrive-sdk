@@ -485,13 +485,13 @@ impl SDDKSyncCleaningSchedule {
 ///
 /// Parameters:
 ///
-///     local_storage_path: a stack-allocated, NULL-terminated string representing the location the app can store settings for a user
+///     local_storage_path: a NULL-terminated string representing the location the app can store settings for a user
 ///
-///     unique_client_id: a stack-allocated, NULL-terminated string representing the current unique_client_id
+///     unique_client_id: a NULL-terminated string representing the current unique_client_id
 ///
-///     client_version: a stack-allocated, NULL-terminated string representing the name and version of the current app
+///     client_version: a NULL-terminated string representing the name and version of the current app
 ///
-///     config: a stack-allocated enum variant of SDDKConfiguration which controls API endpoint and other things
+///     config: an enum variant of SDDKConfiguration which controls API endpoint and other things
 ///
 ///             use SDDKConfigurationStaging for the staging environment
 ///             use SDDKConfigurationProduction for the production environment
@@ -651,9 +651,9 @@ pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     username: a stack-allocated, NULL-terminated string representing a username for a SafeDrive account
+///     username: a NULL-terminated string representing a username for a SafeDrive account
 ///
-///     password: a stack-allocated, NULL-terminated string representing a password for a SafeDrive account
+///     password: a NULL-terminated string representing a password for a SafeDrive account
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
@@ -857,8 +857,8 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     recovery_phrase: a stack-allocated pointer to a recovery phrase obtained by previous calls.
-///                      can be null if no phrase is available
+///     recovery_phrase: a pointer to a recovery phrase obtained by previous calls. can be null if
+///                      no phrase is available
 ///
 ///     store_recovery_key: a C function pointer that will be called when the app should store a
 ///                         recovery phrase
@@ -1432,9 +1432,9 @@ pub extern "C" fn sddk_get_software_clients(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     name: a stack-allocated, NULL terminated string representing the folder name
+///     name: a NULL terminated string representing the folder name
 ///
-///     path: a stack-allocated, NULL terminated string representing the folder path in RFC3986 format
+///     path: a NULL terminated string representing the folder path in RFC3986 format
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
@@ -1510,7 +1510,7 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     folder_id: a stack-allocated, unsigned 64-bit integer representing the registered folder ID
+///     folder_id: an unsigned 64-bit integer representing the registered folder ID
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
@@ -1578,7 +1578,7 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     folder_id: a stack-allocated, unsigned 64-bit integer representing a registered folder ID
+///     folder_id: an unsigned 64-bit integer representing a registered folder ID
 ///
 ///     folder: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was 0
@@ -2077,9 +2077,9 @@ pub extern "C" fn sddk_cancel_sync_task(name: *const std::os::raw::c_char,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     name: a stack-allocated, NULL-terminated UUIDv4 string representing the name of the sync session
+///     name: a NULL-terminated UUIDv4 string representing the name of the sync session
 ///
-///     folder_id: a stack-allocated, unsigned 64-bit integer representing a registered folder ID
+///     folder_id: an unsigned 64-bit integer representing a registered folder ID
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
 ///
@@ -2185,11 +2185,11 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 ///
 ///     state: an opaque pointer obtained from calling sddk_initialize()
 ///
-///     name: a stack-allocated, NULL-terminated UTF-8 string representing the UUIDv4 name of the sync session
+///     name: a NULL-terminated UTF-8 string representing the UUIDv4 name of the sync session
 ///
-///     folder_id: a stack-allocated, unsigned 64-bit integer representing a registered folder ID
+///     folder_id: an unsigned 64-bit integer representing a registered folder ID
 ///
-///     destination: a stack-allocated, NULL-terminated UTF-8 string representing the path the sync session will be restored to
+///     destination: a NULL-terminated UTF-8 string representing the path the sync session will be restored to
 ///
 ///     progress: a C function pointer that will be called periodically to report progress
 ///
@@ -2308,12 +2308,12 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 ///
 /// Parameters:
 ///
-///     unique_client_id: a stack-allocated, NULL terminated string representing the current UCID
+///     unique_client_id: a NULL terminated string representing the current UCID
 ///
-///     description: a stack-allocated, NULL terminated string representing the error description
+///     description: a NULL terminated string representing the error description
 ///
-///     context: a stack-allocated, NULL terminated string representing any context that should be
-///              included in the error report
+///     context: a NULL terminated string representing any context that should be included in the
+///              error report
 ///
 ///     log: a pointer to an array of SDDKLogLine structs, caller retains ownership of the memory
 ///          and must free it after use
