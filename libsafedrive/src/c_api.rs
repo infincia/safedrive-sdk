@@ -34,6 +34,7 @@ use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, Sy
 use ::session::SyncSession;
 
 use ::core::get_unique_client_id;
+use ::core::set_unique_client_id;
 use ::core::generate_unique_client_id;
 
 use ::core::get_current_user;
@@ -1190,6 +1191,88 @@ pub extern "C" fn sddk_get_unique_client_id(local_storage_path: *const std::os::
             }
             0
         },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Set the current unique client ID
+///
+/// Will return a failure code if the unique client ID cannot be set
+///
+/// Parameters:
+///
+///     local_storage_path: a NULL-terminated string representing the location the app can store
+///                         settings for a user
+///
+///     unique_client_id: a NULL-terminated string representing the current unique client ID
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char unique_client_id[] = "1234567890";
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_set_unique_client_id(unique_client_id, &error)) {
+///     printf("Failed to set current unique client id");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Set current unique client id");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_set_unique_client_id(local_storage_path: *const std::os::raw::c_char,
+                                            unique_client_id: *const std::os::raw::c_char,
+                                            mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let lstorage: &CStr = unsafe {
+        assert!(!local_storage_path.is_null());
+        CStr::from_ptr(local_storage_path)
+    };
+
+    let storage_directory: String = match lstorage.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let storage_path = Path::new(&storage_directory);
+
+    let lucid: &CStr = unsafe {
+        assert!(!unique_client_id.is_null());
+        CStr::from_ptr(unique_client_id)
+    };
+
+    let ucid: String = match lucid.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    match set_unique_client_id(&ucid, storage_path) {
+        Ok(()) => 0,
         Err(e) => {
             let c_err = SDDKError::from(e);
 
