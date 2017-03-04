@@ -240,6 +240,29 @@ public class SafeDriveSDK: NSObject {
         sddk_free_state(&state)
     }
     
+    
+    public func getCurrentUser(local_storage_path: String) throws -> Optional<String> {
+        var user: UnsafeMutablePointer<CChar>? = nil
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_get_current_user(local_storage_path, &user, &error)
+        defer {
+            if res >= 0 {
+                sddk_free_string(&user)
+            }
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        switch res {
+        case 0:
+            return String(cString: user!)
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
+    }
+    
+    
     public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
 
         DispatchQueue.global(priority: .default).async {
