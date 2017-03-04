@@ -146,6 +146,9 @@ fn main() {
                 .required(true)
             )
         )
+        .subcommand(SubCommand::with_name("clients")
+            .about("list all registered clients")
+        )
         .subcommand(SubCommand::with_name("list")
             .about("list all registered folders")
         )
@@ -394,6 +397,12 @@ fn main() {
 
         list_folders(token);
 
+    } else if let Some(_) = matches.subcommand_matches("clients") {
+
+        let (token, _) = sign_in(&app_directory);
+
+        list_clients(token);
+
     } else if let Some(_) = matches.subcommand_matches("sessions") {
 
         let (token, _) = sign_in(&app_directory);
@@ -557,6 +566,31 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
     };
 
     (token, keyset)
+}
+
+pub fn list_clients(token: Token) {
+
+    let mut table = Table::new();
+
+    // Add a row
+    table.add_row(row!["Name", "OS", "Language", "ID"]);
+
+    let client_list = match get_software_clients(&token) {
+        Ok(cl) => cl,
+        Err(e) => {
+            error!("Read clients error: {}", e);
+            std::process::exit(1);
+        }
+    };
+    for client in client_list {
+        table.add_row(Row::new(vec![
+            Cell::new(&format!("N/A")),
+            Cell::new(&client.operatingSystem),
+            Cell::new(&client.language),
+            Cell::new(&client.uniqueId)])
+        );
+    }
+    table.printstd();
 }
 
 pub fn add(token: Token, path: &str) {
