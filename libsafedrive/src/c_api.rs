@@ -750,9 +750,9 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 
     match login(&uid, &storage_path, &un, &pa) {
         Ok((token, account_status)) => {
-            c.0.set_account(un.to_owned(), pa.to_owned());
-            c.0.set_api_token(token);
-            c.0.set_unique_client_id(uid);
+            c.0.set_account(Some(un.to_owned()), Some(pa.to_owned()));
+            c.0.set_api_token(Some(token));
+            c.0.set_unique_client_id(Some(uid));
             let c_s = SDDKAccountStatus::from(account_status);
 
             let b = Box::new(c_s);
@@ -879,7 +879,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
         }
     };
 
-    c.0.set_keys(keyset.main, keyset.hmac, keyset.tweak);
+    c.0.set_keys(Some(keyset.main), Some(keyset.hmac), Some(keyset.tweak));
     0
 }
 

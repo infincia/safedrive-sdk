@@ -27,10 +27,10 @@ impl State {
         }
     }
 
-    pub fn set_keys(&mut self, main_key: Key, hmac_key: Key, tweak_key: Key) {
-        self.main_key = Some(main_key);
-        self.hmac_key = Some(hmac_key);
-        self.tweak_key = Some(tweak_key);
+    pub fn set_keys(&mut self, main_key: Option<Key>, hmac_key: Option<Key>, tweak_key: Option<Key>) {
+        self.main_key = main_key;
+        self.hmac_key = hmac_key;
+        self.tweak_key = tweak_key;
     }
 
     pub fn get_api_token(&self) -> &Token {
@@ -42,12 +42,12 @@ impl State {
         tok
     }
 
-    pub fn set_api_token(&mut self, token: Token) {
-        self.api_token = Some(token);
+    pub fn set_api_token(&mut self, token: Option<Token>) {
+        self.api_token = token;
     }
 
-    pub fn set_unique_client_id(&mut self, unique_client_id: String) {
-        self.unique_client_id = Some(unique_client_id)
+    pub fn set_unique_client_id(&mut self, unique_client_id: Option<String>) {
+        self.unique_client_id = unique_client_id;
     }
 
     #[allow(dead_code)]
@@ -59,9 +59,9 @@ impl State {
         uid
     }
 
-    pub fn set_account(&mut self, username: String, password: String) {
-        self.username = Some(username);
-        self.password = Some(password);
+    pub fn set_account(&mut self, username: Option<String>, password: Option<String>) {
+        self.username = username;
+        self.password = password;
     }
 
     #[allow(dead_code)]
