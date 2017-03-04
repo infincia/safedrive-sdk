@@ -40,6 +40,12 @@ public struct AccountStatus {
     public let time: Optional<UInt64>
 }
 
+public struct SoftwareClient {
+    public let uniqueClientID: String
+    public let operatingSystem: String
+    public let language: String
+}
+
 public struct AccountDetails {
     public let assignedStorage: UInt64
     public let usedStorage: UInt64
@@ -317,6 +323,45 @@ public class SafeDriveSDK: NSObject {
                 queue.async { failure(e) }
             }
         }
+    }
+    
+    public func getClients(completionQueue queue: DispatchQueue, success: @escaping (_ folders: [SoftwareClient]) -> Void, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+
+            var clients_ptr: UnsafeMutablePointer<SDDKSoftwareClient>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_get_software_clients(self.state!, &clients_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_software_clients(&clients_ptr, UInt64(res))
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
+                let buffer = UnsafeBufferPointer<SDDKSoftwareClient>(start: UnsafePointer(clients_ptr), count: Int(res))
+                let a = Array(buffer)
+                var new_array = [SoftwareClient]()
+                for c_client in a {
+                    let uniqueClientId = String(cString: c_client.unique_client_id)
+                    let language = String(cString: c_client.language)
+                    let operatingSystem = String(cString: c_client.operating_system)
+                    let client = SoftwareClient(uniqueClientID: uniqueClientId, operatingSystem: operatingSystem, language: language)
+                    new_array.append(client)
+                }
+                
+                queue.async { success(new_array) }
+
+            }
+        }
+
     }
     
     public func getAccountStatus(completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
