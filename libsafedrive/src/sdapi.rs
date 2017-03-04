@@ -869,7 +869,7 @@ pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIErro
     Ok(buffer)
 }
 
-fn multipart_for_binary<T>(items: &[T], field_name: &str) -> (Vec<u8>, usize) where T: ::binformat::BinaryWriter {
+fn multipart_for_binary<T>(items: &[T], field_name: &str) -> (Vec<u8>, usize, usize) where T: ::binformat::BinaryWriter {
     let mut body = Vec::new();
     /// these are compile time optimizations
     let rn = b"\r\n";
@@ -880,9 +880,13 @@ fn multipart_for_binary<T>(items: &[T], field_name: &str) -> (Vec<u8>, usize) wh
     body.extend(rn);
     body.extend(rn);
 
+    let mut real_size = 0;
+
     for item in items {
         let name = item.name();
         let data = item.as_binary();
+        let size = item.len();
+        real_size += size;
         let disp = format!("Content-Disposition: form-data; name=\"{}\"; filename=\"{}\"", field_name, name);
         let content_type = br"Content-Type: application/octet-stream";
 
@@ -908,5 +912,5 @@ fn multipart_for_binary<T>(items: &[T], field_name: &str) -> (Vec<u8>, usize) wh
 
     let content_length = body.len();
 
-    (body, content_length)
+    (body, content_length, real_size)
 }
