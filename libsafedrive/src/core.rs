@@ -533,7 +533,9 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                             }
                         }
 
-                        match write_blocks(&local_token, &local_session_name, &block_batch) {
+                        match write_blocks(&local_token, &local_session_name, &block_batch, |total, current, new| {
+                            debug!("block upload progress: {}/{}, {} new", current, total, new);
+                        }) {
                             Ok(missing) => {
                                 debug!("sending group took {} seconds", block_write_start_time.elapsed().as_secs());
 
@@ -1054,7 +1056,9 @@ pub fn sync(token: &Token,
     /// allow caller to tick the progress display, if one exists
     progress(estimated_size, processed_size, 0, percent_completed, false);
     
-    match finish_sync_session(&token, folder_id, true, &s, processed_size as usize) {
+    match finish_sync_session(&token, folder_id, true, &s, processed_size as usize, move |total, current, new| {
+        debug!("session upload progress: {}/{}, {} new", current, total, new);
+    }) {
         Ok(()) => {},
         Err(SDAPIError::Authentication) => {
             return Err(SDError::Authentication)

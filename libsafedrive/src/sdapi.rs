@@ -958,7 +958,7 @@ pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, e
 
 }
 
-pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, session: &[WrappedSyncSession], size: usize) -> Result<(), SDAPIError> {
+pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool, session: &[WrappedSyncSession], size: usize, progress: F) -> Result<(), SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
 
     let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, encrypted: encrypted, size: size, session: &session[0] };
 
@@ -1250,7 +1250,7 @@ pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError>
 }
 
 #[allow(dead_code)]
-pub fn write_blocks(token: &Token, session: &str, blocks: &[WrappedBlock]) -> Result<Vec<String>, SDAPIError> {
+pub fn write_blocks<F>(token: &Token, session: &str, blocks: &[WrappedBlock], progress: F) -> Result<Vec<String>, SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
 
     let endpoint = APIEndpoint::WriteBlocks { session: session };
 
