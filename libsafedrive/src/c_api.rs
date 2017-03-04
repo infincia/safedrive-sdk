@@ -37,6 +37,7 @@ use ::core::get_unique_client_id;
 use ::core::generate_unique_client_id;
 
 use ::core::get_current_user;
+use ::core::set_current_user;
 
 use ::core::get_account_status;
 use ::core::get_account_details;
@@ -1020,6 +1021,88 @@ pub extern "C" fn sddk_get_current_user(local_storage_path: *const std::os::raw:
             }
             0
         },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Set the current user
+///
+/// Will return a failure code if the user cannot be set
+///
+/// Parameters:
+///
+///     local_storage_path: a NULL-terminated string representing the location the app can store
+///                         settings for a user
+///
+///     user: a pointer to a NULL-terminated string representing the current user name
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char user[] = "user@safedrive.io";
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_set_current_user(user, &error)) {
+///     printf("Failed to set current user");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Set current user");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_set_current_user(local_storage_path: *const std::os::raw::c_char,
+                                        user: *const std::os::raw::c_char,
+                                        mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let lstorage: &CStr = unsafe {
+        assert!(!local_storage_path.is_null());
+        CStr::from_ptr(local_storage_path)
+    };
+
+    let storage_directory: String = match lstorage.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let storage_path = Path::new(&storage_directory);
+
+    let luser: &CStr = unsafe {
+        assert!(!user.is_null());
+        CStr::from_ptr(user)
+    };
+
+    let u: String = match luser.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    match set_current_user(&u, storage_path) {
+        Ok(()) => 0,
         Err(e) => {
             let c_err = SDDKError::from(e);
 

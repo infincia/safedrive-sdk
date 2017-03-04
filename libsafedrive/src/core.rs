@@ -55,6 +55,7 @@ pub use ::util::get_current_os;
 #[cfg(target_os = "macos")]
 pub use ::util::unique_client_hash;
 pub use ::util::get_current_user;
+pub use ::util::set_current_user;
 
 pub use ::cache::clean_cache;
 pub use ::cache::clear_cache;
