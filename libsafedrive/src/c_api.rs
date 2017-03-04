@@ -29,7 +29,7 @@ use ::core::cancel_sync_task;
 
 use ::constants::Configuration;
 
-use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule};
+use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
 
 use ::session::SyncSession;
 
@@ -40,6 +40,8 @@ use ::core::get_current_user;
 
 use ::core::get_account_status;
 use ::core::get_account_details;
+
+use ::core::get_software_clients;
 
 use ::core::send_error_report;
 
@@ -215,6 +217,26 @@ impl From<SyncSession> for SDDKSyncSession {
             date: session.time.unwrap(),
             session_id: session.id.unwrap(),
         }
+    }
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKSoftwareClient {
+    pub unique_client_id: *const std::os::raw::c_char,
+    pub operating_system: *const std::os::raw::c_char,
+    pub language: *const std::os::raw::c_char,
+}
+
+impl From<SoftwareClient> for SDDKSoftwareClient {
+    fn from(client: SoftwareClient) -> SDDKSoftwareClient {
+        let mut c_client = SDDKSoftwareClient {
+            unique_client_id: CString::new(client.uniqueId.as_str()).unwrap().into_raw(),
+            operating_system: CString::new(client.operatingSystem.as_str()).unwrap().into_raw(),
+            language: CString::new(client.language.as_str()).unwrap().into_raw(),
+        };
+
+        c_client
     }
 }
 
@@ -1247,6 +1269,96 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
 
     0
 }
+
+/// Get a list of all registered clients from the SafeDrive server
+///
+/// The caller does not own the memory pointed to by `clients` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     clients: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was 0
+///
+///              must be freed by the caller using sddk_free_software_clients()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///     0+: number of registered clients found, and number of SDDKSoftwareClient structs allocated
+///         in `client`
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+/// SDDKSoftwareClient * clients = NULL;
+///
+/// int length = sddk_get_clients(&state, &clients, &error);
+///
+/// if (0 != length) {
+///     printf("Failed to get clients");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got clients");
+///     // do something with clients here, then free it
+///     sddk_free_software_clients(&clients, length);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_software_clients(state: *mut SDDKState,
+                                            mut clients: *mut *mut SDDKSoftwareClient,
+                                            mut error: *mut *mut SDDKError) -> i64 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let result = match get_software_clients(c.0.get_api_token()) {
+        Ok(clients) => clients,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1
+        },
+    };
+
+    let cl = result.into_iter().map(|client| {
+        SDDKSoftwareClient::from(client)
+    }).collect::<Vec<SDDKSoftwareClient>>();;
+
+    let mut b = cl.into_boxed_slice();
+    let ptr = b.as_mut_ptr();
+    let len = b.len();
+    std::mem::forget(b);
+
+    unsafe {
+        *clients = ptr;
+    }
+
+    len as i64
+}
+
+
 
 
 /// Add a sync folder
@@ -2299,7 +2411,36 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
 
 
+/// Free a pointer to a list of software clients
+///
+/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+///
+/// Parameters:
+///
+///     clients: a pointer obtained from calling sddk_get_software_clients()
+///
+///     length: number of SDDKSoftwareClient structs that were allocated in the pointer
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_software_clients(&clients, length);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_free_software_clients(clients: *mut *mut SDDKSoftwareClient,
+                                             length: u64) {
+    assert!(!clients.is_null());
+    let l = length as usize;
 
+    let clients: Vec<SDDKSoftwareClient> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*clients, l)).into_vec() };
+    for client in clients {
+        let _ = unsafe { CString::from_raw(client.unique_client_id as *mut std::os::raw::c_char) };
+        let _ = unsafe { CString::from_raw(client.language as *mut std::os::raw::c_char) };
+        let _ = unsafe { CString::from_raw(client.operating_system as *mut std::os::raw::c_char) };
+    }
+}
 
 
 /// Free a pointer to a sync folder
