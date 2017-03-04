@@ -418,7 +418,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func generateUniqueClientID(_ email_address: String) throws -> Optional<String> {
+    public func generateUniqueClientID() -> String {
         var unique_client_id: UnsafeMutablePointer<CChar>? = nil
 
         sddk_generate_unique_client_id(&unique_client_id)
