@@ -958,6 +958,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 ///
 /// Parameters:
 ///
+///     local_storage_path: a NULL-terminated string representing the location the app can store
+///                         settings for a user
+///
 ///     user: an uninitialized pointer that will be allocated and initialized when the function
 ///           returns if the return value was 0
 ///
