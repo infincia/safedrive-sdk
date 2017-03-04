@@ -24,6 +24,65 @@ header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type") => [String] }
 header! { (ContentLength, "Content-Length") => [usize] }
 
+struct ProgressReader<F> {
+    inner: ::std::io::Cursor<Vec<u8>>,
+    callback: F,
+    content_length: u64,
+    real_size: u64,
+    current: u64,
+    real_current: u64,
+}
+
+impl<F> ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+    pub fn new(reader: Vec<u8>, callback: F, content_length: u64, real_size: u64) -> ProgressReader<F> {
+        ProgressReader {
+            inner: ::std::io::Cursor::new(reader),
+            callback: callback,
+            content_length: content_length,
+            real_size: real_size,
+            current: 0,
+            real_current: 0,
+        }
+    }
+
+    pub fn to_body(self) -> ::reqwest::Body {
+        let content_length = self.content_length;
+        ::reqwest::Body::sized(self, content_length as u64)
+    }
+}
+
+impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+    fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize> {
+        let r = self.inner.read(buf);
+
+        match r {
+            Ok(size) => {
+                debug!("read {}", size);
+
+                self.current += size as u64;
+
+                let multiplier: f64 = self.current as f64 / self.content_length as f64;
+
+                //let percentage: f64 = multiplier * 100.0;
+
+                let real_updated: f64 = self.real_size as f64 * multiplier;
+
+                let real_new = real_updated - self.real_current as f64;
+
+                self.real_current = real_updated as u64;
+
+                (self.callback)(self.real_size, self.real_current, real_new as u64);
+            },
+            Err(e) => {
+                debug!("error reading: {}", e);
+                return Err(e)
+            },
+        }
+
+        r
+    }
+}
+
 #[derive(Serialize, Debug)]
 #[serde(untagged)]
 pub enum APIEndpoint<'a> {
