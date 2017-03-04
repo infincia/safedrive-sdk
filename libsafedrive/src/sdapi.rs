@@ -1237,7 +1237,6 @@ pub fn write_blocks(token: &Token, session: &str, blocks: &[WrappedBlock]) -> Re
                 return Ok(missing);
             },
             &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::RetryUpload),
-            &::reqwest::StatusCode::NotFound => return Err(SDAPIError::RetryUpload),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
