@@ -1026,34 +1026,55 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
     let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), endpoint.url())
-        .header(::reqwest::header::Connection::close())
-        .header(UserAgent(user_agent.to_string()))
-        .header(SDAuthToken(token.token.to_owned()));
 
-    trace!("sending request");
-    let mut result = try!(request.send());
-    trace!("response received");
-    let mut response = String::new();
-    trace!("reading response");
-    try!(result.read_to_string(&mut response));
+    let retries = 3;
+    let mut retries_left = retries;
 
-    trace!("response: {}", response);
+    loop {
+        let request = client.request(endpoint.method(), endpoint.url())
+            .header(::reqwest::header::Connection::close())
+            .header(UserAgent(user_agent.to_string()))
+            .header(SDAuthToken(token.token.to_owned()));
 
-    match result.status() {
-        &::reqwest::StatusCode::Ok => {},
-        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-        &::reqwest::StatusCode::NotFound => {},
-        &::reqwest::StatusCode::BadRequest => {
-            let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
-            return Err(SDAPIError::Internal(error.message))
-        },
-        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
-        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
+
+        trace!("sending request");
+        let mut result = try!(request.send());
+        trace!("response received");
+        let mut response = String::new();
+        trace!("reading response");
+        try!(result.read_to_string(&mut response));
+
+        trace!("response: {}", response);
+
+        match result.status() {
+            &::reqwest::StatusCode::Ok => {
+                return Ok(())
+            },
+            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            &::reqwest::StatusCode::NotFound => {},
+            &::reqwest::StatusCode::BadRequest => {
+                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                return Err(SDAPIError::Internal(error.message))
+            },
+            &::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable)
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        }
     }
 
-    Ok(())
 }
 
 pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> {
