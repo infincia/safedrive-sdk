@@ -902,41 +902,58 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, s
 
     let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, encrypted: encrypted, size: size, session: &session[0] };
 
-    let (multipart_body, content_length) = multipart_for_binary(session, "file");
-
-    trace!("session body: {}", String::from_utf8_lossy(&multipart_body));
-
-    //trace!("body: {}", String::from_utf8_lossy(&body));
-
     let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
-    let request = client.request(endpoint.method(), endpoint.url())
-        .body(multipart_body)
-        .header(::reqwest::header::Connection::close())
-        .header(UserAgent(user_agent.to_string()))
-        .header(SDAuthToken(token.token.to_owned()))
-        .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
-        .header(ContentLength(content_length));
 
-    trace!("sending request");
-    let mut result = try!(request.send());
-    trace!("response received");
-    let mut response = String::new();
-    trace!("reading response");
-    try!(result.read_to_string(&mut response));
+    let retries = 3;
+    let mut retries_left = retries;
 
-    match result.status() {
-        &::reqwest::StatusCode::Ok => Ok(()),
-        &::reqwest::StatusCode::Created => Ok(()),
-        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-        &::reqwest::StatusCode::BadRequest => {
-            let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
-            return Err(SDAPIError::Internal(error.message))
-        },
-        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
+    loop {
 
-        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        let (multipart_body, content_length, real_size) = multipart_for_binary(session, "file");
+        
+        let request = client.request(endpoint.method(), endpoint.url())
+            .body(multipart_body)
+            .header(::reqwest::header::Connection::close())
+            .header(UserAgent(user_agent.to_string()))
+            .header(SDAuthToken(token.token.to_owned()))
+            .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
+            .header(ContentLength(content_length));
+
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
+
+        trace!("sending request");
+        let mut result = try!(request.send());
+        trace!("response received");
+        let mut response = String::new();
+        trace!("reading response");
+        try!(result.read_to_string(&mut response));
+
+        match result.status() {
+            &::reqwest::StatusCode::Ok => return Ok(()),
+            &::reqwest::StatusCode::Created => return Ok(()),
+            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            &::reqwest::StatusCode::BadRequest => {
+                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                return Err(SDAPIError::Internal(error.message))
+            },
+            &::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable)
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        }
     }
 }
 
