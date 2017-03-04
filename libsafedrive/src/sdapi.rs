@@ -90,6 +90,7 @@ impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync +
 pub enum APIEndpoint<'a> {
     ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str] },
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
+    UnregisterClient,
     GetClients,
     AccountStatus,
     AccountDetails,
@@ -155,6 +156,9 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::RegisterClient { .. } => {
                 ::reqwest::Method::Post
             },
+            APIEndpoint::UnregisterClient => {
+                ::reqwest::Method::Post
+            },
             APIEndpoint::GetClients => {
                 ::reqwest::Method::Get
             },
@@ -213,6 +217,9 @@ impl<'a> APIEndpoint<'a> {
             },
             APIEndpoint::RegisterClient { .. } => {
                 format!("/api/1/client/register")
+            },
+            APIEndpoint::UnregisterClient => {
+                format!("/api/1/client/unRegister")
             },
             APIEndpoint::GetClients => {
                 format!("/api/1/client/list")
@@ -363,6 +370,59 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
                 let token: Token = try!(::serde_json::from_str(&response));
                 return Ok(token)
             },
+            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            &::reqwest::StatusCode::BadRequest => {
+                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                return Err(SDAPIError::Internal(error.message))
+            },
+            &::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable)
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        }
+    }
+}
+
+pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
+
+    let endpoint = APIEndpoint::UnregisterClient;
+
+    let user_agent = &**USER_AGENT.read();
+    let client = ::reqwest::Client::new().unwrap();
+
+    let retries = 3;
+    let mut retries_left = retries;
+
+    loop {
+        let request = client.request(endpoint.method(), endpoint.url())
+            .header(::reqwest::header::Connection::close())
+            .header(UserAgent(user_agent.to_string()))
+            .header(SDAuthToken(token.token.to_owned()));
+
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
+
+        trace!("sending request");
+        let mut result = try!(request.send());
+        trace!("response received");
+        let mut response = String::new();
+        trace!("reading response");
+        try!(result.read_to_string(&mut response));
+
+        trace!("response: {}", response);
+
+        match result.status() {
+            &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
