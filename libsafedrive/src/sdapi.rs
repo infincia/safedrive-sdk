@@ -1197,45 +1197,57 @@ pub fn write_blocks(token: &Token, session: &str, blocks: &[WrappedBlock]) -> Re
     let user_agent = &**USER_AGENT.read();
 
     let client = ::reqwest::Client::new().unwrap();
-    let mut request = client.request(endpoint.method(), endpoint.url())
-        .header(::reqwest::header::Connection::close())
-        .header(UserAgent(user_agent.to_string()))
-        .header(SDAuthToken(token.token.to_owned()));
 
-    let (multipart_body, content_length) = multipart_for_binary(blocks, "files");
+    let retries = 3;
+    let mut retries_left = retries;
 
-    trace!("multiblock body: {}", String::from_utf8_lossy(&multipart_body));
+    loop {
+        let (multipart_body, content_length, real_size) = multipart_for_binary(blocks, "files");
+        
+        let request = client.request(endpoint.method(), endpoint.url())
+            .header(::reqwest::header::Connection::close())
+            .header(UserAgent(user_agent.to_string()))
+            .header(SDAuthToken(token.token.to_owned()))
+            .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
+            .header(ContentLength(content_length))
+            .body(multipart_body);
 
-    request = request.body(multipart_body)
-        .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
-        .header(ContentLength(content_length));
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
 
+        trace!("sending request");
+        let mut result = try!(request.send());
+        trace!("response received");
+        let mut response = String::new();
+        trace!("reading response");
+        try!(result.read_to_string(&mut response));
 
+        debug!("response: {}", response);
 
-    trace!("sending request");
-    let mut result = try!(request.send());
-    trace!("response received");
-    let mut response = String::new();
-    trace!("reading response");
-    try!(result.read_to_string(&mut response));
-
-    trace!("response: {}", response);
-
-    match result.status() {
-        &::reqwest::StatusCode::Ok => {},
-        &::reqwest::StatusCode::Created => {},
-        &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::RetryUpload),
-        &::reqwest::StatusCode::NotFound => return Err(SDAPIError::RetryUpload),
-        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
-
-        _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        match result.status() {
+            &::reqwest::StatusCode::Ok | &::reqwest::StatusCode::Created => {
+                let missing: Vec<String> = try!(::serde_json::from_str(&response));
+                return Ok(missing);
+            },
+            &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::RetryUpload),
+            &::reqwest::StatusCode::NotFound => return Err(SDAPIError::RetryUpload),
+            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            &::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable)
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        }
     }
-
-    let missing: Vec<String> = try!(::serde_json::from_str(&response));
-
-    Ok(missing)
 }
 
 
