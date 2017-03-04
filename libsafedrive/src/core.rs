@@ -510,17 +510,48 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
 
                         let block_write_start_time = ::std::time::Instant::now();
 
-                        let mut should_retry = true;
-                        let mut retries_left = 15.0;
+                        debug!("write cache trying send of {} blocks", block_batch.len());
 
-                        while should_retry {
-                            debug!("write cache trying send of {} blocks", block_batch.len());
+                        if is_sync_task_cancelled(local_session_name.to_owned()) {
+                            match status_send.send(Err(SDError::Cancelled)) {
+                                Ok(()) => {
+                                    debug!("write thread cancelled");
 
-                            if is_sync_task_cancelled(local_session_name.to_owned()) {
-                                match status_send.send(Err(SDError::Cancelled)) {
+                                    return;
+                                },
+                                Err(e) => {
+                                    debug!("channel exited: {}", e);
+                                    break;
+                                },
+                            }
+                        }
+
+                        match write_blocks(&local_token, &local_session_name, &block_batch) {
+                            Ok(missing) => {
+                                debug!("sending group took {} seconds", block_write_start_time.elapsed().as_secs());
+
+                                for block in &block_batch {
+                                    let bn = &block.name();
+                                    if missing.contains(bn) {
+                                        debug!("server missing block, returning to the cache: {}", bn);
+                                        let mut c = block.clone();
+                                        c.needs_upload();
+                                        write_cache.add(c);
+                                    }
+                                }
+
+                                match status_send.send(Ok(false)) {
+                                    Ok(()) => {},
+                                    Err(e) => {
+                                        debug!("channel exited: {}", e);
+                                        break;
+                                    },
+                                }
+                            },
+                            Err(SDAPIError::ServiceUnavailable) => {
+                                match status_send.send(Err(SDError::ServiceUnavailable)) {
                                     Ok(()) => {
-                                        debug!("write thread cancelled");
-
+                                        debug!("write thread exceeded retries");
                                         return;
                                     },
                                     Err(e) => {
@@ -528,96 +559,34 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                                         break;
                                     },
                                 }
-                            }
-
-                            let failed_count = 15.0 - retries_left;
-                            let mut rng = ::rand::thread_rng();
-
-                            /// pick a random multiplier, avoid letting a bunch of clients retry the request
-                            /// at the same 2/4/8/16 backoff times to limit server load spikes
-
-                            let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
-
-                            if retries_left > 0.0 {
-                                let mut backoff_time = backoff_multiplier * (failed_count * failed_count) * 1000.0;
-
-
-                                while backoff_time > 0.0 {
-                                    debug!("backed off for {} seconds", backoff_time);
-
-                                    if is_sync_task_cancelled(local_session_name.to_owned()) {
-                                        match status_send.send(Err(SDError::Cancelled)) {
-                                            Ok(()) => {
-                                                debug!("write thread cancelled");
-
-                                                return;
-                                            },
-                                            Err(e) => {
-                                                debug!("channel exited: {}", e);
-                                                break;
-                                            },
-                                        }
-                                    }
-
-                                    backoff_time -= 1000.0;
-                                    thread::sleep_ms(1000);
+                            },
+                            Err(SDAPIError::Authentication) => {
+                                match status_send.send(Err(SDError::Authentication)) {
+                                    Ok(()) => {
+                                        debug!("write thread auth failure");
+                                        return;
+                                    },
+                                    Err(e) => {
+                                        debug!("channel exited: {}", e);
+                                        break;
+                                    },
                                 }
-                            }
-
-                            match write_blocks(&local_token, &local_session_name, &block_batch) {
-                                Ok(missing) => {
-                                    debug!("sending group took {} seconds", block_write_start_time.elapsed().as_secs());
-                                    should_retry = false;
-
-                                    for block in &block_batch {
-                                        let bn = &block.name();
-                                        if missing.contains(bn) {
-                                            debug!("server missing block, returning to the cache: {}", bn);
-                                            let mut c = block.clone();
-                                            c.needs_upload();
-                                            write_cache.add(c);
-                                        }
-                                    }
-
-                                    match status_send.send(Ok(false)) {
-                                        Ok(()) => {},
-                                        Err(e) => {
-                                            debug!("channel exited: {}", e);
-                                            break;
-                                        },
-                                    }
-                                },
-                                Err(SDAPIError::RequestFailed(_)) => {
-                                    retries_left = retries_left - 1.0;
-                                    if retries_left <= 0.0 {
-                                        match status_send.send(Err(SDError::ExceededRetries(15))) {
-                                            Ok(()) => {
-                                                debug!("write thread exceeded retries");
-                                                return;
-                                            },
-                                            Err(e) => {
-                                                debug!("channel exited: {}", e);
-                                                break;
-                                            },
-                                        }
-                                    }
-                                },
-                                Err(SDAPIError::Authentication) => {
-                                    match status_send.send(Err(SDError::Authentication)) {
-                                        Ok(()) => {
-                                            debug!("write thread auth failure");
-                                            return;
-                                        },
-                                        Err(e) => {
-                                            debug!("channel exited: {}", e);
-                                            break;
-                                        },
-                                    }
-                                },
-                                _ => {}
-                            }
-
+                            },
+                            Err(e) => {
+                                match status_send.send(Err(SDError::RequestFailure(Box::new(e)))) {
+                                    Ok(()) => {
+                                        debug!("write thread error");
+                                        return;
+                                    },
+                                    Err(e) => {
+                                        debug!("channel exited: {}", e);
+                                        break;
+                                    },
+                                }
+                            },
                         }
+
+
 
 
                     }
@@ -1075,51 +1044,19 @@ pub fn sync(token: &Token,
 
     debug!("finishing sync session");
 
-    let mut should_retry = true;
-    let mut retries_left = 15.0;
-
-    while should_retry {
-        /// allow caller to tick the progress display, if one exists
-        progress(estimated_size, processed_size, 0, percent_completed, false);
-
-        let failed_count = 15.0 - retries_left;
-        let mut rng = ::rand::thread_rng();
-
-        /// we pick a multiplier randomly to avoid a bunch of clients trying again
-        /// at the same 2/4/8/16 backoff times time over and over if the server
-        /// is overloaded or down
-        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
-
-        if failed_count >= 1.0 {
-            if is_sync_task_cancelled(session_name.to_owned()) {
-                issue(&format!("sync cancelled ({})", session_name));
-                return Err(SDError::Cancelled)
-            }
-            /// back off significantly every time a call fails
-            let backoff_time = backoff_multiplier * (failed_count * failed_count);
-            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
-            debug!("backing off for {:?}", delay);
-
-            thread::sleep(delay);
+    /// allow caller to tick the progress display, if one exists
+    progress(estimated_size, processed_size, 0, percent_completed, false);
+    
+    match finish_sync_session(&token, folder_id, true, &s, processed_size as usize) {
+        Ok(()) => {},
+        Err(SDAPIError::Authentication) => {
+            return Err(SDError::Authentication)
+        },
+        Err(e) => {
+            issue(&format!("not able to finish sync: {}", e));
+            return Err(SDError::RequestFailure(Box::new(e)));
         }
-
-        match finish_sync_session(&token, folder_id, true, &s, processed_size as usize) {
-            Ok(()) => {
-                should_retry = false;
-            },
-            Err(SDAPIError::Authentication) => {
-                return Err(SDError::Authentication)
-            },
-            Err(e) => {
-                retries_left = retries_left - 1.0;
-                if retries_left <= 0.0 {
-                    issue(&format!("not able to finish sync: too many retries ({})", e));
-                    return Err(SDError::ExceededRetries(15));
-                }
-            }
-        };
-    }
-
+    };
 
     progress(estimated_size, processed_size, 0, 100.0, false);
 
