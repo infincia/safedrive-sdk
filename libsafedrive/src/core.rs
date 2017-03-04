@@ -179,6 +179,13 @@ pub fn login(unique_client_id: &str,
     }
 }
 
+pub fn remove_software_client(token: &Token) -> Result<(), SDError> {
+    match unregister_client(token) {
+        Ok(()) => return Ok(()),
+        Err(e) => return Err(SDError::from(e))
+    }
+}
+
 pub fn get_software_clients(token: &Token) -> Result<Vec<SoftwareClient>, SDError> {
     match list_clients(token) {
         Ok(clients) => Ok(clients),
