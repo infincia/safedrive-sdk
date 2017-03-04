@@ -240,6 +240,16 @@ pub struct Token {
     pub token: String,
 }
 
+///private final String uniqueId
+///private final String operatingSystem
+///private final String language
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SoftwareClient {
+    pub uniqueId: String,
+    pub operatingSystem: String,
+    pub language: String,
+}
+
 ///private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
