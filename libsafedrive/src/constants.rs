@@ -69,6 +69,10 @@ static SD_AUTH_TOKEN_DOMAIN_STAGING: &'static str = "staging.session.safedrive.i
 static SD_RECOVERY_KEY_DOMAIN_PRODUCTION: &'static str = "recovery.safedrive.io";
 static SD_RECOVERY_KEY_DOMAIN_STAGING: &'static str = "staging.recovery.safedrive.io";
 
+// use the same UCID on production and staging until we have a reason not to
+static SD_UNIQUE_CLIENT_ID_DOMAIN_PRODUCTION: &'static str = "ucid.safedrive.io";
+static SD_UNIQUE_CLIENT_ID_DOMAIN_STAGING: &'static str = "staging.ucid.safedrive.io";
+
 
 
 pub fn is_production() -> bool {
