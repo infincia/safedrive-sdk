@@ -964,39 +964,60 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let request = client.request(endpoint.method(), endpoint.url())
-        .header(::reqwest::header::Connection::close())
-        .header(UserAgent(user_agent.to_string()))
-        .header(SDAuthToken(token.token.to_owned()));
+    let retries = 3;
+    let mut retries_left = retries;
 
-    trace!("sending request");
-    let mut result = try!(request.send());
-    trace!("response received");
+    loop {
+        let request = client.request(endpoint.method(), endpoint.url())
+            .header(::reqwest::header::Connection::close())
+            .header(UserAgent(user_agent.to_string()))
+            .header(SDAuthToken(token.token.to_owned()));
 
-    match result.status() {
-        &::reqwest::StatusCode::Ok => {},
-        &::reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
-        &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-        &::reqwest::StatusCode::BadRequest => {
-            let mut response = String::new();
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
-            try!(result.read_to_string(&mut response));
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
 
-            let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
-            return Err(SDAPIError::Internal(error.message))
-        },
-        &::reqwest::StatusCode::ServiceUnavailable => return Err(SDAPIError::ServiceUnavailable),
+        trace!("sending request");
+        let mut result = try!(request.send());
+        trace!("response received");
 
-        _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
-    };
+        match result.status() {
+            &::reqwest::StatusCode::Ok => {
+                let mut buffer = Vec::new();
 
-    let mut buffer = Vec::new();
+                trace!("reading data");
+                try!(result.read_to_end(&mut buffer));
 
-    trace!("reading data");
-    try!(result.read_to_end(&mut buffer));
+                trace!("returning data");
+                return Ok(SyncSessionResponse { name: name, chunk_data: buffer, folder_id: folder_id });
+            },
+            &::reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
+            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            &::reqwest::StatusCode::BadRequest => {
+                let mut response = String::new();
 
-    trace!("returning data");
-    Ok(SyncSessionResponse { name: name, chunk_data: buffer, folder_id: folder_id })
+                try!(result.read_to_string(&mut response));
+
+                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                return Err(SDAPIError::Internal(error.message))
+            },
+            &::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable)
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
+        };
+
+    }
+
 }
 
 pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> {
