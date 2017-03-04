@@ -146,8 +146,22 @@ fn main() {
                 .required(true)
             )
         )
-        .subcommand(SubCommand::with_name("clients")
-            .about("list all registered clients")
+        .subcommand(SubCommand::with_name("client")
+            .about("manage registered clients")
+            .arg(Arg::with_name("list")
+                .short("l")
+                .long("list")
+                .help("list all registered clients")
+                .conflicts_with("remove")
+                .required(true)
+            )
+            .arg(Arg::with_name("remove")
+                .short("r")
+                .long("remove")
+                .help("remove this client. WARNING: this will unregister all sync folders and remove the client from your account")
+                .conflicts_with("list")
+                .required(true)
+            )
         )
         .subcommand(SubCommand::with_name("list")
             .about("list all registered folders")
@@ -397,11 +411,15 @@ fn main() {
 
         list_folders(token);
 
-    } else if let Some(_) = matches.subcommand_matches("clients") {
+    } else if let Some(m) = matches.subcommand_matches("client") {
 
         let (token, _) = sign_in(&app_directory);
 
-        list_clients(token);
+        if m.is_present("list") {
+            list_clients(token);
+        } else if m.is_present("remove") {
+            remove_client(token);
+        }
 
     } else if let Some(_) = matches.subcommand_matches("sessions") {
 
@@ -591,6 +609,20 @@ pub fn list_clients(token: Token) {
         );
     }
     table.printstd();
+}
+
+pub fn remove_client(token: Token) {
+
+    match remove_software_client(&token) {
+        Ok(()) => {
+            println!("client removed");
+        },
+        Err(e) => {
+            error!("Remove client error: {}", e);
+            std::process::exit(1);
+        }
+    };
+
 }
 
 pub fn add(token: Token, path: &str) {
