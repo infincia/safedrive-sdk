@@ -373,6 +373,17 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    public func generateUniqueClientID(_ email_address: String) throws -> Optional<String> {
+        var unique_client_id: UnsafeMutablePointer<CChar>? = nil
+
+        sddk_generate_unique_client_id(&unique_client_id)
+        defer {
+            sddk_free_string(&unique_client_id)
+        }
+        
+        return String(cString: unique_client_id!)
+    }
+    
     public func getUniqueClientID(_ email_address: String) throws -> Optional<String> {
         var unique_client_id: UnsafeMutablePointer<CChar>? = nil
         var error: UnsafeMutablePointer<SDDKError>? = nil
