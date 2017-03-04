@@ -54,6 +54,7 @@ pub use ::util::set_unique_client_id;
 pub use ::util::get_current_os;
 #[cfg(target_os = "macos")]
 pub use ::util::unique_client_hash;
+pub use ::util::get_current_user;
 
 pub use ::cache::clean_cache;
 pub use ::cache::clear_cache;
@@ -153,6 +154,14 @@ pub fn login(unique_client_id: &str,
             debug!("failed to set unique client id: {}", e);
             return Err(e)
 
+        },
+    }
+
+    match ::util::set_current_user(username, local_storage_path) {
+        Ok(()) => {},
+        Err(e) => {
+            debug!("failed to set current user: {}", e);
+            return Err(e)
         },
     }
 

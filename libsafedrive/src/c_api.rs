@@ -36,6 +36,8 @@ use ::session::SyncSession;
 use ::core::get_unique_client_id;
 use ::core::generate_unique_client_id;
 
+use ::core::get_current_user;
+
 use ::core::get_account_status;
 use ::core::get_account_details;
 
@@ -858,6 +860,93 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
     c.0.set_keys(keyset.main, keyset.hmac, keyset.tweak);
     0
 }
+
+/// Get the current user and store it in the `user` parameter
+///
+/// Will return a failure code if the user cannot be determined
+///
+/// The caller does not own the memory pointed to by `user` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     user: an uninitialized pointer that will be allocated and initialized when the function
+///           returns if the return value was 0
+///
+///           must be freed by the caller using sddk_free_string()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char * user;
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_get_current_user(&user, &error)) {
+///     printf("Failed to get current user");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got user");
+///     // do something with user here, then free it
+///     sddk_free_string(&user);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_current_user(local_storage_path: *const std::os::raw::c_char,
+                                        mut user: *mut *mut std::os::raw::c_char,
+                                        mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let lstorage: &CStr = unsafe {
+        assert!(!local_storage_path.is_null());
+        CStr::from_ptr(local_storage_path)
+    };
+
+    let storage_directory: String = match lstorage.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let storage_path = Path::new(&storage_directory);
+
+    match get_current_user(storage_path) {
+        Ok(u) => {
+            unsafe {
+                *user = CString::new(u).expect("Failed to get user").into_raw();
+            }
+            0
+        },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
 
 /// Get the current unique client ID and store it in the `unique_client_id` parameter
 ///
