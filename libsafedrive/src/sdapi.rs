@@ -91,7 +91,7 @@ pub enum APIEndpoint<'a> {
     ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str] },
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
     UnregisterClient,
-    GetClients,
+    GetClients { email: &'a str, password: &'a str },
     AccountStatus,
     AccountDetails,
     AccountKey { master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
@@ -159,7 +159,7 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::UnregisterClient => {
                 ::reqwest::Method::Post
             },
-            APIEndpoint::GetClients => {
+            APIEndpoint::GetClients { .. } => {
                 ::reqwest::Method::Get
             },
             APIEndpoint::AccountStatus => {
@@ -221,8 +221,8 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::UnregisterClient => {
                 format!("/api/1/client/unRegister")
             },
-            APIEndpoint::GetClients => {
-                format!("/api/1/client/list")
+            APIEndpoint::GetClients { .. } => {
+                format!("/api/1/client")
             },
             APIEndpoint::AccountStatus => {
                 format!("/api/1/account/status")
@@ -439,9 +439,9 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
     }
 }
 
-pub fn list_clients(token: &Token) -> Result<Vec<SoftwareClient>, SDAPIError> {
+pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, SDAPIError> {
 
-    let endpoint = APIEndpoint::GetClients;
+    let endpoint = APIEndpoint::GetClients { email: email, password: password };
 
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
@@ -453,7 +453,7 @@ pub fn list_clients(token: &Token) -> Result<Vec<SoftwareClient>, SDAPIError> {
         let request = client.request(endpoint.method(), endpoint.url())
             .header(::reqwest::header::Connection::close())
             .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+            .json(&endpoint);
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();

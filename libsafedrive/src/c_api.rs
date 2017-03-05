@@ -1512,7 +1512,9 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     username: a NULL-terminated string representing a username for a SafeDrive account
+///
+///     password: a NULL-terminated string representing a password for a SafeDrive account
 ///
 ///     clients: an uninitialized pointer that will be allocated and initialized when the function
 ///              returns if the return value was 0
@@ -1553,12 +1555,24 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_software_clients(state: *mut SDDKState,
+pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_char,
+                                            password:  *const std::os::raw::c_char,
                                             mut clients: *mut *mut SDDKSoftwareClient,
                                             mut error: *mut *mut SDDKError) -> i64 {
-    let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let result = match get_software_clients(c.0.get_api_token()) {
+    let c_username: &CStr = unsafe { CStr::from_ptr(username) };
+    let un: String =  match c_username.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let c_password: &CStr = unsafe { CStr::from_ptr(password) };
+    let pa: String =  match c_password.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let result = match get_software_clients(&un, &pa) {
         Ok(clients) => clients,
         Err(e) => {
             let c_err = SDDKError::from(e);

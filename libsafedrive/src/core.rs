@@ -187,8 +187,9 @@ pub fn remove_software_client(token: &Token) -> Result<(), SDError> {
     }
 }
 
-pub fn get_software_clients(token: &Token) -> Result<Vec<SoftwareClient>, SDError> {
-    match list_clients(token) {
+pub fn get_software_clients(username: &str,
+                            password:  &str) -> Result<Vec<SoftwareClient>, SDError> {
+    match list_clients(username, password) {
         Ok(clients) => Ok(clients),
         Err(e) => Err(SDError::from(e))
     }
