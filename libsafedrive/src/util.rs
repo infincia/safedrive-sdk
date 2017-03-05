@@ -24,7 +24,7 @@ use ::constants::*;
 use ::error::SDError;
 
 pub fn generate_uuid() -> String {
-    let sync_uuid = ::uuid::Uuid::new_v4().simple().to_string();
+    let sync_uuid = format!("{}{}", ::uuid::Uuid::new_v4().simple().to_string(), ::uuid::Uuid::new_v4().simple().to_string());
 
     sync_uuid
 }
