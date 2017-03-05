@@ -363,14 +363,14 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func getClients(completionQueue queue: DispatchQueue, success: @escaping (_ folders: [SoftwareClient]) -> Void, failure: @escaping SDKFailure) {
+    public func getClients(withUser username: String, password: String, completionQueue queue: DispatchQueue, success: @escaping (_ folders: [SoftwareClient]) -> Void, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
 
             var clients_ptr: UnsafeMutablePointer<SDDKSoftwareClient>? = nil
             var error: UnsafeMutablePointer<SDDKError>? = nil
             
-            let res = sddk_get_software_clients(self.state!, &clients_ptr, &error)
+            let res = sddk_get_software_clients(username, password, &clients_ptr, &error)
             defer {
                 if res >= 0 {
                     sddk_free_software_clients(&clients_ptr, UInt64(res))
