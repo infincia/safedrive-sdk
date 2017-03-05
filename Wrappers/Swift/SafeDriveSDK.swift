@@ -268,6 +268,22 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    public func setCurrentUser(user: String, local_storage_path: String) throws {
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_set_current_user(local_storage_path, user, &error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        switch res {
+        case 0:
+            return
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
+    }
     
     public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
 
@@ -445,6 +461,23 @@ public class SafeDriveSDK: NSObject {
         switch res {
         case 0:
             return String(cString: unique_client_id!)
+        default:
+            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+        }
+    }
+    
+    public func setUniqueClientID(uniqueClientID: String, local_storage_path: String) throws {
+        var error: UnsafeMutablePointer<SDDKError>? = nil
+
+        let res = sddk_set_unique_client_id(local_storage_path, uniqueClientID, &error)
+        defer {
+            if res == -1 {
+                sddk_free_error(&error)
+            }
+        }
+        switch res {
+        case 0:
+            return
         default:
             throw SDKErrorFromSDDKError(sdkError: error!.pointee)
         }
