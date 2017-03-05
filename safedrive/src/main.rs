@@ -413,11 +413,14 @@ fn main() {
 
     } else if let Some(m) = matches.subcommand_matches("client") {
 
-        let (token, _) = sign_in(&app_directory);
 
         if m.is_present("list") {
-            list_clients(token);
+            let (username, password, _) = find_credentials(&app_directory);
+
+            list_clients(username, password);
         } else if m.is_present("remove") {
+            let (token, _) = sign_in(&app_directory);
+
             remove_client(token);
         }
 
@@ -586,14 +589,14 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
     (token, keyset)
 }
 
-pub fn list_clients(token: Token) {
+pub fn list_clients(username: String, password: String) {
 
     let mut table = Table::new();
 
     // Add a row
     table.add_row(row!["Name", "OS", "Language", "ID"]);
 
-    let client_list = match get_software_clients(&token) {
+    let client_list = match get_software_clients(&username, &password) {
         Ok(cl) => cl,
         Err(e) => {
             error!("Read clients error: {}", e);
