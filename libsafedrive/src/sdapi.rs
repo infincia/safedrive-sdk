@@ -160,7 +160,7 @@ impl<'a> APIEndpoint<'a> {
                 ::reqwest::Method::Post
             },
             APIEndpoint::GetClients { .. } => {
-                ::reqwest::Method::Get
+                ::reqwest::Method::Post
             },
             APIEndpoint::AccountStatus => {
                 ::reqwest::Method::Get
