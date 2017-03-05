@@ -727,7 +727,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
 }
 
-pub fn create_folder<'a>(token: &Token, path: &'a str, name: &'a str, encrypted: bool) -> Result<u64, SDAPIError> {
+pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> Result<u64, SDAPIError> {
 
     let endpoint = APIEndpoint::CreateFolder { folderPath: path, folderName: name, encrypted: encrypted };
 
@@ -902,7 +902,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
 }
 
-pub fn register_sync_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<(), SDAPIError> {
+pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypted: bool) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::RegisterSyncSession { folder_id: folder_id, name: name, encrypted: encrypted };
 
@@ -1194,7 +1194,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
 
 /// block handling
 #[allow(dead_code)]
-pub fn check_block<'a>(token: &Token, name: &'a str) -> Result<bool, SDAPIError> {
+pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 
     let endpoint = APIEndpoint::CheckBlock { name: name };
 
@@ -1313,7 +1313,7 @@ pub fn write_blocks<F>(token: &Token, session: &str, blocks: &[WrappedBlock], pr
 }
 
 
-pub fn read_block<'a>(token: &Token, name: &'a str) -> Result<Vec<u8>, SDAPIError> {
+pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
     let endpoint = APIEndpoint::ReadBlock { name: name };
 
     let user_agent = &**USER_AGENT.read();
