@@ -309,6 +309,28 @@ public class SafeDriveSDK: NSObject {
             }
         }
     }
+    
+    public func removeClient(completionQueue queue: DispatchQueue, success: @escaping () -> Void, failure: @escaping SDKFailure) {
+
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            var status: UnsafeMutablePointer<SDDKAccountStatus>? = nil
+            
+            let res = sddk_remove_client(self.state, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
+        }
+    }
 
     public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
     
