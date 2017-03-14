@@ -5,11 +5,8 @@
 use std;
 
 /// external crate imports
-#[cfg(target_os = "linux")]
-use ::secret_service::SecretService;
 
-#[cfg(target_os = "linux")]
-use ::secret_service::EncryptionType;
+use ::keyring::Keyring;
 
 
 /// internal imports
@@ -46,202 +43,30 @@ impl std::fmt::Display for KeychainService {
     }
 }
 
-#[cfg(target_os = "macos")]
-impl KeychainService {
-    fn content_type(&self) -> ::security_framework::item::ItemClass {
-        match *self {
-            KeychainService::Account => ::security_framework::item::ItemClass::GenericPassword,
-            KeychainService::SSHUsername => ::security_framework::item::ItemClass::GenericPassword,
-            KeychainService::RecoveryPhrase => ::security_framework::item::ItemClass::GenericPassword,
-            KeychainService::AuthToken => ::security_framework::item::ItemClass::GenericPassword,
-
-        }
-    }
-}
-
-#[cfg(target_os = "linux")]
-impl KeychainService {
-    fn content_type(&self) -> &str {
-        match *self {
-            KeychainService::Account => "text/plain",
-            KeychainService::SSHUsername => "text/plain",
-            KeychainService::RecoveryPhrase => "text/plain",
-            KeychainService::AuthToken => "text/plain",
-        }
-    }
-}
-
-
-#[cfg(target_os = "windows")]
-impl KeychainService {
-    fn content_type(&self) -> &str {
-        match *self {
-            KeychainService::Account => "text/plain",
-            KeychainService::SSHUsername => "text/plain",
-            KeychainService::RecoveryPhrase => "text/plain",
-            KeychainService::AuthToken => "text/plain",
-        }
-    }
-}
-
 /// get
 
-#[cfg(target_os = "macos")]
-pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
-    let mut i = ::security_framework::item::ItemSearchOptions::new();
 
-    i.class(service.content_type());
-    i.load_refs(true);
-    i.limit(256);
-
-    let results = match i.search() {
-        Ok(v) => {
-            v
-        },
-        Err(e) => {
-            debug!("{}", e);
-
-            return Err(KeychainError::KeychainItemMissing)
-        }
-    };
-
-    for result in results {
-        match result.reference {
-            Some(reference) => {
-                println!("ref: {:?}", reference);
-            },
-            None => {
-                return Err(KeychainError::KeychainItemMissing)
-            }
-        }
-    }
-    /// need generic password support in security-framework to grab these easily
-    Err(KeychainError::KeychainUnavailable)
-}
-
-#[cfg(target_os = "linux")]
 pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
     let service_name = format!("{}", service);
 
-    /// initialize secret service (dbus connection and encryption session)
-    let ss = match SecretService::new(EncryptionType::Dh) {
-        Ok(ss) => ss,
-        Err(e) => {
-            debug!("{}", e);
+    let keychain = Keyring::new(&service_name, account);
 
-            return Err(KeychainError::KeychainUnavailable)
-        }
-    };
+    let password = keychain.get_password()?;
 
-    /// get default collection
-    let collection = match ss.get_default_collection() {
-        Ok(c) => c,
-        Err(e) => {
-            debug!("{}", e);
-
-            return Err(KeychainError::KeychainUnavailable)
-        }
-    };
-
-    /// search items by properties
-    let search_items = match ss.search_items(
-        vec![("account", account), ("service", &service_name)], /// properties
-    ) {
-        Ok(r) => r,
-        Err(e) => {
-            debug!("{}", e);
-
-            return Err(KeychainError::KeychainItemMissing)
-        },
-
-    };
-
-
-    let item = match search_items.get(0) {
-        Some(i) => i,
-        None => {
-            return Err(KeychainError::KeychainItemMissing)
-        },
-
-    };
-
-    /// retrieve secret from item
-    let secret = match item.get_secret() {
-        Ok(s) => s,
-        Err(e) => {
-            debug!("{}", e);
-
-            return Err(KeychainError::KeychainItemMissing)
-        },
-    };
-    let s = match String::from_utf8(secret) {
-        Ok(s) => s,
-        Err(e) => return Err(KeychainError::KeychainItemMissing)
-    };
-
-    Ok(s)
+    Ok(password)
 }
-
-#[cfg(target_os = "windows")]
-pub fn get_keychain_item(account: &str, service: KeychainService) -> Result<String, KeychainError> {
-    Err(KeychainError::KeychainUnavailable)
-}
-
 
 /// store
 
-#[cfg(target_os = "macos")]
-pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
-    Err(KeychainError::KeychainUnavailable)
-}
-
-#[cfg(target_os = "linux")]
 pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
     let service_name = format!("{}", service);
 
-    /// initialize secret service (dbus connection and encryption session)
-    let ss = match SecretService::new(EncryptionType::Dh) {
-        Ok(ss) => ss,
-        Err(e) => {
-            debug!("{}", e);
+    let keychain = Keyring::new(&service_name, account);
 
-            return Err(KeychainError::KeychainUnavailable)
-        }
-    };
+    keychain.set_password(secret)?;
 
-    /// get default collection
-    let collection = match ss.get_default_collection() {
-        Ok(c) => c,
-        Err(e) => {
-            debug!("{}", e);
-
-            return Err(KeychainError::KeychainUnavailable)
-        }
-    };
-
-    /// create new item
-    match collection.create_item(
-        &format!("safedrive"), /// label
-        vec![("account", account), ("service", &service_name)], /// properties
-        secret.as_bytes(), /// secret
-        true, /// replace item with same attributes
-        service.content_type() /// secret content type
-    ) {
-        Ok(res) => { return Ok(())},
-        Err(e) => {
-            debug!("{}", e);
-
-            return Err(KeychainError::KeychainInsertFailed(Box::new(e)))
-        }
-    }
+    Ok(())
 }
-
-#[cfg(target_os = "windows")]
-pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) -> Result<(), KeychainError> {
-    Err(KeychainError::KeychainUnavailable)
-}
-
-
 
 
 
@@ -352,8 +177,11 @@ fn get_ssh_username() {
         Ok(()) => {},
         Err(_) => { assert!(true == false); return }
     };
-    match get_keychain_item("user@safedrive.io", KeychainService::SSHUsername) {
+    let stored_ssh_password = match get_keychain_item("user@safedrive.io", KeychainService::SSHUsername) {
         Ok(p) => p,
         Err(_) => { assert!(true == false); return }
     };
+
+    assert!(ssh_username == stored_ssh_password);
+
 }

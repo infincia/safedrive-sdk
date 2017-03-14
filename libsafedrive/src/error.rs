@@ -5,24 +5,32 @@ use std;
 use ::bip39::{Bip39Error};
 use ::rustc_serialize::hex::{FromHexError};
 
+#[cfg(feature = "keychain")]
+use ::keyring::KeyringError;
+
+
 #[derive(Debug)]
 pub enum KeychainError {
-    KeychainUnavailable,
+    KeychainUnavailable(Box<std::error::Error + Send + Sync>),
     KeychainItemMissing,
     KeychainInsertFailed(Box<std::error::Error + Send + Sync>),
+    KeychainEncoding(Box<std::error::Error + Send + Sync>),
 }
 
 impl std::fmt::Display for KeychainError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            KeychainError::KeychainUnavailable => {
-                write!(f, "{}", localized_str!("Keychain unavailable", ""))
+            KeychainError::KeychainUnavailable(ref err) => {
+                write!(f, "{}: {}", localized_str!("Keychain unavailable", ""), err)
             },
             KeychainError::KeychainItemMissing => {
                 write!(f, "{}", localized_str!("Keychain item missing", ""))
             },
             KeychainError::KeychainInsertFailed(ref err) => {
                 write!(f, "{}: {}", localized_str!("Keychain insert failed", ""), err)
+            },
+            KeychainError::KeychainEncoding(ref err) => {
+                write!(f, "{}: {}", localized_str!("Keychain encoding error", ""), err)
             },
         }
     }
@@ -32,22 +40,53 @@ impl std::fmt::Display for KeychainError {
 impl std::error::Error for KeychainError {
     fn description(&self) -> &str {
         match *self {
-            KeychainError::KeychainUnavailable => localized_str!("keychain unavailable", ""),
+            KeychainError::KeychainUnavailable(ref err) => err.description(),
             KeychainError::KeychainItemMissing => localized_str!("keychain item missing", ""),
             KeychainError::KeychainInsertFailed(ref err) => err.description(),
+            KeychainError::KeychainEncoding(ref err) => err.description(),
 
         }
     }
 
     fn cause(&self) -> Option<&std::error::Error> {
         match *self {
-            KeychainError::KeychainUnavailable => None,
+            KeychainError::KeychainUnavailable(ref err) => Some(&**err),
             KeychainError::KeychainItemMissing => None,
             KeychainError::KeychainInsertFailed(ref err) => Some(&**err),
+            KeychainError::KeychainEncoding(ref err) => Some(&**err),
+
         }
     }
 }
 
+#[cfg(feature = "keychain")]
+impl From<KeyringError> for KeychainError {
+    fn from(e: KeyringError) -> KeychainError {
+        match e {
+            KeyringError::Parse(err) => {
+                KeychainError::KeychainEncoding(Box::new(err))
+            },
+            #[cfg(target_os = "macos")]
+            KeyringError::MacOsKeychainError(err) => {
+                KeychainError::KeychainInsertFailed(Box::new(err))
+            },
+            KeyringError::NoBackendFound => {
+                KeychainError::KeychainUnavailable(Box::new(e))
+            },
+            KeyringError::NoPasswordFound => {
+                KeychainError::KeychainItemMissing
+            },
+            #[cfg(target_os = "linux")]
+            KeyringError::SecretServiceError(err) => {
+                KeychainError::KeychainInsertFailed(Box::new(err))
+            },
+            #[cfg(target_os = "windows")]
+            KeyringError::WindowsVaultError => {
+                KeychainError::KeychainUnavailable(Box::new(e))
+            }
+        }
+    }
+}
 
 
 #[derive(Debug)]

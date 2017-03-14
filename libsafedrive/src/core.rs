@@ -62,12 +62,16 @@ pub use ::cache::clear_cache;
 
 #[cfg(feature = "keychain")]
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
-    ::keychain::get_keychain_item(account, service)?
+    let password = ::keychain::get_keychain_item(account, service)?;
+
+    Ok(password)
 }
 
 #[cfg(feature = "keychain")]
 pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, secret: &str) -> Result<(), SDError> {
-    ::keychain::set_keychain_item(account, service, secret)?
+    ::keychain::set_keychain_item(account, service, secret)?;
+
+    Ok(())
 }
 
 pub fn get_channel() -> Channel {

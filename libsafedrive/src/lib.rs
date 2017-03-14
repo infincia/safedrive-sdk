@@ -44,7 +44,7 @@ pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
 pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
 #[cfg(feature = "keychain")]
-pub use keychain::{get_keychain_item, set_keychain_item};
+pub use keychain::{get_keychain_item, set_keychain_item, KeychainService};
 
 
 
@@ -70,13 +70,11 @@ extern crate parking_lot;
 extern crate byteorder;
 extern crate blake2_rfc;
 
+#[cfg(feature = "keychain")]
+extern crate keyring;
+
 #[cfg(target_os = "macos")]
 extern crate interfaces;
-
-#[cfg(feature = "keychain")]
-#[cfg(feature = "linux-keychain")]
-#[cfg(target_os = "linux")]
-extern crate secret_service;
 
 #[cfg(target_os = "macos")]
 extern crate objc_foundation;
@@ -84,11 +82,6 @@ extern crate objc_foundation;
 #[cfg(target_os = "macos")]
 #[macro_use]
 extern crate objc;
-
-#[cfg(target_os = "macos")]
-#[cfg(feature = "keychain")]
-#[cfg(feature = "mac-keychain")]
-extern crate security_framework;
 
 #[macro_use]
 extern crate serde_derive;
