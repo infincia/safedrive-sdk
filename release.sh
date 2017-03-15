@@ -26,7 +26,6 @@ mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
 
 bash dep.sh
-export DEP_OPENSSL_VERSION="110"
 
 rustup override set $RUST_PINNED-$TARGET
 

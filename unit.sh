@@ -21,7 +21,6 @@ case $TARGET in
 esac
 
 bash dep.sh
-export DEP_OPENSSL_VERSION="110"
 
 rustup override set $RUST_PINNED-$TARGET
 
