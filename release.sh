@@ -24,7 +24,7 @@ mkdir -p dist-$TARGET/bin
 bash dep.sh
 export DEP_OPENSSL_VERSION="110"
 
-rustup override set beta-2017-03-03
+rustup override set beta-2017-03-03-$TARGET
 
 RUST_BACKTRACE=1 cargo build --release -p safedrive --target $TARGET > /dev/null
 

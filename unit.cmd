@@ -15,6 +15,6 @@ IF "%LINKTYPE%"=="mt" (
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
-rustup.exe override set beta-2017-03-03
+rustup.exe override set beta-2017-03-03-%TARGET%
 
 cargo.exe test --verbose --release -p libsafedrive --target %TARGET%
