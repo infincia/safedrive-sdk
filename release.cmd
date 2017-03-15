@@ -2,8 +2,6 @@ IF [%ARCH%]==[] set ARCH=x86
 IF [%TARGET%]==[] set TARGET=i686-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v140
 IF [%LINKTYPE%]==[] set LINKTYPE=dll
-IF [%CHANNEL%]==[] set CHANNEL=nightly
-IF [%RUST_PINNED%]==[] set RUST_PINNED=beta-2017-03-03
 
 ECHO building SafeDrive for Windows-%ARCH%
 
@@ -19,6 +17,8 @@ set RUST_BACKTRACE="1"
 IF "%LINKTYPE%"=="mt" (
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
+
+call rustver.bat
 
 rustup override set %RUST_PINNED%
 

@@ -9,7 +9,6 @@ env:
     - MAKE_DEB=no
     - DEB_MAINTAINER="Stephen Oliver <steve@infincia.com>"
     - DEB_DESCRIPTION="SafeDrive SDK"
-    - RUST_PINNED="beta-2017-03-03"
 
 addons:
   apt:
@@ -21,11 +20,9 @@ addons:
 matrix:
   include:
     - os: linux
-      rust: beta
       env: TARGET=x86_64-unknown-linux-musl
     - os: osx
       osx_image: xcode8.3
-      rust: beta
       env: TARGET=x86_64-apple-darwin
 
 before_install:
@@ -51,10 +48,6 @@ deploy:
   skip_cleanup: true
   # deploy when a new tag is pushed
   on:
-    # channel to use to produce the release artifacts
-    # NOTE make sure you only release *once* per target
-    # TODO you may want to pick a different channel
-    condition: $TRAVIS_RUST_VERSION = beta
     tags: true
 
 branches:

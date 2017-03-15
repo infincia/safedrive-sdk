@@ -7,8 +7,9 @@ set -ex
 install_rustup() {
     # uninstall the rust toolchain installed by travis, we are going to use rustup
     sh ~/rust/lib/rustlib/uninstall.sh
-    echo "Using Rust $TRAVIS_RUST_VERSION"
-    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$TRAVIS_RUST_VERSION
+    source ../rustver.sh
+    echo "Using Rust $RUST_PINNED"
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$RUST_PINNED
     rustup target add $TARGET || true
     rustc -V
     cargo -V

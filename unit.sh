@@ -6,10 +6,6 @@ if [ -z "${TARGET}" ]; then
     export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 fi
 
-if [ -z "${RUST_PINNED}" ]; then
-    export RUST_PINNED=beta-2017-03-03
-fi
-
 echo "Testing for $TARGET"
 
 case $TARGET in
@@ -21,6 +17,8 @@ case $TARGET in
 esac
 
 bash dep.sh
+
+source ./rustver.sh
 
 rustup override set $RUST_PINNED
 

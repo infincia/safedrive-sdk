@@ -1,17 +1,14 @@
 environment:
   global:
     PROJECT_NAME: safedrive-sdk
-    RUST_PINNED: beta-2017-03-03
   matrix:
     - TARGET: i686-pc-windows-msvc
-      CHANNEL: beta
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
       ESCRIPT: v120_xp.bat
       LINKTYPE: dll
     - TARGET: x86_64-pc-windows-msvc
-      CHANNEL: beta
       ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       TOOLSET: v120
@@ -25,8 +22,9 @@ os: Visual Studio 2013
 install:
   - if defined VS call "%VS%" %ARCH%
   - if defined ESCRIPT call "%ESCRIPT%"
+  - call rustver.bat
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
-  - rustup-init.exe --default-host %TARGET% --default-toolchain %CHANNEL% -y
+  - rustup-init.exe --default-host %TARGET% --default-toolchain %RUST_PINNED% -y
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
   - rustc -Vv
   - cargo -V
@@ -61,12 +59,8 @@ deploy:
   auth_token:
     secure: cW2lNuSBqYoZhkWPcNmD/QQ5gyvXu7oM0etZqA9hvnu/BqRSWgDuiKvYWrGsHPIZ
   provider: GitHub
-  # deploy when a new tag is pushed and only on the stable channel
+  # deploy when a new tag is pushed
   on:
-    # channel to use to produce the release artifacts
-    # NOTE make sure you only release *once* per target
-    # TODO you may want to pick a different channel
-    CHANNEL: beta
     appveyor_repo_tag: true
 
 branches:

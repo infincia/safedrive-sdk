@@ -6,10 +6,6 @@ if [ -z "${TARGET}" ]; then
     export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 fi
 
-if [ -z "${RUST_PINNED}" ]; then
-    export RUST_PINNED=beta-2017-03-03
-fi
-
 echo "Building for $TARGET"
 
 case $TARGET in
@@ -26,6 +22,8 @@ mkdir -p dist-$TARGET/include
 mkdir -p dist-$TARGET/bin
 
 bash dep.sh
+
+source ./rustver.sh
 
 rustup override set $RUST_PINNED
 
