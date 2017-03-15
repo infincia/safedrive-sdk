@@ -6,6 +6,10 @@ if [ -z "${TARGET}" ]; then
     export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 fi
 
+if [ -z "${RUST_PINNED}" ]; then
+    export RUST_PINNED=beta-2017-03-03
+fi
+
 echo "Building for $TARGET"
 
 case $TARGET in
@@ -24,7 +28,7 @@ mkdir -p dist-$TARGET/bin
 bash dep.sh
 export DEP_OPENSSL_VERSION="110"
 
-rustup override set beta-2017-03-03-$TARGET
+rustup override set $RUST_PINNED-$TARGET
 
 RUST_BACKTRACE=1 cargo build --release -p safedrive --target $TARGET > /dev/null
 

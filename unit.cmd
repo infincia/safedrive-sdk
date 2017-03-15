@@ -3,6 +3,7 @@ IF [%TARGET%]==[] set TARGET=i686-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v140
 IF [%LINKTYPE%]==[] set LINKTYPE=dll
 IF [%CHANNEL%]==[] set CHANNEL=nightly
+IF [%RUST_PINNED%]==[] set RUST_PINNED=beta-2017-03-03
 
 ECHO testing SafeDrive for Windows-%ARCH%
 
@@ -15,6 +16,6 @@ IF "%LINKTYPE%"=="mt" (
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
-rustup.exe override set beta-2017-03-03-%TARGET%
+rustup.exe override set %RUST_PINNED%-%TARGET%
 
 cargo.exe test --verbose --release -p libsafedrive --target %TARGET%

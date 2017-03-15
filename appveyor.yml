@@ -1,6 +1,7 @@
 environment:
   global:
     PROJECT_NAME: safedrive-sdk
+    RUST_PINNED: beta-2017-03-03
   matrix:
     - TARGET: i686-pc-windows-msvc
       CHANNEL: beta

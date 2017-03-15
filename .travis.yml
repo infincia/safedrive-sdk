@@ -9,6 +9,7 @@ env:
     - MAKE_DEB=no
     - DEB_MAINTAINER="Stephen Oliver <steve@infincia.com>"
     - DEB_DESCRIPTION="SafeDrive SDK"
+    - RUST_PINNED="beta-2017-03-03"
 
 addons:
   apt:
