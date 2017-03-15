@@ -20,7 +20,7 @@ IF "%LINKTYPE%"=="mt" (
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
-rustup override set %RUST_PINNED%-%TARGET%
+rustup override set %RUST_PINNED%
 
 cargo.exe build --release -p safedrive --target %TARGET%
 cheddar -f libsafedrive\src\c_api.rs dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h

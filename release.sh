@@ -27,7 +27,7 @@ mkdir -p dist-$TARGET/bin
 
 bash dep.sh
 
-rustup override set $RUST_PINNED-$TARGET
+rustup override set $RUST_PINNED
 
 RUST_BACKTRACE=1 cargo build --release -p safedrive --target $TARGET > /dev/null
 

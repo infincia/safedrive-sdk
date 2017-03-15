@@ -22,6 +22,6 @@ esac
 
 bash dep.sh
 
-rustup override set $RUST_PINNED-$TARGET
+rustup override set $RUST_PINNED
 
 RUST_BACKTRACE=1 cargo test --release -p libsafedrive --target $TARGET
