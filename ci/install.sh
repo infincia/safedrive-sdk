@@ -3,11 +3,11 @@
 set -ex
 
 . $(dirname $0)/utils.sh
+. $(dirname $0)/../rustver.sh
 
 install_rustup() {
     # uninstall the rust toolchain installed by travis, we are going to use rustup
     sh ~/rust/lib/rustlib/uninstall.sh
-    source ../rustver.sh
     echo "Using Rust $RUST_PINNED"
     curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$RUST_PINNED
     rustup target add $TARGET || true
