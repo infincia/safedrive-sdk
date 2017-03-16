@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-export RUST_PINNED=beta-2017-03-03
+export RUST_PINNED=1.16.0

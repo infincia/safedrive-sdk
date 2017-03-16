@@ -1,1 +1,1 @@
-set RUST_VER=beta-2017-03-03
+set RUST_VER=1.16.0
