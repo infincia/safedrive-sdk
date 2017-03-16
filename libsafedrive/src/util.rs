@@ -48,54 +48,6 @@ pub fn unique_client_hash(email: &str) -> Result<String, String> {
     Err("failed to get mac address".to_string())
 }
 
-pub fn get_current_user(local_storage_path: &Path) -> Result<String, SDError> {
-    let mut userp = PathBuf::from(local_storage_path);
-    userp.push(".current_user");
-
-    let mut f = try!(File::open(&userp));
-
-    let mut user = String::new();
-
-    try!(f.read_to_string(&mut user));
-
-    Ok(user)
-}
-
-pub fn set_current_user(user: &str, local_storage_path: &Path) -> Result<(), SDError> {
-    let mut userp = PathBuf::from(local_storage_path);
-    userp.push(".current_user");
-
-    let mut f = try!(File::create(&userp));
-
-    try!(f.write_all(user.as_bytes()));
-
-    Ok(())
-}
-
-pub fn get_unique_client_id(local_storage_path: &Path) -> Result<String, SDError> {
-    let mut uidp = PathBuf::from(local_storage_path);
-    uidp.push(".unique_client_id");
-
-    let mut f = try!(File::open(&uidp));
-
-    let mut unique_client_id = String::new();
-
-    try!(f.read_to_string(&mut unique_client_id));
-
-    Ok(unique_client_id)
-}
-
-pub fn set_unique_client_id(unique_client_id: &str, local_storage_path: &Path) -> Result<(), SDError> {
-    let mut uidp = PathBuf::from(local_storage_path);
-    uidp.push(".unique_client_id");
-
-    let mut f = try!(File::create(&uidp));
-
-    try!(f.write_all(unique_client_id.as_bytes()));
-
-    Ok(())
-}
-
 #[cfg(target_os = "macos")]
 #[allow(non_snake_case)]
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
