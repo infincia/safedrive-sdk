@@ -12,7 +12,7 @@ use ::keyring::Keyring;
 /// internal imports
 
 use ::error::KeychainError;
-use ::constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain};
+use ::constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain, current_user_domain, unique_client_id_domain};
 
 /// keychain types
 
@@ -21,6 +21,8 @@ pub enum KeychainService {
     SSHUsername,
     RecoveryPhrase,
     AuthToken,
+    CurrentUser,
+    UniqueClientID,
 }
 
 
@@ -38,6 +40,12 @@ impl std::fmt::Display for KeychainService {
             },
             KeychainService::AuthToken => {
                 write!(f, "{}", token_domain())
+            },
+            KeychainService::CurrentUser => {
+                write!(f, "{}", current_user_domain())
+            },
+            KeychainService::UniqueClientID => {
+                write!(f, "{}", unique_client_id_domain())
             },
         }
     }
