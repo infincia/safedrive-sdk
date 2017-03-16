@@ -140,4 +140,10 @@ pub fn current_user_domain() -> &'static str {
     }
 }
 
+pub fn unique_client_id_domain() -> &'static str {
+    if is_production() {
+        SD_UNIQUE_CLIENT_ID_DOMAIN_PRODUCTION
+    } else {
+        SD_UNIQUE_CLIENT_ID_DOMAIN_STAGING
+    }
 }
