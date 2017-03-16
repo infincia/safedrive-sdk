@@ -44,7 +44,7 @@ pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
 pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
 #[cfg(feature = "keychain")]
-pub use keychain::{get_keychain_item, set_keychain_item, KeychainService};
+pub use keychain::{KeychainService};
 
 
 
