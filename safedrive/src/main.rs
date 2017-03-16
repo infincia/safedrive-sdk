@@ -124,6 +124,17 @@ fn main() {
             .conflicts_with("production")
             .help("use the staging environment")
         )
+        .subcommand(SubCommand::with_name("login")
+            .about("login to SafeDrive account")
+            .arg(Arg::with_name("username")
+                .short("u")
+                .long("username")
+                .value_name("USERNAME")
+                .help("SafeDrive account username (probably your email address)")
+                .takes_value(true)
+                .required(true)
+            )
+        )
         .subcommand(SubCommand::with_name("add")
             .about("add sync folder")
             .arg(Arg::with_name("path")
@@ -346,6 +357,16 @@ fn main() {
                 println!("cache cleaning error: {}", e);
             }
         }
+
+    } else if let Some(m) = matches.subcommand_matches("login") {
+
+        let u = match m.value_of("username") {
+            Some(u) => u,
+            None => {
+                error!("failed to get username from argument list");
+                std::process::exit(1);
+            }
+        };
 
 
     } else if let Some(m) = matches.subcommand_matches("add") {
