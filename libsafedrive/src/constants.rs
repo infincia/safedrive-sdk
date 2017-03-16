@@ -73,7 +73,8 @@ static SD_RECOVERY_KEY_DOMAIN_STAGING: &'static str = "staging.recovery.safedriv
 static SD_UNIQUE_CLIENT_ID_DOMAIN_PRODUCTION: &'static str = "ucid.safedrive.io";
 static SD_UNIQUE_CLIENT_ID_DOMAIN_STAGING: &'static str = "staging.ucid.safedrive.io";
 
-
+static SD_CURRENT_USER_DOMAIN_PRODUCTION: &'static str = "currentuser.safedrive.io";
+static SD_CURRENT_USER_DOMAIN_STAGING: &'static str = "staging.currentuser.safedrive.io";
 
 pub fn is_production() -> bool {
     let c = CONFIGURATION.read();
@@ -129,4 +130,14 @@ pub fn recovery_key_domain() -> &'static str {
     } else {
         SD_RECOVERY_KEY_DOMAIN_STAGING
     }
+}
+
+pub fn current_user_domain() -> &'static str {
+    if is_production() {
+        SD_CURRENT_USER_DOMAIN_PRODUCTION
+    } else {
+        SD_CURRENT_USER_DOMAIN_STAGING
+    }
+}
+
 }
