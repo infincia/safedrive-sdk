@@ -49,13 +49,9 @@ pub use ::util::pretty_bytes;
 
 pub use ::util::get_app_directory;
 pub use ::util::generate_uuid as generate_unique_client_id;
-pub use ::util::get_unique_client_id;
-pub use ::util::set_unique_client_id;
 pub use ::util::get_current_os;
 #[cfg(target_os = "macos")]
 pub use ::util::unique_client_hash;
-pub use ::util::get_current_user;
-pub use ::util::set_current_user;
 
 pub use ::cache::clean_cache;
 pub use ::cache::clear_cache;
@@ -149,26 +145,6 @@ pub fn login(unique_client_id: &str,
              local_storage_path: &Path,
              username: &str,
              password:  &str) -> Result<(Token, AccountStatus), SDError> {
-
-
-
-
-    match ::util::set_unique_client_id(unique_client_id, local_storage_path) {
-        Ok(()) => {},
-        Err(e) => {
-            debug!("failed to set unique client id: {}", e);
-            return Err(e)
-
-        },
-    }
-
-    match ::util::set_current_user(username, local_storage_path) {
-        Ok(()) => {},
-        Err(e) => {
-            debug!("failed to set current user: {}", e);
-            return Err(e)
-        },
-    }
 
     let gos = OPERATING_SYSTEM.read();
     let lc = LANGUAGE_CODE.read();
