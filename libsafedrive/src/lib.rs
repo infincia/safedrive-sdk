@@ -39,7 +39,7 @@ mod keychain;
 pub use c_api::*;
 pub use core::*;
 pub use constants::*;
-pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder};
+pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder, AccountStatus, AccountDetails};
 pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
 pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
