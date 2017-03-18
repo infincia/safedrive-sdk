@@ -39,6 +39,7 @@ mod keychain;
 pub use c_api::*;
 pub use core::*;
 pub use constants::*;
+pub use error::SDError;
 pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder, AccountStatus, AccountDetails, SoftwareClient};
 pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
