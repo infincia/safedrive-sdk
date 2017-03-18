@@ -625,11 +625,14 @@ pub fn list_clients(username: String, password: String) {
         }
     };
     for client in client_list {
+        let mut ucid_raw = client.uniqueId.clone();
+        let ucid: String = ucid_raw.drain(..64).collect();
+
         table.add_row(Row::new(vec![
             Cell::new(&format!("N/A")),
             Cell::new(&client.operatingSystem),
             Cell::new(&client.language),
-            Cell::new(&client.uniqueId)])
+            Cell::new(&ucid)])
         );
     }
     table.printstd();
