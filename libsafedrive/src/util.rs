@@ -1,7 +1,5 @@
-use std::path::{PathBuf, Path};
+use std::path::{PathBuf};
 use std::fs;
-use std::fs::File;
-use std::io::{Read, Write};
 
 // external crate imports
 
@@ -21,7 +19,6 @@ use ::byteorder::ByteOrder;
 // internal imports
 
 use ::constants::*;
-use ::error::SDError;
 
 pub fn generate_uuid() -> String {
     let sync_uuid = format!("{}{}", ::uuid::Uuid::new_v4().simple().to_string(), ::uuid::Uuid::new_v4().simple().to_string());
