@@ -595,9 +595,20 @@ pub fn list_clients(username: &str, password: &str) {
             std::process::exit(1);
         }
     };
+
     for client in client_list {
         let mut ucid_raw = client.uniqueId.clone();
-        let ucid: String = ucid_raw.drain(..64).collect();
+        let ucid = match ucid_raw.len() {
+            64 => {
+                let ucid: String = ucid_raw.drain(..64).collect();
+
+                ucid
+            },
+            _ => {
+                error!("Your account has an invalid client present, contact support: {}", ucid_raw);
+                std::process::exit(1);
+            }
+        };
 
         table.add_row(Row::new(vec![
             Cell::new(&format!("N/A")),
@@ -1107,9 +1118,19 @@ pub fn local_login(username: &str) {
             let replacement_id = replacement_id.trim();
 
             let clients: Vec<SoftwareClient> = client_list.into_iter().filter(|c| {
-                // clip the first 64 characters as the server returns extra stuff at the end
+
                 let mut ucid_raw = c.uniqueId.clone();
-                let ucid: String = ucid_raw.drain(..64).collect();
+                let ucid = match ucid_raw.len() {
+                    64 => {
+                        let ucid: String = ucid_raw.drain(..64).collect();
+
+                        ucid
+                    },
+                    _ => {
+                        error!("Your account has an invalid client present, contact support: {}", ucid_raw);
+                        std::process::exit(1);
+                    }
+                };
                 let found = &ucid == &replacement_id;
 
                 found
@@ -1120,7 +1141,17 @@ pub fn local_login(username: &str) {
             match client {
                 Some(client) => {
                     let mut ucid_raw = client.uniqueId.clone();
-                    let ucid: String = ucid_raw.drain(..64).collect();
+                    let ucid = match ucid_raw.len() {
+                        64 => {
+                            let ucid: String = ucid_raw.drain(..64).collect();
+
+                            ucid
+                        },
+                        _ => {
+                            error!("Your account has an invalid client present, contact support: {}", ucid_raw);
+                            std::process::exit(1);
+                        }
+                    };
 
                     println!("Replacing client {}", &ucid);
                     match set_keychain_item(username, ::safedrive::KeychainService::UniqueClientID, &ucid) {
