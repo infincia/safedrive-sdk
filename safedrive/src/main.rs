@@ -368,6 +368,7 @@ fn main() {
             }
         };
 
+        local_login(&u);
 
     } else if let Some(m) = matches.subcommand_matches("add") {
 
@@ -1074,6 +1075,144 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
     println!("Benchmarking throughput average: {} per second", speed);
 
     std::process::exit(0);
+}
+
+pub fn local_login(username: &str) {
+
+    match set_keychain_item("currentuser", ::safedrive::KeychainService::CurrentUser, username) {
+        Ok(()) => {},
+        Err(e) => {
+            error!("{}", e);
+            std::process::exit(1);
+        }
+    }
+
+    // ask for password by prompting user
+    let password = ::rpassword::prompt_password_stdout("Password: ").unwrap();
+    let password = password.trim();
+
+    match set_keychain_item(username, ::safedrive::KeychainService::Account, &password) {
+        Ok(()) => {},
+        Err(e) => {
+            error!("{}", e);
+            std::process::exit(1);
+        }
+    }
+
+    // figure out if this is a new client or needs to replace another one
+    // this doubles as a way to check the password, we'll get an SDError::Authentication if it was
+    // wrong
+    println!("Checking account...");
+
+    let client_list: Vec<SoftwareClient> = match get_software_clients(&username, &password) {
+        Ok(cl) => cl,
+        Err(e) => {
+            match e {
+                SDError::Authentication => {
+                    error!("Invalid account or password");
+                    std::process::exit(1);
+
+                },
+                _ => {
+                    error!("{}", e);
+                }
+            }
+            std::process::exit(1);
+        }
+    };
+
+    println!("Account found");
+    println!("Checking client...");
+    if client_list.len() > 0 {
+        list_clients(username, &password);
+        println!("1) New");
+        println!("2) Replacement");
+        println!();
+        println!("It looks like you have used other computers with SafeDrive,");
+        let replace = ::rpassword::prompt_response_stdout("is this a new computer, or a replacement for one of them?: ").unwrap();
+        let replace = replace.trim();
+
+        if &replace == &"2" || &replace == &"replacement" || &replace == &"Replacement" {
+            let replacement_id = ::rpassword::prompt_response_stdout("Which computer should this machine replace?: ").unwrap();
+            let replacement_id = replacement_id.trim();
+
+            let clients: Vec<SoftwareClient> = client_list.into_iter().filter(|c| {
+                // clip the first 64 characters as the server returns extra stuff at the end
+                let mut ucid_raw = c.uniqueId.clone();
+                let ucid: String = ucid_raw.drain(..64).collect();
+                let found = &ucid == &replacement_id;
+
+                found
+            }).collect();
+
+            let client = clients.first();
+
+            match client {
+                Some(client) => {
+                    let mut ucid_raw = client.uniqueId.clone();
+                    let ucid: String = ucid_raw.drain(..64).collect();
+
+                    println!("Replacing client {}", &ucid);
+                    match set_keychain_item(username, ::safedrive::KeychainService::UniqueClientID, &ucid) {
+                        Ok(()) => {},
+                        Err(e) => {
+                            error!("{}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                },
+                None => {
+                    println!("Not a valid client");
+                    std::process::exit(1);
+                }
+            }
+
+        }
+    } else {
+        let ucid = generate_unique_client_id();
+        println!("Setting up new client {}", &ucid);
+
+        match set_keychain_item(username, ::safedrive::KeychainService::UniqueClientID, &ucid) {
+            Ok(()) => {},
+            Err(e) => {
+                error!("{}", e);
+                std::process::exit(1);
+            }
+        }
+    }
+    println!();
+
+    let phrase = find_recovery_phrase(&username);
+    match phrase {
+        Some(_) =>{
+            println!("SafeDrive is now ready to use");
+        },
+        None => {
+            // no phrase found locally, so ask if the user has one
+            println!("1) Yes");
+            println!("2) No");
+            println!();
+            let recovery_phrase_present = ::rpassword::prompt_response_stdout("Do you have a recovery phrase on your account already?: ").unwrap();
+            let recovery_phrase_present = recovery_phrase_present.trim();
+
+            if &recovery_phrase_present == &"1" || &recovery_phrase_present == &"yes" || &recovery_phrase_present == &"Yes" {
+                println!();
+                let recovery_phrase = ::rpassword::prompt_response_stdout("Recovery phrase: ").unwrap();
+
+                match set_keychain_item(username, ::safedrive::KeychainService::RecoveryPhrase, &recovery_phrase) {
+                    Ok(()) => {
+                        println!("SafeDrive is now ready to use");
+                    },
+                    Err(e) => {
+                        error!("{}", e);
+                        std::process::exit(1);
+                    }
+                }
+            }
+        },
+    }
+
+
 }
 
 pub fn find_recovery_phrase(username: &str) -> Option<String> {
