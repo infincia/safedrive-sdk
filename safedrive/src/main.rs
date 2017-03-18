@@ -162,14 +162,21 @@ fn main() {
                 .short("l")
                 .long("list")
                 .help("list all registered clients")
-                .conflicts_with("remove")
+                .conflicts_with_all(&["remove", "info"])
+                .required(true)
+            )
+            .arg(Arg::with_name("info")
+                .short("i")
+                .long("info")
+                .help("show info about this client")
+                .conflicts_with_all(&["remove", "list"])
                 .required(true)
             )
             .arg(Arg::with_name("remove")
                 .short("r")
                 .long("remove")
                 .help("remove this client. WARNING: this will unregister all sync folders and remove the client from your account")
-                .conflicts_with("list")
+                .conflicts_with_all(&["list", "info"])
                 .required(true)
             )
         )
@@ -445,6 +452,10 @@ fn main() {
             };
 
             list_clients(&username, &password, None);
+        } else if m.is_present("info") {
+
+            info_for_client()
+
         } else if m.is_present("remove") {
             let (token, _) = sign_in();
 
@@ -638,6 +649,31 @@ pub fn remove_client(token: Token) {
         }
     };
 
+}
+
+pub fn info_for_client() {
+    let (username, password) = match find_credentials() {
+        Ok((username, password)) => (username, password),
+        Err(_) => {
+            error!("No account found, try 'safedrive login --email <user@example.com>'");
+            std::process::exit(1);
+        }
+    };
+    println!("Current user: {}", username);
+    println!();
+    let unique_client_id = match find_unique_client_id(&username) {
+        Some(client_id) => {
+            client_id
+        },
+        None => {
+            error!("Client not registered, try 'safedrive login --email <user@example.com>'");
+            std::process::exit(1);
+        },
+    };
+    println!("Client info:");
+    println!();
+
+    list_clients(&username, &password, Some(&unique_client_id));
 }
 
 pub fn add(token: Token, path: &str) {
