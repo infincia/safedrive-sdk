@@ -285,13 +285,13 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func login(_ username: String, password: String, local_storage_path: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
+    public func login(_ username: String, password: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
 
         DispatchQueue.global(priority: .default).async {
             var error: UnsafeMutablePointer<SDDKError>? = nil
             var status: UnsafeMutablePointer<SDDKAccountStatus>? = nil
             
-            let res = sddk_login(self.state, local_storage_path, unique_client_id, username, password, &status, &error)
+            let res = sddk_login(self.state, unique_client_id, username, password, &status, &error)
             defer {
                 if res == -1 {
                     sddk_free_error(&error)
