@@ -35,7 +35,7 @@ semver = "^0.6.0"
 lz4 = "*"
 chrono = "*"
 number_prefix = "*"
-keyring = { version = "*", optional = true, path = "../../../../3rdparty/keyring-rs" }
+keyring = { version = "*", optional = true, git = "https://github.com/infincia/keyring-rs.git", branch = "mac_keychain"  }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = { version = "*", features = ["exception"] }
