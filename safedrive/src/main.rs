@@ -1072,3 +1072,23 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
 
     std::process::exit(0);
 }
+
+pub fn find_recovery_phrase(username: &str) -> Option<String> {
+
+    let recovery_phrase = match get_keychain_item(&username, ::safedrive::KeychainService::RecoveryPhrase) {
+        Ok(phrase) => Some(phrase),
+        Err(_) => None,
+    };
+
+    recovery_phrase
+}
+
+pub fn find_unique_client_id(username: &str) -> Option<String> {
+
+    let unique_client_id = match get_keychain_item(&username, ::safedrive::KeychainService::UniqueClientID) {
+        Ok(ucid) => Some(ucid),
+        Err(_) => None,
+    };
+
+    unique_client_id
+}
