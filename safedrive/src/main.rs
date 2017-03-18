@@ -532,7 +532,7 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
         },
     };
 
-    let (token, _) = match login(&uid, app_directory, &username, &password) {
+    let (token, _) = match login(&uid, &username, &password) {
         Ok((t, a)) => (t, a),
         Err(e) => {
             error!("Login error: {}", e);
