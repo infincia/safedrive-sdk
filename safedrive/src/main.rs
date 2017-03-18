@@ -437,7 +437,13 @@ fn main() {
 
 
         if m.is_present("list") {
-            let (username, password, _) = find_credentials(&app_directory);
+            let (username, password) = match find_credentials() {
+                Ok((username, password)) => (username, password),
+                Err(_) => {
+                    error!("No account found, try 'safedrive login --user <username>'");
+                    std::process::exit(1);
+                },
+            };
 
             list_clients(username, password);
         } else if m.is_present("remove") {
@@ -496,72 +502,25 @@ fn main() {
     }
 }
 
+pub fn find_credentials() -> Result<(String, String), SDError> {
 
+    let username = get_keychain_item("currentuser", ::safedrive::KeychainService::CurrentUser)?;
+    let password = get_keychain_item(&username, ::safedrive::KeychainService::Account)?;
 
-pub fn find_credentials(storage_path: &Path) -> (String, String, Option<String>) {
-
-    let mut credential_file_path = PathBuf::from(&storage_path);
-    credential_file_path.push("credentials.json");
-
-    let mut credential_file = match File::open(credential_file_path) {
-        Ok(file) => file,
-        Err(e) => {
-            error!("Error reading account info in credentials.json: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    let mut cs = String::new();
-
-    match credential_file.read_to_string(&mut cs) {
-        Ok(file) => file,
-        Err(e) => {
-            error!("Error reading account info in credentials.json: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    let credentials: Credentials = match serde_json::from_str(&cs) {
-        Ok(c) => c,
-        Err(e) =>  {
-            error!("Couldn't parse credentials.json: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    let username = match credentials.email {
-        Some(email) => email,
-        None => {
-            error!("No email found in credentials.json");
-            std::process::exit(1);
-        }
-    };
-
-    let password = match credentials.password {
-        Some(pass) => pass,
-        None => {
-            error!("No password found in credentials.json");
-            std::process::exit(1);
-        }
-    };
-
-    #[cfg(feature = "keychain")]
-    let s = match ::safedrive::get_keychain_item(&username, ::safedrive::keychain::KeychainService::Account) {
-        Ok(s) => s,
-        Err(e) => {
-            error!("Error getting keychain item: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    (username, password, credentials.phrase)
+    Ok((username, password))
 }
 
 pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
 
     println!("Signing in to SafeDrive...");
 
-    let (username, password, phrase) = find_credentials(app_directory);
+    let (username, password) = match find_credentials() {
+        Ok((username, password)) => (username, password),
+        Err(_) => {
+            error!("No account found, try 'safedrive login --user <username>'");
+            std::process::exit(1);
+        },
+    };
 
     let uid = match get_unique_client_id(app_directory) {
         Ok(uid) => uid,
@@ -591,6 +550,9 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
     };
 
     println!("Loading keys...");
+
+    // get the users recovery phrase, if they have one
+    let phrase = find_recovery_phrase(&username);
 
     let keyset = match load_keys(&token, phrase, &|new_phrase| {
         // store phrase in keychain and display
