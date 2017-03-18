@@ -541,6 +541,15 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
     };
 
 
+    // save auth token
+    match set_keychain_item(&username, ::safedrive::KeychainService::AuthToken, &token.token) {
+        Ok(()) => {},
+        Err(e) => {
+            error!("{}", e);
+            std::process::exit(1);
+        }
+    }
+
     // get the users recovery phrase, if they have one
     let phrase = find_recovery_phrase(&username);
 
