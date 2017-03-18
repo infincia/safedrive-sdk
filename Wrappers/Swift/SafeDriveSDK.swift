@@ -763,5 +763,78 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    // keychain
+    
+    public func getKeychainItem(withUser username: String, service: String, completionQueue queue: DispatchQueue, success: @escaping (_ secret: String) -> Void, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            
+            var secret_ptr: UnsafeMutablePointer<CChar>? = nil
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_get_keychain_item(username, service, &secret_ptr, &error)
+            defer {
+                if res >= 0 {
+                    sddk_free_string(&secret_ptr)
+                }
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
+                let secret = String(cString: secret_ptr!)
+                
+                queue.async { success(secret) }
+            }
+        }
+    }
+    
+    public func setKeychainItem(withUser username: String, service: String, secret: String, completionQueue queue: DispatchQueue, success: @escaping () -> Void, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            
+            let res = sddk_set_keychain_item(username, service, secret, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
+                queue.async { success() }
+            }
+        }
+    }
+    
+    public func deleteKeychainItem(withUser username: String, service: String, completionQueue queue: DispatchQueue, success: @escaping () -> Void, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            
+            let res = sddk_delete_keychain_item(username, service, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
+                queue.async { success() }
+            }
+        }
+    }
 }
 
