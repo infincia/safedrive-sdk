@@ -705,25 +705,12 @@ pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_login(state: *mut SDDKState,
-                             local_storage_path: *const std::os::raw::c_char,
                              unique_client_id: *const std::os::raw::c_char,
                              username: *const std::os::raw::c_char,
                              password:  *const std::os::raw::c_char,
                              mut status: *mut *mut SDDKAccountStatus,
                              mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); assert!(!username.is_null()); assert!(!password.is_null()); &mut * state };
-
-    let lstorage: &CStr = unsafe {
-        assert!(!local_storage_path.is_null());
-        CStr::from_ptr(local_storage_path)
-    };
-
-    let storage_directory: String = match lstorage.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
-    };
-
-    let storage_path = Path::new(&storage_directory);
 
     let uids: &CStr = unsafe {
         assert!(!unique_client_id.is_null());
@@ -747,7 +734,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
         Err(e) => { panic!("string is not valid UTF-8: {}", e) },
     };
 
-    match login(&uid, &storage_path, &un, &pa) {
+    match login(&uid, &un, &pa) {
         Ok((token, account_status)) => {
             c.0.set_account(Some(un.to_owned()), Some(pa.to_owned()));
             c.0.set_api_token(Some(token));

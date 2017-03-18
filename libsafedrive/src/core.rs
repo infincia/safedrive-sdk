@@ -142,7 +142,6 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
 }
 
 pub fn login(unique_client_id: &str,
-             local_storage_path: &Path,
              username: &str,
              password:  &str) -> Result<(Token, AccountStatus), SDError> {
 
