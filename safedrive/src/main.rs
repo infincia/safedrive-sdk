@@ -1185,9 +1185,7 @@ pub fn local_login(username: &str) {
 
     let phrase = find_recovery_phrase(&username);
     match phrase {
-        Some(_) =>{
-            println!("SafeDrive is now ready to use");
-        },
+        Some(_) =>{},
         None => {
             // no phrase found locally, so ask if the user has one
             println!("1) Yes");
@@ -1201,9 +1199,7 @@ pub fn local_login(username: &str) {
                 let recovery_phrase = ::rpassword::prompt_response_stdout("Recovery phrase: ").unwrap();
 
                 match set_keychain_item(username, ::safedrive::KeychainService::RecoveryPhrase, &recovery_phrase) {
-                    Ok(()) => {
-                        println!("SafeDrive is now ready to use");
-                    },
+                    Ok(()) => {},
                     Err(e) => {
                         error!("{}", e);
                         std::process::exit(1);
@@ -1213,6 +1209,9 @@ pub fn local_login(username: &str) {
         },
     }
 
+    let (_, _) = sign_in();
+
+    println!("SafeDrive is now ready to use");
 
 }
 
