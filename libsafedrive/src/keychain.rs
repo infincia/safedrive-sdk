@@ -69,6 +69,9 @@ impl From<String> for KeychainService {
             "ucid.safedrive.io"         => KeychainService::UniqueClientID,
             "staging.ucid.safedrive.io" => KeychainService::UniqueClientID,
 
+            "currentuser.safedrive.io"         => KeychainService::CurrentUser,
+            "staging.currentuser.safedrive.io" => KeychainService::CurrentUser,
+
             _ => panic!("invalid keychain service"),
         }
     }
