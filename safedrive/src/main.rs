@@ -444,7 +444,7 @@ fn main() {
                 },
             };
 
-            list_clients(&username, &password);
+            list_clients(&username, &password, None);
         } else if m.is_present("remove") {
             let (token, _) = sign_in();
 
@@ -581,7 +581,7 @@ pub fn sign_in() -> (Token, Keyset) {
     (token, keyset)
 }
 
-pub fn list_clients(username: &str, password: &str) {
+pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
 
     let mut table = Table::new();
 
@@ -609,6 +609,12 @@ pub fn list_clients(username: &str, password: &str) {
                 std::process::exit(1);
             }
         };
+
+        if let Some(single_client) = single {
+            if single_client != &ucid {
+                continue;
+            }
+        }
 
         table.add_row(Row::new(vec![
             Cell::new(&format!("N/A")),
@@ -1105,7 +1111,7 @@ pub fn local_login(username: &str) {
     println!("Account found");
     println!("Checking client...");
     if client_list.len() > 0 {
-        list_clients(username, &password);
+        list_clients(username, &password, None);
         println!("1) New");
         println!("2) Replacement");
         println!();
