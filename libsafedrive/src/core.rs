@@ -761,12 +761,6 @@ pub fn sync(token: &Token,
 
         /// store metadata for directory or file
         let mut header = Header::new_gnu();
-        if let Err(e) = header.set_path(relative_path) {
-            issue(&format!("not able to sync file {}: {}", relative_path.display(), e));
-
-            failed + failed + 1;
-            continue // we don't care about errors here, they'll only happen for truly invalid paths
-        }
         header.set_metadata(&md);
 
         let mut hmac_bag: Vec<u8> = Vec::new();
@@ -908,18 +902,18 @@ pub fn sync(token: &Token,
 
                 header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); /// hmac list size
                 header.set_cksum();
-                ar.append(&header, hmac_bag.as_slice()).expect("failed to append session entry header");
+                ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append session entry header");
 
             } else {
                 header.set_size(0); /// hmac list size is zero when file has no actual data
                 header.set_cksum();
-                ar.append(&header, hmac_bag.as_slice()).expect("failed to append zero length archive header");
+                ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append zero length archive header");
             }
         } else if is_dir {
             /// folder
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
-            ar.append(&header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
+            ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
         } else if is_symlink {
             /// symlink
 
@@ -942,7 +936,7 @@ pub fn sync(token: &Token,
 
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
-            ar.append(&header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
+            ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
         }
     }
 
