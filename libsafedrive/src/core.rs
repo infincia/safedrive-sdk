@@ -70,6 +70,13 @@ pub fn set_keychain_item(account: &str, service: ::keychain::KeychainService, se
     Ok(())
 }
 
+#[cfg(feature = "keychain")]
+pub fn delete_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<(), SDError> {
+    ::keychain::delete_keychain_item(account, service)?;
+
+    Ok(())
+}
+
 pub fn get_channel() -> Channel {
     let c = CHANNEL.read();
 
