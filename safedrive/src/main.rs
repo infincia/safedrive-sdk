@@ -553,6 +553,14 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
         println!("---------------------------------------------------------------------");
         println!("Recovery phrase: {}", new_phrase);
         println!("---------------------------------------------------------------------");
+        match set_keychain_item(&username, ::safedrive::KeychainService::RecoveryPhrase, new_phrase) {
+            Ok(()) => {
+                println!("Recovery phrase saved in keychain");
+            },
+            Err(e) => {
+                warn!("Recovery phrase could not be saved in keychain: {}", e);
+            }
+        }
     }) {
         Ok(keyset) => keyset,
         Err(e) => {
