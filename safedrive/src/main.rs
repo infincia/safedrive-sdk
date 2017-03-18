@@ -522,22 +522,13 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
         },
     };
 
-    let uid = match get_unique_client_id(app_directory) {
-        Ok(uid) => uid,
-        Err(_) => {
-            #[cfg(target_os = "macos")]
-            let uid = match unique_client_hash(&username) {
-                Ok(hash) => hash,
-                Err(e) => {
-                    error!("Error generating client ID: {}", e);
-                    std::process::exit(1);
-                },
-            };
+    // get the UCID, if we don't have one the user needs to login
 
-            #[cfg(not(target_os = "macos"))]
-            let uid = generate_unique_client_id();
-
-            uid
+    let uid = match find_unique_client_id(&username) {
+        Some(ucid) => ucid,
+        None => {
+            error!("This computer is not registered with your account yet, try 'safedrive login --user <username>'");
+            std::process::exit(1);
         },
     };
 
