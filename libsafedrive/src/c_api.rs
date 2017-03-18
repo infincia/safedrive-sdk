@@ -31,6 +31,11 @@ use ::constants::Configuration;
 
 use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
 
+use ::keychain::KeychainService;
+use ::core::get_keychain_item;
+use ::core::set_keychain_item;
+use ::core::delete_keychain_item;
+
 use ::session::SyncSession;
 
 use ::core::generate_unique_client_id;
@@ -636,6 +641,288 @@ pub extern "C" fn sddk_get_channel() -> *mut std::os::raw::c_char {
 pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
     let version = ::core::get_version();
     CString::new(version.as_str()).unwrap().into_raw()
+}
+
+
+/// Get a keychain item for a user/service pair, and store it in the `secret` parameter
+///
+/// Will return a failure code if the keychain item cannot be retrieved
+///
+/// The caller does not own the memory pointed to by `secret` after this function returns, it must
+/// be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     user: a pointer to a NULL-terminated string representing the SafeDrive user account name
+///
+///  service: a pointer to a NULL-terminated string representing the SafeDrive service subdomain
+///
+///   secret: an uninitialized pointer that will be allocated and initialized when the function
+///           returns if the return value was 0
+///
+///           must be freed by the caller using sddk_free_string()
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char * user = "user@safedrive.io";
+/// char * service = "safedrive.io";
+/// char * secret = NULL;
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_get_keychain_item(user, service, &secret, &error)) {
+///     printf("Failed to get keychain item for user");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got keychain item");
+///     // do something with secret here, then free it
+///     sddk_free_string(&secret);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_keychain_item(user: *const std::os::raw::c_char,
+                                         service: *const std::os::raw::c_char,
+                                         mut secret: *mut *mut std::os::raw::c_char,
+                                         mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let luser: &CStr = unsafe {
+        assert!(!user.is_null());
+        CStr::from_ptr(user)
+    };
+
+    let u: String = match luser.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let lservice: &CStr = unsafe {
+        assert!(!service.is_null());
+        CStr::from_ptr(service)
+    };
+
+    let s: String = match lservice.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let service = KeychainService::from(s);
+
+    match get_keychain_item(&u, service) {
+        Ok(sec) => {
+            unsafe {
+                *secret = CString::new(sec).expect("Failed to get keychain item secret").into_raw();
+            }
+            0
+        },
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Set a keychain item for a user/service pair
+///
+/// Will return a failure code if the keychain item cannot be set
+///
+/// Parameters:
+///
+///     user: a pointer to a NULL-terminated string representing the SafeDrive user account name
+///
+///  service: a pointer to a NULL-terminated string representing the SafeDrive service subdomain
+///
+///   secret: a pointer to a NULL-terminated string representing the secret to store in the keychain
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char * user = "user@safedrive.io";
+/// char * service = "safedrive.io";
+/// char * secret = "my_password";
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_set_keychain_item(user, service, secret, &error)) {
+///     printf("Failed to set keychain item");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Set keychain item");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
+                                         service: *const std::os::raw::c_char,
+                                         secret: *const std::os::raw::c_char,
+                                         mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let luser: &CStr = unsafe {
+        assert!(!user.is_null());
+        CStr::from_ptr(user)
+    };
+
+    let u: String = match luser.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let lservice: &CStr = unsafe {
+        assert!(!service.is_null());
+        CStr::from_ptr(service)
+    };
+
+    let s: String = match lservice.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let lsecret: &CStr = unsafe {
+        assert!(!secret.is_null());
+        CStr::from_ptr(secret)
+    };
+
+    let sec: String = match lsecret.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let service = KeychainService::from(s);
+
+    match set_keychain_item(&u, service, &sec) {
+        Ok(()) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Delete a keychain item for a user/service pair
+///
+/// Will return a failure code if the keychain item cannot be deleted
+///
+/// Parameters:
+///
+///     user: a pointer to a NULL-terminated string representing the SafeDrive user account name
+///
+///  service: a pointer to a NULL-terminated string representing the SafeDrive service subdomain
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// char * user = "user@safedrive.io";
+/// char * service = "safedrive.io";
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_delete_keychain_item(user, service, &error)) {
+///     printf("Failed to delete keychain item");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Deleted keychain item");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
+                                            service: *const std::os::raw::c_char,
+                                            mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+
+    let luser: &CStr = unsafe {
+        assert!(!user.is_null());
+        CStr::from_ptr(user)
+    };
+
+    let u: String = match luser.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let lservice: &CStr = unsafe {
+        assert!(!service.is_null());
+        CStr::from_ptr(service)
+    };
+
+    let s: String = match lservice.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let service = KeychainService::from(s);
+
+    match delete_keychain_item(&u, service) {
+        Ok(()) => 0,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
 }
 
 
