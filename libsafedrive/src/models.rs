@@ -250,6 +250,13 @@ pub struct SoftwareClient {
     pub language: String,
 }
 
+impl std::fmt::Display for SoftwareClient {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
+        write!(f, "SoftwareClient {{ uniqueId: {}, os: {}, language: {} }}", self.uniqueId, self.operatingSystem, self.language)
+    }
+}
+
+
 ///private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
