@@ -99,7 +99,17 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
     Ok(())
 }
 
+/// delete
 
+pub fn delete_keychain_item(account: &str, service: KeychainService) -> Result<(), KeychainError> {
+    let service_name = format!("{}", service);
+
+    let keychain = Keyring::new(&service_name, account);
+
+    keychain.delete_password()?;
+
+    Ok(())
+}
 
 #[test]
 fn set_account_password() {
