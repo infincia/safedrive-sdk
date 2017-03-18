@@ -246,45 +246,6 @@ public class SafeDriveSDK: NSObject {
         sddk_free_state(&state)
     }
     
-    
-    public func getCurrentUser(local_storage_path: String) throws -> Optional<String> {
-        var user: UnsafeMutablePointer<CChar>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_get_current_user(local_storage_path, &user, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_string(&user)
-            }
-            if res == -1 {
-                sddk_free_error(&error)
-            }
-        }
-        switch res {
-        case 0:
-            return String(cString: user!)
-        default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
-        }
-    }
-    
-    public func setCurrentUser(user: String, local_storage_path: String) throws {
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_set_current_user(local_storage_path, user, &error)
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
-            }
-        }
-        switch res {
-        case 0:
-            return
-        default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
-        }
-    }
-    
     public func login(_ username: String, password: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
 
         DispatchQueue.global(priority: .default).async {
@@ -465,44 +426,6 @@ public class SafeDriveSDK: NSObject {
         }
         
         return String(cString: unique_client_id!)
-    }
-    
-    public func getUniqueClientID(local_storage_path: String) throws -> String {
-        var unique_client_id: UnsafeMutablePointer<CChar>? = nil
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_get_unique_client_id(local_storage_path, &unique_client_id, &error)
-        defer {
-            if res >= 0 {
-                sddk_free_string(&unique_client_id)
-            }
-            if res == -1 {
-                sddk_free_error(&error)
-            }
-        }
-        switch res {
-        case 0:
-            return String(cString: unique_client_id!)
-        default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
-        }
-    }
-    
-    public func setUniqueClientID(uniqueClientID: String, local_storage_path: String) throws {
-        var error: UnsafeMutablePointer<SDDKError>? = nil
-
-        let res = sddk_set_unique_client_id(local_storage_path, uniqueClientID, &error)
-        defer {
-            if res == -1 {
-                sddk_free_error(&error)
-            }
-        }
-        switch res {
-        case 0:
-            return
-        default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
-        }
     }
     
     public func addFolder(_ name: String, path: String, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: UInt64) -> Void, failure: @escaping SDKFailure) {
