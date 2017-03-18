@@ -540,10 +540,11 @@ pub fn sign_in(app_directory: &Path) -> (Token, Keyset) {
         }
     };
 
-    println!("Loading keys...");
 
     // get the users recovery phrase, if they have one
     let phrase = find_recovery_phrase(&username);
+
+    println!("Loading keys...");
 
     let keyset = match load_keys(&token, phrase, &|new_phrase| {
         // store phrase in keychain and display
