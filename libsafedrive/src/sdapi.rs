@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+#![allow(unused_variables)]
 
 use std::io::Read;
 use std::collections::HashMap;
@@ -26,6 +27,7 @@ header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 header! { (ContentType, "Content-Type") => [String] }
 header! { (ContentLength, "Content-Length") => [usize] }
 
+#[allow(dead_code)]
 struct ProgressReader<F> {
     inner: ::std::io::Cursor<Vec<u8>>,
     callback: F,
@@ -36,6 +38,7 @@ struct ProgressReader<F> {
 }
 
 impl<F> ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+    #[allow(dead_code)]
     pub fn new(reader: Vec<u8>, callback: F, content_length: u64, real_size: u64) -> ProgressReader<F> {
         ProgressReader {
             inner: ::std::io::Cursor::new(reader),
@@ -47,6 +50,7 @@ impl<F> ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static 
         }
     }
 
+    #[allow(dead_code)]
     pub fn to_body(self) -> ::reqwest::Body {
         let content_length = self.content_length;
         ::reqwest::Body::sized(self, content_length as u64)
