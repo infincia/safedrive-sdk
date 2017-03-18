@@ -24,8 +24,7 @@ use std::thread;
 #[cfg(target_os = "linux")]
 use std::env;
 
-use std::path::{PathBuf, Path};
-use std::io::{Read};
+use std::path::{PathBuf};
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};
