@@ -125,11 +125,11 @@ fn main() {
         )
         .subcommand(SubCommand::with_name("login")
             .about("login to SafeDrive account")
-            .arg(Arg::with_name("username")
-                .short("u")
-                .long("username")
-                .value_name("USERNAME")
-                .help("SafeDrive account username (probably your email address)")
+            .arg(Arg::with_name("email")
+                .short("e")
+                .long("email")
+                .value_name("EMAIL")
+                .help("Your email address")
                 .takes_value(true)
                 .required(true)
             )
@@ -359,10 +359,10 @@ fn main() {
 
     } else if let Some(m) = matches.subcommand_matches("login") {
 
-        let u = match m.value_of("username") {
+        let u = match m.value_of("email") {
             Some(u) => u,
             None => {
-                error!("failed to get username from argument list");
+                error!("failed to get email from argument list");
                 std::process::exit(1);
             }
         };
@@ -439,7 +439,7 @@ fn main() {
             let (username, password) = match find_credentials() {
                 Ok((username, password)) => (username, password),
                 Err(_) => {
-                    error!("No account found, try 'safedrive login --user <username>'");
+                    error!("No account found, try 'safedrive login --email <user@example.com>'");
                     std::process::exit(1);
                 },
             };
@@ -516,7 +516,7 @@ pub fn sign_in() -> (Token, Keyset) {
     let (username, password) = match find_credentials() {
         Ok((username, password)) => (username, password),
         Err(_) => {
-            error!("No account found, try 'safedrive login --user <username>'");
+            error!("No account found, try 'safedrive login --email <user@example.com>'");
             std::process::exit(1);
         },
     };
@@ -526,7 +526,7 @@ pub fn sign_in() -> (Token, Keyset) {
     let uid = match find_unique_client_id(&username) {
         Some(ucid) => ucid,
         None => {
-            error!("This computer is not registered with your account yet, try 'safedrive login --user <username>'");
+            error!("This computer is not registered with your account yet, try 'safedrive login --email <user@example.com>'");
             std::process::exit(1);
         },
     };
