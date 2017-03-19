@@ -137,7 +137,7 @@ pub struct SDDKAccountDetails {
 
 impl From<AccountDetails> for SDDKAccountDetails {
     fn from(details: AccountDetails) -> SDDKAccountDetails {
-        let (c_notifications, c_notifications_count) = match details.notifications {
+        /*let (c_notifications, c_notifications_count) = match details.notifications {
             Some(notifications) => {
                 let cn = notifications.into_iter().map(|notification| {
                     SDDKNotification::from(notification)
@@ -151,7 +151,7 @@ impl From<AccountDetails> for SDDKAccountDetails {
                 (Some(ptr), len as i32)
             },
             None => (None, -1),
-        };
+        };*/
 
 
 
@@ -162,12 +162,12 @@ impl From<AccountDetails> for SDDKAccountDetails {
             low_free_space_threshold: details.lowFreeStorageThreshold,
             expiration_date: details.expirationDate,
             notifications: std::ptr::null(),
-            notification_count: c_notifications_count as i32,
+            notification_count: 0 as i32,
         };
 
-        if let Some(c_n) = c_notifications {
+        /*if let Some(c_n) = c_notifications {
             c_details.notifications = c_n;
-        }
+        }*/
 
         c_details
     }
@@ -2817,7 +2817,7 @@ pub extern "C" fn sddk_free_account_status(status: *mut *mut SDDKAccountStatus) 
 pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetails) {
     assert!(!details.is_null());
     let d: Box<SDDKAccountDetails> = unsafe { Box::from_raw(*details) };
-    if !d.notifications.is_null() {
+    /*if !d.notifications.is_null() {
         let _ = unsafe {
             let notifications: Vec<SDDKNotification> = Box::from_raw(std::slice::from_raw_parts_mut(d.notifications as *mut SDDKNotification, d.notification_count as usize)).into_vec();
             for notification in notifications {
@@ -2826,5 +2826,5 @@ pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetail
 
             }
         };
-    }
+    }*/
 }
