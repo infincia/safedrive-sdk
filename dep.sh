@@ -12,7 +12,7 @@ mkdir -p dep/$TARGET/bin
 
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
-export SODIUM_VER=1.0.11
+export SODIUM_VER=1.0.12
 export SODIUM_VER_FILE=$PWD/dep/${TARGET}/lib/.sodium_ver
 
 export LIBDBUS_VER=1.10.14
