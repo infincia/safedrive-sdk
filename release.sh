@@ -41,12 +41,27 @@ esac
 cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
 
 
-cp -a dep/$TARGET/lib/* dist-$TARGET/lib/
-
-cp -a target/$TARGET/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
-cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib || true
-install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib || true
-install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib || true
-cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so || true
-cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
-cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/ || true
+case $TARGET in
+    x86_64-apple-darwin)
+        cp -a dep/$TARGET/lib/*.dylib dist-$TARGET/lib/
+        cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib
+        install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib
+        install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib
+        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+        ;;
+    i686-unknown-linux-musl|x86_64-unknown-linux-musl)
+        cp -a target/$TARGET/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
+        cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/
+        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+        ;;
+    i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
+        cp -a dep/$TARGET/lib/pkgconfig dist-$TARGET/lib/
+        cp -a dep/$TARGET/lib/*.so dist-$TARGET/lib/
+        cp -a dep/$TARGET/lib/.*_ver dist-$TARGET/lib/
+        cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so
+        cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/
+        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+        ;;
+    *)
+        ;;
+esac
