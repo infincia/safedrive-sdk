@@ -290,7 +290,6 @@ pub struct AccountDetails {
     pub usedStorage: u64,
     pub lowFreeStorageThreshold: i64,
     pub expirationDate: u64,
-    pub notifications: Option<Vec<Notification>>,
 }
 
 
