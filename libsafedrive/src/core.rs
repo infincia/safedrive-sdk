@@ -961,7 +961,6 @@ pub fn sync(token: &Token,
     }
 
     debug!("waiting for write cache to finish");
-    issue(&format!("waiting for write cache to finish"));
 
     loop {
         match status_receive.try_recv() {
