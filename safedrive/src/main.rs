@@ -281,14 +281,6 @@ fn main() {
 
     let matches = app.get_matches();
 
-    let log_level = match matches.occurrences_of("debug") {
-        0 => ::log::LogLevelFilter::Warn,
-        1 => ::log::LogLevelFilter::Debug,
-        2 | _ => ::log::LogLevelFilter::Trace,
-    };
-
-    let _ = TermLogger::init(log_level, Config::default()).unwrap();
-
     if let Some(m) = matches.subcommand_matches("version") {
 
         match m.is_present("json") {
@@ -306,6 +298,15 @@ fn main() {
         }
         std::process::exit(0);
     }
+
+
+    let log_level = match matches.occurrences_of("debug") {
+        0 => ::log::LogLevelFilter::Warn,
+        1 => ::log::LogLevelFilter::Debug,
+        2 | _ => ::log::LogLevelFilter::Trace,
+    };
+
+    let _ = TermLogger::init(log_level, Config::default()).unwrap();
 
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
