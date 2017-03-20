@@ -297,7 +297,7 @@ fn main() {
                 s.insert("name", NAME);
                 s.insert("version", VERSION);
                 s.insert("copyright", COPYRIGHT);
-                let serialized = serde_json::to_string_pretty(&s).unwrap();
+                let serialized = serde_json::to_string_pretty(&s).expect("failed to serialize version");
                 println!("{}", &serialized);
             },
             false => {
