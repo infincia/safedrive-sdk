@@ -26,6 +26,8 @@ use std::env;
 
 use std::path::{PathBuf};
 
+use std::collections::HashMap;
+
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
@@ -64,6 +66,16 @@ fn main() {
         .version(VERSION)
         .about(COPYRIGHT)
         .setting(::clap::AppSettings::SubcommandRequiredElseHelp)
+        .subcommand(SubCommand::with_name("version")
+            .about("app version")
+            .arg(Arg::with_name("json")
+                .short("j")
+                .long("json")
+                .help("output as json")
+                .takes_value(false)
+                .required(false)
+            )
+        )
         .subcommand(SubCommand::with_name("bench")
             .about("benchmark chunking a file")
             .arg(Arg::with_name("path")
@@ -276,6 +288,25 @@ fn main() {
     };
 
     let _ = TermLogger::init(log_level, Config::default()).unwrap();
+
+    if let Some(m) = matches.subcommand_matches("version") {
+
+        match m.is_present("json") {
+            true => {
+                let mut s = HashMap::new();
+                s.insert("name", NAME);
+                s.insert("version", VERSION);
+                s.insert("copyright", COPYRIGHT);
+                let serialized = serde_json::to_string_pretty(&s).unwrap();
+                println!("{}", &serialized);
+            },
+            false => {
+                println!("{}", VERSION);
+                println!();
+            }
+        }
+        std::process::exit(0);
+    }
 
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
