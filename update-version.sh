@@ -85,8 +85,8 @@ while read -r thisPlist; do
 		"${plistBuddy}" -c "Set :CFBundleVersion ${mainBundleVersion}" "${thisPlist}"
 	fi
 	# Update the CFBundleShortVersionString if needed
-	if [[ ${thisBundleShortVersionString} != ${bundleShortVersionString} ]]; then
-		echo "Updating \"${thisPlist}\" with marketing version ${bundleShortVersionString}"
+	if [[ ${thisBundleShortVersionString} != "v${bundleShortVersionString}" ]]; then
+		echo "Updating \"${thisPlist}\" with marketing version v${bundleShortVersionString}"
 		"${plistBuddy}" -c "Set :CFBundleShortVersionString ${bundleShortVersionString}" "${thisPlist}"
 	fi
 done <<< "${plists}"
