@@ -302,7 +302,6 @@ fn main() {
             },
             false => {
                 println!("{}", VERSION);
-                println!();
             }
         }
         std::process::exit(0);
