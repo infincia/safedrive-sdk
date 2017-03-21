@@ -282,6 +282,17 @@ pub fn add_sync_folder(token: &Token,
     }
 }
 
+pub fn update_sync_folder(token: &Token,
+                          name: &str,
+                          path: &str,
+                          syncing: bool,
+                          folder_id: u64) -> Result<(), SDError> {
+    match update_folder(token, path, name, syncing, folder_id) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e))
+    }
+}
+
 pub fn remove_sync_folder(token: &Token,
                           folder_id: u64) -> Result<(), SDError> {
     match delete_folder(token, folder_id) {
