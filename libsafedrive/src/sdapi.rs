@@ -101,6 +101,8 @@ pub enum APIEndpoint<'a> {
     AccountKey { master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
     ReadFolders,
     CreateFolder { folderPath: &'a str, folderName: &'a str, encrypted: bool },
+    UpdateFolder { folderPath: &'a str, folderName: &'a str, syncing: bool, id: u64 },
+
     DeleteFolder { folder_id: u64 },
     RegisterSyncSession { folder_id: u64, name: &'a str, encrypted: bool },
     #[serde(skip_serializing)]
@@ -181,6 +183,9 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::CreateFolder { .. } => {
                 ::reqwest::Method::Post
             },
+            APIEndpoint::UpdateFolder { .. } => {
+                ::reqwest::Method::Put
+            },
             APIEndpoint::DeleteFolder { .. } => {
                 ::reqwest::Method::Delete
             },
@@ -241,6 +246,9 @@ impl<'a> APIEndpoint<'a> {
                 format!("/api/1/folder")
             },
             APIEndpoint::CreateFolder { .. } => {
+                format!("/api/1/folder")
+            },
+            APIEndpoint::UpdateFolder { .. } => {
                 format!("/api/1/folder")
             },
             APIEndpoint::DeleteFolder { .. } => {
@@ -773,6 +781,63 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
                 let folder_response: CreateFolderResponse = try!(::serde_json::from_str(&response));
                 return Ok(folder_response.id);
             },
+            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            &::reqwest::StatusCode::BadRequest => {
+                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                return Err(SDAPIError::Internal(error.message))
+            },
+            &::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable)
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+        }
+    }
+
+
+}
+
+pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqueID: u64) -> Result<(), SDAPIError> {
+
+    let endpoint = APIEndpoint::UpdateFolder { folderPath: path, folderName: name, syncing: syncing, id: uniqueID };
+
+    let user_agent = &**USER_AGENT.read();
+
+    let client = ::reqwest::Client::new().unwrap();
+
+    let retries = 3;
+    let mut retries_left = retries;
+
+    loop {
+        let request = client.request(endpoint.method(), endpoint.url())
+            .json(&endpoint)
+            .header(::reqwest::header::Connection::close())
+            .header(UserAgent(user_agent.to_string()))
+            .header(SDAuthToken(token.token.to_owned()));
+
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
+
+        trace!("sending request");
+        let mut result = try!(request.send());
+        trace!("response received");
+        let mut response = String::new();
+        trace!("reading response");
+        try!(result.read_to_string(&mut response));
+
+        trace!("response: {}", response);
+
+        match result.status() {
+            &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
