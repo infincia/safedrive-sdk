@@ -21,6 +21,7 @@ public struct Folder {
     public let path: String
     public let date: UInt64
     public let encrypted: Bool
+    public let syncing: Bool
     
 }
 
@@ -521,7 +522,7 @@ public class SafeDriveSDK: NSObject {
                 let name = String(cString: folder_ptr!.pointee.name)
                 let path = String(cString: folder_ptr!.pointee.path)
                 let id = folder_ptr!.pointee.id
-                let new_folder = Folder(id: id, name: name, path: path, date: folder_ptr!.pointee.date, encrypted: folder_ptr!.pointee.encrypted == 1 ? true : false)
+                let new_folder = Folder(id: id, name: name, path: path, date: folder_ptr!.pointee.date, encrypted: folder_ptr!.pointee.encrypted == 1 ? true : false, syncing: folder_ptr!.pointee.syncing == 1 ? true : false)
                 
                 queue.async { success(new_folder) }
             default:
@@ -559,7 +560,7 @@ public class SafeDriveSDK: NSObject {
                     let name = String(cString: folder.name)
                     let path = String(cString: folder.path)
                     let id = folder.id
-                    let new_folder = Folder(id: id, name: name, path: path, date: folder.date, encrypted: folder.encrypted == 1 ? true : false)
+                    let new_folder = Folder(id: id, name: name, path: path, date: folder.date, encrypted: folder.encrypted == 1 ? true : false, syncing: folder.syncing == 1 ? true : false)
                     new_array.append(new_folder)
                 }
                 
