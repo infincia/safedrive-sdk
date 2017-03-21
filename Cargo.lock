@@ -797,19 +797,19 @@ version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "owning_ref 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "parking_lot_core 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parking_lot_core 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "thread-id 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "parking_lot_core"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "smallvec 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "smallvec 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1225,7 +1225,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "smallvec"
-version = "0.1.8"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -1694,7 +1694,7 @@ dependencies = [
 "checksum openssl-sys 0.9.9 (registry+https://github.com/rust-lang/crates.io-index)" = "376c5c6084e5ea95eea9c3280801e46d0dcf51251d4f01b747e044fb64d1fb31"
 "checksum owning_ref 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "cdf84f41639e037b484f93433aa3897863b561ed65c6e59c7073d7c561710f37"
 "checksum parking_lot 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "aebb68eebde2c99f89592d925288600fde220177e46b5c9a91ca218d245aeedf"
-"checksum parking_lot_core 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fb1b97670a2ffadce7c397fb80a3d687c4f3060140b885621ef1653d0e5d5068"
+"checksum parking_lot_core 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "56a19dcbb5d1e32b6cccb8a9aa1fc2a38418c8699652e735e2bf391a3dc0aa16"
 "checksum pbr 1.0.0-alpha.2 (git+https://github.com/infincia/pb.git?branch=logging)" = "<none>"
 "checksum pkg-config 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)" = "3a8b4c6b8165cd1a1cd4b9b120978131389f64bdaf456435caa41e630edba903"
 "checksum prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)" = "688511bfaadcbbd46b7cc18cc189e5726da4d17f95027e07b18cf417fdbfc5e4"
@@ -1739,7 +1739,7 @@ dependencies = [
 "checksum simplelog 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "2c3a63f2b74bc3359ed6050da62e32cc0e10a162c4f62a0c1d80cd89d432234b"
 "checksum skeptic 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "34c7f11b6755efa4abfd2739426c17de0a36153510bacd6147113fd3a9f2634d"
 "checksum slab 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "17b4fcaed89ab08ef143da37bc52adbcc04d4a69014f4c1208d6b51f0c47bc23"
-"checksum smallvec 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "fcc8d19212aacecf95e4a7a2179b26f7aeb9732a915cf01f05b0d3e044865410"
+"checksum smallvec 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "3a3c84984c278afe61a46e19868e8b23e2ee3be5b3cc6dea6edad4893bc6c841"
 "checksum sodiumoxide 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)" = "bc02c0bc77ffed8e8eaef004399b825cf4fd8aa02d0af6e473225affd583ff4d"
 "checksum stable_deref_trait 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "15132e0e364248108c5e2c02e3ab539be8d6f5d52a01ca9bbf27ed657316f02b"
 "checksum strsim 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0d5f575d5ced6634a5c4cb842163dab907dc7e9148b28dc482d81b8855cbe985"
