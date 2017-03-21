@@ -334,6 +334,7 @@ pub struct RegisteredFolder {
     pub folderName: String,
     pub folderPath: String,
     pub addedDate: u64,
-    pub encrypted: bool
+    pub encrypted: bool,
+    pub syncing: bool,
 }
 
