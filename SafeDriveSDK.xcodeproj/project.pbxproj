@@ -17,7 +17,7 @@
 		AA97A1AD1E2C64C100CAAD19 /* SafeDriveSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */; };
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFDD561DC4E91000B4EAC7 /* libz.tbd */; };
-		AAFBBA1E1E7ED27D001A3688 /* safedrive in CopyFiles */ = {isa = PBXBuildFile; fileRef = AAFBBA1D1E7ED27D001A3688 /* safedrive */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AAFBBA1E1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli in CopyFiles */ = {isa = PBXBuildFile; fileRef = AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,7 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
-				AAFBBA1E1E7ED27D001A3688 /* safedrive in CopyFiles */,
+				AAFBBA1E1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,7 +64,7 @@
 		AA9D8AF01D6E9BCC0011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Wrappers/Swift/Info.plist; sourceTree = "<group>"; };
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		AAFBBA1D1E7ED27D001A3688 /* safedrive */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = safedrive; path = "dist-x86_64-apple-darwin/bin/safedrive"; sourceTree = "<group>"; };
+		AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist-x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,7 +155,7 @@
 		AAE34C781CF8EAAA0067B401 = {
 			isa = PBXGroup;
 			children = (
-				AAFBBA1D1E7ED27D001A3688 /* safedrive */,
+				AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */,
 				AABF37281E36E19C003DC6C2 /* update-version.sh */,
 				AA47B6491D7D336E005C134D /* Old */,
 				AA47B6331D7BCD0D005C134D /* Wrappers */,

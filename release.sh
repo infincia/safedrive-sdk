@@ -47,7 +47,7 @@ case $TARGET in
         cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib
         install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib
         install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib
-        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/io.safedrive.SafeDrive.cli
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)
         cp -a target/$TARGET/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
