@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		AA498ABA1E29927000DAA1C8 /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
 		AA498ABB1E29927000DAA1C8 /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
+		AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA686A1D1E81C0AA00C9F33B /* Constants.swift */; };
 		AA80B0C21D6F963F00512FC7 /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
 		AA8CCDCD1E2947B90002B1FF /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
@@ -54,6 +55,7 @@
 		AA47B63F1D7D3366005C134D /* SyncEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyncEngine.h; path = SyncEngine/SyncEngine.h; sourceTree = "<group>"; };
 		AA47B6401D7D3366005C134D /* SyncEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncEngine.swift; path = SyncEngine/SyncEngine.swift; sourceTree = "<group>"; };
 		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Wrappers/Swift/Constants.swift; sourceTree = "<group>"; };
 		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist-x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
 		AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsafedrive.dylib; path = "dist-x86_64-apple-darwin/lib/libsafedrive.dylib"; sourceTree = "<group>"; };
 		AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = "dist-x86_64-apple-darwin/lib/libsodium.18.dylib"; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				AA97A1A81E2C645C00CAAD19 /* Tests */,
 				AA9D8AF01D6E9BCC0011DE1F /* Info.plist */,
 				AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */,
+				AA686A1D1E81C0AA00C9F33B /* Constants.swift */,
 			);
 			name = Swift;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */,
+				AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
