@@ -450,7 +450,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func updateFolder(_ name: String, path: String, syncing: Bool, uniqueID: UInt64, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: UInt64) -> Void, failure: @escaping SDKFailure) {
+    public func updateFolder(_ name: String, path: String, syncing: Bool, uniqueID: UInt64, completionQueue queue: DispatchQueue, success: @escaping () -> Void, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
             
@@ -472,7 +472,7 @@ public class SafeDriveSDK: NSObject {
                 let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             default:
-                queue.async { success(UInt64(res)) }
+                queue.async { success() }
             }
         }
     }
