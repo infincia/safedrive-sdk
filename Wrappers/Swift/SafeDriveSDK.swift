@@ -83,6 +83,7 @@ public enum SDKErrorType: Int {
     case SessionUnreadable = 0x0013
     case ServiceUnavailable = 0x0014
     case Cancelled = 0x0015
+    case FolderMissing = 0x0016
 }
 
 public struct SDKError: Error {
