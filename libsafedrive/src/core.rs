@@ -684,6 +684,14 @@ pub fn sync(token: &Token,
     let folder_path = PathBuf::from(&folder.folderPath);
     let folder_name = &folder.folderName;
 
+    let p: &Path = &folder_path;
+    let path_exists = p.exists();
+    let path_is_dir = p.is_dir();
+
+    if !path_exists || !path_is_dir {
+        return Err(SDError::FolderMissing)
+    }
+
     #[cfg(feature = "locking")]
     let flock = try!(FolderLock::new(&folder_path));
 
@@ -1078,6 +1086,14 @@ pub fn restore(token: &Token,
     let restore_start_time = ::std::time::Instant::now();
 
     try!(fs::create_dir_all(&destination));
+
+    let dpath: &Path = &destination;
+    let path_exists = dpath.exists();
+    let path_is_dir = dpath.is_dir();
+
+    if !path_exists || !path_is_dir {
+        return Err(SDError::FolderMissing)
+    }
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
