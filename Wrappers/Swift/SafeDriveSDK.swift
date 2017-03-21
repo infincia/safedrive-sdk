@@ -108,6 +108,62 @@ extension SDKError: LocalizedError {
     }
 }
 
+extension SDKError:  CustomNSError {
+    var errorDomain: String {
+        switch self.kind {
+        case .StateMissing:
+            return SDErrorDomainInternal
+        case .Internal:
+            return SDErrorDomainInternal
+        case .RequestFailure:
+            return SDErrorDomainNotReported
+        case .NetworkFailure:
+            return SDErrorDomainNotReported
+        case .Conflict:
+            return SDErrorDomainNotReported
+        case .BlockMissing:
+            return SDErrorDomainReported
+        case .SessionMissing:
+            return SDErrorDomainInternal
+        case .RecoveryPhraseIncorrect:
+            return SDErrorDomainNotReported
+        case .InsufficientFreeSpace:
+            return SDErrorDomainNotReported
+        case .Authentication:
+            return SDErrorDomainNotReported
+        case .UnicodeError:
+            return SDErrorDomainReported
+        case .TokenExpired:
+            return SDErrorDomainNotReported
+        case .CryptoError:
+            return SDErrorDomainReported
+        case .IO:
+            return SDErrorDomainNotReported
+        case .SyncAlreadyInProgress:
+            return SDErrorDomainNotReported
+        case .RestoreAlreadyInProgress:
+            return SDErrorDomainNotReported
+        case .ExceededRetries:
+            return SDErrorDomainNotReported
+        case .KeychainError:
+            return SDErrorDomainReported
+        case .BlockUnreadable:
+            return SDErrorDomainReported
+        case .SessionUnreadable:
+            return SDErrorDomainReported
+        case .ServiceUnavailable:
+            return SDErrorDomainReported
+        case .Cancelled:
+            return SDErrorDomainNotReported
+        case .FolderMissing:
+            return SDErrorDomainNotReported
+        }
+    }
+    
+    public var errorCode: Int {
+        return self.kind.rawValue
+    }
+}
 
 
 
