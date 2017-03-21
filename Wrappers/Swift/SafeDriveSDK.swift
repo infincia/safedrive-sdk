@@ -86,13 +86,9 @@ public enum SDKErrorType: Int {
     case FolderMissing = 0x0016
 }
 
-public struct SDKError: Error {
+public struct SDKError {
     public var message: String
     public var kind: SDKErrorType
-    
-    var localizedDescription: String {
-        return self.message
-    }
     
     var code: Int {
         return self.kind.rawValue
@@ -101,6 +97,14 @@ public struct SDKError: Error {
     public init(message: String, kind: SDKErrorType) {
         self.message = message
         self.kind = kind
+    }
+}
+
+extension SDKError: LocalizedError {
+    public var errorDescription: String? {
+        get {
+            return self.message
+        }
     }
 }
 
