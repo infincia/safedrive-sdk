@@ -14,6 +14,7 @@ use ::state::State;
 use ::core::initialize;
 
 use ::core::add_sync_folder;
+use ::core::update_sync_folder;
 use ::core::remove_sync_folder;
 use ::core::get_sync_folder;
 use ::core::get_sync_folders;
@@ -1597,6 +1598,95 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 
     match add_sync_folder(c.0.get_api_token(), &n, &p) {
         Ok(folder_id) => folder_id as i64,
+        Err(e) => {
+            let c_err = SDDKError::from(e);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Update a sync folder
+///
+/// Will return a failure code if for any reason the folder cannot be updated
+///
+///
+/// Parameters:
+///
+///     state: an opaque pointer obtained from calling sddk_initialize()
+///
+///     name: a NULL terminated string representing the folder name
+///
+///     path: a NULL terminated string representing the folder path in RFC3986 format
+///
+///     syncing: an 8-bit unsigned integer representing a boolean state: whether the folder
+///              should be actively syncing at the current time or not. Valid settings are 0 or 1
+///
+///     unique_id: a 64-bit unsigned integer representing the unique folder ID
+///
+///     error: an uninitialized pointer that will be allocated and initialized when the function
+///            returns if the return value was -1
+///
+///            must be freed by the caller using sddk_free_error()
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///      0: success
+///
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// if (0 != sddk_update_sync_folder(&state, "Documents", "/Users/name/Documents", 1, 56, &error)) {
+///     printf("Failed to update folder");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Updated folder");
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_update_sync_folder(state: *mut SDDKState,
+                                          name: *const std::os::raw::c_char,
+                                          path: *const std::os::raw::c_char,
+                                          syncing: std::os::raw::c_uchar,
+                                          unique_id: std::os::raw::c_ulonglong,
+                                          mut error: *mut *mut SDDKError) -> std::os::raw::c_longlong {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let c_name: &CStr = unsafe { CStr::from_ptr(name) };
+    let n: String = match c_name.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+
+    let c_path: &CStr = unsafe { CStr::from_ptr(path) };
+    let p: String = match c_path.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    };
+
+    let c_syncing = syncing >= 1;
+
+    let c_unique_id: u64 = unique_id;
+
+
+    match update_sync_folder(c.0.get_api_token(), &n, &p, c_syncing, c_unique_id) {
+        Ok(()) => 0,
         Err(e) => {
             let c_err = SDDKError::from(e);
 
