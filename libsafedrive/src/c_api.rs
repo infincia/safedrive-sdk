@@ -278,6 +278,7 @@ pub enum SDDKErrorType {
     SessionUnreadable = 0x0013,
     ServiceUnavailable = 0x0014,
     Cancelled = 0x0015,
+    FolderMissing = 0x0016,
 }
 
 #[derive(Debug)]
@@ -352,6 +353,9 @@ impl From<SDError> for SDDKError {
             },
             SDError::Cancelled => {
                 SDDKErrorType::Cancelled
+            },
+            SDError::FolderMissing => {
+                SDDKErrorType::FolderMissing
             },
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
