@@ -182,6 +182,7 @@ pub struct SDDKFolder {
     pub path: *const std::os::raw::c_char,
     pub date: u64,
     pub encrypted: i8,
+    pub syncing: i8,
 }
 
 impl From<RegisteredFolder> for SDDKFolder {
@@ -193,6 +194,14 @@ impl From<RegisteredFolder> for SDDKFolder {
             date: folder.addedDate,
             encrypted: {
                 if folder.encrypted {
+                    1
+                } else {
+                    0
+                }
+
+            },
+            syncing: {
+                if folder.syncing {
                     1
                 } else {
                     0
