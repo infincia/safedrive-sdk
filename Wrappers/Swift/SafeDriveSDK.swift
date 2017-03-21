@@ -450,6 +450,33 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    public func updateFolder(_ name: String, path: String, syncing: Bool, uniqueID: UInt64, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: UInt64) -> Void, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            var c_syncing: UInt8 = 0
+            if syncing {
+                c_syncing = 1
+            }
+            
+            let res = sddk_update_sync_folder(self.state!, name, path, c_syncing, uniqueID, &error)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case -1:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            default:
+                queue.async { success(UInt64(res)) }
+            }
+        }
+    }
+    
     public func removeFolder(_ folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         DispatchQueue.global(priority: .default).async {
             
