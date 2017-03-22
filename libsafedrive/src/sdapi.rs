@@ -492,10 +492,7 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
                 return Ok(clients)
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
-                return Err(SDAPIError::Internal(error.message))
-            },
+            &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
