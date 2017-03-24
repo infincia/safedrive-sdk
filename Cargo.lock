@@ -117,7 +117,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "bitflags"
-version = "0.8.1"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -194,7 +194,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "ansi_term 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "atty 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "bitflags 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "strsim 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "term_size 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "unicode-segmentation 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -431,11 +431,11 @@ dependencies = [
 [[package]]
 name = "keyring"
 version = "0.4.0"
-source = "git+https://github.com/infincia/keyring-rs.git?branch=mac_keychain#2593ed5a74559bf193452d4daf3ded303038d48d"
+source = "git+https://github.com/infincia/keyring-rs.git?branch=infincia#6dc921f4dfcc737f2ef3e4956ac6e70e0de6db0d"
 dependencies = [
  "advapi32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.22.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "rpassword 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rpassword 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.23 (registry+https://github.com/rust-lang/crates.io-index)",
  "secret-service 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "security-framework 0.1.8 (git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support)",
@@ -472,14 +472,14 @@ name = "libsafedrive"
 version = "0.5.12"
 dependencies = [
  "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "bitflags 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "blake2-rfc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.10.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "interfaces 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=mac_keychain)",
+ "keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=infincia)",
  "lazy_static 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsodium-sys 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -947,8 +947,8 @@ dependencies = [
 
 [[package]]
 name = "rpassword"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+version = "0.3.1"
+source = "git+https://github.com/infincia/rustastic-password.git?branch=add-non-password-responses#673fadb075690af415b93d8a60ac26af2624fada"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -959,7 +959,7 @@ dependencies = [
 [[package]]
 name = "rpassword"
 version = "0.3.1"
-source = "git+https://github.com/infincia/rustastic-password.git?branch=add-non-password-responses#673fadb075690af415b93d8a60ac26af2624fada"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1616,7 +1616,7 @@ dependencies = [
 "checksum bitflags 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "8dead7461c1127cf637931a1e50934eb6eee8bff2f74433ac7909e9afcee04a3"
 "checksum bitflags 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "4f67931368edf3a9a51d29886d245f1c3db2f1ef0dcc9e35ff70341b78c10d23"
 "checksum bitflags 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "aad18937a628ec6abcd26d1489012cc0e18c21798210f491af69ded9b881106d"
-"checksum bitflags 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "45628e6f4c6fd6c0f69256167a04fe97bb507bc30067026cbaa94a757d9e2ca9"
+"checksum bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1370e9fc2a6ae53aea8b7a5110edbd08836ed87c88736dfabccade1c2b44bff4"
 "checksum bitreader 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b245039eddbd1a051b8bfa5d5b6afaad6d34d172057a15d561e80b50b4978e8d"
 "checksum blake2-rfc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)" = "0c6a476f32fef3402f1161f89d0d39822809627754a126f8441ff2a9d45e2d59"
 "checksum block 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
@@ -1656,7 +1656,7 @@ dependencies = [
 "checksum itertools 0.4.19 (registry+https://github.com/rust-lang/crates.io-index)" = "c4a9b56eb56058f43dc66e58f40a214b2ccbc9f3df51861b63d51dec7b65bc3f"
 "checksum itoa 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "eb2f404fbc66fd9aac13e998248505e7ecb2ad8e44ab6388684c5fb11c6c251c"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
-"checksum keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=mac_keychain)" = "<none>"
+"checksum keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=infincia)" = "<none>"
 "checksum language-tags 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "a91d884b6667cd606bb5a69aa0c99ba811a115fc68915e7056ec08a46e93199a"
 "checksum lazy_static 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)" = "cf186d1a8aa5f5bee5fd662bc9c1b949e0259e1bcc379d1f006847b0080c7417"
 "checksum lazy_static 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "7291b1dd97d331f752620b02dfdbc231df7fc01bf282a00769e1cdb963c460dc"
@@ -1710,8 +1710,8 @@ dependencies = [
 "checksum regex-syntax 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2f9191b1f57603095f105d317e375d19b1c9c5c3185ea9633a99a6dcbed04457"
 "checksum reqwest 0.4.0 (git+https://github.com/infincia/reqwest.git?branch=rustls)" = "<none>"
 "checksum ring 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3ee2899d039d933a84eeba04312f7a270b42785cb260fafbfe57839a7118bb97"
-"checksum rpassword 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)" = "8f0eee8d16609fa0ec2a13c8d812fc6049f71d3cdd93f6f713fedf6397868c5c"
 "checksum rpassword 0.3.1 (git+https://github.com/infincia/rustastic-password.git?branch=add-non-password-responses)" = "<none>"
+"checksum rpassword 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ec4bdede957362ec6fdd550f7e79c6d14cad2bc26b2d062786234c6ee0cb27bb"
 "checksum rust-crypto 0.2.36 (registry+https://github.com/rust-lang/crates.io-index)" = "f76d05d3993fd5f4af9434e8e436db163a12a9d40e1a58a726f27a01dfd12a2a"
 "checksum rust-gmp 0.2.10 (registry+https://github.com/rust-lang/crates.io-index)" = "8fe953fa4b7bcd4ae39ad490f31c53322a00f889cf4f3047a1cbe3d25b9fc55c"
 "checksum rustc-serialize 0.3.23 (registry+https://github.com/rust-lang/crates.io-index)" = "684ce48436d6465300c9ea783b6b14c4361d6b8dcbb1375b486a69cc19e2dfb0"
