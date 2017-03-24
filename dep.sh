@@ -89,7 +89,7 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
         echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
 
-        curl -O "https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2" > /dev/null
+        curl -L https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2 -o expat-${EXPAT_VER}.tar.bz2 > /dev/null
         tar xf expat-${EXPAT_VER}.tar.bz2 > /dev/null
         pushd expat-${EXPAT_VER}
         ./configure --prefix=${BUILD_PREFIX} ${EXPAT_ARGS} > /dev/null
