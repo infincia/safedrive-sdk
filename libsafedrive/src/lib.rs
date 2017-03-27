@@ -75,6 +75,9 @@ extern crate time;
 #[cfg(feature = "keychain")]
 extern crate keyring;
 
+#[cfg(feature = "sessionfs")]
+extern crate fuse_mt;
+
 #[cfg(target_os = "macos")]
 extern crate interfaces;
 

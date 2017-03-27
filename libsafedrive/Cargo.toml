@@ -36,6 +36,7 @@ lz4 = "*"
 chrono = "*"
 number_prefix = "*"
 keyring = { version = "*", optional = true, git = "https://github.com/infincia/keyring-rs.git", branch = "infincia"  }
+fuse_mt = { version = "*", optional = true }
 time = "*"
 
 [target.'cfg(target_os = "macos")'.dependencies]
@@ -56,3 +57,4 @@ default = ["keychain"]
 
 locking = ["scopeguard"]
 keychain = ["keyring"]
+sessionfs = ["fuse_mt"]
