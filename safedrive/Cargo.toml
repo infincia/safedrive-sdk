@@ -20,3 +20,8 @@ simplelog = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"
+
+
+[features]
+default = []
+sessionfs = []
