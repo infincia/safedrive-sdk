@@ -70,6 +70,7 @@ extern crate regex;
 extern crate parking_lot;
 extern crate byteorder;
 extern crate blake2_rfc;
+extern crate time;
 
 #[cfg(feature = "keychain")]
 extern crate keyring;
