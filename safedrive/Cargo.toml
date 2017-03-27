@@ -22,5 +22,5 @@ path = "../libsafedrive"
 
 
 [features]
-default = []
+default = ["sessionfs"]
 sessionfs = []

@@ -14,7 +14,6 @@ extern crate serde_json;
 
 use std::str;
 
-#[cfg(target_os = "linux")]
 use std::ffi::OsStr;
 
 use std::fs::File;
@@ -136,6 +135,17 @@ fn main() {
         )
         .subcommand(SubCommand::with_name("daemon")
             .about("run SafeDrive daemon")
+        )
+        .subcommand(SubCommand::with_name("fuse")
+            .about("mount the fuse restore directory")
+            .arg(Arg::with_name("path")
+                .short("p")
+                .long("path")
+                .value_name("PATH")
+                .help("the location to mount the directory")
+                .takes_value(true)
+                .required(true)
+            )
         )
         .subcommand(SubCommand::with_name("login")
             .about("login to SafeDrive account")
@@ -397,7 +407,41 @@ fn main() {
         let (token, _) = sign_in();
 
         daemon();
+    } else if let Some(m) = matches.subcommand_matches("fuse") {
 
+        let p: &str = match m.value_of("path") {
+            Some(p) => p,
+            None => {
+                error!("failed to get path from argument list");
+                std::process::exit(1);
+            }
+        };
+
+
+        #[cfg(feature = "sessionfs")] {
+            let o: &OsStr = p.as_ref();
+
+            let (token, _) = sign_in();
+
+
+            let folder_list = match get_sync_folders(&token) {
+                Ok(fl) => fl,
+                Err(e) => {
+                    error!("Read folders error: {}", e);
+                    std::process::exit(1);
+                }
+            };
+
+            let filesystem = SessionFS {
+                target: o.to_owned(),
+                folders: folder_list,
+            };
+
+            let path = PathBuf::from(p);
+            std::fs::create_dir_all(&path).expect("failed to create dir");
+
+            filesystem.mount(path);
+        }
     } else if let Some(m) = matches.subcommand_matches("login") {
 
         let u = match m.value_of("email") {

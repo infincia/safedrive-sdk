@@ -60,7 +60,7 @@ crate-type = ["rlib", "cdylib"]
 doctest = false
 
 [features]
-default = []
+default = ["sessionfs"]
 
 locking = ["scopeguard"]
 sessionfs = ["fuse_mt"]
