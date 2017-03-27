@@ -33,6 +33,8 @@ mod chunk;
 mod oplog;
 #[cfg(feature = "keychain")]
 mod keychain;
+#[cfg(feature = "sessionfs")]
+mod sessionfs;
 
 /// public API
 ///
@@ -47,6 +49,8 @@ pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
 #[cfg(feature = "keychain")]
 pub use keychain::{KeychainService};
 
+#[cfg(feature = "sessionfs")]
+pub use sessionfs::*;
 
 
 
