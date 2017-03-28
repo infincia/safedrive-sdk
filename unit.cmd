@@ -15,6 +15,6 @@ IF "%LINKTYPE%"=="mt" (
 
 call rustver.bat
 
-rustup.exe override set %RUST_PINNED%
+rustup.exe override set %RUST_VER%
 
 cargo.exe test --verbose --release -p libsafedrive --target %TARGET%
