@@ -83,9 +83,6 @@ extern crate keyring;
 extern crate fuse_mt;
 
 #[cfg(target_os = "macos")]
-extern crate interfaces;
-
-#[cfg(target_os = "macos")]
 extern crate objc_foundation;
 
 #[cfg(target_os = "macos")]
