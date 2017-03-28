@@ -741,7 +741,7 @@ pub fn sync(token: &Token,
         estimated_size = estimated_size + stream_length;
     }
 
-    let (write_thread, block_send, status_receive) = upload_thread(token, session_name);
+    let (_, block_send, status_receive) = upload_thread(token, session_name);
 
     let mut failed = 0;
 
@@ -823,7 +823,7 @@ pub fn sync(token: &Token,
                     match status_receive.try_recv() {
                         Ok(msg) => {
                             match msg {
-                                Ok(finished) => {},
+                                Ok(_) => {},
                                 Err(e) => return Err(e)
                             };
                         },
