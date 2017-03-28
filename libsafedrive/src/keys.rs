@@ -41,6 +41,34 @@ impl KeyType {
     }
 }
 
+impl<'a> ::std::fmt::Display for KeyType {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        match *self {
+            KeyType::Master => {
+                write!(f, "KeyType<Master>")
+            },
+            KeyType::Main => {
+                write!(f, "KeyType<Main>")
+            },
+            KeyType::HMAC => {
+                write!(f, "KeyType<HMAC>")
+            },
+            KeyType::Tweak => {
+                write!(f, "KeyType<Tweak>")
+            },
+            KeyType::Recovery => {
+                write!(f, "KeyType<Recovery>")
+            },
+            KeyType::Session => {
+                write!(f, "KeyType<Session>")
+            },
+            KeyType::Block => {
+                write!(f, "KeyType<Block>")
+            },
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct WrappedKeyset {
     recovery: Option<String>,
