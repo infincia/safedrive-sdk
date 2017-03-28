@@ -417,3 +417,22 @@ fn key_unwrap_uppercase_master_generated_by_sdk_00318_test() {
     };
 }
 
+#[test]
+#[should_panic]
+fn key_unwrap_failing_master_test() {
+    let phrase = "hockey increase universe rib stone nothing someone sentence click game fresh vessel";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let wrapped_master_hex = "9e1215400656d9c56cfe62b03d0b949fed1200bad51fc23477fb10623a2f6b767deb3553e68de9dd0141bf14e58fa890";
+
+    let wrapped_master = WrappedKey::from_hex(wrapped_master_hex.to_owned(), KeyType::Master).expect("Failed to decode key hex");
+    match wrapped_master.to_key(&recovery_key, None) {
+        Ok(_) => {},
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+}
