@@ -377,3 +377,43 @@ fn key_unwrap_test() {
         Err(_) => { assert!(true == false); return }
     };
 }
+
+
+#[test]
+fn key_unwrap_lowercase_master_generated_by_sdk_00318_test() {
+    let phrase = "plastic quote hotel coyote exercise stairs runway protect visit lion arch truth";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let wrapped_master_hex = "f4814a238215f659585052a6d21cba789e60c3fdcb7ae095641366857aae59f4a374b564e24d41a1619ec13118873621";
+
+    let wrapped_master = WrappedKey::from_hex(wrapped_master_hex.to_owned(), KeyType::Master).expect("Failed to decode key hex");
+    match wrapped_master.to_key(&recovery_key, None) {
+        Ok(_) => {},
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+}
+
+#[test]
+fn key_unwrap_uppercase_master_generated_by_sdk_00318_test() {
+    let phrase = "plastic quote hotel coyote exercise stairs runway protect visit lion arch truth";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let wrapped_master_hex = "F4814A238215F659585052A6D21CBA789E60C3FDCB7AE095641366857AAE59F4A374B564E24D41A1619EC13118873621";
+
+    let wrapped_master = WrappedKey::from_hex(wrapped_master_hex.to_owned(), KeyType::Master).expect("Failed to decode key hex");
+    match wrapped_master.to_key(&recovery_key, None) {
+        Ok(_) => {},
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+}
+
