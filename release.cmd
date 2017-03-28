@@ -37,4 +37,4 @@ copy /y target\%TARGET%\release\safedrive.pdb dist-%TARGET%-%TOOLSET%-%LINKTYPE%
 
 copy /y target\%TARGET%\release\safedrive.exe dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\
 
-copy /y %CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\libsodium.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\libsodium.dll
+copy /y dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\libsodium.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\libsodium.dll
