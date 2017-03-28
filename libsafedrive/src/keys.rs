@@ -197,6 +197,11 @@ impl ToHex for WrappedKey {
 
 
 
+impl<'a> ::std::fmt::Display for WrappedKey {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "WrappedKey <length:{}: {:?}>", self.bytes.len(), self.bytes)
+    }
+}
 
 
 #[derive(Debug, Clone)]
