@@ -1177,6 +1177,8 @@ pub fn local_login(username: &str) {
 
     println!("Account found");
     println!("Checking client...");
+    let mut create_new = false;
+
     if client_list.len() > 0 {
         list_clients(username, &password, None);
         println!("1) New");
@@ -1241,8 +1243,14 @@ pub fn local_login(username: &str) {
                 }
             }
 
+        } else if &replace == &"1" || &replace == &"new" || &replace == &"New" {
+            create_new = true;
         }
     } else {
+        create_new = true;
+    }
+
+    if create_new {
         let ucid = generate_unique_client_id();
         println!("Setting up new client {}", &ucid);
 
