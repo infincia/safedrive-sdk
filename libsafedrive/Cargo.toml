@@ -39,6 +39,9 @@ keyring = { version = "*", optional = true, git = "https://github.com/infincia/k
 fuse_mt = { version = "*", optional = true }
 time = "*"
 
+[replace]
+"ring:0.7.2" = { git = "https://github.com/infincia/ring.git", branch = "infincia", default-features = false, features = ["use_heap", "dev_urandom_fallback"] }
+
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
