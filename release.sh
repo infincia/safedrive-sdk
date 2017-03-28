@@ -25,7 +25,7 @@ bash dep.sh
 
 source ./rustver.sh
 
-rustup override set $RUST_PINNED
+rustup override set $RUST_VER
 
 RUST_BACKTRACE=1 cargo build --release -p safedrive --target $TARGET > /dev/null
 

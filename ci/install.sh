@@ -6,8 +6,8 @@ set -ex
 . $(dirname $0)/../rustver.sh
 
 install_rustup() {
-    echo "Using Rust $RUST_PINNED"
-    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$RUST_PINNED
+    echo "Using Rust $RUST_VER"
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$RUST_VER
     rustup target add $TARGET || true
     rustc -V
     cargo -V

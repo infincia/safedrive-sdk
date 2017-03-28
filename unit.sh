@@ -20,6 +20,6 @@ bash dep.sh
 
 source ./rustver.sh
 
-rustup override set $RUST_PINNED
+rustup override set $RUST_VER
 
 RUST_BACKTRACE=1 cargo test --release -p libsafedrive --target $TARGET
