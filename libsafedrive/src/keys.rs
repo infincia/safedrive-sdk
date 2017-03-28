@@ -117,6 +117,11 @@ impl From<WrappedKeysetBody> for WrappedKeyset {
 
 }
 
+impl<'a> ::std::fmt::Display for WrappedKeyset {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        write!(f, "WrappedKeyset <master:{}, main:{}, hmac:{}, tweak:{}>", self.master, self.main, self.hmac, self.tweak)
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Keyset {
