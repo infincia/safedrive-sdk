@@ -48,7 +48,7 @@ objc-foundation = "*"
 
 [lib]
 name = "safedrive"
-crate-type = ["lib", "staticlib", "cdylib"]
+crate-type = ["rlib", "cdylib"]
 doctest = false
 
 [features]
