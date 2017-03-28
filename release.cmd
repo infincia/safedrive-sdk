@@ -1,6 +1,6 @@
-IF [%ARCH%]==[] set ARCH=x86
-IF [%TARGET%]==[] set TARGET=i686-pc-windows-msvc
-IF [%TOOLSET%]==[] set TOOLSET=v140
+IF [%ARCH%]==[] set ARCH=x86_64
+IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
+IF [%TOOLSET%]==[] set TOOLSET=v141
 IF [%LINKTYPE%]==[] set LINKTYPE=dll
 
 ECHO building SafeDrive for Windows-%ARCH%
