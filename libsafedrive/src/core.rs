@@ -50,8 +50,6 @@ pub use ::util::pretty_bytes;
 pub use ::util::get_app_directory;
 pub use ::util::generate_uuid as generate_unique_client_id;
 pub use ::util::get_current_os;
-#[cfg(target_os = "macos")]
-pub use ::util::unique_client_hash;
 
 pub use ::cache::clean_cache;
 pub use ::cache::clear_cache;

@@ -27,25 +27,6 @@ pub fn generate_uuid() -> String {
 }
 
 #[cfg(target_os = "macos")]
-pub fn unique_client_hash(email: &str) -> Result<String, String> {
-    let interface = "en0";
-
-    if let Ok(hardware) = ::interfaces::Interface::get_by_name(interface) {
-        if let Some(interface) = hardware {
-            if let Ok(mac) = interface.hardware_addr() {
-                let mac_string = mac.as_bare_string();
-                let to_hash = mac_string + &email;
-                let hash = sha256(to_hash.as_bytes());
-                return Ok(hash)
-            }
-        }
-    } else {
-        error!("could not find {} interface", interface);
-    }
-    Err("failed to get mac address".to_string())
-}
-
-#[cfg(target_os = "macos")]
 #[allow(non_snake_case)]
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     let NSFileManager_cls = Class::get("NSFileManager").unwrap();
