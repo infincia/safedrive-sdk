@@ -44,9 +44,6 @@ objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
 interfaces = "*"
 
-[build-dependencies]
-rusty-cheddar = "*"
-
 [lib]
 name = "safedrive"
 crate-type = ["lib", "staticlib", "cdylib"]
