@@ -5,6 +5,8 @@ IF [%LINKTYPE%]==[] set LINKTYPE=dll
 
 ECHO building SafeDrive for Windows-%ARCH%
 
+del /q dist-%TARGET%-%TOOLSET%-%LINKTYPE%
+
 mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%
 mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
 mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include
