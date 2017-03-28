@@ -1459,14 +1459,14 @@ pub fn restore(token: &Token,
                     let is_dir = md.file_type().is_dir();
                     
                     if is_dir {
-                        match ::std::os::windows::fs::symlink_dir(&src, full_path) {
+                        match ::std::os::windows::fs::symlink_dir(&src, &full_path) {
                             Ok(()) => {},
                             Err(e) => {
                                 issue(&format!("not able to restore directory symlink {}: {}", full_path.display(), e));
                             },
                         }
                     } else {
-                        match ::std::os::windows::fs::symlink_file(&src, full_path) {
+                        match ::std::os::windows::fs::symlink_file(&src, &full_path) {
                             Ok(()) => {},
                             Err(e) => {
                                 issue(&format!("not able to restore file symlink {}: {}", full_path.display(), e));
