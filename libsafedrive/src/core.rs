@@ -615,7 +615,9 @@ fn upload_thread(token: &Token, session_name: &str) -> (::std::thread::JoinHandl
                     Err(e) => {
                         match e {
                             ::std::sync::mpsc::TryRecvError::Empty => {
-                                thread::sleep_ms(10);
+                                let delay = time::Duration::from_millis(10);
+
+                                thread::sleep(delay);
                                 continue;
                             },
                             ::std::sync::mpsc::TryRecvError::Disconnected => {
@@ -1005,7 +1007,9 @@ pub fn sync(token: &Token,
                 }
             },
         };
-        thread::sleep_ms(500);
+        let delay = time::Duration::from_millis(500);
+
+        thread::sleep(delay);
     }
 
     debug!("processing session and statistics");
