@@ -3,3 +3,6 @@ members = ["libsafedrive", "safedrive", "safedrived"]
 
 [profile.release]
 debug = true
+
+[replace]
+"ring:0.7.3" = { git = "https://github.com/infincia/ring.git", branch = "infincia" }
