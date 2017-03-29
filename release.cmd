@@ -33,10 +33,7 @@ copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\libsodium.dll %CD%\dist-%TARGET%-%
 copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\libsodium.lib %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\libsodium.lib
 
 copy /y target\%TARGET%\release\safedrive.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.lib
-copy /y target\%TARGET%\release\safedrive.dll.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll.lib
-copy /y target\%TARGET%\release\safedrive.dll.exp dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll.exp
 copy /y target\%TARGET%\release\safedrive.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll
-copy /y target\%TARGET%\release\safedrive.pdb dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.pdb
 
 copy /y target\%TARGET%\release\safedrive.exe dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\
 
