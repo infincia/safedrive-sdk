@@ -74,7 +74,7 @@ impl From<KeyringError> for KeychainError {
             },
             #[cfg(target_os = "macos")]
             KeyringError::MacOsKeychainError(err) => {
-                KeychainError::KeychainInsertFailed(Box::new(err))
+                KeychainError::KeychainError(format!("{}", err))
             },
             KeyringError::NoBackendFound => {
                 KeychainError::KeychainUnavailable(Box::new(e))
@@ -84,11 +84,11 @@ impl From<KeyringError> for KeychainError {
             },
             #[cfg(target_os = "linux")]
             KeyringError::SecretServiceError(err) => {
-                KeychainError::KeychainInsertFailed(Box::new(err))
+                KeychainError::KeychainError(format!("{}", err))
             },
             #[cfg(target_os = "windows")]
             KeyringError::WindowsVaultError => {
-                KeychainError::KeychainUnavailable(Box::new(e))
+                KeychainError::KeychainError(format!("{}", err))
             }
         }
     }
