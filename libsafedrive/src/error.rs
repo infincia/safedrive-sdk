@@ -5,7 +5,6 @@ use std;
 use ::bip39::{Bip39Error};
 use ::rustc_serialize::hex::{FromHexError};
 
-#[cfg(feature = "keychain")]
 use ::keyring::KeyringError;
 
 
@@ -65,7 +64,6 @@ impl std::error::Error for KeychainError {
     }
 }
 
-#[cfg(feature = "keychain")]
 impl From<KeyringError> for KeychainError {
     fn from(e: KeyringError) -> KeychainError {
         match e {

@@ -35,7 +35,7 @@ semver = "^0.6.0"
 lz4 = "*"
 chrono = "*"
 number_prefix = "*"
-keyring = { version = "*", optional = true, git = "https://github.com/infincia/keyring-rs.git", branch = "infincia"  }
+keyring = { version = "*", git = "https://github.com/infincia/keyring-rs.git", branch = "infincia"  }
 fuse_mt = { version = "*", optional = true }
 time = "*"
 
@@ -49,8 +49,7 @@ crate-type = ["rlib", "cdylib"]
 doctest = false
 
 [features]
-default = ["keychain"]
+default = []
 
 locking = ["scopeguard"]
-keychain = ["keyring"]
 sessionfs = ["fuse_mt"]

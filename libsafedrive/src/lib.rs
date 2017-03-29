@@ -31,7 +31,6 @@ mod session;
 mod lock;
 mod chunk;
 mod oplog;
-#[cfg(feature = "keychain")]
 mod keychain;
 #[cfg(feature = "sessionfs")]
 mod sessionfs;
@@ -46,7 +45,6 @@ pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder, Acc
 pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
 pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
-#[cfg(feature = "keychain")]
 pub use keychain::{KeychainService};
 
 #[cfg(feature = "sessionfs")]
@@ -76,7 +74,6 @@ extern crate byteorder;
 extern crate blake2_rfc;
 extern crate time;
 
-#[cfg(feature = "keychain")]
 extern crate keyring;
 
 #[cfg(feature = "sessionfs")]
