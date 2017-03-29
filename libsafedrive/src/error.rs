@@ -11,6 +11,7 @@ use ::keyring::KeyringError;
 
 #[derive(Debug)]
 pub enum KeychainError {
+    KeychainError(String),
     KeychainUnavailable(Box<std::error::Error + Send + Sync>),
     KeychainItemMissing,
     KeychainInsertFailed(Box<std::error::Error + Send + Sync>),
@@ -20,6 +21,9 @@ pub enum KeychainError {
 impl std::fmt::Display for KeychainError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
+            KeychainError::KeychainError(ref string) => {
+                write!(f, "{}: {}", localized_str!("Keychain error", ""), string)
+            },
             KeychainError::KeychainUnavailable(ref err) => {
                 write!(f, "{}: {}", localized_str!("Keychain unavailable", ""), err)
             },
@@ -40,6 +44,7 @@ impl std::fmt::Display for KeychainError {
 impl std::error::Error for KeychainError {
     fn description(&self) -> &str {
         match *self {
+            KeychainError::KeychainError(ref string) => string,
             KeychainError::KeychainUnavailable(ref err) => err.description(),
             KeychainError::KeychainItemMissing => localized_str!("keychain item missing", ""),
             KeychainError::KeychainInsertFailed(ref err) => err.description(),
@@ -50,6 +55,7 @@ impl std::error::Error for KeychainError {
 
     fn cause(&self) -> Option<&std::error::Error> {
         match *self {
+            KeychainError::KeychainError(_) => None,
             KeychainError::KeychainUnavailable(ref err) => Some(&**err),
             KeychainError::KeychainItemMissing => None,
             KeychainError::KeychainInsertFailed(ref err) => Some(&**err),
