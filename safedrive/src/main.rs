@@ -476,7 +476,8 @@ fn main() {
         if m.is_present("list") {
             let (username, password) = match find_credentials() {
                 Ok((username, password)) => (username, password),
-                Err(_) => {
+                Err(e) => {
+                    error!("{}", e);
                     error!("No account found, try 'safedrive login --email <user@example.com>'");
                     std::process::exit(1);
                 },
@@ -557,7 +558,8 @@ pub fn sign_in() -> (Token, Keyset) {
 
     let (username, password) = match find_credentials() {
         Ok((username, password)) => (username, password),
-        Err(_) => {
+        Err(e) => {
+            error!("{}", e);
             error!("No account found, try 'safedrive login --email <user@example.com>'");
             std::process::exit(1);
         },
@@ -685,7 +687,8 @@ pub fn remove_client(token: Token) {
 pub fn info_for_client() {
     let (username, password) = match find_credentials() {
         Ok((username, password)) => (username, password),
-        Err(_) => {
+        Err(e) => {
+            error!("{}", e);
             error!("No account found, try 'safedrive login --email <user@example.com>'");
             std::process::exit(1);
         }
