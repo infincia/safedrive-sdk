@@ -378,14 +378,14 @@ dependencies = [
 [[package]]
 name = "keyring"
 version = "0.4.0"
-source = "git+https://github.com/infincia/keyring-rs.git?branch=infincia#6dc921f4dfcc737f2ef3e4956ac6e70e0de6db0d"
+source = "git+https://github.com/infincia/keyring-rs.git?branch=infincia#e4ba6d691a8a21f0cdc035716f62c45316bee45d"
 dependencies = [
  "advapi32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.22.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.23 (registry+https://github.com/rust-lang/crates.io-index)",
  "secret-service 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "security-framework 0.1.8 (git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support)",
+ "security-framework 0.1.13 (git+https://github.com/infincia/rust-security-framework.git?branch=infincia)",
  "winapi 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1010,30 +1010,25 @@ dependencies = [
 
 [[package]]
 name = "security-framework"
-version = "0.1.8"
-source = "git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support#c00a545656fc68bf1047f44fede6e7403e8d412c"
+version = "0.1.13"
+source = "git+https://github.com/infincia/rust-security-framework.git?branch=infincia#0efa205aa8d419987d28b60926b9341736e7b345"
 dependencies = [
  "core-foundation 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "core-foundation-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "security-framework-sys 0.1.8 (git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support)",
+ "security-framework-sys 0.1.13 (git+https://github.com/infincia/rust-security-framework.git?branch=infincia)",
 ]
 
 [[package]]
 name = "security-framework"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "core-foundation 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "core-foundation-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "security-framework-sys 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)",
-]
+replace = "security-framework 0.1.13 (git+https://github.com/infincia/rust-security-framework.git?branch=infincia)"
 
 [[package]]
 name = "security-framework-sys"
-version = "0.1.8"
-source = "git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support#c00a545656fc68bf1047f44fede6e7403e8d412c"
+version = "0.1.13"
+source = "git+https://github.com/infincia/rust-security-framework.git?branch=infincia#0efa205aa8d419987d28b60926b9341736e7b345"
 dependencies = [
  "MacTypes-sys 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "core-foundation-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1044,10 +1039,7 @@ dependencies = [
 name = "security-framework-sys"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "core-foundation-sys 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
-]
+replace = "security-framework-sys 0.1.13 (git+https://github.com/infincia/rust-security-framework.git?branch=infincia)"
 
 [[package]]
 name = "semver"
@@ -1568,10 +1560,10 @@ dependencies = [
 "checksum scopeguard 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c79eb2c3ac4bc2507cda80e7f3ac5b88bd8eae4c0914d5663e6a8933994be918"
 "checksum secret-service 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "2e5a0fbad2fc8af71fd4c3a645c3ce8f5506db366356a6bed30ccfef0b202e26"
 "checksum secur32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3f412dfa83308d893101dd59c10d6fda8283465976c28c287c5c855bf8d216bc"
+"checksum security-framework 0.1.13 (git+https://github.com/infincia/rust-security-framework.git?branch=infincia)" = "<none>"
 "checksum security-framework 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)" = "2a8396fe671bb1f80fa3f4ff2aae0e968de16ef18d37a4e5e514771a1f07726e"
-"checksum security-framework 0.1.8 (git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support)" = "<none>"
+"checksum security-framework-sys 0.1.13 (git+https://github.com/infincia/rust-security-framework.git?branch=infincia)" = "<none>"
 "checksum security-framework-sys 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)" = "573b031c5f672b298cca566fac71aceea00e41bc925e75b5ec7b44dc7237180a"
-"checksum security-framework-sys 0.1.8 (git+https://github.com/infincia/rust-security-framework.git?branch=add-password-support)" = "<none>"
 "checksum semver 0.1.20 (registry+https://github.com/rust-lang/crates.io-index)" = "d4f410fedcf71af0345d7607d246e7ad15faaadd49d240ee3b24e5dc21a820ac"
 "checksum semver 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7a3186ec9e65071a2095434b1f5bb24838d4e8e130f584c790f6033c79943537"
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
