@@ -86,7 +86,7 @@ impl From<KeyringError> for KeychainError {
             },
             #[cfg(target_os = "windows")]
             KeyringError::WindowsVaultError => {
-                KeychainError::KeychainError(format!("{}", err))
+                KeychainError::KeychainError(format!("{}", e))
             }
         }
     }
