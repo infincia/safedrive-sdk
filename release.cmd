@@ -24,8 +24,10 @@ call rustver.bat
 
 rustup override set %RUST_VER%
 
-cargo.exe build --release -p safedrive --target %TARGET%
+cargo.exe build --release -p libsafedrive --target %TARGET%
 cheddar -f libsafedrive\src\c_api.rs dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h
+
+cargo.exe build --release -p safedrive --target %TARGET%
 
 copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\libsodium.dll %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\libsodium.dll
 copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\libsodium.lib %CD%\dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\libsodium.lib
