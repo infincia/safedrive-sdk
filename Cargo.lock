@@ -853,7 +853,7 @@ dependencies = [
 [[package]]
 name = "ring"
 version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+source = "git+https://github.com/infincia/ring.git?branch=infincia#eb8fb16712fd935d813d3b39f1111b383214211d"
 dependencies = [
  "gcc 0.3.45 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -861,6 +861,12 @@ dependencies = [
  "rayon 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "untrusted 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "ring"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+replace = "ring 0.7.3 (git+https://github.com/infincia/ring.git?branch=infincia)"
 
 [[package]]
 name = "rpassword"
@@ -1547,6 +1553,7 @@ dependencies = [
 "checksum regex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4278c17d0f6d62dfef0ab00028feb45bd7d2102843f80763474eeb1be8a10c01"
 "checksum regex-syntax 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2f9191b1f57603095f105d317e375d19b1c9c5c3185ea9633a99a6dcbed04457"
 "checksum reqwest 0.5.0 (git+https://github.com/infincia/reqwest.git?branch=rustls)" = "<none>"
+"checksum ring 0.7.3 (git+https://github.com/infincia/ring.git?branch=infincia)" = "<none>"
 "checksum ring 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3ee2899d039d933a84eeba04312f7a270b42785cb260fafbfe57839a7118bb97"
 "checksum rpassword 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ec4bdede957362ec6fdd550f7e79c6d14cad2bc26b2d062786234c6ee0cb27bb"
 "checksum rpassword 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "72556b202b5b38d0b69b0fdced60cf92dec7e37640c98eb9d7baf5bd86dc8e1a"
