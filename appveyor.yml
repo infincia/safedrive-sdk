@@ -6,42 +6,42 @@ environment:
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      TOOLSET: v120
+      TOOLSET: v120_xp
       ESCRIPT: v120_xp.bat
       LINKTYPE: static
     - TARGET: x86_64-pc-windows-msvc
       ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      TOOLSET: v120
+      TOOLSET: v120_xp
       ESCRIPT: v120_xp64.bat
       LINKTYPE: static
     - TARGET: i686-pc-windows-msvc
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      TOOLSET: v140
+      TOOLSET: v140_xp
       ESCRIPT: v140_xp.bat
       LINKTYPE: static
     - TARGET: x86_64-pc-windows-msvc
       ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      TOOLSET: v140
+      TOOLSET: v140_xp
       ESCRIPT: v140_xp64.bat
       LINKTYPE: static
     - TARGET: i686-pc-windows-msvc
       ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: v141
+      TOOLSET: v141_xp
       ESCRIPT: v141_xp.bat
       LINKTYPE: static
     - TARGET: x86_64-pc-windows-msvc
       ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: v141
+      TOOLSET: v141_xp
       ESCRIPT: v141_xp64.bat
       LINKTYPE: static
 
