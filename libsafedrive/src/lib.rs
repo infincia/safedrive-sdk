@@ -11,6 +11,8 @@ extern crate chrono;
 
 extern crate number_prefix;
 
+extern crate reed_solomon;
+
 #[macro_use]
 mod localized;
 

@@ -38,6 +38,7 @@ number_prefix = "*"
 keyring = { version = "*", git = "https://github.com/infincia/keyring-rs.git", branch = "infincia"  }
 fuse_mt = { version = "*", optional = true }
 time = "*"
+reed-solomon = "*"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = { version = "*", features = ["exception"] }
