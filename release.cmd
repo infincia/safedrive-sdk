@@ -1,7 +1,7 @@
 IF [%ARCH%]==[] set ARCH=x86_64
 IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141
-IF [%LINKTYPE%]==[] set LINKTYPE=dll
+IF [%LINKTYPE%]==[] set LINKTYPE=static
 
 set LIBPREFIX=
 IF [%TOOLSET%]==[v141] set LIBPREFIX=lib
