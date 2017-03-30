@@ -50,7 +50,7 @@ IF "%BUILD%"=="true" (
     7z x -y libsodium-%SODIUM_VER%.tar.gz
     7z x -y libsodium-%SODIUM_VER%.tar
     cd libsodium-%SODIUM_VER%
-    msbuild /m /v:n /p:Configuration=%CONFIGURATION% /p:OutDir=%BUILD_PREFIX%\lib\;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln
+    msbuild /m /v:n /p:OutDir=%BUILD_PREFIX%\lib\;Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln
     cd ..
     del /q libsodium-%SODIUM_VER%
     del /q libsodium-%SODIUM_VER%.tar
