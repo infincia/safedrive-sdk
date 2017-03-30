@@ -8,7 +8,7 @@ ECHO testing SafeDrive for Windows-%ARCH%
 set SODIUM_LIB_DIR=%CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib
 set RUST_BACKTRACE="1"
 
-IF "%LINKTYPE%"=="mt" (
+IF "%LINKTYPE%"=="static" (
     set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
     set SODIUM_STATIC=""
 )
