@@ -34,7 +34,7 @@ IF "%ARCH%"=="x86_64" (
 )
 
 IF "%ARCH%"=="x86" (
-    set PLATFORM=x86
+    set PLATFORM=Win32
 )
 
 set SODIUM_VER=1.0.12
