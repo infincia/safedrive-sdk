@@ -4,9 +4,7 @@ IF [%TOOLSET%]==[] set TOOLSET=v141_xp
 IF [%LINKTYPE%]==[] set LINKTYPE=static
 
 set LIBPREFIX=
-IF [%TOOLSET%]==[v141] set LIBPREFIX=lib
-
-
+IF [%TOOLSET%]==[v141_xp] set LIBPREFIX=lib
 
 ECHO building SafeDrive for Windows-%ARCH%
 
