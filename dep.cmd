@@ -55,6 +55,6 @@ IF "%BUILD%"=="true" (
     del /q libsodium-%SODIUM_VER%
     del /q libsodium-%SODIUM_VER%.tar
     del /q libsodium-%SODIUM_VER%.tar.gz
-    copy /y %BUILD_PREFIX%\lib\%LIBPREFIX%sodium.%LIBSUFFIX% %BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%
+    copy /y %BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX% %BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%
     @echo %SODIUM_VER%> %SODIUM_VER_FILE%
 )
