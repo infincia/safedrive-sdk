@@ -23,6 +23,8 @@ IF "%LINKTYPE%"=="static" (
     set SODIUM_STATIC=""
 )
 
+call dep.cmd
+
 call rustver.bat
 
 rustup override set %RUST_VER%
