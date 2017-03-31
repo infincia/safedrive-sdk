@@ -55,6 +55,10 @@ pub static SECRETBOX_MAC_SIZE: usize = ::sodiumoxide::crypto::secretbox::MACBYTE
 /// API constants
 pub static MULTIPART_BOUNDARY: &'static str = "SAFEDRIVEBINARY";
 
+/// key constants
+
+pub static KEY_ECC_LEN: usize = 48;
+
 /// keychain constants
 
 static SD_ACCOUNT_CREDENTIAL_DOMAIN_PRODUCTION: &'static str = "safedrive.io";
