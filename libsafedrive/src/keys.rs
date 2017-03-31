@@ -371,6 +371,14 @@ fn key_generate_test() {
 }
 
 #[test]
+fn key_wrap_test() {
+    let master_key = Key::new(KeyType::Master);
+    let main_key = Key::new(KeyType::Main);
+    let wrapped_main_key: WrappedKey = main_key.to_wrapped(&master_key, None).expect("failed to wrap key");
+    assert!(wrapped_main_key.bytes.len() == 48, "invalid key length");
+}
+
+#[test]
 fn key_unwrap_test() {
     let wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
