@@ -364,6 +364,13 @@ fn keyset_generate_test() {
 }
 
 #[test]
+fn key_generate_test() {
+    let key = Key::new(KeyType::Master);
+
+    assert!(key.bytes.len() == 32, "key size invalid");
+}
+
+#[test]
 fn key_unwrap_test() {
     let wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
