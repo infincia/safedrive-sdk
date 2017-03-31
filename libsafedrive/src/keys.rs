@@ -3,6 +3,7 @@
 
 use ::bip39::{Bip39, Language};
 use ::rustc_serialize::hex::{ToHex, FromHex};
+use reed_solomon::Encoder as RSEncoder;
 use reed_solomon::Decoder as RSDecoder;
 
 /// internal imports
@@ -225,6 +226,15 @@ impl WrappedKey {
         };
 
         Ok(Key { bytes: key_raw, key_type: self.key_type })
+    }
+
+    fn to_rs(&self) -> Vec<u8> {
+        let enc = RSEncoder::new(KEY_ECC_LEN);
+        let encoded = enc.encode(self.bytes.as_slice());
+
+        let ecc = *encoded;
+
+        ecc.to_vec()
     }
 }
 
