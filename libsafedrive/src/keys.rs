@@ -3,6 +3,7 @@
 
 use ::bip39::{Bip39, Language};
 use ::rustc_serialize::hex::{ToHex, FromHex};
+use reed_solomon::Decoder as RSDecoder;
 
 /// internal imports
 
@@ -182,6 +183,16 @@ impl WrappedKey {
     pub fn from(key: Vec<u8>, key_type: KeyType) -> WrappedKey {
 
         WrappedKey { bytes: key, key_type: key_type }
+    }
+
+    pub fn from_rs(coded_key: Vec<u8>, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
+        let mut key = coded_key;
+
+        let dec = RSDecoder::new(KEY_ECC_LEN);
+
+        let recovered = dec.correct(&mut key, None)?;
+
+        Ok(WrappedKey::from(recovered.data().to_vec(), key_type))
     }
 
     pub fn from_hex(hex_key: String, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
