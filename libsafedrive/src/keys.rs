@@ -356,7 +356,7 @@ impl Key {
 
 
 #[test]
-fn key_generate_test() {
+fn keyset_generate_test() {
     let _ = match WrappedKeyset::new() {
         Ok(wks) => wks,
         Err(_) => { assert!(true == false); return }
