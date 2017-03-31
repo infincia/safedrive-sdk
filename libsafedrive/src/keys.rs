@@ -108,6 +108,12 @@ impl WrappedKeyset {
         let tweak_key = Key::new(tweak_key_type);
         let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key, None));
         debug!("generated key set");
+        debug!("new recovery phrase: {}", recovery_phrase);
+        debug!("new master key: {}", master_key_wrapped.to_hex());
+        debug!("new main key: {}", main_key_wrapped.to_hex());
+        debug!("new hmac key: {}", hmac_key_wrapped.to_hex());
+        debug!("new tweak key: {}", tweak_key_wrapped.to_hex());
+
 
         Ok( WrappedKeyset { recovery: Some(recovery_phrase), master: master_key_wrapped, main: main_key_wrapped, hmac: hmac_key_wrapped, tweak: tweak_key_wrapped })
 
