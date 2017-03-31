@@ -6,7 +6,7 @@ use ::bip39::{Bip39Error};
 use ::rustc_serialize::hex::{FromHexError};
 
 use ::keyring::KeyringError;
-
+use reed_solomon::DecoderError;
 
 #[derive(Debug)]
 pub enum KeychainError {
@@ -181,6 +181,13 @@ impl std::error::Error for CryptoError {
 impl From<FromHexError> for CryptoError {
     fn from(e: FromHexError) -> CryptoError {
         CryptoError::KeyInvalid
+    }
+}
+
+#[allow(unused_variables)]
+impl From<DecoderError> for CryptoError {
+    fn from(e: DecoderError) -> CryptoError {
+        CryptoError::KeyMissing
     }
 }
 
