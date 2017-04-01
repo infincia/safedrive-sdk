@@ -387,6 +387,7 @@ impl From<CryptoError> for SDError {
     fn from(e: CryptoError) -> Self {
         match e {
             CryptoError::RecoveryPhraseIncorrect => SDError::RecoveryPhraseIncorrect,
+            CryptoError::KeyCorrupted => SDError::KeyCorrupted,
 
             _ =>  SDError::CryptoError(Box::new(e))
         }
