@@ -84,6 +84,8 @@ public enum SDKErrorType: Int {
     case ServiceUnavailable = 0x0014
     case Cancelled = 0x0015
     case FolderMissing = 0x0016
+    case KeyCorrupted = 0x0017
+
 }
 
 public struct SDKError {
@@ -157,6 +159,8 @@ extension SDKError:  CustomNSError {
             return SDErrorDomainNotReported
         case .FolderMissing:
             return SDErrorDomainNotReported
+        case .KeyCorrupted:
+            return SDErrorDomainReported
         }
     }
     
