@@ -197,7 +197,16 @@ impl WrappedKey {
     }
 
     pub fn from_hex(hex_key: String, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
-        Ok(WrappedKey::from(try!(hex_key.from_hex()), key_type))
+        let mut key = hex_key.from_hex()?;
+
+        // short path if the key has no ecc info
+        if key.len() == 48 {
+            return Ok(WrappedKey::from(key, key_type))
+        }
+
+        let recovered = WrappedKey::from_rs(key, key_type)?;
+
+        Ok(recovered)
     }
 
     pub fn to_key(&self, wrapping_key: &Key, nonce: Option<&::sodiumoxide::crypto::secretbox::Nonce>) -> Result<Key, CryptoError> {
