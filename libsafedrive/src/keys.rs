@@ -255,7 +255,7 @@ impl AsRef<[u8]> for WrappedKey {
 
 impl ToHex for WrappedKey {
     fn to_hex(&self) -> String {
-        self.bytes.to_hex()
+        self.to_rs().to_hex()
     }
 }
 
