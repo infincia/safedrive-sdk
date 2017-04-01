@@ -96,7 +96,7 @@ impl From<KeyringError> for KeychainError {
 #[derive(Debug)]
 pub enum CryptoError {
     KeyInvalid,
-    KeyMissing,
+    KeyCorrupted,
     RecoveryPhraseInvalid(Box<std::error::Error + Send + Sync>),
     RecoveryPhraseIncorrect,
     KeyGenerationFailed,
@@ -113,8 +113,8 @@ impl std::fmt::Display for CryptoError {
             CryptoError::KeyInvalid => {
                 write!(f, "{}", localized_str!("Invalid key used", ""))
             },
-            CryptoError::KeyMissing => {
-                write!(f, "{}", localized_str!("Missing key", ""))
+            CryptoError::KeyCorrupted => {
+                write!(f, "{}", localized_str!("Corrupted key", ""))
             },
             CryptoError::RecoveryPhraseInvalid(ref err) => {
                 write!(f, "{}: {}", localized_str!("Recovery phrase incorrect", ""), err)
@@ -149,7 +149,7 @@ impl std::error::Error for CryptoError {
     fn description(&self) -> &str {
         match *self {
             CryptoError::KeyInvalid => localized_str!("invalid key found", ""),
-            CryptoError::KeyMissing => localized_str!("key missing", ""),
+            CryptoError::KeyCorrupted => localized_str!("key corrupted", ""),
             CryptoError::RecoveryPhraseInvalid(ref err) => err.description(),
             CryptoError::RecoveryPhraseIncorrect => localized_str!("recovery phrase incorrect", ""),
             CryptoError::KeyGenerationFailed => localized_str!("key generation failed", ""),
@@ -164,7 +164,7 @@ impl std::error::Error for CryptoError {
     fn cause(&self) -> Option<&std::error::Error> {
         match *self {
             CryptoError::KeyInvalid => None,
-            CryptoError::KeyMissing => None,
+            CryptoError::KeyCorrupted => None,
             CryptoError::RecoveryPhraseInvalid(ref err) => Some(&**err),
             CryptoError::RecoveryPhraseIncorrect => None,
             CryptoError::KeyGenerationFailed => None,
@@ -187,7 +187,9 @@ impl From<FromHexError> for CryptoError {
 #[allow(unused_variables)]
 impl From<DecoderError> for CryptoError {
     fn from(e: DecoderError) -> CryptoError {
-        CryptoError::KeyMissing
+        match e {
+            DecoderError::TooManyErrors => CryptoError::KeyCorrupted,
+        }
     }
 }
 
@@ -218,6 +220,7 @@ pub enum SDError {
     BlockUnreadable,
     SessionUnreadable,
     RecoveryPhraseIncorrect,
+    KeyCorrupted,
     InsufficientFreeSpace,
     Authentication,
     UnicodeError,
@@ -245,6 +248,7 @@ impl std::error::Error for SDError {
             SDError::BlockUnreadable => localized_str!("block cannot be used", ""),
             SDError::SessionUnreadable => localized_str!("session cannot be used", ""),
             SDError::RecoveryPhraseIncorrect => localized_str!("recovery phrase incorrect", ""),
+            SDError::KeyCorrupted => localized_str!("key corrupted", ""),
             SDError::InsufficientFreeSpace => localized_str!("insufficient free space", ""),
             SDError::Authentication => localized_str!("authentication failed", ""),
             SDError::UnicodeError => localized_str!("not valid unicode", ""),
@@ -272,6 +276,7 @@ impl std::error::Error for SDError {
             SDError::BlockUnreadable => None,
             SDError::SessionUnreadable => None,
             SDError::RecoveryPhraseIncorrect => None,
+            SDError::KeyCorrupted => None,
             SDError::InsufficientFreeSpace => None,
             SDError::Authentication => None,
             SDError::UnicodeError => None,
@@ -324,6 +329,9 @@ impl std::fmt::Display for SDError {
             },
             SDError::RecoveryPhraseIncorrect => {
                 write!(f, "{}", localized_str!("Recovery phrase incorrect", ""))
+            },
+            SDError::KeyCorrupted => {
+                write!(f, "{}", localized_str!("Key corrupted, recover from backup", ""))
             },
             SDError::InsufficientFreeSpace => {
                 write!(f, "{}", localized_str!("Insufficient free space", ""))
