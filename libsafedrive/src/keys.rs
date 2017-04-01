@@ -512,6 +512,245 @@ fn key_unwrap_uppercase_master_generated_by_sdk_00318_test() {
 }
 
 #[test]
+fn key_unwrap_uppercase_master_generated_by_sdk_00600_test() {
+    let phrase = "special cheap live sing proud ethics public you apology outside empty person";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let wrapped_master_hex = "CAEC81365F37D055C53545E74C34A35C8031D6E6810BFEEBBC119C7C34892176BBF19AE24C322EF6F9B385B1C5B01640C0CFFAA2AA4827DF9E054E12E73251C2F7D7713C778A2D14BACAF587B01EF2BD51D3A883D4CBA0C6DC0E6E702DB7568F";
+
+    let wrapped_master = WrappedKey::from_hex(wrapped_master_hex.to_owned(), KeyType::Master).expect("Failed to decode key hex");
+    assert!(wrapped_master.bytes.len() == 48, "invalid wrapped master key length");
+
+    let master = match wrapped_master.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(master.bytes.len() == 32, "invalid master key length");
+}
+
+#[test]
+fn key_unwrap_lowercase_master_generated_by_sdk_00600_test() {
+    let phrase = "special cheap live sing proud ethics public you apology outside empty person";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let wrapped_master_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
+
+    let wrapped_master = WrappedKey::from_hex(wrapped_master_hex.to_owned(), KeyType::Master).expect("Failed to decode key hex");
+    assert!(wrapped_master.bytes.len() == 48, "invalid wrapped master key length");
+
+    let master = match wrapped_master.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(master.bytes.len() == 32, "invalid master key length");
+}
+
+#[test]
+fn key_unwrap_lowercase_keyset_generated_by_sdk_00600_test() {
+    let phrase = "special cheap live sing proud ethics public you apology outside empty person";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let wrapped_master_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
+    let wrapped_main_hex = "405975cfb94e00fb2fa794cc50d5d8389eaddb224edd4f92fd739a6821af8e999f69736f1c8a69e40c3dede2f1eefaac6144fd143065a43469304b56ecb3160d92e4c280895607752347a70d541ef0259f7347644f913c1fc8c87dcc9ca68104";
+    let wrapped_hmac_hex = "4dbc87f0ba2d5e6ad37c2fa86d790df01957ab1f4ea5055704ce8f27602c985686316c9c0811b4fa36d871e67221322918f1e242ada5b268c32124d8873d8683ec67d5512f5f1b38aa614e98768565f7d98333146a231c8a803a9aeaa220ad3b";
+    let wrapped_tweak_hex = "abf16c9cd3516db370731b6377b4b54accc804502e1ca53666d411f4e8264b7989a75b3c97584f9b6e18c449f03bd999e92cf5aaeb03024111e1989072ee9830b4a76e8440e493861acff7a6efcfae648e1d4bcc7fc0f28509710caeb87cce1e";
+
+
+
+    let wrapped_master = WrappedKey::from_hex(wrapped_master_hex.to_owned(), KeyType::Master).expect("Failed to decode key hex");
+    assert!(wrapped_master.bytes.len() == 48, "invalid wrapped master key length");
+
+    let wrapped_main = WrappedKey::from_hex(wrapped_main_hex.to_owned(), KeyType::Main).expect("Failed to decode key hex");
+    assert!(wrapped_main.bytes.len() == 48, "invalid wrapped main key length");
+
+    let wrapped_hmac = WrappedKey::from_hex(wrapped_hmac_hex.to_owned(), KeyType::HMAC).expect("Failed to decode key hex");
+    assert!(wrapped_hmac.bytes.len() == 48, "invalid wrapped hmac key length");
+
+    let wrapped_tweak = WrappedKey::from_hex(wrapped_tweak_hex.to_owned(), KeyType::Tweak).expect("Failed to decode key hex");
+    assert!(wrapped_tweak.bytes.len() == 48, "invalid wrapped tweak key length");
+
+    // check the master key
+
+    let master = match wrapped_master.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(master.bytes.len() == 32, "invalid master key length");
+
+    // check the main key
+
+    let main = match wrapped_main.to_key(&master, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(main.bytes.len() == 32, "invalid main key length");
+
+    // check the hmac key
+
+    let hmac = match wrapped_hmac.to_key(&master, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(hmac.bytes.len() == 32, "invalid hmac key length");
+
+    // check the tweak key
+
+    let tweak = match wrapped_tweak.to_key(&master, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(tweak.bytes.len() == 32, "invalid tweak key length");
+}
+
+#[test]
+fn key_unwrap_corrupt_hex_generated_by_sdk_00600_test() {
+    let phrase = "special cheap live sing proud ethics public you apology outside empty person";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let original_master_wrapped_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
+    let corrupt_master_wrapped_hex =  "000000000000000000000000000000000000000000000000bc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
+
+    let original_master_wrapped = WrappedKey::from_hex(original_master_wrapped_hex.to_owned(), KeyType::Master).expect("Failed to decode key");
+    assert!(original_master_wrapped.bytes.len() == 48, "invalid original wrapped master key length");
+
+    let original_master = match original_master_wrapped.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+    assert!(original_master.bytes.len() == 32, "invalid original master key length");
+
+
+    let corrected_master_wrapped = WrappedKey::from_hex(corrupt_master_wrapped_hex.to_owned(), KeyType::Master).expect("Failed to decode key");
+    assert!(corrected_master_wrapped.bytes.len() == 48, "invalid corrected wrapped master key length");
+
+    let corrected_master = match corrected_master_wrapped.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(corrected_master.bytes.len() == 32, "invalid corrected master key length");
+
+    assert!(corrected_master.bytes == original_master.bytes, "corrected master key bytes do not match original");
+}
+
+#[test]
+fn key_unwrap_corrupt_ecc_generated_by_sdk_00600_test() {
+    let phrase = "special cheap live sing proud ethics public you apology outside empty person";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let original_master_wrapped_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
+    let corrupt_master_wrapped_hex =  "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14000000000000000000000000000000000000000000000000";
+
+    let original_master_wrapped = WrappedKey::from_hex(original_master_wrapped_hex.to_owned(), KeyType::Master).expect("Failed to decode key");
+    assert!(original_master_wrapped.bytes.len() == 48, "invalid original wrapped master key length");
+
+    let original_master = match original_master_wrapped.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+    assert!(original_master.bytes.len() == 32, "invalid original master key length");
+
+
+    let corrected_master_wrapped = WrappedKey::from_hex(corrupt_master_wrapped_hex.to_owned(), KeyType::Master).expect("Failed to decode key");
+    assert!(corrected_master_wrapped.bytes.len() == 48, "invalid corrected wrapped master key length");
+
+    let corrected_master = match corrected_master_wrapped.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(corrected_master.bytes.len() == 32, "invalid corrected master key length");
+
+    assert!(corrected_master.bytes == original_master.bytes, "corrected master key bytes do not match original");
+}
+
+#[test]
+#[should_panic]
+fn key_unwrap_corrupt_ecc_too_damaged_generated_by_sdk_00600_test() {
+    let phrase = "special cheap live sing proud ethics public you apology outside empty person";
+
+    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let recovery_key = Key::from(mnemonic);
+
+    let original_master_wrapped_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
+    let corrupt_master_wrapped_hex =  "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c00000000000000000000000000000000000000000000000000000000";
+
+    let original_master_wrapped = WrappedKey::from_hex(original_master_wrapped_hex.to_owned(), KeyType::Master).expect("Failed to decode key");
+    assert!(original_master_wrapped.bytes.len() == 48, "invalid original wrapped master key length");
+
+    let original_master = match original_master_wrapped.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+    assert!(original_master.bytes.len() == 32, "invalid original master key length");
+
+
+    let corrected_master_wrapped = WrappedKey::from_hex(corrupt_master_wrapped_hex.to_owned(), KeyType::Master).expect("Failed to decode key");
+    assert!(corrected_master_wrapped.bytes.len() == 48, "invalid corrected wrapped master key length");
+
+    let corrected_master = match corrected_master_wrapped.to_key(&recovery_key, None) {
+        Ok(k) => k,
+        Err(e) => {
+            assert!(true == false, format!("{}", e));
+            return
+        }
+    };
+
+    assert!(corrected_master.bytes.len() == 32, "invalid corrected master key length");
+
+    assert!(corrected_master.bytes == original_master.bytes, "corrected master key bytes do not match original");
+}
+
+#[test]
 #[should_panic]
 fn key_unwrap_failing_master_test() {
     let phrase = "hockey increase universe rib stone nothing someone sentence click game fresh vessel";
