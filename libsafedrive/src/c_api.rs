@@ -279,6 +279,7 @@ pub enum SDDKErrorType {
     ServiceUnavailable = 0x0014,
     Cancelled = 0x0015,
     FolderMissing = 0x0016,
+    KeyCorrupted = 0x0017,
 }
 
 #[derive(Debug)]
@@ -323,6 +324,9 @@ impl From<SDError> for SDDKError {
             },
             SDError::RecoveryPhraseIncorrect => {
                 SDDKErrorType::RecoveryPhraseIncorrect
+            },
+            SDError::KeyCorrupted => {
+                SDDKErrorType::KeyCorrupted
             },
             SDError::InsufficientFreeSpace => {
                 SDDKErrorType::InsufficientFreeSpace
