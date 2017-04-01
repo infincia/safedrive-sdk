@@ -415,6 +415,49 @@ fn key_wrap_test() {
 }
 
 #[test]
+fn key_rs_correction_test() {
+    let master_key = Key::new(KeyType::Master);
+    let main_key = Key::new(KeyType::Main);
+
+    let wrapped_main_key: WrappedKey = main_key.to_wrapped(&master_key, None).expect("failed to wrap key");
+    assert!(wrapped_main_key.bytes.len() == 48, "invalid key length");
+
+    let mut wrapped_main_key_ecc = wrapped_main_key.to_rs();
+    assert!(wrapped_main_key_ecc.len() == 96, "invalid ecc key length");
+    let mut wrapped_main_key_ecc_slice = wrapped_main_key_ecc.as_mut_slice();
+
+    // destroy 12 bytes of the key in different places
+    wrapped_main_key_ecc_slice[0] = 0;
+    wrapped_main_key_ecc_slice[2] = 0;
+    wrapped_main_key_ecc_slice[3] = 0;
+    wrapped_main_key_ecc_slice[4] = 0;
+    wrapped_main_key_ecc_slice[5] = 0;
+    wrapped_main_key_ecc_slice[6] = 0;
+    wrapped_main_key_ecc_slice[7] = 0;
+    wrapped_main_key_ecc_slice[12] = 0;
+    wrapped_main_key_ecc_slice[14] = 0;
+    wrapped_main_key_ecc_slice[20] = 0;
+    wrapped_main_key_ecc_slice[24] = 0;
+    wrapped_main_key_ecc_slice[30] = 0;
+
+    // destroy part of the ecc code
+    wrapped_main_key_ecc_slice[95] = 0;
+
+    assert!(wrapped_main_key_ecc_slice.len() == 96, "invalid ecc key length");
+
+
+    let wrapped_main_key_corrupted_hex = wrapped_main_key_ecc_slice.to_hex();
+    assert!(wrapped_main_key_corrupted_hex.len() == 192, "invalid ecc hex key length");
+
+
+    let recovered_main_key = WrappedKey::from_hex(wrapped_main_key_corrupted_hex, KeyType::Main).expect("key recovery failed");
+
+    let main = recovered_main_key.to_key(&master_key, None).expect("failed to unwrap recovered key");
+    assert!(main.bytes.len() == 32, "invalid key length");
+
+}
+
+#[test]
 fn key_unwrap_test() {
     let wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
