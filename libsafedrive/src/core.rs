@@ -1505,6 +1505,13 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
     let gcv = CLIENT_VERSION.read();
     let gos = OPERATING_SYSTEM.read();
 
+    // clone the memory log to avoid holding the lock for the duration of the API call
+    let log_messages: Vec<String> = {
+        let log = LOG.read();
+
+        (*log).clone()
+    };
+
     let cv: &str = match client_version {
         Some(ref cv) => cv,
         None => {
@@ -1519,7 +1526,7 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
         }
     };
 
-    match report_error(cv, os, unique_client_id, description, context, log) {
+    match report_error(cv, os, unique_client_id, description, context, &log_messages) {
         Ok(()) => return Ok(()),
         Err(e) => Err(SDError::from(e))
     }

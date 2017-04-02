@@ -92,7 +92,7 @@ impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync +
 #[derive(Serialize, Debug)]
 #[serde(untagged)]
 pub enum APIEndpoint<'a> {
-    ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str] },
+    ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a Vec<String> },
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
     UnregisterClient,
     GetClients { email: &'a str, password: &'a str },
@@ -290,7 +290,7 @@ impl<'a> APIEndpoint<'a> {
 
 /// SD API
 #[allow(dead_code)]
-pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operatingSystem: &'a str, description: &'a str, context: &'a str, log: &'a [&'a str]) -> Result<(), SDAPIError> {
+pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operatingSystem: &'a str, description: &'a str, context: &'a str, log: &'a Vec<String>) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
 
