@@ -197,7 +197,7 @@ impl WrappedKey {
     }
 
     pub fn from_hex(hex_key: String, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
-        let mut key = hex_key.from_hex()?;
+        let key = hex_key.from_hex()?;
 
         // short path if the key has no ecc info
         if key.len() == 48 {
