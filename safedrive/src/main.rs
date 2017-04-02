@@ -333,11 +333,9 @@ fn main() {
     let app_directory = get_app_directory(&config).expect("Error: could not determine local storage directory");
     debug!("Using local dir: {:?}", &app_directory);
 
-    let client_version = format!("{} {}", NAME, VERSION);
-
     let operating_system = get_current_os();
 
-    match initialize(&client_version, false, operating_system, "en_US", config, log_level, &app_directory) {
+    match initialize(&VERSION, false, operating_system, "en_US", config, log_level, &app_directory) {
         Ok(()) => {},
         Err(e) => {
             error!("failed to initialize libsafedrive: {}", e);
