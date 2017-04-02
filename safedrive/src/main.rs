@@ -1,7 +1,4 @@
 #[macro_use] extern crate log;
-extern crate simplelog;
-
-use ::simplelog::{Config, TermLogger};
 
 #[macro_use] extern crate prettytable;
 use prettytable::Table;
@@ -305,8 +302,6 @@ fn main() {
         1 => ::log::LogLevelFilter::Debug,
         2 | _ => ::log::LogLevelFilter::Trace,
     };
-
-    let _ = TermLogger::init(log_level, Config::default()).unwrap();
 
     println!("{} {}", NAME, VERSION);
     println!("{}", COPYRIGHT);
