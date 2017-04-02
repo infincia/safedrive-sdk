@@ -7,6 +7,8 @@ extern crate lz4;
 
 #[macro_use] extern crate log;
 
+extern crate simplelog;
+
 extern crate chrono;
 
 extern crate number_prefix;
