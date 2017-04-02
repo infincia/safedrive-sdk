@@ -67,12 +67,6 @@ pub enum SDDKConfiguration {
 
 #[derive(Debug)]
 #[repr(C)]
-pub struct SDDKLogLine {
-    pub line: *const std::os::raw::c_char,
-}
-
-#[derive(Debug)]
-#[repr(C)]
 pub struct SDDKNotification {
     pub title: *const std::os::raw::c_char,
     pub message: *const std::os::raw::c_char,
