@@ -16,7 +16,6 @@ serde_derive = "^0.9"
 log = "*"
 prettytable-rs = "*"
 chrono = "^0.3"
-simplelog = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"
