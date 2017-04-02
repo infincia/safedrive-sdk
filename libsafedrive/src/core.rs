@@ -100,7 +100,7 @@ pub fn get_version() -> String {
 
 /// internal functions
 
-pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration, log_level: LogLevelFilter, local_storage_path: &Path) -> Result<(), SDError> {
+pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: &'a str, language_code: &'a str, config: Configuration, log_level: LogLevelFilter, local_storage_path: &Path) -> Result<(), SDError> {
     if !::sodiumoxide::init() == true {
         panic!("sodium initialization failed, cannot continue");
     }
@@ -120,6 +120,15 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
 
     let mut lc = LANGUAGE_CODE.write();
     *lc = language_code.to_string();
+
+    let app_type = match desktop {
+        true => {
+            "desktop".to_owned()
+        },
+        false => {
+            "cli".to_owned()
+        }
+    };
 
     if let Err(e) = fs::create_dir_all(local_storage_path) {
         debug!("failed to create local directories: {}", e);

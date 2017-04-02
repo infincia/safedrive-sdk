@@ -337,7 +337,7 @@ fn main() {
 
     let operating_system = get_current_os();
 
-    match initialize(&client_version, operating_system, "en_US", config, log_level, &app_directory) {
+    match initialize(&client_version, false, operating_system, "en_US", config, log_level, &app_directory) {
         Ok(()) => {},
         Err(e) => {
             error!("failed to initialize libsafedrive: {}", e);

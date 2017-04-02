@@ -591,7 +591,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
     let storage_path = Path::new(&storage_directory);
 
-    match initialize(&cv, &os, &langc, c, ::log::LogLevelFilter::Info, storage_path) {
+    match initialize(&cv, true, &os, &langc, c, ::log::LogLevelFilter::Info, storage_path) {
         Ok(()) => {
 
             let sstate = State::new();
