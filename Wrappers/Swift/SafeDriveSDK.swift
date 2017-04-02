@@ -801,7 +801,7 @@ public class SafeDriveSDK: NSObject {
     
     
     // SDAPI
-    public func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, withLog log: [String], completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
         
@@ -809,13 +809,9 @@ public class SafeDriveSDK: NSObject {
             
             let context = error.domain
             
-            let sl = SDDKLogLinesFromLog(log: log)
-            
-            let sl_count = UInt64(log.count)
-            
             var s_error: UnsafeMutablePointer<SDDKError>? = nil
             
-            let res = sddk_report_error(clientVersion, os, uniqueClientId, description, context, sl, sl_count, &s_error)
+            let res = sddk_report_error(clientVersion, os, uniqueClientId, description, context, &s_error)
             defer {
                 if res == -1 {
                     sddk_free_error(&s_error)
