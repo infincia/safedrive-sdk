@@ -2532,9 +2532,6 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 ///     context: a NULL terminated string representing any context that should be included in the
 ///              error report
 ///
-///     log: a pointer to an array of SDDKLogLine structs, caller retains ownership of the memory
-///          and must free it after use
-///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
 ///
@@ -2572,8 +2569,6 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
                                     unique_client_id: *const std::os::raw::c_char,
                                     description: *const std::os::raw::c_char,
                                     context: *const std::os::raw::c_char,
-                                    log: *const SDDKLogLine,
-                                    logline_count: u64,
                                     mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
     let ucid: String = unsafe {
@@ -2615,28 +2610,6 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
         cont
     };
 
-    let rlog = unsafe {
-        assert!(!log.is_null());
-        let loglines = std::slice::from_raw_parts(log, logline_count as usize);
-
-        let mut rlv: Vec<&str > = Vec::new();
-
-        for line in loglines {
-            assert!(!line.line.is_null());
-
-            let c_line: &CStr = CStr::from_ptr(line.line);
-
-            let l = match c_line.to_str() {
-                Ok(s) => s,
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
-            };
-
-            rlv.push(l);
-        }
-
-        rlv
-    };
-
     let ver: Option<String> = unsafe {
         if client_version.is_null() {
             None
@@ -2668,7 +2641,7 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
     };
 
 
-    match send_error_report(ver, os, &ucid, &desc, &cont, &rlog) {
+    match send_error_report(ver, os, &ucid, &desc, &cont) {
         Ok(()) => {
             0
         },
