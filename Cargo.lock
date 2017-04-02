@@ -455,6 +455,7 @@ dependencies = [
  "serde 0.9.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "simplelog 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "sodiumoxide 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "tar 0.4.10 (git+https://github.com/infincia/tar-rs.git?branch=append_long_name)",
  "time 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -956,7 +957,6 @@ dependencies = [
  "serde 0.9.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "simplelog 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
