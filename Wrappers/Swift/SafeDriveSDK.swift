@@ -181,19 +181,6 @@ func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
     return SDKError(message: s, kind: type)
 }
 
-
-
-func SDDKLogLinesFromLog(log: [String]) -> [SDDKLogLine] {
-    var sl = [SDDKLogLine]()
-    
-    for line in log {
-        let l = SDDKLogLine(line: line)
-        sl.append(l)
-    }
-
-    return sl
-}
-
 func SDDKAccountStatusToAccountStatus(account_status: SDDKAccountStatus) -> AccountStatus {
     var s: Optional<String> = nil
     if account_status.status != nil {
