@@ -38,6 +38,7 @@ mod oplog;
 mod keychain;
 #[cfg(feature = "sessionfs")]
 mod sessionfs;
+mod sdlog;
 
 /// public API
 ///
