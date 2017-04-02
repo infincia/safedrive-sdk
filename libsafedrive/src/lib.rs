@@ -158,6 +158,9 @@ lazy_static! {
     static ref CANCEL_LIST: ::parking_lot::RwLock<Vec<String>> = ::parking_lot::RwLock::new(Vec::new());
 }
 
+lazy_static! {
+    static ref LOG: ::parking_lot::RwLock<Vec<String>> = ::parking_lot::RwLock::new(Vec::new());
+}
 
 
 
