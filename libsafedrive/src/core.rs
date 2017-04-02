@@ -106,14 +106,13 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     }
 
     let sodium_version = ::sodiumoxide::version::version_string();
+    let sdk_version = get_version();
+
     let mut c = CONFIGURATION.write();
     *c = config;
 
     let mut cv = CLIENT_VERSION.write();
     *cv = client_version.to_string();
-
-    let mut ua = USER_AGENT.write();
-    *ua = str::replace(client_version, " ", "/").to_string();
 
     let mut os = OPERATING_SYSTEM.write();
     *os = operating_system.to_string();
@@ -129,6 +128,10 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
             "cli".to_owned()
         }
     };
+
+
+    let mut ua = USER_AGENT.write();
+    *ua = format!("SafeDrive/{} ({}; {}) SafeDriveSDK/{} libsodium/{}", client_version, operating_system, app_type, sdk_version, sodium_version);
 
     if let Err(e) = fs::create_dir_all(local_storage_path) {
         debug!("failed to create local directories: {}", e);
