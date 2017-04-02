@@ -785,7 +785,11 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    
+    public func log(_ message: String, _ level: SDKLogLevel) {
+        DispatchQueue.global(priority: .default).async {
+            sddk_log(message, level.rawValue)
+        }
+    }
     
     // SDAPI
     public func reportError(_ error: NSError, forUniqueClientId uniqueClientId: String, os: Optional<String>, clientVersion: Optional<String>, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
