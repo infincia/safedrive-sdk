@@ -160,7 +160,9 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     *cd = cache_s;
 
     let mut log_path = PathBuf::from(local_storage_path);
-    log_path.push("safedrive.log");
+    let log_name = format!("safedrive-{}.log", app_type);
+
+    log_path.push(&log_name);
 
     let f = match ::std::fs::OpenOptions::new().read(true).append(true).create(true).open(&log_path) {
         Ok(file) => file,
