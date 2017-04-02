@@ -19,6 +19,8 @@ use ::core::remove_sync_folder;
 use ::core::get_sync_folder;
 use ::core::get_sync_folders;
 
+use ::core::log;
+
 use ::core::get_sync_sessions;
 use ::core::remove_sync_session;
 use ::core::clean_sync_sessions;
@@ -2653,6 +2655,58 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
     }
 }
 
+/// Log
+///
+/// Will write to stdout if a terminal is present, otherwise will log to a file in the storage dir
+/// as well as an in-memory ring buffer that will be sent with any error reports
+///
+///
+/// Parameters:
+///
+///     message: a NULL terminated string for the log message
+///
+///     level: unsigned 8-bit integer:
+///
+///               0: error
+///               1: warn
+///               2: info
+///               3: debug
+///               4: trace
+///
+///
+/// # Examples
+///
+/// ```c
+/// sddk_log("starting safedrive", 2);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
+                           level: std::os::raw::c_uchar) {
+
+    let msg: String = unsafe {
+        assert!(!message.is_null());
+
+        let c_msg: &CStr = CStr::from_ptr(message);
+
+        let msg: String = match c_msg.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        };
+
+        msg
+    };
+
+    let log_level = match level {
+        0 => ::log::LogLevelFilter::Error,
+        1 => ::log::LogLevelFilter::Warn,
+        2 => ::log::LogLevelFilter::Info,
+        3  => ::log::LogLevelFilter::Debug,
+        4 | _=> ::log::LogLevelFilter::Trace,
+    };
+
+    log(&msg, log_level);
+}
 
 
 
