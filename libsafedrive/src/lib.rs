@@ -135,6 +135,10 @@ lazy_static! {
 }
 
 lazy_static! {
+    static ref STORAGE_DIR: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
+}
+
+lazy_static! {
     static ref CLIENT_VERSION: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
 }
 

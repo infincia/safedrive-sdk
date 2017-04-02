@@ -27,6 +27,7 @@ use ::lock::{FolderLock};
 use ::error::{CryptoError, SDAPIError, SDError};
 use ::CONFIGURATION;
 use ::CACHE_DIR;
+use ::STORAGE_DIR;
 use ::CLIENT_VERSION;
 use ::USER_AGENT;
 use ::OPERATING_SYSTEM;
@@ -116,6 +117,16 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
         debug!("failed to create local directories: {}", e);
         return Err(SDError::from(e))
     }
+
+    let storage_s = match local_storage_path.to_str() {
+        Some(ref s) => s.to_string(),
+        None => { return Err(SDError::UnicodeError) },
+    };
+
+    let mut sd = STORAGE_DIR.write();
+    *sd = storage_s;
+
+
 
     let mut p = PathBuf::from(local_storage_path);
     p.push("cache");
