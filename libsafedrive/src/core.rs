@@ -1501,7 +1501,7 @@ pub fn restore(token: &Token,
     Ok(())
 }
 
-pub fn send_error_report<'a>(client_version: Option<String>, operating_system: Option<String>, unique_client_id: &str, description: &str, context: &str, log: &'a [&'a str]) -> Result<(), SDError> {
+pub fn send_error_report<'a>(client_version: Option<String>, operating_system: Option<String>, unique_client_id: &str, description: &str, context: &str) -> Result<(), SDError> {
     let gcv = CLIENT_VERSION.read();
     let gos = OPERATING_SYSTEM.read();
 
