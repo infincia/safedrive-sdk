@@ -101,6 +101,11 @@ pub fn get_version() -> String {
 /// internal functions
 
 pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration, log_level: LogLevelFilter, local_storage_path: &Path) -> Result<(), SDError> {
+    if !::sodiumoxide::init() == true {
+        panic!("sodium initialization failed, cannot continue");
+    }
+
+    let sodium_version = ::sodiumoxide::version::version_string();
     let mut c = CONFIGURATION.write();
     *c = config;
 
@@ -176,11 +181,7 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
         },
     };
 
-    if !::sodiumoxide::init() == true {
-        panic!("sodium initialization failed, cannot continue");
-    }
 
-    let sodium_version = ::sodiumoxide::version::version_string();
     debug!("libsodium {}", sodium_version);
 
     debug!("ready");
