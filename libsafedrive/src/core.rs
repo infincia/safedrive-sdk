@@ -11,6 +11,7 @@ use ::rand::distributions::{IndependentSample, Range};
 use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::nom::IResult::*;
+use ::log::LogLevelFilter;
 
 /// internal imports
 
@@ -1499,6 +1500,30 @@ pub fn restore(token: &Token,
     progress(session_size, processed_size, 0, 100.0, false);
 
     Ok(())
+}
+
+pub fn log(text: &str, level: LogLevelFilter) {
+    let log_level = match level {
+        ::log::LogLevelFilter::Off => {
+
+        },
+        ::log::LogLevelFilter::Error => {
+            error!("{}", text);
+        },
+        ::log::LogLevelFilter::Warn => {
+            warn!("{}", text);
+        },
+        ::log::LogLevelFilter::Info => {
+            info!("{}", text);
+        },
+        ::log::LogLevelFilter::Debug => {
+            debug!("{}", text);
+        },
+        ::log::LogLevelFilter::Trace => {
+            trace!("{}", text);
+        },
+    };
+
 }
 
 pub fn send_error_report<'a>(client_version: Option<String>, operating_system: Option<String>, unique_client_id: &str, description: &str, context: &str) -> Result<(), SDError> {
