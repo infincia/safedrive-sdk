@@ -11,6 +11,7 @@ use ::rand::distributions::{IndependentSample, Range};
 use ::tar::{Builder, Header, Archive, EntryType};
 use ::walkdir::WalkDir;
 use ::nom::IResult::*;
+use ::simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
 use ::log::LogLevelFilter;
 
 /// internal imports
@@ -36,6 +37,7 @@ use ::LANGUAGE_CODE;
 use ::SYNC_VERSION;
 use ::CHANNEL;
 use ::CANCEL_LIST;
+use ::LOG;
 
 use ::session::{SyncSession, WrappedSyncSession};
 
@@ -98,7 +100,7 @@ pub fn get_version() -> String {
 
 /// internal functions
 
-pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration, local_storage_path: &Path) -> Result<(), SDError> {
+pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, language_code: &'a str, config: Configuration, log_level: LogLevelFilter, local_storage_path: &Path) -> Result<(), SDError> {
     let mut c = CONFIGURATION.write();
     *c = config;
 
@@ -142,6 +144,37 @@ pub fn initialize<'a>(client_version: &'a str, operating_system: &'a str, langua
     }
     let mut cd = CACHE_DIR.write();
     *cd = cache_s;
+
+    let mut log_path = PathBuf::from(local_storage_path);
+    log_path.push("safedrive.log");
+
+    let f = match ::std::fs::OpenOptions::new().read(true).append(true).create(true).open(&log_path) {
+        Ok(file) => file,
+        Err(e) => {
+            return Err(SDError::Internal(format!("failed to open log file: {}", e)));
+        },
+    };
+    let mut logs: Vec<Box<SharedLogger>> = Vec::new();
+
+    let wl = WriteLogger::new(log_level, LogConfig::default(), f);
+    logs.push(wl);
+
+    match TermLogger::new(log_level, LogConfig::default()) {
+        Some(logger) => {
+            logs.push(logger);
+        },
+        None => {},
+    }
+
+    let sdl = ::sdlog::SDLogger::new(log_level, LogConfig::default());
+    logs.push(sdl);
+
+    let _ = match CombinedLogger::init(logs) {
+        Ok(()) => {},
+        Err(e) => {
+            return Err(SDError::Internal(format!("failed to initialize log: {}", e)));
+        },
+    };
 
     if !::sodiumoxide::init() == true {
         panic!("sodium initialization failed, cannot continue");
