@@ -96,6 +96,14 @@ pub fn set_keychain_item(account: &str, service: KeychainService, secret: &str) 
 
     let keychain = Keyring::new(&service_name, account);
 
+    // attempt to delete the keychain item first, but if that fails it's normally going to be caused
+    // by the item not being in the keychain already. If it fails for another reason, we'll find out
+    // when we try to set the password again below
+    match keychain.delete_password() {
+        Ok(()) => {},
+        Err(e) => {},
+    }
+
     keychain.set_password(secret)?;
 
     Ok(())
