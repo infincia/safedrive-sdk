@@ -167,6 +167,30 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 
     log_path.push(&log_name);
 
+    match ::std::fs::symlink_metadata(&log_path) {
+        Ok(md) => {
+            let stream_length = md.len();
+            let is_file = md.file_type().is_file();
+            if is_file && stream_length > 10_000_000 {
+                let now = ::chrono::UTC::now();
+                let log_backup_name = format!("safedrive-{}-{}.log", app_type, now);
+
+                match ::std::fs::rename(&log_name, &log_backup_name) {
+                    Ok(()) => {
+
+                    },
+                    Err(_) => {
+                        // we're actually renaming the log file here, before logging is initialized
+                        // so it's not as though we can log the error :D
+                        // luckily this is going to be incredibly rare unless the drive is out of
+                        // space, which we could add a check for
+                    }
+                }
+            }
+        },
+        Err(_) => {},
+    };
+
     let f = match ::std::fs::OpenOptions::new().read(true).append(true).create(true).open(&log_path) {
         Ok(file) => file,
         Err(e) => {
