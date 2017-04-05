@@ -18,7 +18,6 @@
 		AA97A1AD1E2C64C100CAAD19 /* SafeDriveSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */; };
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFDD561DC4E91000B4EAC7 /* libz.tbd */; };
-		AAFBBA1E1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli in CopyFiles */ = {isa = PBXBuildFile; fileRef = AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,9 +36,8 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 7;
+			dstSubfolderSpec = 6;
 			files = (
-				AAFBBA1E1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
