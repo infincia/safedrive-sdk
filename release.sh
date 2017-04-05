@@ -8,9 +8,31 @@ fi
 
 echo "Building for $TARGET"
 
-case $TARGET in
-    i686-unknown-linux-gnu|i686-unknown-linux-musl)
-        export PKG_CONFIG_ALLOW_CROSS=1
+case ${TARGET} in
+    x86_64-apple-darwin)
+        export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
+        export OSX_CPU_ARCH=${OSX_CPU_ARCH-"core2"}
+        export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g -flto"
+        export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
+        export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
+        ;;
+    x86_64-unknown-linux-gnu)
+        export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
+        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+        ;;
+    i686-unknown-linux-gnu)
+        export CFLAGS="-O2 -g -flto -m32"
+        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+        ;;
+    x86_64-unknown-linux-musl)
+        export CFLAGS="-O2 -g -flto"
+        export LDFLAGS="-flto"
+        export CC=musl-gcc
+        ;;
+    i686-unknown-linux-musl)
+        export CFLAGS="-O2 -g -flto -m32"
+        export LDFLAGS="-flto"
+        export CC=musl-gcc
         ;;
     *)
         ;;
