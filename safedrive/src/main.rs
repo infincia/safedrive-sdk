@@ -1262,7 +1262,29 @@ pub fn local_login(username: &str) {
 
     let phrase = find_recovery_phrase(&username);
     match phrase {
-        Some(_) =>{},
+        Some(p) =>{
+            // recovery phrase found, ask if it is correct or if the user would like to enter a new one
+            println!("Recovery phrase found: {}", &p);
+
+            println!("1) Yes");
+            println!("2) No");
+            println!();
+            let recovery_phrase_present = ::rpassword::prompt_response_stdout("Is this the correct recovery phrase for your account?: ").unwrap();
+            let recovery_phrase_present = recovery_phrase_present.trim();
+
+            if &recovery_phrase_present == &"2" || &recovery_phrase_present == &"no" || &recovery_phrase_present == &"No" {
+                println!();
+                let recovery_phrase = ::rpassword::prompt_response_stdout("Enter your recovery phrase: ").unwrap();
+
+                match set_keychain_item(username, ::safedrive::KeychainService::RecoveryPhrase, &recovery_phrase) {
+                    Ok(()) => {},
+                    Err(e) => {
+                        error!("{}", e);
+                        std::process::exit(1);
+                    }
+                }
+            }
+        },
         None => {
             // no phrase found locally, so ask if the user has one
             println!("1) Yes");
