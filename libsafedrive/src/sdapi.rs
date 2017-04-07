@@ -1316,7 +1316,7 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 }
 
 #[allow(dead_code)]
-pub fn write_blocks<F>(token: &Token, session: &str, blocks: &[WrappedBlock], progress: F) -> Result<Vec<String>, SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: F) -> Result<Vec<String>, SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static, T: ::binformat::BinaryWriter {
 
     let endpoint = APIEndpoint::WriteBlocks { session: session };
 
