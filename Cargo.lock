@@ -933,7 +933,7 @@ dependencies = [
 [[package]]
 name = "rustls"
 version = "0.5.8"
-source = "git+https://github.com/infincia/rustls.git?branch=infincia#36ae4d4cb937a9046ee186b6a847e3b0e4e50082"
+source = "git+https://github.com/infincia/rustls.git?branch=infincia#19cfb5c618e369cee03f9a4f474593b330a22f82"
 dependencies = [
  "base64 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
