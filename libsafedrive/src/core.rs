@@ -1369,7 +1369,7 @@ pub fn restore(token: &Token,
 }
 
 pub fn log(text: &str, level: LogLevelFilter) {
-    let log_level = match level {
+    match level {
         ::log::LogLevelFilter::Off => {
 
         },
