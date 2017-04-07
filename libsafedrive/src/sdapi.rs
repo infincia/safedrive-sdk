@@ -14,7 +14,6 @@ use std::{thread, time};
 
 use ::error::SDAPIError;
 use ::models::*;
-use ::block::*;
 use ::session::*;
 use ::keys::*;
 use ::constants::*;
