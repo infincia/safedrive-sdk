@@ -4,18 +4,26 @@ use std::io::{Read, Write};
 use ::rustc_serialize::hex::{FromHex};
 use ::walkdir::WalkDir;
 
+use std::{thread, time};
+
 use ::CACHE_DIR;
 use ::block::WrappedBlock;
 use ::error::SDError;
 
-pub struct WriteCacheMessage<T> {
-    pub item: Option<T>,
+use ::models::Token;
+
+use ::error::SDAPIError;
+
+use ::binformat::BinaryWriter;
+
+pub struct WriteCacheMessage {
+    pub item: Option<WrappedBlock>,
     pub stop: bool,
     pub error: Option<SDError>,
 }
 
-impl<T> WriteCacheMessage<T> where T: ::binformat::BinaryWriter {
-    pub fn new(item: Option<T>, stop: bool, error: Option<SDError>) -> WriteCacheMessage<T> {
+impl WriteCacheMessage {
+    pub fn new(item: Option<WrappedBlock>, stop: bool, error: Option<SDError>) -> WriteCacheMessage {
         WriteCacheMessage {
             item: item,
             stop: stop,
@@ -24,8 +32,8 @@ impl<T> WriteCacheMessage<T> where T: ::binformat::BinaryWriter {
     }
 }
 
-pub struct WriteCache<T> {
-    waiting: Vec<T>,
+pub struct WriteCache {
+    waiting: Vec<WrappedBlock>,
     item_limit: usize,
     data_limit: usize,
     data_waiting: usize,
@@ -33,9 +41,9 @@ pub struct WriteCache<T> {
 }
 
 
-impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
-    pub fn new(item_limit: usize, data_limit: usize) -> WriteCache<T> where T: ::binformat::BinaryWriter {
-        let waiting_list: Vec<T> = Vec::new();
+impl WriteCache {
+    pub fn new(item_limit: usize, data_limit: usize) -> WriteCache {
+        let waiting_list: Vec<WrappedBlock> = Vec::new();
 
         WriteCache {
             waiting: waiting_list,
@@ -45,21 +53,21 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
             received_final_item: false,
         }
     }
-    pub fn add(&mut self, block: T) {
+    pub fn add(&mut self, block: WrappedBlock) {
         self.data_waiting += block.len();
 
         self.waiting.push(block);
     }
 
     #[allow(dead_code)]
-    pub fn add_many(&mut self, blocks: Vec<T>) {
+    pub fn add_many(&mut self, blocks: Vec<WrappedBlock>) {
         for block in blocks {
             self.data_waiting += block.len();
             self.waiting.push(block);
         }
     }
 
-    pub fn remove(&mut self) -> Option<T> {
+    pub fn remove(&mut self) -> Option<WrappedBlock> {
         match self.waiting.pop() {
             Some(block) => {
                 self.data_waiting -= block.len();
@@ -70,12 +78,12 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
         }
     }
 
-    pub fn request_waiting_items(&mut self) -> Option<Vec<T>> {
+    pub fn request_waiting_items(&mut self) -> Option<Vec<WrappedBlock>> {
         if self.full() || self.received_final_item {
             let pretty_size_limit = ::util::pretty_bytes(self.data_limit as f64);
 
             debug!("requesting items from the write cache (limit: {} or {})", self.item_limit, pretty_size_limit);
-            let mut r: Vec<T> = Vec::new();
+            let mut r: Vec<WrappedBlock> = Vec::new();
 
             let mut taken_count = 0;
             let mut taken_size = 0;
@@ -130,6 +138,217 @@ impl<T> WriteCache<T> where T: ::binformat::BinaryWriter {
 
     pub fn full(&self) -> bool {
         self.data_waiting >= self.data_limit || self.items_waiting() >= self.item_limit
+    }
+
+    pub fn upload_thread(self, token: &Token, session_name: &str) -> (::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage>, ::std::sync::mpsc::Receiver<Result<bool, SDError>>) {
+
+        let (block_send, block_receive) = ::std::sync::mpsc::sync_channel::<::cache::WriteCacheMessage>(0);
+        let (status_send, status_receive) = ::std::sync::mpsc::channel::<Result<bool, SDError>>();
+
+        let local_token = token.clone();
+
+        let local_session_name = session_name.to_owned();
+
+        let mut local_self = self;
+
+        thread::spawn(move || {
+            info!("Running upload thread");
+
+            loop {
+
+                // check to see if we're finished, we need to ensure that we have already put the last
+                // block in the cache and that the cache is now empty before exiting
+                if local_self.received_final_item() == true && local_self.items_waiting() == 0 {
+                    match status_send.send(Ok(true)) {
+                        Ok(()) => {
+                            let pretty_size = ::util::pretty_bytes(local_self.data_waiting() as f64);
+                            debug!("write cache has no more work to do: {} blocks remaining ({})", local_self.items_waiting(), pretty_size);
+                            return;
+                        },
+                        Err(e) => {
+                            debug!("channel exited: {}", e);
+                            return;
+                        },
+                    }
+                } else {
+                    let pretty_size = ::util::pretty_bytes(local_self.data_waiting() as f64);
+
+                    debug!("write cache has more work to do: {} blocks remaining ({})", local_self.items_waiting(), pretty_size);
+                }
+
+                // The write cache has both size and item limits, because we need to avoid sending
+                // too many blocks or too little data with each request. We try to achieve a balance,
+                // sending more blocks if they are very small, fewer if they are very large.
+                //
+                // For example:
+                //
+                // A group of 100x 256KiB blocks is 25MiB
+                // a group of 100x 256B blocks is 25KiB
+                //
+                // The tiny group is not worth the HTTP request unless we have no more waiting, but even
+                // sending 5x more of the smaller blocks will still only get us a 1MiB request
+
+                match local_self.request_waiting_items() {
+
+                    Some(block_batch) => {
+
+                        if block_batch.len() > 0 {
+
+                            debug!("sending {} blocks", block_batch.len());
+
+                            let block_write_start_time = ::std::time::Instant::now();
+
+                            debug!("write cache trying send of {} blocks", block_batch.len());
+
+                            if ::core::is_sync_task_cancelled(local_session_name.to_owned()) {
+                                match status_send.send(Err(SDError::Cancelled)) {
+                                    Ok(()) => {
+                                        debug!("write thread cancelled");
+
+                                        return;
+                                    },
+                                    Err(e) => {
+                                        debug!("channel exited: {}", e);
+                                        break;
+                                    },
+                                }
+                            }
+
+                            match ::sdapi::write_blocks(&local_token, &local_session_name, &block_batch, |total, current, new| {
+                                debug!("block upload progress: {}/{}, {} new", current, total, new);
+                            }) {
+                                Ok(missing) => {
+                                    debug!("sending group took {} seconds", block_write_start_time.elapsed().as_secs());
+
+                                    for block in &block_batch {
+                                        let bn = &block.name();
+                                        if missing.contains(bn) {
+                                            debug!("server missing block, returning to the cache: {}", bn);
+                                            let mut c = block.clone();
+                                            c.needs_upload();
+                                            local_self.add(c);
+                                        }
+                                    }
+
+                                    match status_send.send(Ok(false)) {
+                                        Ok(()) => {},
+                                        Err(e) => {
+                                            debug!("channel exited: {}", e);
+                                            break;
+                                        },
+                                    }
+                                },
+                                Err(SDAPIError::ServiceUnavailable) => {
+                                    match status_send.send(Err(SDError::ServiceUnavailable)) {
+                                        Ok(()) => {
+                                            debug!("write thread exceeded retries");
+                                            return;
+                                        },
+                                        Err(e) => {
+                                            debug!("channel exited: {}", e);
+                                            break;
+                                        },
+                                    }
+                                },
+                                Err(SDAPIError::Authentication) => {
+                                    match status_send.send(Err(SDError::Authentication)) {
+                                        Ok(()) => {
+                                            debug!("write thread auth failure");
+                                            return;
+                                        },
+                                        Err(e) => {
+                                            debug!("channel exited: {}", e);
+                                            break;
+                                        },
+                                    }
+                                },
+                                Err(e) => {
+                                    match status_send.send(Err(SDError::RequestFailure(Box::new(e)))) {
+                                        Ok(()) => {
+                                            debug!("write thread error");
+                                            return;
+                                        },
+                                        Err(e) => {
+                                            debug!("channel exited: {}", e);
+                                            break;
+                                        },
+                                    }
+                                },
+                            }
+
+
+
+
+                        }
+
+                    },
+                    None => {},
+                };
+
+                // if the cache is not full, receive a new message from the block iteration thread,
+                // this should keep the cache close to full most of the time without stuttering
+
+                if !local_self.full() {
+                    let cache_message = match block_receive.try_recv() {
+                        Ok(message) => {
+                            debug!("write cache: message received");
+                            message
+                        },
+                        Err(e) => {
+                            match e {
+                                ::std::sync::mpsc::TryRecvError::Empty => {
+                                    let delay = time::Duration::from_millis(10);
+
+                                    thread::sleep(delay);
+                                    continue;
+                                },
+                                ::std::sync::mpsc::TryRecvError::Disconnected => {
+                                    debug!("write cache: no more messages, end of channel {}", e);
+                                    break;
+                                },
+                            }
+                        },
+                    };
+
+                    // if we were told to stop processing blocks, just stop immediately
+                    if cache_message.stop {
+                        debug!("write cache told to stop");
+
+                        return;
+                    }
+
+                    debug!("write cache checking item in last message");
+
+                    // check to see if we were given a new block, if so store it in the cache. if we don't
+                    // get a block here, it will be because the block iterator thread is completely done
+                    // and waiting for this thread to finish uploading them
+                    match cache_message.item {
+                        Some(block) => {
+                            debug!("write cache adding block");
+
+                            local_self.add(block);
+                        },
+                        None => {
+                            debug!("write cache has final item");
+                            local_self.set_received_final_item(true);
+                        }
+                    };
+                }
+            }
+
+            match status_send.send(Ok(true)) {
+                Ok(()) => {
+                    debug!("write thread finished, informing main thread to continue");
+                },
+                Err(e) => {
+                    debug!("channel exited: {}", e);
+                    return;
+                },
+            }
+        });
+
+
+        (block_send, status_receive)
     }
 }
 
@@ -244,7 +463,7 @@ pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
 
 }
 
-pub fn write_binary<'a, T>(item: &T) -> Result<(), SDError> where T: ::binformat::BinaryWriter {
+pub fn write_binary<'a>(item: &WrappedBlock) -> Result<(), SDError> {
     let cd = CACHE_DIR.read();
     let mut item_path = PathBuf::from(&*cd);
     let name = item.name();
