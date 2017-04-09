@@ -5,7 +5,6 @@ members = ["libsafedrive", "safedrive", "safedrived"]
 debug = true
 
 [replace]
-"ring:0.7.3" = { git = "https://github.com/infincia/ring.git", branch = "infincia" }
 "security-framework:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "security-framework-sys:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "rustls:0.5.8" = { git = "https://github.com/infincia/rustls.git", branch = "infincia" }
