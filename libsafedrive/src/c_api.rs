@@ -543,35 +543,46 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                                   local_storage_path: *const std::os::raw::c_char,
                                   mut state: *mut *mut SDDKState,
                                   mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
+    let cv: String = match client_version.is_null() {
+        true => {
+            "0.0".to_owned()
+        },
+        false => {
+            let cvs: &CStr = unsafe { CStr::from_ptr(client_version) };
 
-    let cvs: &CStr = unsafe {
-        assert!(!client_version.is_null());
-        CStr::from_ptr(client_version)
+            match cvs.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            }
+        },
     };
 
-    let cv: String = match cvs.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+    let os: String = match operating_system.is_null() {
+        true => {
+            ::core::get_current_os().to_owned()
+        },
+        false => {
+            let oss: &CStr = unsafe { CStr::from_ptr(operating_system) };
+
+            match oss.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            }
+        },
     };
 
-    let oss: &CStr = unsafe {
-        assert!(!operating_system.is_null());
-        CStr::from_ptr(operating_system)
-    };
+    let langc: String = match language_code.is_null() {
+        true => {
+            "en_US".to_owned() //sane default if nothing was passed in, might want to check libc
+        },
+        false => {
+            let c_language_code: &CStr = unsafe { CStr::from_ptr(language_code) };
 
-    let os: String = match oss.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
-    };
-
-    let c_language_code: &CStr = unsafe {
-        assert!(!language_code.is_null());
-        CStr::from_ptr(language_code)
-    };
-
-    let langc: String = match c_language_code.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            match c_language_code.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            }
+        },
     };
 
     let c = match config {
@@ -579,14 +590,18 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    let lstorage: &CStr = unsafe {
-        assert!(!local_storage_path.is_null());
-        CStr::from_ptr(local_storage_path)
-    };
+    let storage_directory: String = match local_storage_path.is_null() {
+        true => {
+            "/var/tmp/safedrive".to_owned() //sane default if nothing was passed in,
+        },
+        false => {
+            let lstorage: &CStr = unsafe { CStr::from_ptr(local_storage_path) };
 
-    let storage_directory: String = match lstorage.to_str() {
-        Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            match lstorage.to_str() {
+                Ok(s) => s.to_owned(),
+                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            }
+        },
     };
 
     let storage_path = Path::new(&storage_directory);
