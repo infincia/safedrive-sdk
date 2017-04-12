@@ -53,24 +53,12 @@ impl std::fmt::Display for KeychainService {
 impl From<String> for KeychainService {
     fn from(s: String) -> KeychainService {
         match s.as_str() {
-            "safedrive.io"         => KeychainService::Account,
-            "staging.safedrive.io" => KeychainService::Account,
-
-            "ssh.safedrive.io"         => KeychainService::SSHUsername,
-            "staging.ssh.safedrive.io" => KeychainService::SSHUsername,
-
-            "session.safedrive.io"         => KeychainService::AuthToken,
-            "staging.session.safedrive.io" => KeychainService::AuthToken,
-
-            "recovery.safedrive.io"         => KeychainService::RecoveryPhrase,
-            "staging.recovery.safedrive.io" => KeychainService::RecoveryPhrase,
-
-            "ucid.safedrive.io"         => KeychainService::UniqueClientID,
-            "staging.ucid.safedrive.io" => KeychainService::UniqueClientID,
-
-            "currentuser.safedrive.io"         => KeychainService::CurrentUser,
-            "staging.currentuser.safedrive.io" => KeychainService::CurrentUser,
-
+            "safedrive.io" => KeychainService::Account,
+            "ssh.safedrive.io" => KeychainService::SSHUsername,
+            "session.safedrive.io" => KeychainService::AuthToken,
+            "recovery.safedrive.io" => KeychainService::RecoveryPhrase,
+            "ucid.safedrive.io" => KeychainService::UniqueClientID,
+            "currentuser.safedrive.io" => KeychainService::CurrentUser,
             _ => panic!("invalid keychain service"),
         }
     }
