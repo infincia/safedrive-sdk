@@ -7,7 +7,7 @@ workspace = ".."
 
 [dependencies]
 clap = "*"
-pbr = { git = "https://github.com/infincia/pb.git", branch = "logging" }
+pbr = { git = "https://github.com/infincia/pb.git", branch = "infincia" }
 rpassword = "0.4"
 uuid = { version = "*", features = ["v4"] }
 serde = "^0.9"
