@@ -15,7 +15,6 @@ set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%
 
 ECHO building libsodium for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-del /q %BUILD_PREFIX%
 
 mkdir %BUILD_PREFIX%
 mkdir %BUILD_PREFIX%\lib
