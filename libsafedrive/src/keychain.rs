@@ -109,6 +109,7 @@ pub fn delete_keychain_item(account: &str, service: KeychainService) -> Result<(
     Ok(())
 }
 
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn set_account_password() {
     let password = "password";
@@ -119,6 +120,7 @@ fn set_account_password() {
     };
 }
 
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn get_account_password() {
     let password = "password";
@@ -138,7 +140,7 @@ fn get_account_password() {
 
 
 
-
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn set_auth_token() {
     let auth_token = "ABCDEF";
@@ -149,6 +151,7 @@ fn set_auth_token() {
     };
 }
 
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn get_auth_token() {
     let auth_token = "ABCDEF";
@@ -168,7 +171,7 @@ fn get_auth_token() {
 
 
 
-
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn set_recovery_phrase() {
     let recovery_phrase = "alter victory unaware differ negative hole rocket mixture nephew merit iron loud";
@@ -179,6 +182,7 @@ fn set_recovery_phrase() {
     };
 }
 
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn get_recovery_phrase() {
     let recovery_phrase = "alter victory unaware differ negative hole rocket mixture nephew merit iron loud";
@@ -197,7 +201,7 @@ fn get_recovery_phrase() {
 
 
 
-
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn set_ssh_username() {
     let ssh_username = "ABCDEF";
@@ -208,6 +212,7 @@ fn set_ssh_username() {
     };
 }
 
+#[cfg(not(target_os = "linux"))]
 #[test]
 fn get_ssh_username() {
     let ssh_username = "ABCDEF";
