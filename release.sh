@@ -65,10 +65,8 @@ cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
 
 case $TARGET in
     x86_64-apple-darwin)
-        cp -a dep/$TARGET/lib/*.dylib dist-$TARGET/lib/
         cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib
         install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib
-        install_name_tool -id "@rpath/libsodium.18.dylib" dist-$TARGET/lib/libsodium.18.dylib
         cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/io.safedrive.SafeDrive.cli
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)
