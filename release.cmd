@@ -20,6 +20,7 @@ set NATIVE_BUILD_PREFIX=dep\%TARGET%\%TOOLSET%\%LINKTYPE%
 set SODIUM_LIB_DIR=%CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib
 set SODIUM_STATIC=""
 set RUST_BACKTRACE="1"
+set RUST_FLAGS="-Z print-link-args"
 
 call dep.cmd
 
