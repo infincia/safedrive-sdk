@@ -3,7 +3,7 @@ IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141_xp
 IF [%LINKTYPE%]==[] set LINKTYPE=static
 
-ECHO building SafeDrive for Windows-%ARCH%
+ECHO building safedrive for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
 del /q dist-%TARGET%-%TOOLSET%-%LINKTYPE%
 
