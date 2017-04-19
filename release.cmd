@@ -3,9 +3,6 @@ IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141_xp
 IF [%LINKTYPE%]==[] set LINKTYPE=static
 
-set LIBPREFIX=
-IF [%TOOLSET%]==[v141_xp] set LIBPREFIX=lib
-
 ECHO building SafeDrive for Windows-%ARCH%
 
 del /q dist-%TARGET%-%TOOLSET%-%LINKTYPE%
@@ -33,11 +30,9 @@ cheddar -f "libsafedrive\src\c_api.rs" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\inclu
 
 cargo.exe build --release -p safedrive --target %TARGET%
 
-ECHO copying "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\%LIBPREFIX%safedrive.dll"
-
-copy /y "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\%LIBPREFIX%safedrive.dll"
+ECHO copying "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll"
+copy /y "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll"
 
 ECHO copying "target\%TARGET%\release\safedrive.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
-
 copy /y "target\%TARGET%\release\safedrive.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
 
