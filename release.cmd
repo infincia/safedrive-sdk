@@ -32,16 +32,8 @@ cheddar -f libsafedrive\src\c_api.rs dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\
 
 cargo.exe build --release -p safedrive --target %TARGET%
 
-IF "%LINKTYPE%"=="static" (
-    copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\%LIBPREFIX%sodium.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\%LIBPREFIX%sodium.lib
-    copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\%LIBPREFIX%sodium.lib dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\%LIBPREFIX%sodium.lib
 
-)
 
-IF "%LINKTYPE%"=="dll" (
-    copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\%LIBPREFIX%sodium.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\%LIBPREFIX%sodium.dll
-    copy /y dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\%LIBPREFIX%sodium.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\%LIBPREFIX%sodium.dll
-)
 
 copy /y target\%TARGET%\release\safedrive.dll dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\%LIBPREFIX%safedrive.dll
 
