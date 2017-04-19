@@ -72,7 +72,7 @@ case $TARGET in
         cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/io.safedrive.SafeDrive.cli
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)
-        cp -a target/$TARGET/release/libsafedrive.a dist-$TARGET/lib/libsafedrive.a
+        cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so
         cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/
         cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
         ;;
