@@ -15,10 +15,9 @@ set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%
 
 ECHO building libsodium for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-
-mkdir %BUILD_PREFIX%
-mkdir %BUILD_PREFIX%\lib
-mkdir %BUILD_PREFIX%\include
+mkdir "%BUILD_PREFIX%"
+mkdir "%BUILD_PREFIX%\lib"
+mkdir "%BUILD_PREFIX%\include"
 
 IF "%LINKTYPE%"=="static" (
     set CONFIGURATION=Release
@@ -37,7 +36,7 @@ IF "%ARCH%"=="x86" (
 )
 
 set SODIUM_VER=1.0.12
-set SODIUM_VER_FILE=%BUILD_PREFIX%\sodium_ver
+set SODIUM_VER_FILE="%BUILD_PREFIX%\sodium_ver"
 
 set BUILD=false
 
@@ -49,11 +48,11 @@ IF "%BUILD%"=="true" (
     7z x -y libsodium-%SODIUM_VER%.tar.gz
     7z x -y libsodium-%SODIUM_VER%.tar
     cd libsodium-%SODIUM_VER%
-    msbuild /m /v:n /p:OutDir=%BUILD_PREFIX%\lib\;Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln
+    msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln
     cd ..
     del /q libsodium-%SODIUM_VER%
     del /q libsodium-%SODIUM_VER%.tar
     del /q libsodium-%SODIUM_VER%.tar.gz
-    copy /y %BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX% %BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%
+    copy /y "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%"
     @echo %SODIUM_VER%> %SODIUM_VER_FILE%
 )
