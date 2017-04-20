@@ -587,7 +587,7 @@ pub fn sync(token: &Token,
             Ok(m) => m,
             Err(e) => {
                 issue(&format!("not able to sync file {}: {}", item_path.display(), e));
-                continue
+                continue;
             },
         };
 
@@ -1041,7 +1041,7 @@ pub fn restore(token: &Token,
             Err(e) => {
                 issue(&format!("not able to restore session entry: {}", e));
                 failed + failed + 1;
-                continue // we do care about errors here, but we can't really recover from them for this item
+                continue; // we do care about errors here, but we can't really recover from them for this item
             },
         };
 
@@ -1058,7 +1058,7 @@ pub fn restore(token: &Token,
                 progress(session_size, processed_size, 0, percent_completed, false);
 
                 failed + failed + 1;
-                continue // we do care about errors here, but we can't really recover from them for this item
+                continue; // we do care about errors here, but we can't really recover from them for this item
             },
         };
 
@@ -1078,7 +1078,7 @@ pub fn restore(token: &Token,
                         issue(&format!("not able to create file at {}: {}", full_path.display(), err));
 
                         failed = failed +1;
-                        continue
+                        continue;
                     },
                 };
 
@@ -1321,7 +1321,7 @@ pub fn restore(token: &Token,
                         Ok(m) => m,
                         Err(e) => {
                             issue(&format!("not able to restore symlink {}: {}", full_path.display(), e));
-                            continue
+                            continue;
                         },
                     };
 
