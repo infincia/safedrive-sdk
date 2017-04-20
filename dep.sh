@@ -31,7 +31,7 @@ case ${TARGET} in
     x86_64-apple-darwin)
         export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
         export OSX_CPU_ARCH=${OSX_CPU_ARCH-"core2"}
-        export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g -flto"
+        export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g"
         export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
         export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
         export SODIUM_ARGS="--enable-shared=no"
@@ -40,7 +40,7 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
+        export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=no"
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
@@ -49,7 +49,7 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -flto -m32 -I${BUILD_PREFIX}/include"
+        export CFLAGS="-O2 -g -m32 -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=no"
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
@@ -59,7 +59,7 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-musl)
-        export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
+        export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
@@ -69,7 +69,7 @@ case ${TARGET} in
         BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-musl)
-        export CFLAGS="-O2 -g -flto -m32 -I${BUILD_PREFIX}/include"
+        export CFLAGS="-O2 -g -m32 -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
