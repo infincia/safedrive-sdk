@@ -99,7 +99,7 @@ pub enum APIEndpoint<'a> {
     AccountDetails,
     AccountKey { master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
     ReadFolders,
-    CreateFolder { folderPath: &'a str, folderName: &'a str, encrypted: bool },
+    CreateFolder { folderPath: &'a str, folderName: &'a str, encrypted: bool, syncing: bool },
     UpdateFolder { folderPath: &'a str, folderName: &'a str, syncing: bool, id: u64 },
 
     DeleteFolder { folder_id: u64 },
@@ -737,7 +737,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
 pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> Result<u64, SDAPIError> {
 
-    let endpoint = APIEndpoint::CreateFolder { folderPath: path, folderName: name, encrypted: encrypted };
+    let endpoint = APIEndpoint::CreateFolder { folderPath: path, folderName: name, encrypted: encrypted, syncing: true };
 
     let user_agent = &**USER_AGENT.read();
 
