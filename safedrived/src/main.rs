@@ -1,9 +1,11 @@
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 extern crate simplelog;
 
 use ::simplelog::{Config, TermLogger};
 
-#[macro_use] extern crate prettytable;
+#[macro_use]
+extern crate prettytable;
 use prettytable::Table;
 use prettytable::row::Row;
 use prettytable::cell::Cell;

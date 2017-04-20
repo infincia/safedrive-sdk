@@ -5,7 +5,8 @@ extern crate bitflags;
 
 extern crate lz4;
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
 extern crate simplelog;
 
