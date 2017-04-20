@@ -6,19 +6,19 @@ use std::collections::HashMap;
 
 /// external crate imports
 
-use ::rustc_serialize::hex::{ToHex};
-use ::rand::distributions::{IndependentSample, Range};
+use rustc_serialize::hex::ToHex;
+use rand::distributions::{IndependentSample, Range};
 use std::{thread, time};
 
 /// internal imports
 
-use ::error::SDAPIError;
-use ::models::*;
-use ::session::*;
-use ::keys::*;
-use ::constants::*;
-use ::USER_AGENT;
-use ::binformat::BinaryWriter;
+use error::SDAPIError;
+use models::*;
+use session::*;
+use keys::*;
+use constants::*;
+use USER_AGENT;
+use binformat::BinaryWriter;
 
 
 header! { (UserAgent, "User-Agent") => [String] }

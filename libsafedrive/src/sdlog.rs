@@ -1,7 +1,7 @@
-use ::log::{LogLevel, LogLevelFilter, LogMetadata, LogRecord, Log};
-use ::simplelog::{Config, SharedLogger};
+use log::{LogLevel, LogLevelFilter, LogMetadata, LogRecord, Log};
+use simplelog::{Config, SharedLogger};
 
-use ::LOG;
+use LOG;
 
 pub struct SDLogger {
     level: LogLevelFilter,

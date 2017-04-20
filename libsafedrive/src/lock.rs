@@ -3,7 +3,7 @@
 use std::path::{PathBuf, Path};
 use std::fs::File;
 
-use ::error::SDError;
+use error::SDError;
 
 #[derive(Debug)]
 pub struct FolderLock {

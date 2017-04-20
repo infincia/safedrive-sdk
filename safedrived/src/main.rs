@@ -2,7 +2,7 @@
 extern crate log;
 extern crate simplelog;
 
-use ::simplelog::{Config, TermLogger};
+use simplelog::{Config, TermLogger};
 
 #[macro_use]
 extern crate prettytable;
@@ -19,7 +19,7 @@ use std::str;
 use std::fs::File;
 
 use std::path::{Path, PathBuf};
-use std::io::{Read};
+use std::io::Read;
 
 extern crate clap;
 use clap::{Arg, App, SubCommand};

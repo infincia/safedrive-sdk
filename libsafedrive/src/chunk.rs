@@ -1,22 +1,22 @@
 #![allow(dead_code)]
 
 use std;
-use std::path::{Path};
+use std::path::Path;
 use std::fs::File;
 use std::io::{BufReader, Read, Seek, SeekFrom};
 use std::cmp::{min, max};
 
-use ::cdc::Chunk;
-use ::byteorder::LittleEndian;
-use ::byteorder::ByteOrder;
+use cdc::Chunk;
+use byteorder::LittleEndian;
+use byteorder::ByteOrder;
 
-use ::models::SyncVersion;
+use models::SyncVersion;
 
-use ::error::{SDError};
+use error::SDError;
 
-use ::block::{Block};
+use block::Block;
 
-use ::keys::{Key};
+use keys::Key;
 
 pub struct BlockGeneratorStats {
     pub item_size: u64,

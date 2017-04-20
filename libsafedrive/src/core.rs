@@ -6,40 +6,40 @@ use std::io::{BufWriter, Read, Write, Seek, SeekFrom};
 use std::{thread, time};
 /// external crate imports
 
-use ::rustc_serialize::hex::{ToHex, FromHex};
-use ::rand::distributions::{IndependentSample, Range};
-use ::tar::{Builder, Header, Archive, EntryType};
-use ::walkdir::WalkDir;
-use ::nom::IResult::*;
-use ::simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
-use ::log::LogLevelFilter;
+use rustc_serialize::hex::{ToHex, FromHex};
+use rand::distributions::{IndependentSample, Range};
+use tar::{Builder, Header, Archive, EntryType};
+use walkdir::WalkDir;
+use nom::IResult::*;
+use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
+use log::LogLevelFilter;
 
 /// internal imports
 
-use ::models::*;
-use ::block::*;
-use ::constants::*;
-use ::sdapi::*;
-use ::keys::*;
-use ::binformat::BinaryWriter;
+use models::*;
+use block::*;
+use constants::*;
+use sdapi::*;
+use keys::*;
+use binformat::BinaryWriter;
 
 #[cfg(feature = "locking")]
-use ::lock::{FolderLock};
+use lock::FolderLock;
 
-use ::error::{CryptoError, SDAPIError, SDError};
-use ::CONFIGURATION;
-use ::CACHE_DIR;
-use ::STORAGE_DIR;
-use ::CLIENT_VERSION;
-use ::USER_AGENT;
-use ::OPERATING_SYSTEM;
-use ::LANGUAGE_CODE;
-use ::SYNC_VERSION;
-use ::CHANNEL;
-use ::CANCEL_LIST;
-use ::LOG;
+use error::{CryptoError, SDAPIError, SDError};
+use CONFIGURATION;
+use CACHE_DIR;
+use STORAGE_DIR;
+use CLIENT_VERSION;
+use USER_AGENT;
+use OPERATING_SYSTEM;
+use LANGUAGE_CODE;
+use SYNC_VERSION;
+use CHANNEL;
+use CANCEL_LIST;
+use LOG;
 
-use ::session::{SyncSession, WrappedSyncSession};
+use session::{SyncSession, WrappedSyncSession};
 
 /// crypto exports
 
@@ -49,14 +49,14 @@ pub fn sha256(input: &[u8]) -> String {
 
 /// helpers
 
-pub use ::util::pretty_bytes;
+pub use util::pretty_bytes;
 
-pub use ::util::get_app_directory;
-pub use ::util::generate_uuid as generate_unique_client_id;
-pub use ::util::get_current_os;
+pub use util::get_app_directory;
+pub use util::generate_uuid as generate_unique_client_id;
+pub use util::get_current_os;
 
-pub use ::cache::clean_cache;
-pub use ::cache::clear_cache;
+pub use cache::clean_cache;
+pub use cache::clear_cache;
 
 pub fn get_keychain_item(account: &str, service: ::keychain::KeychainService) -> Result<String, SDError> {
     let password = ::keychain::get_keychain_item(account, service)?;

@@ -1,7 +1,7 @@
 /// internal imports
 
-use ::keys::Key;
-use ::models::{Token};
+use keys::Key;
+use models::Token;
 
 #[derive(Debug)]
 pub struct State {

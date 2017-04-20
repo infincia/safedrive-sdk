@@ -1,18 +1,18 @@
 use std::io::{Read, Write};
 
-use ::models::{SyncVersion};
+use models::SyncVersion;
 
-use ::error::{CryptoError, SDError};
-use ::binformat::BinaryFormat;
-use ::nom::IResult::*;
-use ::keys::{Key, WrappedKey, KeyType};
-use ::rustc_serialize::hex::{ToHex};
-use ::blake2_rfc::blake2b::blake2b;
-use ::binformat::BinaryWriter;
+use error::{CryptoError, SDError};
+use binformat::BinaryFormat;
+use nom::IResult::*;
+use keys::{Key, WrappedKey, KeyType};
+use rustc_serialize::hex::ToHex;
+use blake2_rfc::blake2b::blake2b;
+use binformat::BinaryWriter;
 
-use ::constants::*;
-use ::models::*;
-use ::CHANNEL;
+use constants::*;
+use models::*;
+use CHANNEL;
 
 #[derive(Debug, Clone)]
 pub struct Block {

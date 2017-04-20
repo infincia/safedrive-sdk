@@ -1,4 +1,4 @@
-use ::CONFIGURATION;
+use CONFIGURATION;
 
 #[derive(Debug, Clone)]
 pub enum Configuration {

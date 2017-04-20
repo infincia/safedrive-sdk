@@ -1,24 +1,24 @@
-use std::path::{PathBuf};
+use std::path::PathBuf;
 use std::fs;
 
 // external crate imports
 
-use ::rustc_serialize::hex::{ToHex};
+use rustc_serialize::hex::ToHex;
 
-use ::number_prefix::{binary_prefix, Standalone, Prefixed};
-
-#[cfg(target_os = "macos")]
-use ::objc_foundation::{NSObject, NSString, INSString};
+use number_prefix::{binary_prefix, Standalone, Prefixed};
 
 #[cfg(target_os = "macos")]
-use ::objc::runtime::{Class};
+use objc_foundation::{NSObject, NSString, INSString};
 
-use ::byteorder::LittleEndian;
-use ::byteorder::ByteOrder;
+#[cfg(target_os = "macos")]
+use objc::runtime::Class;
+
+use byteorder::LittleEndian;
+use byteorder::ByteOrder;
 
 // internal imports
 
-use ::constants::*;
+use constants::*;
 
 pub fn generate_uuid() -> String {
     let sync_uuid = format!("{}{}", ::uuid::Uuid::new_v4().simple().to_string(), ::uuid::Uuid::new_v4().simple().to_string());

@@ -5,13 +5,13 @@ use std;
 
 /// external crate imports
 
-use ::keyring::Keyring;
+use keyring::Keyring;
 
 
 /// internal imports
 
-use ::error::KeychainError;
-use ::constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain, current_user_domain, unique_client_id_domain};
+use error::KeychainError;
+use constants::{account_credential_domain, recovery_key_domain, ssh_credential_domain, token_domain, current_user_domain, unique_client_id_domain};
 
 /// keychain types
 

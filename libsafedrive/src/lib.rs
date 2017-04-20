@@ -51,7 +51,7 @@ pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder, Acc
 pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
 pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
-pub use keychain::{KeychainService};
+pub use keychain::KeychainService;
 
 #[cfg(feature = "sessionfs")]
 pub use sessionfs::*;

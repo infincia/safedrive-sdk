@@ -1,20 +1,20 @@
 use std::fs::File;
-use std::path::{PathBuf};
+use std::path::PathBuf;
 use std::io::{Read, Write};
-use ::rustc_serialize::hex::{FromHex};
-use ::walkdir::WalkDir;
+use rustc_serialize::hex::FromHex;
+use walkdir::WalkDir;
 
 use std::{thread, time};
 
-use ::CACHE_DIR;
-use ::block::WrappedBlock;
-use ::error::SDError;
+use CACHE_DIR;
+use block::WrappedBlock;
+use error::SDError;
 
-use ::models::Token;
+use models::Token;
 
-use ::error::SDAPIError;
+use error::SDAPIError;
 
-use ::binformat::BinaryWriter;
+use binformat::BinaryWriter;
 
 pub struct WriteCacheMessage {
     pub item: Option<WrappedBlock>,

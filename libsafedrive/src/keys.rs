@@ -1,16 +1,16 @@
 
 /// external crate imports
 
-use ::bip39::{Bip39, Language};
-use ::rustc_serialize::hex::{ToHex, FromHex};
+use bip39::{Bip39, Language};
+use rustc_serialize::hex::{ToHex, FromHex};
 use reed_solomon::Encoder as RSEncoder;
 use reed_solomon::Decoder as RSDecoder;
 
 /// internal imports
 
-use ::error::CryptoError;
-use ::models::WrappedKeysetBody;
-use ::constants::*;
+use error::CryptoError;
+use models::WrappedKeysetBody;
+use constants::*;
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]

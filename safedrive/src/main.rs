@@ -15,7 +15,7 @@ extern crate serde_json;
 use std::str;
 
 #[cfg(target_os = "linux")]
-use std::ffi::{OsStr};
+use std::ffi::OsStr;
 
 use std::fs::File;
 use std::thread;
@@ -23,7 +23,7 @@ use std::thread;
 #[cfg(target_os = "linux")]
 use std::env;
 
-use std::path::{PathBuf};
+use std::path::PathBuf;
 
 use std::collections::HashMap;
 
@@ -41,7 +41,7 @@ extern crate uuid;
 use uuid::Uuid;
 
 extern crate chrono;
-use ::chrono::{Local, UTC, TimeZone};
+use chrono::{Local, UTC, TimeZone};
 
 extern crate safedrive;
 use safedrive::*;

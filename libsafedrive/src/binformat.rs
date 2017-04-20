@@ -1,8 +1,8 @@
 use std;
 
-use ::nom::{IResult, rest, le_u32};
+use nom::{IResult, rest, le_u32};
 
-use ::constants::*;
+use constants::*;
 
 pub trait BinaryWriter {
     fn name(&self) -> String;

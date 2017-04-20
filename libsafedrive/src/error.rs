@@ -2,10 +2,10 @@ use std;
 
 /// external crate imports
 
-use ::bip39::{Bip39Error};
-use ::rustc_serialize::hex::{FromHexError};
+use bip39::Bip39Error;
+use rustc_serialize::hex::FromHexError;
 
-use ::keyring::KeyringError;
+use keyring::KeyringError;
 use reed_solomon::DecoderError;
 
 #[derive(Debug)]

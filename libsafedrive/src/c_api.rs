@@ -9,50 +9,50 @@ use std::path::{Path, PathBuf};
 use std::u64;
 /// internal imports
 
-use ::state::State;
+use state::State;
 
-use ::core::initialize;
+use core::initialize;
 
-use ::core::add_sync_folder;
-use ::core::update_sync_folder;
-use ::core::remove_sync_folder;
-use ::core::get_sync_folder;
-use ::core::get_sync_folders;
+use core::add_sync_folder;
+use core::update_sync_folder;
+use core::remove_sync_folder;
+use core::get_sync_folder;
+use core::get_sync_folders;
 
-use ::core::log;
+use core::log;
 
-use ::core::get_sync_sessions;
-use ::core::remove_sync_session;
-use ::core::clean_sync_sessions;
-use ::core::sync;
-use ::core::restore;
-use ::core::load_keys;
-use ::core::login;
-use ::core::cancel_sync_task;
+use core::get_sync_sessions;
+use core::remove_sync_session;
+use core::clean_sync_sessions;
+use core::sync;
+use core::restore;
+use core::load_keys;
+use core::login;
+use core::cancel_sync_task;
 
-use ::constants::Configuration;
+use constants::Configuration;
 
-use ::models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
+use models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
 
-use ::keychain::KeychainService;
-use ::core::get_keychain_item;
-use ::core::set_keychain_item;
-use ::core::delete_keychain_item;
+use keychain::KeychainService;
+use core::get_keychain_item;
+use core::set_keychain_item;
+use core::delete_keychain_item;
 
-use ::session::SyncSession;
+use session::SyncSession;
 
-use ::core::generate_unique_client_id;
+use core::generate_unique_client_id;
 
-use ::core::get_account_status;
-use ::core::get_account_details;
+use core::get_account_status;
+use core::get_account_details;
 
-use ::core::remove_software_client;
+use core::remove_software_client;
 
-use ::core::get_software_clients;
+use core::get_software_clients;
 
-use ::core::send_error_report;
+use core::send_error_report;
 
-use ::error::SDError;
+use error::SDError;
 
 /// exports
 

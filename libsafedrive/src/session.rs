@@ -1,13 +1,13 @@
 use std::io::{Read, Write};
 
-use ::error::{CryptoError, SDError};
-use ::binformat::BinaryFormat;
-use ::nom::IResult::*;
-use ::keys::{Key, WrappedKey, KeyType};
-use ::models::*;
+use error::{CryptoError, SDError};
+use binformat::BinaryFormat;
+use nom::IResult::*;
+use keys::{Key, WrappedKey, KeyType};
+use models::*;
 
-use ::constants::*;
-use ::CHANNEL;
+use constants::*;
+use CHANNEL;
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct SyncSession {
