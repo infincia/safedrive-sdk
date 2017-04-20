@@ -10,78 +10,64 @@ mkdir -p dep/$TARGET/lib
 mkdir -p dep/$TARGET/include
 mkdir -p dep/$TARGET/bin
 
+export BUILD_PREFIX=$PWD/dep/${TARGET}
+
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
-export SODIUM_VER_FILE=$PWD/dep/${TARGET}/lib/.sodium_ver
+export SODIUM_VER_FILE=${BUILD_PREFIX}/lib/.sodium_ver
+export SODIUM_ARGS="--enable-shared=no"
 
 export LIBDBUS_VER=1.10.14
-export LIBDBUS_VER_FILE=$PWD/dep/${TARGET}/lib/.dbus_ver
+export LIBDBUS_VER_FILE=${BUILD_PREFIX}/lib/.dbus_ver
+export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
 export EXPAT_VER=2.2.0
-export EXPAT_VER_FILE=$PWD/dep/${TARGET}/lib/.expat_ver
+export EXPAT_VER_FILE=${BUILD_PREFIX}/lib/.expat_ver
+export EXPAT_ARGS="--enable-shared=no"
 
-export BUILD_PREFIX=$PWD/dep/${TARGET}
+export BUILD_DBUS=true
+export BUILD_LIBSODIUM=true
 
-export BUILD_DBUS=false
+export RUSTFLAGS=""
+export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
 
-export BUILD_LIBSODIUM=false
+export OSX_VERSION_MIN="10.9"
+export OSX_CPU_ARCH="core2"
+export MAC_ARGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH}"
 
 case ${TARGET} in
     x86_64-apple-darwin)
-        export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
-        export OSX_CPU_ARCH=${OSX_CPU_ARCH-"core2"}
-        export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g"
-        export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
-        export RUSTFLAGS="-C link-args=-mmacosx-version-min=10.9"
-        export SODIUM_ARGS="--enable-shared=no"
-        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-launchd --disable-libaudit"
-        export EXPAT_ARGS="--enable-shared=no"
-        BUILD_LIBSODIUM=true
+        export CFLAGS="${CFLAGS} ${MAC_ARGS}"
+        export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
+        export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
+        export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
         ;;
     x86_64-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
-        export SODIUM_ARGS="--enable-shared=no"
-        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
-        export EXPAT_ARGS="--enable-shared=no"
-        BUILD_DBUS=true
-        BUILD_LIBSODIUM=true
+        export CFLAGS="${CFLAGS}"
+        export CPPFLAGS="${CPPFLAGS}"
+        export LDFLAGS="${LDFLAGS}"
         ;;
     i686-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -m32 -I${BUILD_PREFIX}/include"
-        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
-        export SODIUM_ARGS="--enable-shared=no"
-        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
-        export EXPAT_ARGS="--enable-shared=no"
+        export CFLAGS="${CFLAGS} -m32"
+        export CPPFLAGS="${CPPFLAGS} -m32"
+        export LDFLAGS="${LDFLAGS}"
         export PKG_CONFIG_ALLOW_CROSS=1
-        BUILD_DBUS=true
-        BUILD_LIBSODIUM=true
         ;;
     x86_64-unknown-linux-musl)
-        export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+        export CFLAGS="${CFLAGS}"
+        export CPPFLAGS="${CPPFLAGS}"
+        export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
-        export SODIUM_ARGS="--enable-shared=no"
-        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
-        export EXPAT_ARGS="--enable-shared=no"
-        BUILD_DBUS=true
-        BUILD_LIBSODIUM=true
         ;;
     i686-unknown-linux-musl)
-        export CFLAGS="-O2 -g -m32 -I${BUILD_PREFIX}/include"
-        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+        export CFLAGS="${CFLAGS} -m32"
+        export CPPFLAGS="${CPPFLAGS} -m32"
+        export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
-        export SODIUM_ARGS="--enable-shared=no"
-        export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
-        export EXPAT_ARGS="--enable-shared=no"
         export PKG_CONFIG_ALLOW_CROSS=1
-        BUILD_DBUS=true
-        BUILD_LIBSODIUM=true
         ;;
     *)
         ;;

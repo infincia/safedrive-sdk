@@ -8,33 +8,45 @@ fi
 
 echo "Testing for $TARGET"
 
-export RUSTFLAGS="-Z print-link-args"
+export BUILD_PREFIX=$PWD/dep/${TARGET}
+
+export RUSTFLAGS=""
+export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+
+export OSX_VERSION_MIN="10.9"
+export OSX_CPU_ARCH="core2"
+export MAC_ARGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH}"
 
 case ${TARGET} in
     x86_64-apple-darwin)
-        export OSX_VERSION_MIN=${OSX_VERSION_MIN-"10.9"}
-        export OSX_CPU_ARCH=${OSX_CPU_ARCH-"core2"}
-        export CFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -O2 -g -flto"
-        export LDFLAGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -flto"
-        export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=10.9 "
+        export CFLAGS="${CFLAGS} ${MAC_ARGS}"
+        export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
+        export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
+        export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
         ;;
     x86_64-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -flto -I${BUILD_PREFIX}/include"
-        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+        export CFLAGS="${CFLAGS}"
+        export CPPFLAGS="${CPPFLAGS}"
+        export LDFLAGS="${LDFLAGS}"
         ;;
     i686-unknown-linux-gnu)
-        export CFLAGS="-O2 -g -flto -m32"
-        export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+        export CFLAGS="${CFLAGS} -m32"
+        export CPPFLAGS="${CPPFLAGS} -m32"
+        export LDFLAGS="${LDFLAGS}"
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     x86_64-unknown-linux-musl)
-        export CFLAGS="-O2 -g -flto"
-        export LDFLAGS="-flto"
+        export CFLAGS="${CFLAGS}"
+        export CPPFLAGS="${CPPFLAGS}"
+        export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
         ;;
     i686-unknown-linux-musl)
-        export CFLAGS="-O2 -g -flto -m32"
-        export LDFLAGS="-flto"
+        export CFLAGS="${CFLAGS} -m32"
+        export CPPFLAGS="${CPPFLAGS} -m32"
+        export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
