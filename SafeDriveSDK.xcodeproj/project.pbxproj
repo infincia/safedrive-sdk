@@ -12,9 +12,7 @@
 		AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA686A1D1E81C0AA00C9F33B /* Constants.swift */; };
 		AA80B0C21D6F963F00512FC7 /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
-		AA8CCDCD1E2947B90002B1FF /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
 		AA8CCDCF1E2948170002B1FF /* libsafedrive.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		AA8CCDD01E2948170002B1FF /* libsodium.18.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA97A1AD1E2C64C100CAAD19 /* SafeDriveSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */; };
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFDD561DC4E91000B4EAC7 /* libz.tbd */; };
@@ -28,7 +26,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				AA8CCDCF1E2948170002B1FF /* libsafedrive.dylib in CopyFiles */,
-				AA8CCDD01E2948170002B1FF /* libsodium.18.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,7 +70,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */,
-				AA8CCDCD1E2947B90002B1FF /* libsodium.18.dylib in Frameworks */,
 				AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
