@@ -296,8 +296,8 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -348,8 +348,8 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -404,8 +404,8 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -457,8 +457,8 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -510,8 +510,8 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -567,8 +567,8 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -625,8 +625,8 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -685,8 +685,8 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -743,8 +743,8 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -803,8 +803,8 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -859,8 +859,8 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -916,8 +916,8 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -975,8 +975,8 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -1031,8 +1031,8 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
 
@@ -1089,8 +1089,8 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -1152,8 +1152,8 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -1209,8 +1209,8 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -1267,8 +1267,8 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
@@ -1323,8 +1323,8 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let (multipart_body, content_length, real_size) = multipart_for_binary(blocks, "files");
@@ -1385,8 +1385,8 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
 
     let client = ::reqwest::Client::new().unwrap();
 
-    let retries = 3;
-    let mut retries_left = retries;
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
 
     loop {
         let request = client.request(endpoint.method(), endpoint.url())
