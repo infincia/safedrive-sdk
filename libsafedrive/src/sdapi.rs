@@ -1241,7 +1241,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                     return Err(SDAPIError::ServiceUnavailable);
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
+            _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status()))),
         };
 
     }
@@ -1560,7 +1560,7 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
                     return Err(SDAPIError::ServiceUnavailable);
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
+            _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status()))),
         };
     }
 

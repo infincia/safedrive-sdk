@@ -1409,6 +1409,6 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
 
     match report_error(cv, os, unique_client_id, description, context, &log_messages) {
         Ok(()) => return Ok(()),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
