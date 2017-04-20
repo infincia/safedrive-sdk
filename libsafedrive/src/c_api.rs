@@ -55,7 +55,6 @@ use core::send_error_report;
 use error::SDError;
 
 /// exports
-
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKState(State);
@@ -129,7 +128,6 @@ pub struct SDDKAccountDetails {
     pub expiration_date: u64,
     pub notifications:  *const SDDKNotification,
     pub notification_count: i32,
-
 }
 
 impl From<AccountDetails> for SDDKAccountDetails {
@@ -1896,7 +1894,7 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
     unsafe {
         *folders = ptr;
     }
-    
+
     len as i64
 }
 

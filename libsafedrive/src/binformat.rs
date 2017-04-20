@@ -29,7 +29,6 @@ impl<'a> std::fmt::Display for BinaryFormat<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         write!(f, "BinaryFormat <type:{}, version:{}, payload:{}>", self.file_type, self.version, self.wrapped_data.len())
     }
-
 }
 
 pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> {
@@ -94,5 +93,3 @@ pub fn parse_hmacs<'a, T: AsRef<[u8]>>(input: &'a T) -> IResult<&'a [u8], Vec<&'
     }
     IResult::Done(d, hmacs)
 }
-
-

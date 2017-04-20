@@ -98,7 +98,6 @@ impl<'a> BlockGenerator<'a> {
 
 
 impl<'a> Iterator for BlockGenerator<'a> {
-
     type Item = Result<::block::Block, SDError>;
 
     fn next(&mut self) -> Option<Result<::block::Block, SDError>> {
@@ -206,7 +205,6 @@ impl<'a> ChunkGenerator<'a> {
 }
 
 impl<'a> Iterator for ChunkGenerator<'a> {
-
     type Item = Chunk;
 
     fn next(&mut self) -> Option<Chunk> {
@@ -265,7 +263,6 @@ impl<I, F, H> Iterator for SeparatorIter<I, F, H> where I: Iterator<Item=u8>, F:
 
         None
     }
-
 }
 
 
@@ -282,7 +279,6 @@ pub struct RollingBlake2b {
 }
 
 impl RollingBlake2b {
-
     pub fn new(tweak: Key, window_size_bits: u32) -> RollingBlake2b {
         let window_size = 1 << window_size_bits;
 

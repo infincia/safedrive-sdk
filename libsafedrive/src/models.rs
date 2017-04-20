@@ -331,4 +331,3 @@ pub struct RegisteredFolder {
     pub encrypted: bool,
     pub syncing: bool,
 }
-

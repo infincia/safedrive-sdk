@@ -15,7 +15,6 @@ impl SDLogger {
 }
 
 impl Log for SDLogger {
-
     fn enabled(&self, metadata: &LogMetadata) -> bool {
         metadata.level() <= self.level
     }
@@ -36,7 +35,6 @@ impl Log for SDLogger {
 }
 
 impl SharedLogger for SDLogger {
-
     fn level(&self) -> LogLevelFilter {
         self.level
     }
@@ -49,5 +47,4 @@ impl SharedLogger for SDLogger {
     fn as_log(self: Box<Self>) -> Box<Log> {
         Box::new(*self)
     }
-
 }

@@ -318,7 +318,7 @@ impl WrappedBlock {
     pub fn real_size(&self) -> u64 {
         panic!("can't retrieve real size of a wrapped block");
     }
-    
+
     pub fn upload(&self) -> bool {
         self.upload
     }
@@ -390,11 +390,9 @@ impl WrappedBlock {
 
         Ok(wrapped_block)
     }
-
 }
 
 impl ::binformat::BinaryWriter for WrappedBlock {
-
     fn name(&self) -> String {
         self.hmac.to_hex()
     }

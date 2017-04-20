@@ -165,10 +165,3 @@ lazy_static! {
 lazy_static! {
     static ref LOG: ::parking_lot::RwLock<Vec<String>> = ::parking_lot::RwLock::new(Vec::new());
 }
-
-
-
-
-
-
-

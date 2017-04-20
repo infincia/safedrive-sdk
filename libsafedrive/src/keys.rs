@@ -126,7 +126,6 @@ impl WrappedKeyset {
             None => None,
         }
     }
-
 }
 
 impl From<WrappedKeysetBody> for WrappedKeyset {
@@ -138,7 +137,6 @@ impl From<WrappedKeysetBody> for WrappedKeyset {
 
         WrappedKeyset { master: wrapped_master_key, main: wrapped_main_key, hmac: wrapped_hmac_key, tweak: wrapped_tweak_key, recovery: None }
     }
-
 }
 
 impl<'a> ::std::fmt::Display for WrappedKeyset {
@@ -265,7 +263,6 @@ pub struct Key {
 }
 
 impl Key {
-
     pub fn new(key_type: KeyType) -> Key {
         let key_size = match key_type {
             KeyType::Master => SECRETBOX_KEY_SIZE,

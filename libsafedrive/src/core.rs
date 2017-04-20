@@ -1075,7 +1075,7 @@ pub fn restore(token: &Token,
                 let stream_length = file_entry.header().size().unwrap();
 
                 trace!("entry has {} blocks", stream_length / 32);
-                
+
                 if stream_length > 0 {
                     let mut stream = BufWriter::new(f);
 
@@ -1316,7 +1316,7 @@ pub fn restore(token: &Token,
                     };
 
                     let is_dir = md.file_type().is_dir();
-                    
+
                     if is_dir {
                         match ::std::os::windows::fs::symlink_dir(&src, &full_path) {
                             Ok(()) => {},

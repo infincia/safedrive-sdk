@@ -313,11 +313,9 @@ impl WrappedSyncSession {
     pub fn compressed(&self) -> bool {
         self.compressed
     }
-
 }
 
 impl ::binformat::BinaryWriter for WrappedSyncSession {
-
     fn name(&self) -> String {
         self.name.clone()
     }

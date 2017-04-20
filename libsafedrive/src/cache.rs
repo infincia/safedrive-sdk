@@ -191,7 +191,6 @@ impl WriteCache {
                 match local_self.request_waiting_items() {
 
                     Some(block_batch) => {
-
                         if block_batch.len() > 0 {
 
                             debug!("sending {} blocks", block_batch.len());
@@ -280,7 +279,6 @@ impl WriteCache {
 
 
                         }
-
                     },
                     None => {},
                 };
