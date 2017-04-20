@@ -84,7 +84,7 @@ impl WrappedKeyset {
     pub fn new() -> Result<WrappedKeyset, CryptoError> {
         /// generate a recovery phrase that will be used to encrypt the master key
         let mnemonic_keytype = ::bip39::KeyType::Key128;
-        let mnemonic = try!(Bip39::new(&mnemonic_keytype, Language::English, ""));
+        let mnemonic = Bip39::new(&mnemonic_keytype, Language::English, "")?;
         let recovery_phrase = { mnemonic.mnemonic.clone() };
         let recovery_key = Key::from(mnemonic);
         debug!("phrase: {}", recovery_phrase);
@@ -93,22 +93,22 @@ impl WrappedKeyset {
         /// We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
         let master_key_type = KeyType::Master;
         let master_key = Key::new(master_key_type);
-        let master_key_wrapped = try!(master_key.to_wrapped(&recovery_key, None));
+        let master_key_wrapped = master_key.to_wrapped(&recovery_key, None)?;
 
         /// generate a main key and encrypt it with the master key and static nonce
         let main_key_type = KeyType::Main;
         let main_key = Key::new(main_key_type);
-        let main_key_wrapped = try!(main_key.to_wrapped(&master_key, None));
+        let main_key_wrapped = main_key.to_wrapped(&master_key, None)?;
 
         /// generate an hmac key and encrypt it with the master key and static nonce
         let hmac_key_type = KeyType::HMAC;
         let hmac_key = Key::new(hmac_key_type);
-        let hmac_key_wrapped = try!(hmac_key.to_wrapped(&master_key, None));
+        let hmac_key_wrapped = hmac_key.to_wrapped(&master_key, None)?;
 
         /// generate a tweak key and encrypt it with the master key and static nonce
         let tweak_key_type = KeyType::Tweak;
         let tweak_key = Key::new(tweak_key_type);
-        let tweak_key_wrapped = try!(tweak_key.to_wrapped(&master_key, None));
+        let tweak_key_wrapped = tweak_key.to_wrapped(&master_key, None)?;
         debug!("generated key set");
         debug!("new recovery phrase: {}", recovery_phrase);
         debug!("new master key: {}", master_key_wrapped.to_hex());
@@ -122,12 +122,12 @@ impl WrappedKeyset {
     }
 
     pub fn to_keyset(&self, phrase: &str) -> Result<Keyset, CryptoError> {
-        let mnemonic = try!(Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()));
+        let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string())?;
         let recovery_key = Key::from(mnemonic);
-        let master_key = try!(self.master.to_key(&recovery_key, None));
-        let main_key = try!(self.main.to_key(&master_key, None));
-        let hmac_key = try!(self.hmac.to_key(&master_key, None));
-        let tweak_key = try!(self.tweak.to_key(&master_key, None));
+        let master_key = self.master.to_key(&recovery_key, None)?;
+        let main_key = self.main.to_key(&master_key, None)?;
+        let hmac_key = self.hmac.to_key(&master_key, None)?;
+        let tweak_key = self.tweak.to_key(&master_key, None)?;
 
         Ok(Keyset { recovery: phrase.to_string(), master: master_key, main: main_key, hmac: hmac_key, tweak: tweak_key })
     }

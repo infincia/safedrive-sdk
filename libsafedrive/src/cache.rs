@@ -452,11 +452,11 @@ pub fn read_block<'a>(name: &'a str) -> Result<WrappedBlock, SDError> {
 
     bp.push(name);
 
-    let mut file = try!(File::open(&bp));
+    let mut file = File::open(&bp)?;
 
     let mut buffer = Vec::new();
 
-    try!(file.read_to_end(&mut buffer));
+    file.read_to_end(&mut buffer)?;
     let h = name.from_hex().unwrap();
 
     WrappedBlock::from(buffer, h)
@@ -470,8 +470,8 @@ pub fn write_binary<'a>(item: &WrappedBlock) -> Result<(), SDError> {
 
     item_path.push(name);
 
-    let mut f = try!(File::create(&item_path));
-    try!(f.write_all(&item.as_binary()));
+    let mut f = File::create(&item_path)?;
+    f.write_all(&item.as_binary())?;
 
     Ok(())
 }

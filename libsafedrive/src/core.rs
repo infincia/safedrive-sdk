@@ -563,7 +563,7 @@ pub fn sync(token: &Token,
     }
 
     #[cfg(feature = "locking")]
-    let flock = try!(FolderLock::new(&folder_path));
+    let flock = FolderLock::new(&folder_path)?;
 
     #[cfg(feature = "locking")]
     defer!({
@@ -962,7 +962,7 @@ pub fn restore(token: &Token,
                issue: &mut FnMut(&str)) -> Result<(), SDError> {
     let restore_start_time = ::std::time::Instant::now();
 
-    try!(fs::create_dir_all(&destination));
+    fs::create_dir_all(&destination)?;
 
     let dpath: &Path = &destination;
     let path_exists = dpath.exists();
@@ -980,7 +980,7 @@ pub fn restore(token: &Token,
     let folder_name = &folder.folderName;
 
     #[cfg(feature = "locking")]
-    let flock = try!(FolderLock::new(&destination));
+    let flock = FolderLock::new(&destination)?;
 
     #[cfg(feature = "locking")]
     defer!({
@@ -1093,7 +1093,7 @@ pub fn restore(token: &Token,
 
                     let mut block_hmac_bag = Vec::new();
 
-                    try!(file_entry.read_to_end(&mut block_hmac_bag));
+                    file_entry.read_to_end(&mut block_hmac_bag)?;
                     let block_hmac_list = match ::binformat::parse_hmacs(&block_hmac_bag) {
                         Done(_, o) => o,
                         Error(e) => {
@@ -1239,7 +1239,7 @@ pub fn restore(token: &Token,
                         trace!("writing block segment of {} bytes", block.len());
 
                         {
-                            try!(stream.write_all(block.as_ref()));
+                            stream.write_all(block.as_ref())?;
                         }
                         {
                             let new_position = stream.seek(SeekFrom::Current(0)).unwrap();
@@ -1261,7 +1261,7 @@ pub fn restore(token: &Token,
                 }
             },
             EntryType::Directory => {
-                try!(fs::create_dir_all(&full_path));
+                fs::create_dir_all(&full_path)?;
             },
             EntryType::Link => {
                 let src = match file_entry.link_name() {

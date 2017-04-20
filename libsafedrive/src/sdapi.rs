@@ -316,18 +316,18 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -368,22 +368,22 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let token: Token = try!(::serde_json::from_str(&response));
+                let token: Token = ::serde_json::from_str(&response)?;
                 return Ok(token)
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -424,11 +424,11 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -436,7 +436,7 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
             &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -477,17 +477,17 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let clients: Vec<SoftwareClient> = try!(::serde_json::from_str(&response));
+                let clients: Vec<SoftwareClient> = ::serde_json::from_str(&response)?;
                 return Ok(clients)
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
@@ -530,22 +530,22 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let account_status: AccountStatus = try!(::serde_json::from_str(&response));
+                let account_status: AccountStatus = ::serde_json::from_str(&response)?;
                 return Ok(account_status);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -587,22 +587,22 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let account_details: AccountDetails = try!(::serde_json::from_str(&response));
+                let account_details: AccountDetails = ::serde_json::from_str(&response)?;
                 return Ok(account_details);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -646,22 +646,22 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let wrapped_keyset_b: WrappedKeysetBody = try!(::serde_json::from_str(&response));
+                let wrapped_keyset_b: WrappedKeysetBody = ::serde_json::from_str(&response)?;
                 return Ok(WrappedKeyset::from(wrapped_keyset_b));
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -705,22 +705,22 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let folders: Vec<RegisteredFolder> = try!(::serde_json::from_str(&response));
+                let folders: Vec<RegisteredFolder> = ::serde_json::from_str(&response)?;
                 return Ok(folders);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -764,22 +764,22 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let folder_response: CreateFolderResponse = try!(::serde_json::from_str(&response));
+                let folder_response: CreateFolderResponse = ::serde_json::from_str(&response)?;
                 return Ok(folder_response.id);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -824,11 +824,11 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -836,7 +836,7 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
             &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -879,11 +879,11 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -891,7 +891,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
             &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -936,22 +936,22 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
-                let sessions: HashMap<String, HashMap<u64, Vec<SyncSession>>> = try!(::serde_json::from_str(&response));
+                let sessions: HashMap<String, HashMap<u64, Vec<SyncSession>>> = ::serde_json::from_str(&response)?;
                 return Ok(sessions);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -995,11 +995,11 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -1008,7 +1008,7 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
             &::reqwest::StatusCode::Created => {},
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -1057,18 +1057,18 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         match result.status() {
             &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Created => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -1109,7 +1109,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
 
         match result.status() {
@@ -1117,7 +1117,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                 let mut buffer = Vec::new();
 
                 trace!("reading data");
-                try!(result.read_to_end(&mut buffer));
+                result.read_to_end(&mut buffer)?;
 
                 trace!("returning data");
                 return Ok(SyncSessionResponse { name: name, chunk_data: buffer, folder_id: folder_id });
@@ -1127,9 +1127,9 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
             &::reqwest::StatusCode::BadRequest => {
                 let mut response = String::new();
 
-                try!(result.read_to_string(&mut response));
+                result.read_to_string(&mut response)?;
 
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -1172,11 +1172,11 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -1187,7 +1187,7 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::NotFound => {},
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -1229,11 +1229,11 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -1242,7 +1242,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::NotFound => {},
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -1287,11 +1287,11 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         trace!("response: {}", response);
 
@@ -1300,7 +1300,7 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
             &::reqwest::StatusCode::NotFound => return Ok(false),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
@@ -1348,21 +1348,21 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
-        try!(result.read_to_string(&mut response));
+        result.read_to_string(&mut response)?;
 
         debug!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok | &::reqwest::StatusCode::Created => {
-                let missing: Vec<String> = try!(::serde_json::from_str(&response));
+                let missing: Vec<String> = ::serde_json::from_str(&response)?;
                 return Ok(missing);
             },
             &::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
@@ -1405,14 +1405,14 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = try!(request.send());
+        let mut result = request.send()?;
         trace!("response received");
 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
                 let mut buffer = Vec::new();
                 trace!("reading data");
-                try!(result.read_to_end(&mut buffer));
+                result.read_to_end(&mut buffer)?;
                 trace!("returning data");
 
                 return Ok(buffer);
@@ -1422,9 +1422,9 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
             &::reqwest::StatusCode::BadRequest => {
                 let mut response = String::new();
 
-                try!(result.read_to_string(&mut response));
+                result.read_to_string(&mut response)?;
 
-                let error: ServerErrorResponse = try!(::serde_json::from_str(&response));
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message))
             },
             &::reqwest::StatusCode::ServiceUnavailable => {

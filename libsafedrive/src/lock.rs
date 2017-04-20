@@ -25,7 +25,7 @@ impl FolderLock {
                 return Err(SDError::SyncAlreadyInProgress);
             },
             false => {
-                try!(File::create(&path));
+                File::create(&path)?;
             }
         }
 
