@@ -41,6 +41,7 @@ case ${TARGET} in
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=no"
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
@@ -50,6 +51,7 @@ case ${TARGET} in
         ;;
     i686-unknown-linux-gnu)
         export CFLAGS="-O2 -g -m32 -I${BUILD_PREFIX}/include"
+        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export SODIUM_ARGS="--enable-shared=no"
         export LIBDBUS_ARGS="--enable-shared=no --disable-tests --without-dbus-glib --with-x=no --disable-systemd --disable-libaudit --disable-selinux --disable-apparmor"
@@ -60,6 +62,7 @@ case ${TARGET} in
         ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
@@ -70,6 +73,7 @@ case ${TARGET} in
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="-O2 -g -m32 -I${BUILD_PREFIX}/include"
+        export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
         export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
         export CC=musl-gcc
         export SODIUM_ARGS="--enable-shared=no"
