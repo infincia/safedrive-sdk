@@ -208,7 +208,7 @@ impl WrappedKey {
 
         // short path if the key has no ecc info
         if key.len() == 48 {
-            return Ok(WrappedKey::from(key, key_type))
+            return Ok(WrappedKey::from(key, key_type));
         }
 
         let recovered = WrappedKey::from_rs(key, key_type)?;
@@ -529,7 +529,7 @@ fn key_unwrap_lowercase_master_generated_by_sdk_00318_test() {
         Ok(_) => {},
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 }
@@ -548,7 +548,7 @@ fn key_unwrap_uppercase_master_generated_by_sdk_00318_test() {
         Ok(_) => {},
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 }
@@ -569,7 +569,7 @@ fn key_unwrap_uppercase_master_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 
@@ -592,7 +592,7 @@ fn key_unwrap_lowercase_master_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 
@@ -631,7 +631,7 @@ fn key_unwrap_lowercase_keyset_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 
@@ -691,7 +691,7 @@ fn key_unwrap_corrupt_hex_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
     assert!(original_master.bytes.len() == 32, "invalid original master key length");
@@ -704,7 +704,7 @@ fn key_unwrap_corrupt_hex_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 
@@ -730,7 +730,7 @@ fn key_unwrap_corrupt_ecc_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
     assert!(original_master.bytes.len() == 32, "invalid original master key length");
@@ -743,7 +743,7 @@ fn key_unwrap_corrupt_ecc_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 
@@ -770,7 +770,7 @@ fn key_unwrap_corrupt_ecc_too_damaged_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
     assert!(original_master.bytes.len() == 32, "invalid original master key length");
@@ -783,7 +783,7 @@ fn key_unwrap_corrupt_ecc_too_damaged_generated_by_sdk_00600_test() {
         Ok(k) => k,
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 
@@ -807,7 +807,7 @@ fn key_unwrap_failing_master_test() {
         Ok(_) => {},
         Err(e) => {
             assert!(true == false, format!("{}", e));
-            return
+            return;
         },
     };
 }

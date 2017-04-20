@@ -247,7 +247,7 @@ impl WrappedBlock {
             Ok(k) => k,
             Err(e) => {
                 debug!("block key unwrap failed: {:?}", e);
-                return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)))
+                return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)));
             },
         };
 
@@ -255,7 +255,7 @@ impl WrappedBlock {
             Ok(s) => s,
             Err(e) => {
                 debug!("block decrypt failed: {:?}", e);
-                return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)))
+                return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)));
             },
         };
 
@@ -286,11 +286,11 @@ impl WrappedBlock {
                             },
                         };
 
-                        return Err(SDError::BlockUnreadable)
+                        return Err(SDError::BlockUnreadable);
                     },
                     Incomplete(_) => {
                         debug!("block data cannot be unpadded, this should never happen");
-                        return Err(SDError::BlockUnreadable)
+                        return Err(SDError::BlockUnreadable);
                     },
                 };
 
@@ -383,11 +383,11 @@ impl WrappedBlock {
                     },
                 };
 
-                return Err(SDError::BlockUnreadable)
+                return Err(SDError::BlockUnreadable);
             },
             Incomplete(_) => {
                 debug!("block file cannot be parsed, this should never happen");
-                return Err(SDError::BlockUnreadable)
+                return Err(SDError::BlockUnreadable);
             },
         };
 

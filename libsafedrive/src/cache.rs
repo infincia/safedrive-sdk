@@ -104,7 +104,7 @@ impl WriteCache {
 
             debug!("write cache provided {} items ({})", taken_count, pretty);
 
-            return Some(r)
+            return Some(r);
         }
 
         None

@@ -119,7 +119,7 @@ impl<'a> Iterator for BlockGenerator<'a> {
                 self.chunk_index = self.chunk_index + chunk.size;
 
                 if let Err(e) = buffer.read_to_end(&mut data) {
-                    return Some(Err(SDError::from(e)))
+                    return Some(Err(SDError::from(e)));
                 }
 
                 let block = Block::new(self.version, self.hmac_key, data);

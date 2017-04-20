@@ -231,12 +231,12 @@ impl WrappedSyncSession {
                             },
                         };
 
-                        return Err(SDError::SessionUnreadable)
+                        return Err(SDError::SessionUnreadable);
                     },
                     Incomplete(_) => {
                         debug!("session data cannot be unpadded, this should never happen");
-                        return Err(SDError::SessionUnreadable)
-                    }
+                        return Err(SDError::SessionUnreadable);
+                    },
                 };
 
                 let unpadded_data = unpadded.to_vec();
@@ -310,12 +310,12 @@ impl WrappedSyncSession {
                     },
                 };
 
-                return Err(SDError::SessionUnreadable)
+                return Err(SDError::SessionUnreadable);
             },
             Incomplete(_) => {
                 debug!("session file cannot be parsed, this should never happen");
-                return Err(SDError::SessionUnreadable)
-            }
+                return Err(SDError::SessionUnreadable);
+            },
         };
 
         debug!("got valid binary file: {}", &raw_session);

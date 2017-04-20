@@ -1075,7 +1075,7 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1178,7 +1178,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1300,7 +1300,7 @@ pub extern "C" fn sddk_get_account_status(state: *mut SDDKState,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1382,7 +1382,7 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1480,7 +1480,7 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1803,7 +1803,7 @@ pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1887,7 +1887,7 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 
@@ -1976,7 +1976,7 @@ pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState,
             unsafe {
                 *error = ptr;
             }
-            return -1
+            return -1;
         },
     };
 

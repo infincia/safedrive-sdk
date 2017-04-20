@@ -58,7 +58,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         Ok(()) => {},
         Err(_) => {}, // ignore this for the moment, it's primarily going to be the directory existing already
     }
-    return Ok(storage_path)
+    return Ok(storage_path);
 
 }
 
@@ -98,7 +98,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         Err(_) => {}, // ignore this for the moment, it's primarily going to be the directory existing already
     }
 
-    return Ok(storage_path)
+    return Ok(storage_path);
 }
 
 pub fn get_current_os() -> &'static str {

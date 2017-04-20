@@ -125,7 +125,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 
     if let Err(e) = fs::create_dir_all(local_storage_path) {
         debug!("failed to create local directories: {}", e);
-        return Err(SDError::from(e))
+        return Err(SDError::from(e));
     }
 
     let storage_s = match local_storage_path.to_str() {
@@ -147,7 +147,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     };
     if let Err(e) = fs::create_dir_all(&cache_s) {
         debug!("failed to create local directories: {}", e);
-        return Err(SDError::from(e))
+        return Err(SDError::from(e));
     }
     let mut cd = CACHE_DIR.write();
     *cd = cache_s;
@@ -334,10 +334,10 @@ pub fn get_sync_folder(token: &Token,
     };
     for folder in folders {
         if folder.id == folder_id {
-            return Ok(folder)
+            return Ok(folder);
         }
     }
-    return Err(SDError::Internal(format!("unexpected failure to find folder_id {}", folder_id)))
+    return Err(SDError::Internal(format!("unexpected failure to find folder_id {}", folder_id)));
 }
 
 pub fn add_sync_folder(token: &Token,
@@ -547,7 +547,7 @@ pub fn sync(token: &Token,
     let path_is_dir = p.is_dir();
 
     if !path_exists || !path_is_dir {
-        return Err(SDError::FolderMissing)
+        return Err(SDError::FolderMissing);
     }
 
     #[cfg(feature = "locking")]
@@ -622,7 +622,7 @@ pub fn sync(token: &Token,
                     issue(&format!("not able to cancel upload: ({})", e));
                 },
             }
-            return Err(SDError::Cancelled)
+            return Err(SDError::Cancelled);
         }
 
         trace!("examining {}", item.path().display());
@@ -686,7 +686,7 @@ pub fn sync(token: &Token,
                                 issue(&format!("not able to cancel upload: ({})", e));
                             },
                         }
-                        return Err(SDError::Cancelled)
+                        return Err(SDError::Cancelled);
                     }
 
                     match status_receive.try_recv() {
@@ -967,7 +967,7 @@ pub fn restore(token: &Token,
     let path_is_dir = dpath.is_dir();
 
     if !path_exists || !path_is_dir {
-        return Err(SDError::FolderMissing)
+        return Err(SDError::FolderMissing);
     }
 
     let folder = match get_sync_folder(token, folder_id) {
@@ -1029,7 +1029,7 @@ pub fn restore(token: &Token,
         if is_sync_task_cancelled(session_name.to_owned()) {
             issue(&format!("sync cancelled ({})", session_name));
 
-            return Err(SDError::Cancelled)
+            return Err(SDError::Cancelled);
         }
         let restore_item_start_time = ::std::time::Instant::now();
 
@@ -1097,7 +1097,7 @@ pub fn restore(token: &Token,
                         Error(e) => {
                             error!("hmac bag parsing failed: {}", e);
 
-                            return Err(SDError::SessionUnreadable)
+                            return Err(SDError::SessionUnreadable);
                         },
                         Incomplete(_) => panic!("should never happen"),
                     };
@@ -1107,7 +1107,7 @@ pub fn restore(token: &Token,
                         if is_sync_task_cancelled(session_name.to_owned()) {
                             issue(&format!("sync cancelled ({})", session_name));
 
-                            return Err(SDError::Cancelled)
+                            return Err(SDError::Cancelled);
                         }
 
                         let block_start_time = ::std::time::Instant::now();
@@ -1139,7 +1139,7 @@ pub fn restore(token: &Token,
                             if is_sync_task_cancelled(session_name.to_owned()) {
                                 issue(&format!("sync cancelled ({})", session_name));
 
-                                return Err(SDError::Cancelled)
+                                return Err(SDError::Cancelled);
                             }
 
                             let failed_count = 15.0 - retries_left;
@@ -1179,7 +1179,7 @@ pub fn restore(token: &Token,
                                         Err(e) => {
                                             debug!("block failed validation: {}", &block_hmac_hex);
 
-                                            return Err(e)
+                                            return Err(e);
                                         },
                                     };
                                     trace!("Block processing took {} seconds", block_processing_start_time.elapsed().as_secs());
@@ -1205,7 +1205,7 @@ pub fn restore(token: &Token,
                                     if retries_left <= 0.0 {
                                         issue(&format!("not able to retrieve part of {}: {}", full_path.display(), err.description()));
 
-                                        return Err(SDError::RequestFailure(err))
+                                        return Err(SDError::RequestFailure(err));
                                     }
                                 },
                                 _ => {},

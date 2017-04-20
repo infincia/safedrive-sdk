@@ -80,7 +80,7 @@ impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync +
             },
             Err(e) => {
                 debug!("error reading: {}", e);
-                return Err(e)
+                return Err(e);
             },
         }
 
@@ -335,12 +335,12 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
             &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -396,17 +396,17 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         match result.status() {
             &::reqwest::StatusCode::Ok => {
                 let token: Token = ::serde_json::from_str(&response)?;
-                return Ok(token)
+                return Ok(token);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -458,12 +458,12 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -516,14 +516,14 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
         match result.status() {
             &::reqwest::StatusCode::Ok => {
                 let clients: Vec<SoftwareClient> = ::serde_json::from_str(&response)?;
-                return Ok(clients)
+                return Ok(clients);
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -578,12 +578,12 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -639,12 +639,12 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -707,12 +707,12 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -770,12 +770,12 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
@@ -834,12 +834,12 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -900,12 +900,12 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -961,12 +961,12 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1027,12 +1027,12 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1092,12 +1092,12 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1161,12 +1161,12 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1233,12 +1233,12 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                 result.read_to_string(&mut response)?;
 
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
@@ -1291,12 +1291,12 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
             &::reqwest::StatusCode::NotFound => {},
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1352,12 +1352,12 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
             &::reqwest::StatusCode::NotFound => {},
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1416,12 +1416,12 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1484,13 +1484,13 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
             },
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => {
@@ -1552,12 +1552,12 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
                 result.read_to_string(&mut response)?;
 
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message))
+                return Err(SDAPIError::Internal(error.message));
             },
             &::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable)
+                    return Err(SDAPIError::ServiceUnavailable);
                 }
             },
             _ => return Err(SDAPIError::Internal(format!("unexpected status code: {}", result.status())))
