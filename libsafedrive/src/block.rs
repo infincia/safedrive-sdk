@@ -99,7 +99,16 @@ impl Block {
 
         let production = is_production();
 
-        Block { version: version, data: maybe_compressed_data, real_size: real_size, compressed_size: maybe_compressed_size, hmac: block_hmac, compressed: compressed, channel: channel, production: production }
+        Block {
+            version: version,
+            data: maybe_compressed_data,
+            real_size: real_size,
+            compressed_size: maybe_compressed_size,
+            hmac: block_hmac,
+            compressed: compressed,
+            channel: channel,
+            production: production,
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -191,7 +200,17 @@ impl Block {
         };
 
 
-        Ok(WrappedBlock { version: self.version, hmac: self.hmac, wrapped_data: wrapped_data, wrapped_key: wrapped_block_key, nonce: block_nonce, compressed: self.compressed, channel: self.channel, production: self.production, upload: false })
+        Ok(WrappedBlock {
+               version: self.version,
+               hmac: self.hmac,
+               wrapped_data: wrapped_data,
+               wrapped_key: wrapped_block_key,
+               nonce: block_nonce,
+               compressed: self.compressed,
+               channel: self.channel,
+               production: self.production,
+               upload: false,
+           })
     }
 }
 
@@ -304,7 +323,16 @@ impl WrappedBlock {
         let real_size = maybe_uncompressed_data.len();
 
 
-        Ok(Block { version: self.version, hmac: self.hmac, data: maybe_uncompressed_data, real_size: real_size as u64, compressed_size: maybe_compressed_size, compressed: self.compressed, channel: self.channel, production: self.production })
+        Ok(Block {
+               version: self.version,
+               hmac: self.hmac,
+               data: maybe_uncompressed_data,
+               real_size: real_size as u64,
+               compressed_size: maybe_compressed_size,
+               compressed: self.compressed,
+               channel: self.channel,
+               production: self.production,
+           })
     }
 
     pub fn get_hmac(&self) -> Vec<u8> {
@@ -385,7 +413,17 @@ impl WrappedBlock {
         let production = raw_block.production;
         let compressed = raw_block.compressed;
 
-        let wrapped_block = WrappedBlock { version: block_ver, hmac: hmac, wrapped_key: wrapped_block_key, wrapped_data: wrapped_block_raw, nonce: block_nonce, compressed: compressed, channel: channel, production: production, upload: false };
+        let wrapped_block = WrappedBlock {
+            version: block_ver,
+            hmac: hmac,
+            wrapped_key: wrapped_block_key,
+            wrapped_data: wrapped_block_raw,
+            nonce: block_nonce,
+            compressed: compressed,
+            channel: channel,
+            production: production,
+            upload: false,
+        };
         debug!("got valid wrapped block: {}", &wrapped_block);
 
         Ok(wrapped_block)

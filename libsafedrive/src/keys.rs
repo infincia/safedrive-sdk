@@ -105,7 +105,13 @@ impl WrappedKeyset {
         debug!("new tweak key: {}", tweak_key_wrapped.to_hex());
 
 
-        Ok( WrappedKeyset { recovery: Some(recovery_phrase), master: master_key_wrapped, main: main_key_wrapped, hmac: hmac_key_wrapped, tweak: tweak_key_wrapped })
+        Ok(WrappedKeyset {
+               recovery: Some(recovery_phrase),
+               master: master_key_wrapped,
+               main: main_key_wrapped,
+               hmac: hmac_key_wrapped,
+               tweak: tweak_key_wrapped,
+           })
 
     }
 
@@ -117,7 +123,13 @@ impl WrappedKeyset {
         let hmac_key = self.hmac.to_key(&master_key, None)?;
         let tweak_key = self.tweak.to_key(&master_key, None)?;
 
-        Ok(Keyset { recovery: phrase.to_string(), master: master_key, main: main_key, hmac: hmac_key, tweak: tweak_key })
+        Ok(Keyset {
+               recovery: phrase.to_string(),
+               master: master_key,
+               main: main_key,
+               hmac: hmac_key,
+               tweak: tweak_key,
+           })
     }
 
     pub fn recovery_phrase(&self) -> Option<String> {
@@ -135,7 +147,13 @@ impl From<WrappedKeysetBody> for WrappedKeyset {
         let wrapped_hmac_key = WrappedKey::from_hex(body.hmac, KeyType::HMAC).expect("failed to convert key hex to key");
         let wrapped_tweak_key = WrappedKey::from_hex(body.tweak, KeyType::Tweak).expect("failed to convert key hex to key");
 
-        WrappedKeyset { master: wrapped_master_key, main: wrapped_main_key, hmac: wrapped_hmac_key, tweak: wrapped_tweak_key, recovery: None }
+        WrappedKeyset {
+            master: wrapped_master_key,
+            main: wrapped_main_key,
+            hmac: wrapped_hmac_key,
+            tweak: wrapped_tweak_key,
+            recovery: None,
+        }
     }
 }
 
@@ -169,7 +187,10 @@ pub struct WrappedKey {
 impl WrappedKey {
     pub fn from(key: Vec<u8>, key_type: KeyType) -> WrappedKey {
 
-        WrappedKey { bytes: key, key_type: key_type }
+        WrappedKey {
+            bytes: key,
+            key_type: key_type,
+        }
     }
 
     pub fn from_rs(coded_key: Vec<u8>, key_type: KeyType) -> Result<WrappedKey, CryptoError> {
@@ -222,7 +243,10 @@ impl WrappedKey {
             Err(_) => return Err(CryptoError::RecoveryPhraseIncorrect),
         };
 
-        Ok(Key { bytes: key_raw, key_type: self.key_type })
+        Ok(Key {
+               bytes: key_raw,
+               key_type: self.key_type,
+           })
     }
 
     fn to_rs(&self) -> Vec<u8> {
@@ -277,12 +301,18 @@ impl Key {
         };
         let key = ::sodiumoxide::randombytes::randombytes(key_size);
 
-        Key { bytes: key.to_vec(), key_type: key_type }
+        Key {
+            bytes: key.to_vec(),
+            key_type: key_type,
+        }
     }
 
     fn from(recovery_phrase: Bip39) -> Key {
         let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(recovery_phrase.seed.as_ref());
-        Key { bytes: recovery_key.as_ref().to_vec(), key_type: KeyType::Recovery }
+        Key {
+            bytes: recovery_key.as_ref().to_vec(),
+            key_type: KeyType::Recovery,
+        }
     }
 
     pub fn as_sodium_secretbox_key(&self) -> ::sodiumoxide::crypto::secretbox::Key {

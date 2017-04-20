@@ -291,7 +291,14 @@ impl<'a> APIEndpoint<'a> {
 #[allow(dead_code)]
 pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operatingSystem: &'a str, description: &'a str, context: &'a str, log: &'a Vec<String>) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::ErrorLog { operatingSystem: operatingSystem, uniqueClientId: uniqueClientId, clientVersion: clientVersion, description: description, context: context, log: log };
+    let endpoint = APIEndpoint::ErrorLog {
+        operatingSystem: operatingSystem,
+        uniqueClientId: uniqueClientId,
+        clientVersion: clientVersion,
+        description: description,
+        context: context,
+        log: log,
+    };
 
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
@@ -347,7 +354,13 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
 
 pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<Token, SDAPIError> {
 
-    let endpoint = APIEndpoint::RegisterClient{ operatingSystem: operatingSystem, email: email, password: password, language: languageCode, uniqueClientId: uniqueClientId };
+    let endpoint = APIEndpoint::RegisterClient {
+        operatingSystem: operatingSystem,
+        email: email,
+        password: password,
+        language: languageCode,
+        uniqueClientId: uniqueClientId,
+    };
 
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
@@ -464,7 +477,10 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
 
 pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, SDAPIError> {
 
-    let endpoint = APIEndpoint::GetClients { email: email, password: password };
+    let endpoint = APIEndpoint::GetClients {
+        email: email,
+        password: password,
+    };
 
     let user_agent = &**USER_AGENT.read();
     let client = ::reqwest::Client::new().unwrap();
@@ -643,7 +659,12 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
 
 pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<WrappedKeyset, SDAPIError> {
 
-    let endpoint = APIEndpoint::AccountKey { master: &new_wrapped_keyset.master.to_hex(), main: &new_wrapped_keyset.main.to_hex(), hmac: &new_wrapped_keyset.hmac.to_hex(), tweak: &new_wrapped_keyset.tweak.to_hex() };
+    let endpoint = APIEndpoint::AccountKey {
+        master: &new_wrapped_keyset.master.to_hex(),
+        main: &new_wrapped_keyset.main.to_hex(),
+        hmac: &new_wrapped_keyset.hmac.to_hex(),
+        tweak: &new_wrapped_keyset.tweak.to_hex(),
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -765,7 +786,12 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
 
 pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> Result<u64, SDAPIError> {
 
-    let endpoint = APIEndpoint::CreateFolder { folderPath: path, folderName: name, encrypted: encrypted, syncing: true };
+    let endpoint = APIEndpoint::CreateFolder {
+        folderPath: path,
+        folderName: name,
+        encrypted: encrypted,
+        syncing: true,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -829,7 +855,12 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
 
 pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqueID: u64) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::UpdateFolder { folderPath: path, folderName: name, syncing: syncing, id: uniqueID };
+    let endpoint = APIEndpoint::UpdateFolder {
+        folderPath: path,
+        folderName: name,
+        syncing: syncing,
+        id: uniqueID,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -889,7 +920,9 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
 }
 
 pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
-    let endpoint = APIEndpoint::DeleteFolder { folder_id: folder_id };
+    let endpoint = APIEndpoint::DeleteFolder {
+        folder_id: folder_id,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -950,7 +983,9 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
 
 pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<SyncSession>>>, SDAPIError> {
 
-    let endpoint = APIEndpoint::ReadSyncSessions { encrypted: true };
+    let endpoint = APIEndpoint::ReadSyncSessions {
+        encrypted: true,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1013,7 +1048,11 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
 
 pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypted: bool) -> Result<(), SDAPIError> {
 
-    let endpoint = APIEndpoint::RegisterSyncSession { folder_id: folder_id, name: name, encrypted: encrypted };
+    let endpoint = APIEndpoint::RegisterSyncSession {
+        folder_id: folder_id,
+        name: name,
+        encrypted: encrypted,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1073,7 +1112,12 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
 
 pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool, session: &[WrappedSyncSession], size: usize, progress: F) -> Result<(), SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
 
-    let endpoint = APIEndpoint::FinishSyncSession { folder_id: folder_id, encrypted: encrypted, size: size, session: &session[0] };
+    let endpoint = APIEndpoint::FinishSyncSession {
+        folder_id: folder_id,
+        encrypted: encrypted,
+        size: size,
+        session: &session[0],
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1135,7 +1179,10 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
 }
 
 pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted: bool) -> Result<SyncSessionResponse<'a>, SDAPIError> {
-    let endpoint = APIEndpoint::ReadSyncSession { name: name, encrypted: encrypted };
+    let endpoint = APIEndpoint::ReadSyncSession {
+        name: name,
+        encrypted: encrypted,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1172,7 +1219,11 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                 result.read_to_end(&mut buffer)?;
 
                 trace!("returning data");
-                return Ok(SyncSessionResponse { name: name, chunk_data: buffer, folder_id: folder_id });
+                return Ok(SyncSessionResponse {
+                              name: name,
+                              chunk_data: buffer,
+                              folder_id: folder_id,
+                          });
             },
             &::reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
@@ -1198,7 +1249,9 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
 }
 
 pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> {
-    let endpoint = APIEndpoint::DeleteSyncSession { session_id: session_id };
+    let endpoint = APIEndpoint::DeleteSyncSession {
+        session_id: session_id,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1257,7 +1310,9 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
 }
 
 pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> {
-    let endpoint = APIEndpoint::DeleteSyncSessions { timestamp: timestamp };
+    let endpoint = APIEndpoint::DeleteSyncSessions {
+        timestamp: timestamp,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1319,7 +1374,9 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
 #[allow(dead_code)]
 pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 
-    let endpoint = APIEndpoint::CheckBlock { name: name };
+    let endpoint = APIEndpoint::CheckBlock {
+        name: name,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1379,7 +1436,9 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 #[allow(dead_code)]
 pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: F) -> Result<Vec<String>, SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static, T: ::binformat::BinaryWriter {
 
-    let endpoint = APIEndpoint::WriteBlocks { session: session };
+    let endpoint = APIEndpoint::WriteBlocks {
+        session: session,
+    };
 
     let user_agent = &**USER_AGENT.read();
 
@@ -1445,7 +1504,9 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
 
 
 pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
-    let endpoint = APIEndpoint::ReadBlock { name: name };
+    let endpoint = APIEndpoint::ReadBlock {
+        name: name,
+    };
 
     let user_agent = &**USER_AGENT.read();
 

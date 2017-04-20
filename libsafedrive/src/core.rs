@@ -661,7 +661,12 @@ pub fn sync(token: &Token,
         if is_file {
             if stream_length > 0 {
 
-                let mut block_generator = ::chunk::BlockGenerator::new(&full_path, main_key, hmac_key, tweak_key, stream_length, SYNC_VERSION);
+                let mut block_generator = ::chunk::BlockGenerator::new(&full_path,
+                                                                       main_key,
+                                                                       hmac_key,
+                                                                       tweak_key,
+                                                                       stream_length,
+                                                                       SYNC_VERSION);
 
                 let mut item_padding: u64 = 0;
 
@@ -885,7 +890,12 @@ pub fn sync(token: &Token,
     let raw_session = ar.into_inner().unwrap();
 
 
-    let session = SyncSession::new(SYNC_VERSION, folder_id, session_name.to_string(), Some(processed_size), None, raw_session);
+    let session = SyncSession::new(SYNC_VERSION,
+                                   folder_id,
+                                   session_name.to_string(),
+                                   Some(processed_size),
+                                   None,
+                                   raw_session);
 
 
     let compression_ratio = (processed_size_compressed as f64 / session.size.unwrap() as f64) * 100.0;

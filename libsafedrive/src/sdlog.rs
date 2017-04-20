@@ -10,7 +10,10 @@ pub struct SDLogger {
 
 impl SDLogger {
     pub fn new(log_level: LogLevelFilter, config: Config) -> Box<SDLogger> {
-        Box::new(SDLogger { level: log_level, config: config })
+        Box::new(SDLogger {
+                     level: log_level,
+                     config: config,
+                 })
     }
 }
 

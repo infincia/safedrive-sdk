@@ -29,7 +29,9 @@ impl FolderLock {
             },
         }
 
-        return Ok(FolderLock { path: path })
+        return Ok(FolderLock {
+                      path: path,
+                  });
     }
 
     pub fn unlock(&self) {

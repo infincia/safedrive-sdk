@@ -171,11 +171,15 @@ impl<'a> ChunkGenerator<'a> {
             SyncVersion::Version1 => {
                 let hash = ::cdc::Rabin64::new(window_size_bits);
 
-                let separator_iter = SeparatorIter::custom_new(byte_iter, min_chunk_size, max_chunk_size, hash, move |x: u64| {
-                    let bit_mask: u64 = (1u64 << leading_value_bits) - 1;
+                let separator_iter = SeparatorIter::custom_new(byte_iter,
+                                                               min_chunk_size,
+                                                               max_chunk_size,
+                                                               hash,
+                                                               move |x: u64| {
+                                                                   let bit_mask: u64 = (1u64 << leading_value_bits) - 1;
 
-                    x & bit_mask == bit_mask
-                });
+                                                                   x & bit_mask == bit_mask
+                                                               });
 
                 let chunk_iter = ::cdc::ChunkIter::new(separator_iter, total_size);
 
@@ -187,11 +191,15 @@ impl<'a> ChunkGenerator<'a> {
                 /// not using a custom hash yet, but we can
                 //let hash = RollingBlake2b::new(tweak_key.clone(), window_size_bits);
 
-                let separator_iter = SeparatorIter::custom_new(byte_iter, min_chunk_size, max_chunk_size, hash, move |x: u64| {
-                    let bit_mask: u64 = (1u64 << leading_value_bits) - 1;
+                let separator_iter = SeparatorIter::custom_new(byte_iter,
+                                                               min_chunk_size,
+                                                               max_chunk_size,
+                                                               hash,
+                                                               move |x: u64| {
+                                                                   let bit_mask: u64 = (1u64 << leading_value_bits) - 1;
 
-                    x & bit_mask == bit_mask
-                });
+                                                                   x & bit_mask == bit_mask
+                                                               });
 
                 let chunk_iter = ::cdc::ChunkIter::new(separator_iter, total_size);
 
@@ -200,7 +208,11 @@ impl<'a> ChunkGenerator<'a> {
 
         };
 
-        ChunkGenerator { iter: chunk_iter, tweak_key: tweak_key, version: version }
+        ChunkGenerator {
+            iter: chunk_iter,
+            tweak_key: tweak_key,
+            version: version,
+        }
     }
 }
 
@@ -252,7 +264,10 @@ impl<I, F, H> Iterator for SeparatorIter<I, F, H> where I: Iterator<Item=u8>, F:
             self.hash.slide(&byte);
             self.index += 1;
             if (self.predicate)(*self.hash.get_hash()) {
-                let separator = ::cdc::Separator { index: self.index, hash: *self.hash.get_hash() };
+                let separator = ::cdc::Separator {
+                    index: self.index,
+                    hash: *self.hash.get_hash(),
+                };
 
                 // Note: We skip min chunk size + subsequent separators which may overlap the current one.
                 self.index += self.hash.reset_and_prefill_window(&mut self.iter) as u64;

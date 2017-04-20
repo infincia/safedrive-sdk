@@ -82,7 +82,20 @@ impl SyncSession {
 
         let production = is_production();
 
-        SyncSession { version: version, folder_id: Some(folder_id), name: name, size: size, time: time, data: maybe_compressed_data, compressed: compressed, id: None, production: production, channel: channel, real_size: real_size, compressed_size: maybe_compressed_size }
+        SyncSession {
+            version: version,
+            folder_id: Some(folder_id),
+            name: name,
+            size: size,
+            time: time,
+            data: maybe_compressed_data,
+            compressed: compressed,
+            id: None,
+            production: production,
+            channel: channel,
+            real_size: real_size,
+            compressed_size: maybe_compressed_size,
+        }
     }
 
 
@@ -121,7 +134,19 @@ impl SyncSession {
             Err(e) => return Err(e),
         };
 
-        Ok(WrappedSyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, time: self.time, wrapped_data: wrapped_data, wrapped_key: wrapped_session_key, nonce: session_nonce, compressed: self.compressed, production: self.production, channel: self.channel })
+        Ok(WrappedSyncSession {
+               version: self.version,
+               folder_id: self.folder_id,
+               name: self.name,
+               size: self.size,
+               time: self.time,
+               wrapped_data: wrapped_data,
+               wrapped_key: wrapped_session_key,
+               nonce: session_nonce,
+               compressed: self.compressed,
+               production: self.production,
+               channel: self.channel,
+           })
     }
 
     pub fn compressed(&self) -> bool {
@@ -243,7 +268,20 @@ impl WrappedSyncSession {
 
         let real_size = maybe_uncompressed_data.len();
 
-        Ok(SyncSession { version: self.version, folder_id: self.folder_id, name: self.name, size: self.size, real_size: real_size as u64, compressed_size: maybe_compressed_size, time: self.time, data: maybe_uncompressed_data, compressed: self.compressed, id: None, production: self.production, channel: self.channel })
+        Ok(SyncSession {
+               version: self.version,
+               folder_id: self.folder_id,
+               name: self.name,
+               size: self.size,
+               real_size: real_size as u64,
+               compressed_size: maybe_compressed_size,
+               time: self.time,
+               data: maybe_uncompressed_data,
+               compressed: self.compressed,
+               id: None,
+               production: self.production,
+               channel: self.channel,
+           })
     }
 
     pub fn from(body: SyncSessionResponse) -> Result<WrappedSyncSession, SDError> {
@@ -302,7 +340,19 @@ impl WrappedSyncSession {
         let production = raw_session.production;
         let compressed = raw_session.compressed;
 
-        let wrapped_session = WrappedSyncSession { version: session_ver, folder_id: Some(body.folder_id), name: body.name.to_string(), size: None, time: None, wrapped_key: wrapped_session_key, wrapped_data: wrapped_session_raw, nonce: session_nonce, compressed: compressed, channel: channel, production: production };
+        let wrapped_session = WrappedSyncSession {
+            version: session_ver,
+            folder_id: Some(body.folder_id),
+            name: body.name.to_string(),
+            size: None,
+            time: None,
+            wrapped_key: wrapped_session_key,
+            wrapped_data: wrapped_session_raw,
+            nonce: session_nonce,
+            compressed: compressed,
+            channel: channel,
+            production: production,
+        };
 
 
         debug!("got valid wrapped session: {}", &wrapped_session);

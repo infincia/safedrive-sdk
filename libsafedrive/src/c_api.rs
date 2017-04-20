@@ -310,20 +310,29 @@ impl From<SDError> for SDDKError {
             SDError::Cancelled => SDDKErrorType::Cancelled,
             SDError::FolderMissing => SDDKErrorType::FolderMissing,
         };
-        SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
+        SDDKError {
+            error_type: error_type,
+            message: CString::new(format!("{}", e)).unwrap().into_raw(),
+        }
     }
 }
 
 impl From<str::Utf8Error> for SDDKError {
     fn from(e: str::Utf8Error) -> Self {
-        SDDKError { error_type: SDDKErrorType::UnicodeError, message: CString::new(format!("{}", e)).unwrap().into_raw() }
+        SDDKError {
+            error_type: SDDKErrorType::UnicodeError,
+            message: CString::new(format!("{}", e)).unwrap().into_raw(),
+        }
     }
 }
 
 
 impl From<String> for SDDKError {
     fn from(s: String) -> Self {
-        SDDKError { error_type: SDDKErrorType::Internal, message: CString::new(format!("{}", s)).unwrap().into_raw() }
+        SDDKError {
+            error_type: SDDKErrorType::Internal,
+            message: CString::new(format!("{}", s)).unwrap().into_raw(),
+        }
     }
 }
 
