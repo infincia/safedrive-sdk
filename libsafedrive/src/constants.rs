@@ -22,15 +22,9 @@ impl ::std::default::Default for Channel {
 impl ::std::fmt::Display for Channel {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
         match *self {
-            Channel::Stable => {
-                write!(f, "stable")
-            },
-            Channel::Beta => {
-                write!(f, "beta")
-            },
-            Channel::Nightly => {
-                write!(f, "nightly")
-            },
+            Channel::Stable => write!(f, "stable"),
+            Channel::Beta => write!(f, "beta"),
+            Channel::Nightly => write!(f, "nightly"),
         }
     }
 }

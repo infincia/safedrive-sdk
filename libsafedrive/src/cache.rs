@@ -367,7 +367,7 @@ pub fn clean_cache(limit: u64) -> Result<u64, SDError> {
 
         let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
-            Err(_) => { continue },
+            Err(_) => continue,
         };
 
         let stream_length = md.len();
@@ -426,7 +426,7 @@ pub fn clear_cache() -> Result<u64, SDError> {
 
         let md = match ::std::fs::symlink_metadata(&p) {
             Ok(m) => m,
-            Err(_) => { continue },
+            Err(_) => continue,
         };
 
         let stream_length = md.len();

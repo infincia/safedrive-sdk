@@ -77,7 +77,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
     let m = format!("failed to get {} environment variable", evar);
     let path = match ::std::env::var(evar) {
         Ok(e) => e,
-        Err(_) => { return Err(m) }
+        Err(_) => return Err(m),
     };
 
     let mut storage_path = PathBuf::from(&path);
@@ -287,7 +287,10 @@ fn nearest_to_1890() {
 fn staging_directory_test() {
     match get_app_directory(&Configuration::Staging) {
         Ok(p) => p,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -295,6 +298,9 @@ fn staging_directory_test() {
 fn production_directory_test() {
     match get_app_directory(&Configuration::Production) {
         Ok(p) => p,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }

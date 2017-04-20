@@ -80,15 +80,9 @@ pub fn get_channel() -> Channel {
     let c = CHANNEL.read();
 
     match *c {
-        Channel::Stable => {
-            Channel::Stable
-        },
-        Channel::Beta => {
-            Channel::Beta
-        },
-        Channel::Nightly => {
-            Channel::Nightly
-        },
+        Channel::Stable => Channel::Stable,
+        Channel::Beta => Channel::Beta,
+        Channel::Nightly => Channel::Nightly,
     }
 }
 
@@ -121,12 +115,8 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     *lc = language_code.to_string();
 
     let app_type = match desktop {
-        true => {
-            "desktop".to_owned()
-        },
-        false => {
-            "cli".to_owned()
-        }
+        true => "desktop".to_owned(),
+        false => "cli".to_owned(),
     };
 
 
@@ -140,7 +130,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 
     let storage_s = match local_storage_path.to_str() {
         Some(ref s) => s.to_string(),
-        None => { return Err(SDError::UnicodeError) },
+        None => return Err(SDError::UnicodeError),
     };
 
     let mut sd = STORAGE_DIR.write();
@@ -153,7 +143,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 
     let cache_s = match p.as_path().to_str() {
         Some(ref s) => s.to_string(),
-        None => { return Err(SDError::UnicodeError) },
+        None => return Err(SDError::UnicodeError),
     };
     if let Err(e) = fs::create_dir_all(&cache_s) {
         debug!("failed to create local directories: {}", e);
@@ -308,9 +298,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 
             if let Some(p) = recovery_phrase {
                 match real_wrapped_keyset.to_keyset(&p) {
-                    Ok(ks) => {
-                        Ok(ks)
-                    },
+                    Ok(ks) => Ok(ks),
                     Err(e) => {
                         debug!("failed to decrypt keys: {}", e);
                         Err(SDError::RecoveryPhraseIncorrect)
@@ -425,7 +413,7 @@ pub fn remove_sync_session(token: &Token,
                            session_id: u64) -> Result<(), SDError> {
     match delete_session(token, session_id) {
         Ok(()) => Ok(()),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -652,7 +640,10 @@ pub fn sync(token: &Token,
 
         let md = match ::std::fs::symlink_metadata(&full_path) {
             Ok(m) => m,
-            Err(_) => { failed = failed +1; continue },
+            Err(_) => {
+                failed = failed + 1;
+                continue;
+            },
         };
 
         let stream_length = md.len();
@@ -914,8 +905,7 @@ pub fn sync(token: &Token,
             debug!("session file total compressed: {}", size);
             debug!("session file compression ratio: {}", compression_ratio);
         },
-        None => {
-        }
+        None => {},
     }
 
 
@@ -937,9 +927,7 @@ pub fn sync(token: &Token,
         debug!("session upload progress: {}/{}, {} new", current, total, new);
     }) {
         Ok(()) => {},
-        Err(SDAPIError::Authentication) => {
-            return Err(SDError::Authentication)
-        },
+        Err(SDAPIError::Authentication) => return Err(SDError::Authentication),
         Err(e) => {
             issue(&format!("not able to finish sync: {}", e));
             return Err(SDError::RequestFailure(Box::new(e)));
@@ -1197,9 +1185,7 @@ pub fn restore(token: &Token,
 
                                     wrapped_block = Some(wb);
                                 },
-                                Err(SDAPIError::Authentication) => {
-                                    return Err(SDError::Authentication)
-                                },
+                                Err(SDAPIError::Authentication) => return Err(SDError::Authentication),
                                 Err(SDAPIError::RequestFailed(err)) => {
                                     retries_left = retries_left - 1.0;
 
@@ -1370,9 +1356,7 @@ pub fn restore(token: &Token,
 
 pub fn log(text: &str, level: LogLevelFilter) {
     match level {
-        ::log::LogLevelFilter::Off => {
-
-        },
+        ::log::LogLevelFilter::Off => {},
         ::log::LogLevelFilter::Error => {
             error!("{}", text);
         },
@@ -1405,16 +1389,12 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
 
     let cv: &str = match client_version {
         Some(ref cv) => cv,
-        None => {
-            &**gcv
-        }
+        None => &**gcv,
     };
 
     let os: &str = match operating_system {
         Some(ref os) => os,
-        None => {
-            &**gos
-        }
+        None => &**gos,
     };
 
     match report_error(cv, os, unique_client_id, description, context, &log_messages) {

@@ -75,15 +75,9 @@ impl SyncSession {
         let c = CHANNEL.read();
 
         let channel = match *c {
-            Channel::Stable => {
-                Channel::Stable
-            },
-            Channel::Beta => {
-                Channel::Beta
-            },
-            Channel::Nightly => {
-                Channel::Nightly
-            },
+            Channel::Stable => Channel::Stable,
+            Channel::Beta => Channel::Beta,
+            Channel::Nightly => Channel::Nightly,
         };
 
         let production = is_production();
@@ -186,9 +180,7 @@ impl WrappedSyncSession {
         };
 
         let unpadded_data = match self.version {
-            SyncVersion::Version1 => {
-                session_raw
-            },
+            SyncVersion::Version1 => session_raw,
             SyncVersion::Version2 => {
                 let unpadded = match ::binformat::remove_padding(&session_raw) {
                     Done(_, o) => o,
@@ -230,9 +222,7 @@ impl WrappedSyncSession {
         };
 
         let (maybe_uncompressed_data, maybe_compressed_size) = match self.version {
-            SyncVersion::Version1 => {
-                (unpadded_data, None)
-            },
+            SyncVersion::Version1 => (unpadded_data, None),
             SyncVersion::Version2 => {
                 match self.compressed {
                     true => {
@@ -245,9 +235,7 @@ impl WrappedSyncSession {
 
                         (uncompressed_data, Some(compressed_size as u64))
                     },
-                    false => {
-                        (unpadded_data, None)
-                    }
+                    false => (unpadded_data, None),
                 }
             },
             _ => panic!("unknown binary version"),
@@ -355,9 +343,7 @@ impl ::binformat::BinaryWriter for WrappedSyncSession {
         let mut flags = Empty;
 
         match self.channel {
-            Channel::Stable => {
-                flags.insert(Stable)
-            },
+            Channel::Stable => flags.insert(Stable),
             Channel::Beta => {
                 flags.insert(Beta);
             },

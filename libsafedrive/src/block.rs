@@ -92,15 +92,9 @@ impl Block {
         let c = CHANNEL.read();
 
         let channel = match *c {
-            Channel::Stable => {
-                Channel::Stable
-            },
-            Channel::Beta => {
-                Channel::Beta
-            },
-            Channel::Nightly => {
-                Channel::Nightly
-            },
+            Channel::Stable => Channel::Stable,
+            Channel::Beta => Channel::Beta,
+            Channel::Nightly => Channel::Nightly,
         };
 
         let production = is_production();
@@ -247,9 +241,7 @@ impl WrappedBlock {
         };
 
         let unpadded_data = match self.version {
-            SyncVersion::Version1 => {
-                block_raw
-            },
+            SyncVersion::Version1 => block_raw,
             SyncVersion::Version2 => {
                 let unpadded = match ::binformat::remove_padding(&block_raw) {
                     Done(_, o) => o,
@@ -291,9 +283,7 @@ impl WrappedBlock {
         };
 
         let (maybe_uncompressed_data, maybe_compressed_size) = match self.version {
-            SyncVersion::Version1 => {
-                (unpadded_data, None)
-            },
+            SyncVersion::Version1 => (unpadded_data, None),
             SyncVersion::Version2 => {
                 match self.compressed {
                     true => {
@@ -305,9 +295,7 @@ impl WrappedBlock {
 
                         (uncompressed_data, Some(compressed_size))
                     },
-                    false => {
-                        (unpadded_data, None)
-                    }
+                    false => (unpadded_data, None),
                 }
             },
             _ => panic!("unknown binary version"),
@@ -431,9 +419,7 @@ impl ::binformat::BinaryWriter for WrappedBlock {
         let mut flags = Empty;
 
         match self.channel {
-            Channel::Stable => {
-                flags.insert(Stable)
-            },
+            Channel::Stable => flags.insert(Stable),
             Channel::Beta => {
                 flags.insert(Beta);
             },
@@ -512,7 +498,10 @@ fn wrap_block_v1_test() {
 
     let _ = match block.to_wrapped(&main) {
         Ok(wb) => wb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -528,7 +517,10 @@ fn wrap_block_v2_test() {
 
     let _ = match block.to_wrapped(&main) {
         Ok(wb) => wb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -545,12 +537,18 @@ fn unwrap_block_v1_test() {
 
     let wrapped_block = match block.to_wrapped(&main) {
         Ok(wb) => wb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     let _ = match wrapped_block.to_block(&main) {
         Ok(uwb) => uwb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -566,12 +564,18 @@ fn unwrap_block_v2_test() {
 
     let wrapped_block = match block.to_wrapped(&main) {
         Ok(wb) => wb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     let _ = match wrapped_block.to_block(&main) {
         Ok(uwb) => uwb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -587,7 +591,10 @@ fn wrapped_block_from_vec_v1_test() {
 
     let wrapped_block = match block.to_wrapped(&main) {
         Ok(wb) => wb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     let raw_wrapped_data = wrapped_block.as_binary();
@@ -595,7 +602,10 @@ fn wrapped_block_from_vec_v1_test() {
 
     let _ = match WrappedBlock::from(raw_wrapped_data, hmac_value.to_vec()) {
         Ok(rwb) => rwb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -611,7 +621,10 @@ fn wrapped_block_from_vec_v2_test() {
 
     let wrapped_block = match block.to_wrapped(&main) {
         Ok(wb) => wb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     let raw_wrapped_data = wrapped_block.as_binary();
@@ -619,6 +632,9 @@ fn wrapped_block_from_vec_v2_test() {
 
     let _ = match WrappedBlock::from(raw_wrapped_data, hmac_value.to_vec()) {
         Ok(rwb) => rwb,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }

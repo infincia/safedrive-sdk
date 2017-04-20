@@ -23,9 +23,7 @@ impl Log for SDLogger {
     fn log(&self, record: &LogRecord) {
         if self.enabled(record.metadata()) {
             match record.level() {
-                LogLevel::Debug | LogLevel::Trace => {
-
-                },
+                LogLevel::Debug | LogLevel::Trace => {},
                 _ => {
                     let mut log = LOG.write();
                     let line = format!("{}", record.args());

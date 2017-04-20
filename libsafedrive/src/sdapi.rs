@@ -336,7 +336,11 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -392,7 +396,11 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -445,7 +453,11 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -498,7 +510,11 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -554,7 +570,11 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -611,7 +631,11 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -670,7 +694,11 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -788,7 +816,11 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -845,7 +877,11 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -900,7 +936,11 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -960,7 +1000,11 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -1017,7 +1061,11 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -1077,7 +1125,11 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -1181,9 +1233,7 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
-                return Ok(())
-            },
+            &::reqwest::StatusCode::Ok => return Ok(()),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::NotFound => {},
             &::reqwest::StatusCode::BadRequest => {
@@ -1196,7 +1246,11 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -1251,7 +1305,11 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 
@@ -1309,7 +1367,11 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }
@@ -1372,7 +1434,11 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
                     return Err(SDAPIError::ServiceUnavailable)
                 }
             },
-            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
+            _ => {
+                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                        result.status(),
+                                                        &response)))
+            },
         }
     }
 }

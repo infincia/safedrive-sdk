@@ -35,7 +35,9 @@ impl KeyType {
             KeyType::Main => [2u8; 24],
             KeyType::HMAC => [3u8; 24],
             KeyType::Tweak => [4u8; 24],
-            _ => { panic!("other key types don't have a static nonce");  }
+            _ => {
+                panic!("other key types don't have a static nonce");
+            },
         };
         let nonce = ::sodiumoxide::crypto::secretbox::Nonce::from_slice(&nonce_value).expect("failed to get nonce");
 
@@ -46,27 +48,13 @@ impl KeyType {
 impl<'a> ::std::fmt::Display for KeyType {
     fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
         match *self {
-            KeyType::Master => {
-                write!(f, "KeyType<Master>")
-            },
-            KeyType::Main => {
-                write!(f, "KeyType<Main>")
-            },
-            KeyType::HMAC => {
-                write!(f, "KeyType<HMAC>")
-            },
-            KeyType::Tweak => {
-                write!(f, "KeyType<Tweak>")
-            },
-            KeyType::Recovery => {
-                write!(f, "KeyType<Recovery>")
-            },
-            KeyType::Session => {
-                write!(f, "KeyType<Session>")
-            },
-            KeyType::Block => {
-                write!(f, "KeyType<Block>")
-            },
+            KeyType::Master => write!(f, "KeyType<Master>"),
+            KeyType::Main => write!(f, "KeyType<Main>"),
+            KeyType::HMAC => write!(f, "KeyType<HMAC>"),
+            KeyType::Tweak => write!(f, "KeyType<Tweak>"),
+            KeyType::Recovery => write!(f, "KeyType<Recovery>"),
+            KeyType::Session => write!(f, "KeyType<Session>"),
+            KeyType::Block => write!(f, "KeyType<Block>"),
         }
     }
 }
@@ -223,7 +211,9 @@ impl WrappedKey {
                 /// use a non-static nonce when wrapping their key type, MUST NOT use a static nonce
                 nonce.expect("attempted to unwrap a block or session key without an external random nonce").clone()
             },
-            _ => { panic!("other key types cannot be wrapped");  }
+            _ => {
+                panic!("other key types cannot be wrapped");
+            },
         };
 
         /// decrypt the key with the wrapping key and nonce
@@ -284,7 +274,9 @@ impl Key {
             KeyType::Tweak => SECRETBOX_KEY_SIZE,
             KeyType::Block => SECRETBOX_KEY_SIZE,
             KeyType::Session => SECRETBOX_KEY_SIZE,
-            _ => { panic!("other key types can't be created this way");  }
+            _ => {
+                panic!("other key types can't be created this way");
+            },
         };
         let key = ::sodiumoxide::randombytes::randombytes(key_size);
 
@@ -304,7 +296,9 @@ impl Key {
             KeyType::Recovery => {},
             KeyType::Block => {},
             KeyType::Session => {},
-            _ => { panic!("other key types can't be used as a secretbox key");  }
+            _ => {
+                panic!("other key types can't be used as a secretbox key");
+            },
         };
         ::sodiumoxide::crypto::secretbox::Key::from_slice(self.bytes.as_ref()).expect("failed to get secretbox key struct")
     }
@@ -313,7 +307,9 @@ impl Key {
         match self.key_type {
             KeyType::HMAC => {},
             KeyType::Tweak => {},
-            _ => { panic!("other key types can't be used as an auth key");  }
+            _ => {
+                panic!("other key types can't be used as an auth key");
+            },
         };
         ::sodiumoxide::crypto::auth::Key::from_slice(self.bytes.as_ref()).expect("failed to get auth key struct")
     }
@@ -322,7 +318,9 @@ impl Key {
         match self.key_type {
             KeyType::HMAC => {},
             KeyType::Tweak => {},
-            _ => { panic!("other key types can't be used as a blake2 key");  }
+            _ => {
+                panic!("other key types can't be used as a blake2 key");
+            },
         };
         let s = self.bytes.as_slice();
         let k = &s[0..8];
@@ -334,7 +332,9 @@ impl Key {
         match self.key_type {
             KeyType::HMAC => {},
             KeyType::Tweak => {},
-            _ => { panic!("other key types can't be used as a blake2 key");  }
+            _ => {
+                panic!("other key types can't be used as a blake2 key");
+            },
         };
         let s = self.bytes.as_slice();
         let k = &s[0..16];
@@ -346,7 +346,9 @@ impl Key {
         match self.key_type {
             KeyType::HMAC => {},
             KeyType::Tweak => {},
-            _ => { panic!("other key types can't be used as a blake2 key");  }
+            _ => {
+                panic!("other key types can't be used as a blake2 key");
+            },
         };
         let s = self.bytes.as_slice();
         let k = &s[0..24];
@@ -358,7 +360,9 @@ impl Key {
         match self.key_type {
             KeyType::HMAC => {},
             KeyType::Tweak => {},
-            _ => { panic!("other key types can't be used as a blake2 key");  }
+            _ => {
+                panic!("other key types can't be used as a blake2 key");
+            },
         };
         let s = self.bytes.as_slice();
         let k = &s[0..32];
@@ -379,7 +383,9 @@ impl Key {
                 /// use a random nonce when wrapping this key type, MUST NOT use a static nonce
                 nonce.expect("attempted to wrap a block or session key without an external random nonce").clone()
             },
-            _ => { panic!("other key types cannot be wrapped");  }
+            _ => {
+                panic!("other key types cannot be wrapped");
+            },
         };
 
         let wrapping_key_s = wrapping_key.as_sodium_secretbox_key();
@@ -395,7 +401,10 @@ impl Key {
 fn keyset_generate_test() {
     let _ = match WrappedKeyset::new() {
         Ok(wks) => wks,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -461,14 +470,20 @@ fn key_rs_correction_test() {
 fn key_unwrap_test() {
     let wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     let phrase = wrapped_keyset.recovery_phrase().unwrap();
 
     match wrapped_keyset.to_keyset(&phrase) {
         Ok(_) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 

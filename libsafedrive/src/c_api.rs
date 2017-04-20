@@ -288,75 +288,29 @@ pub struct SDDKError {
 impl From<SDError> for SDDKError {
     fn from(e: SDError) -> Self {
         let error_type = match e {
-            SDError::Internal(_) => {
-                SDDKErrorType::Internal
-            },
-            SDError::IO(_) => {
-                SDDKErrorType::IO
-            },
-            SDError::KeychainError(_) => {
-                SDDKErrorType::KeychainError
-            },
-            SDError::RequestFailure(_) => {
-                SDDKErrorType::RequestFailure
-            },
-            SDError::NetworkFailure(_) => {
-                SDDKErrorType::NetworkFailure
-            },
-            SDError::Conflict(_) => {
-                SDDKErrorType::Conflict
-            },
-            SDError::BlockMissing => {
-                SDDKErrorType::BlockMissing
-            },
-            SDError::SessionMissing => {
-                SDDKErrorType::SessionMissing
-            },
-            SDError::BlockUnreadable => {
-                SDDKErrorType::BlockUnreadable
-            },
-            SDError::SessionUnreadable => {
-                SDDKErrorType::SessionUnreadable
-            },
-            SDError::RecoveryPhraseIncorrect => {
-                SDDKErrorType::RecoveryPhraseIncorrect
-            },
-            SDError::KeyCorrupted => {
-                SDDKErrorType::KeyCorrupted
-            },
-            SDError::InsufficientFreeSpace => {
-                SDDKErrorType::InsufficientFreeSpace
-            },
-            SDError::Authentication => {
-                SDDKErrorType::Authentication
-            },
-            SDError::UnicodeError => {
-                SDDKErrorType::UnicodeError
-            },
-            SDError::TokenExpired => {
-                SDDKErrorType::TokenExpired
-            },
-            SDError::CryptoError(_) => {
-                SDDKErrorType::CryptoError
-            },
-            SDError::SyncAlreadyInProgress => {
-                SDDKErrorType::SyncAlreadyInProgress
-            },
-            SDError::RestoreAlreadyInProgress => {
-                SDDKErrorType::RestoreAlreadyInProgress
-            },
-            SDError::ExceededRetries(_) => {
-                SDDKErrorType::ExceededRetries
-            },
-            SDError::ServiceUnavailable => {
-                SDDKErrorType::ServiceUnavailable
-            },
-            SDError::Cancelled => {
-                SDDKErrorType::Cancelled
-            },
-            SDError::FolderMissing => {
-                SDDKErrorType::FolderMissing
-            },
+            SDError::Internal(_) => SDDKErrorType::Internal,
+            SDError::IO(_) => SDDKErrorType::IO,
+            SDError::KeychainError(_) => SDDKErrorType::KeychainError,
+            SDError::RequestFailure(_) => SDDKErrorType::RequestFailure,
+            SDError::NetworkFailure(_) => SDDKErrorType::NetworkFailure,
+            SDError::Conflict(_) => SDDKErrorType::Conflict,
+            SDError::BlockMissing => SDDKErrorType::BlockMissing,
+            SDError::SessionMissing => SDDKErrorType::SessionMissing,
+            SDError::BlockUnreadable => SDDKErrorType::BlockUnreadable,
+            SDError::SessionUnreadable => SDDKErrorType::SessionUnreadable,
+            SDError::RecoveryPhraseIncorrect => SDDKErrorType::RecoveryPhraseIncorrect,
+            SDError::KeyCorrupted => SDDKErrorType::KeyCorrupted,
+            SDError::InsufficientFreeSpace => SDDKErrorType::InsufficientFreeSpace,
+            SDError::Authentication => SDDKErrorType::Authentication,
+            SDError::UnicodeError => SDDKErrorType::UnicodeError,
+            SDError::TokenExpired => SDDKErrorType::TokenExpired,
+            SDError::CryptoError(_) => SDDKErrorType::CryptoError,
+            SDError::SyncAlreadyInProgress => SDDKErrorType::SyncAlreadyInProgress,
+            SDError::RestoreAlreadyInProgress => SDDKErrorType::RestoreAlreadyInProgress,
+            SDError::ExceededRetries(_) => SDDKErrorType::ExceededRetries,
+            SDError::ServiceUnavailable => SDDKErrorType::ServiceUnavailable,
+            SDError::Cancelled => SDDKErrorType::Cancelled,
+            SDError::FolderMissing => SDDKErrorType::FolderMissing,
         };
         SDDKError { error_type: error_type, message: CString::new(format!("{}", e)).unwrap().into_raw() }
     }
@@ -451,42 +405,26 @@ pub enum SDDKSyncCleaningSchedule {
 impl SDDKSyncCleaningSchedule {
     fn to_schedule(&self, date: Option<String>) -> SyncCleaningSchedule {
         match *self {
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAuto => {
-                SyncCleaningSchedule::Auto
-            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAuto => SyncCleaningSchedule::Auto,
             SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleExactDateRFC3339 => {
-                SyncCleaningSchedule::ExactDateRFC3339 { date: date.unwrap() }
+                SyncCleaningSchedule::ExactDateRFC3339 {
+                    date: date.unwrap(),
+                }
             },
             SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleExactDateRFC2822 => {
-                SyncCleaningSchedule::ExactDateRFC2822 { date: date.unwrap() }
+                SyncCleaningSchedule::ExactDateRFC2822 {
+                    date: date.unwrap(),
+                }
             },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAll => {
-                SyncCleaningSchedule::All
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeToday => {
-                SyncCleaningSchedule::BeforeToday
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisWeek => {
-                SyncCleaningSchedule::BeforeThisWeek
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisMonth => {
-                SyncCleaningSchedule::BeforeThisMonth
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisYear => {
-                SyncCleaningSchedule::BeforeThisYear
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneDay => {
-                SyncCleaningSchedule::OneDay
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneWeek => {
-                SyncCleaningSchedule::OneWeek
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneMonth => {
-                SyncCleaningSchedule::OneMonth
-            },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneYear => {
-                SyncCleaningSchedule::OneYear
-            },
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAll => SyncCleaningSchedule::All,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeToday => SyncCleaningSchedule::BeforeToday,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisWeek => SyncCleaningSchedule::BeforeThisWeek,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisMonth => SyncCleaningSchedule::BeforeThisMonth,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisYear => SyncCleaningSchedule::BeforeThisYear,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneDay => SyncCleaningSchedule::OneDay,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneWeek => SyncCleaningSchedule::OneWeek,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneMonth => SyncCleaningSchedule::OneMonth,
+            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneYear => SyncCleaningSchedule::OneYear,
         }
     }
 }
@@ -544,29 +482,25 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                                   mut state: *mut *mut SDDKState,
                                   mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let cv: String = match client_version.is_null() {
-        true => {
-            "0.0".to_owned()
-        },
+        true => "0.0".to_owned(),
         false => {
             let cvs: &CStr = unsafe { CStr::from_ptr(client_version) };
 
             match cvs.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             }
         },
     };
 
     let os: String = match operating_system.is_null() {
-        true => {
-            ::core::get_current_os().to_owned()
-        },
+        true => ::core::get_current_os().to_owned(),
         false => {
             let oss: &CStr = unsafe { CStr::from_ptr(operating_system) };
 
             match oss.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             }
         },
     };
@@ -580,7 +514,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
             match c_language_code.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             }
         },
     };
@@ -599,7 +533,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
             match lstorage.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             }
         },
     };
@@ -740,7 +674,7 @@ pub extern "C" fn sddk_get_keychain_item(user: *const std::os::raw::c_char,
 
     let u: String = match luser.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let lservice: &CStr = unsafe {
@@ -750,7 +684,7 @@ pub extern "C" fn sddk_get_keychain_item(user: *const std::os::raw::c_char,
 
     let s: String = match lservice.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let service = KeychainService::from(s);
@@ -831,7 +765,7 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 
     let u: String = match luser.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let lservice: &CStr = unsafe {
@@ -841,7 +775,7 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 
     let s: String = match lservice.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let lsecret: &CStr = unsafe {
@@ -851,7 +785,7 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 
     let sec: String = match lsecret.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let service = KeychainService::from(s);
@@ -923,7 +857,7 @@ pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
 
     let u: String = match luser.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let lservice: &CStr = unsafe {
@@ -933,7 +867,7 @@ pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
 
     let s: String = match lservice.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let service = KeychainService::from(s);
@@ -1035,19 +969,19 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 
     let uid: String = match uids.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
     let un: String =  match c_username.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let c_password: &CStr = unsafe { CStr::from_ptr(password) };
     let pa: String =  match c_password.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     match login(&uid, &un, &pa) {
@@ -1214,7 +1148,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
             let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
             match c_recovery.to_str() {
                 Ok(s) => Some(s.to_owned()),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             }
         }
         else {
@@ -1519,13 +1453,13 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
     let un: String =  match c_username.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let c_password: &CStr = unsafe { CStr::from_ptr(password) };
     let pa: String =  match c_password.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let result = match get_software_clients(&un, &pa) {
@@ -1613,14 +1547,14 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
 
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = match c_path.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
 
@@ -1698,14 +1632,14 @@ pub extern "C" fn sddk_update_sync_folder(state: *mut SDDKState,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
 
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = match c_path.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     let c_syncing = syncing >= 1;
@@ -2179,7 +2113,7 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
             let c_date: &CStr = CStr::from_ptr(date);
             let d: String = match c_date.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             };
 
             Some(d)
@@ -2287,7 +2221,7 @@ pub extern "C" fn sddk_cancel_sync_task(name: *const std::os::raw::c_char,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
     cancel_sync_task(&n);
@@ -2362,7 +2296,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
 
@@ -2475,14 +2409,14 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+        Err(e) => panic!("string is not valid UTF-8: {}", e),
     };
 
 
     let c_destination: &CStr = unsafe { CStr::from_ptr(destination) };
     let d: String =  match c_destination.to_str() {
         Ok(p) => p.to_owned(),
-        Err(e) => { panic!("path is not valid UTF-8: {}", e) },
+        Err(e) => panic!("path is not valid UTF-8: {}", e),
     };
     let p = PathBuf::from(d);
 
@@ -2589,7 +2523,7 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
         let ucid: String = match c_ucid.to_str() {
             Ok(s) => s.to_owned(),
-            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            Err(e) => panic!("string is not valid UTF-8: {}", e),
         };
 
         ucid
@@ -2602,7 +2536,7 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
         let desc: String = match c_desc.to_str() {
             Ok(s) => s.to_owned(),
-            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            Err(e) => panic!("string is not valid UTF-8: {}", e),
         };
 
         desc
@@ -2615,7 +2549,7 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
         let cont: String = match c_cont.to_str() {
             Ok(s) => s.to_owned(),
-            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            Err(e) => panic!("string is not valid UTF-8: {}", e),
         };
 
         cont
@@ -2629,7 +2563,7 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
             let ver: String = match c_client_version.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             };
 
             Some(ver)
@@ -2644,7 +2578,7 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
             let os: String = match c_operating_system.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+                Err(e) => panic!("string is not valid UTF-8: {}", e),
             };
 
             Some(os)
@@ -2706,7 +2640,7 @@ pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
 
         let msg: String = match c_msg.to_str() {
             Ok(s) => s.to_owned(),
-            Err(e) => { panic!("string is not valid UTF-8: {}", e) },
+            Err(e) => panic!("string is not valid UTF-8: {}", e),
         };
 
         msg

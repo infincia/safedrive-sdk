@@ -28,24 +28,12 @@ pub enum KeychainService {
 impl std::fmt::Display for KeychainService {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            KeychainService::Account => {
-                write!(f, "{}", account_credential_domain())
-            },
-            KeychainService::SSHUsername => {
-                write!(f, "{}", ssh_credential_domain())
-            },
-            KeychainService::RecoveryPhrase => {
-                write!(f, "{}", recovery_key_domain())
-            },
-            KeychainService::AuthToken => {
-                write!(f, "{}", token_domain())
-            },
-            KeychainService::CurrentUser => {
-                write!(f, "{}", current_user_domain())
-            },
-            KeychainService::UniqueClientID => {
-                write!(f, "{}", unique_client_id_domain())
-            },
+            KeychainService::Account => write!(f, "{}", account_credential_domain()),
+            KeychainService::SSHUsername => write!(f, "{}", ssh_credential_domain()),
+            KeychainService::RecoveryPhrase => write!(f, "{}", recovery_key_domain()),
+            KeychainService::AuthToken => write!(f, "{}", token_domain()),
+            KeychainService::CurrentUser => write!(f, "{}", current_user_domain()),
+            KeychainService::UniqueClientID => write!(f, "{}", unique_client_id_domain()),
         }
     }
 }
@@ -116,7 +104,10 @@ fn set_account_password() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::Account, password) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -127,11 +118,17 @@ fn get_account_password() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::Account, password) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
     let stored_password = match get_keychain_item("user@safedrive.io", KeychainService::Account) {
         Ok(p) => p,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     assert!(password == stored_password);
@@ -147,7 +144,10 @@ fn set_auth_token() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::AuthToken, auth_token) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -158,11 +158,17 @@ fn get_auth_token() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::AuthToken, auth_token) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
     let stored_auth_token = match get_keychain_item("user@safedrive.io", KeychainService::AuthToken) {
         Ok(p) => p,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     assert!(auth_token == stored_auth_token);
@@ -178,7 +184,10 @@ fn set_recovery_phrase() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::RecoveryPhrase, recovery_phrase) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -189,11 +198,17 @@ fn get_recovery_phrase() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::RecoveryPhrase, recovery_phrase) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
     let stored_recovery_phrase = match get_keychain_item("user@safedrive.io", KeychainService::RecoveryPhrase) {
         Ok(rec) => rec,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     assert!(recovery_phrase == stored_recovery_phrase);
@@ -208,7 +223,10 @@ fn set_ssh_username() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::SSHUsername, ssh_username) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 }
 
@@ -219,11 +237,17 @@ fn get_ssh_username() {
 
     match set_keychain_item("user@safedrive.io", KeychainService::SSHUsername, ssh_username) {
         Ok(()) => {},
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
     let stored_ssh_password = match get_keychain_item("user@safedrive.io", KeychainService::SSHUsername) {
         Ok(p) => p,
-        Err(_) => { assert!(true == false); return }
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
     };
 
     assert!(ssh_username == stored_ssh_password);

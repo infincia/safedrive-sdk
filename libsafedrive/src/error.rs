@@ -20,20 +20,25 @@ pub enum KeychainError {
 impl std::fmt::Display for KeychainError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            KeychainError::KeychainError(ref string) => {
-                write!(f, "{}: {}", localized_str!("Keychain error", ""), string)
-            },
+            KeychainError::KeychainError(ref string) => write!(f, "{}: {}", localized_str!("Keychain error", ""), string),
             KeychainError::KeychainUnavailable(ref string) => {
-                write!(f, "{}: {}", localized_str!("Keychain unavailable", ""), string)
+                write!(f,
+                       "{}: {}",
+                       localized_str!("Keychain unavailable", ""),
+                       string)
             },
-            KeychainError::KeychainItemMissing => {
-                write!(f, "{}", localized_str!("Keychain item missing", ""))
-            },
+            KeychainError::KeychainItemMissing => write!(f, "{}", localized_str!("Keychain item missing", "")),
             KeychainError::KeychainInsertFailed(ref string) => {
-                write!(f, "{}: {}", localized_str!("Keychain insert failed", ""), string)
+                write!(f,
+                       "{}: {}",
+                       localized_str!("Keychain insert failed", ""),
+                       string)
             },
             KeychainError::KeychainEncoding(ref string) => {
-                write!(f, "{}: {}", localized_str!("Keychain encoding error", ""), string)
+                write!(f,
+                       "{}: {}",
+                       localized_str!("Keychain encoding error", ""),
+                       string)
             },
         }
     }
@@ -67,27 +72,15 @@ impl std::error::Error for KeychainError {
 impl From<KeyringError> for KeychainError {
     fn from(e: KeyringError) -> KeychainError {
         match e {
-            KeyringError::Parse(err) => {
-                KeychainError::KeychainEncoding(format!("{}", err))
-            },
+            KeyringError::Parse(err) => KeychainError::KeychainEncoding(format!("{}", err)),
             #[cfg(target_os = "macos")]
-            KeyringError::MacOsKeychainError(err) => {
-                KeychainError::KeychainError(format!("{}", err))
-            },
-            KeyringError::NoBackendFound => {
-                KeychainError::KeychainUnavailable(format!("no backend found"))
-            },
-            KeyringError::NoPasswordFound => {
-                KeychainError::KeychainItemMissing
-            },
+            KeyringError::MacOsKeychainError(err) => KeychainError::KeychainError(format!("{}", err)),
+            KeyringError::NoBackendFound => KeychainError::KeychainUnavailable(format!("no backend found")),
+            KeyringError::NoPasswordFound => KeychainError::KeychainItemMissing,
             #[cfg(target_os = "linux")]
-            KeyringError::SecretServiceError(err) => {
-                KeychainError::KeychainError(format!("{}", err))
-            },
+            KeyringError::SecretServiceError(err) => KeychainError::KeychainError(format!("{}", err)),
             #[cfg(target_os = "windows")]
-            KeyringError::WindowsVaultError => {
-                KeychainError::KeychainError(format!("{}", e))
-            }
+            KeyringError::WindowsVaultError => KeychainError::KeychainError(format!("{}", e)),
         }
     }
 }
@@ -110,36 +103,21 @@ pub enum CryptoError {
 impl std::fmt::Display for CryptoError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            CryptoError::KeyInvalid => {
-                write!(f, "{}", localized_str!("Invalid key used", ""))
-            },
-            CryptoError::KeyCorrupted => {
-                write!(f, "{}", localized_str!("Corrupted key", ""))
-            },
+            CryptoError::KeyInvalid => write!(f, "{}", localized_str!("Invalid key used", "")),
+            CryptoError::KeyCorrupted => write!(f, "{}", localized_str!("Corrupted key", "")),
             CryptoError::RecoveryPhraseInvalid(ref err) => {
-                write!(f, "{}: {}", localized_str!("Recovery phrase incorrect", ""), err)
+                write!(f,
+                       "{}: {}",
+                       localized_str!("Recovery phrase incorrect", ""),
+                       err)
             },
-            CryptoError::RecoveryPhraseIncorrect => {
-                write!(f, "{}", localized_str!("Recovery phrase incorrect", ""))
-            },
-            CryptoError::KeyGenerationFailed => {
-                write!(f, "{}", localized_str!("Key generation failed", ""))
-            },
-            CryptoError::KeyWrapFailed => {
-                write!(f, "{}", localized_str!("Key wrapping failed", ""))
-            },
-            CryptoError::BlockDecryptFailed => {
-                write!(f, "{}", localized_str!("Block decrypt failed", ""))
-            },
-            CryptoError::BlockEncryptFailed => {
-                write!(f, "{}", localized_str!("Block encrypt failed", ""))
-            },
-            CryptoError::SessionDecryptFailed => {
-                write!(f, "{}", localized_str!("Session decrypt failed", ""))
-            },
-            CryptoError::SessionEncryptFailed => {
-                write!(f, "{}", localized_str!("Session encrypt failed", ""))
-            },
+            CryptoError::RecoveryPhraseIncorrect => write!(f, "{}", localized_str!("Recovery phrase incorrect", "")),
+            CryptoError::KeyGenerationFailed => write!(f, "{}", localized_str!("Key generation failed", "")),
+            CryptoError::KeyWrapFailed => write!(f, "{}", localized_str!("Key wrapping failed", "")),
+            CryptoError::BlockDecryptFailed => write!(f, "{}", localized_str!("Block decrypt failed", "")),
+            CryptoError::BlockEncryptFailed => write!(f, "{}", localized_str!("Block encrypt failed", "")),
+            CryptoError::SessionDecryptFailed => write!(f, "{}", localized_str!("Session decrypt failed", "")),
+            CryptoError::SessionEncryptFailed => write!(f, "{}", localized_str!("Session encrypt failed", "")),
         }
     }
 }
@@ -294,75 +272,47 @@ impl std::error::Error for SDError {
 impl std::fmt::Display for SDError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            SDError::Internal(ref message) => {
-                write!(f, "{}", message)
-            },
-            SDError::IO(ref err) => {
-                write!(f, "{} ({})", localized_str!("IO failure", ""), err)
-            },
-            SDError::KeychainError(ref err) => {
-                write!(f, "{} ({})", localized_str!("Keychain error", ""), err)
-            },
-            SDError::RequestFailure(ref err) => {
-                write!(f, "{}: {}", localized_str!("API request failed", ""), err)
-            },
-            SDError::NetworkFailure(ref err) => {
-                write!(f, "{}: {}", localized_str!("Network unavailable", ""), err)
-            },
-            SDError::ServiceUnavailable => {
-                write!(f, "{}", localized_str!("Service unavailable", ""))
-            },
+            SDError::Internal(ref message) => write!(f, "{}", message),
+            SDError::IO(ref err) => write!(f, "{} ({})", localized_str!("IO failure", ""), err),
+            SDError::KeychainError(ref err) => write!(f, "{} ({})", localized_str!("Keychain error", ""), err),
+            SDError::RequestFailure(ref err) => write!(f, "{}: {}", localized_str!("API request failed", ""), err),
+            SDError::NetworkFailure(ref err) => write!(f, "{}: {}", localized_str!("Network unavailable", ""), err),
+            SDError::ServiceUnavailable => write!(f, "{}", localized_str!("Service unavailable", "")),
             SDError::Conflict(ref err) => {
-                write!(f, "{}: {}", localized_str!("API parameter conflict", ""), err)
+                write!(f,
+                       "{}: {}",
+                       localized_str!("API parameter conflict", ""),
+                       err)
             },
-            SDError::BlockMissing => {
-                write!(f, "{}", localized_str!("Block not found on server", ""))
-            },
-            SDError::SessionMissing => {
-                write!(f, "{}", localized_str!("Session not found on server", ""))
-            },
-            SDError::BlockUnreadable => {
-                write!(f, "{}", localized_str!("Block cannot be used", ""))
-            },
-            SDError::SessionUnreadable => {
-                write!(f, "{}", localized_str!("Session cannot be used", ""))
-            },
-            SDError::RecoveryPhraseIncorrect => {
-                write!(f, "{}", localized_str!("Recovery phrase incorrect", ""))
-            },
+            SDError::BlockMissing => write!(f, "{}", localized_str!("Block not found on server", "")),
+            SDError::SessionMissing => write!(f, "{}", localized_str!("Session not found on server", "")),
+            SDError::BlockUnreadable => write!(f, "{}", localized_str!("Block cannot be used", "")),
+            SDError::SessionUnreadable => write!(f, "{}", localized_str!("Session cannot be used", "")),
+            SDError::RecoveryPhraseIncorrect => write!(f, "{}", localized_str!("Recovery phrase incorrect", "")),
             SDError::KeyCorrupted => {
-                write!(f, "{}", localized_str!("Key corrupted, recover from backup", ""))
+                write!(f,
+                       "{}",
+                       localized_str!("Key corrupted, recover from backup", ""))
             },
-            SDError::InsufficientFreeSpace => {
-                write!(f, "{}", localized_str!("Insufficient free space", ""))
-            },
-            SDError::Authentication => {
-                write!(f, "{}", localized_str!("Authentication failed", ""))
-            },
-            SDError::UnicodeError => {
-                write!(f, "{}", localized_str!("Invalid Unicode", ""))
-            },
+            SDError::InsufficientFreeSpace => write!(f, "{}", localized_str!("Insufficient free space", "")),
+            SDError::Authentication => write!(f, "{}", localized_str!("Authentication failed", "")),
+            SDError::UnicodeError => write!(f, "{}", localized_str!("Invalid Unicode", "")),
             SDError::TokenExpired => {
-                write!(f, "{}", localized_str!("SafeDrive authentication token expired", ""))
+                write!(f,
+                       "{}",
+                       localized_str!("SafeDrive authentication token expired", ""))
             },
-            SDError::CryptoError(ref err) => {
-                write!(f, "{}: {}", localized_str!("Crypto error", ""), err)
-            },
-            SDError::SyncAlreadyInProgress => {
-                write!(f, "{}", localized_str!("Sync already in progress", ""))
-            },
-            SDError::RestoreAlreadyInProgress => {
-                write!(f, "{}", localized_str!("Restore already in progress", ""))
-            },
+            SDError::CryptoError(ref err) => write!(f, "{}: {}", localized_str!("Crypto error", ""), err),
+            SDError::SyncAlreadyInProgress => write!(f, "{}", localized_str!("Sync already in progress", "")),
+            SDError::RestoreAlreadyInProgress => write!(f, "{}", localized_str!("Restore already in progress", "")),
             SDError::ExceededRetries(retries) => {
-                write!(f, "{} ({})", localized_str!("Exceeded retry count", ""), retries)
+                write!(f,
+                       "{} ({})",
+                       localized_str!("Exceeded retry count", ""),
+                       retries)
             },
-            SDError::Cancelled => {
-                write!(f, "{}", localized_str!("Cancelled sync/restore", ""))
-            },
-            SDError::FolderMissing => {
-                write!(f, "{}", localized_str!("Folder missing", ""))
-            },
+            SDError::Cancelled => write!(f, "{}", localized_str!("Cancelled sync/restore", "")),
+            SDError::FolderMissing => write!(f, "{}", localized_str!("Folder missing", "")),
         }
     }
 }
@@ -431,36 +381,16 @@ pub enum SDAPIError {
 impl std::fmt::Display for SDAPIError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         match *self {
-            SDAPIError::Internal(ref message) => {
-                write!(f, "{}", message)
-            },
-            SDAPIError::IO(ref err) => {
-                write!(f, "{}", err)
-            },
-            SDAPIError::RequestFailed(ref err) => {
-                write!(f, "{}", err)
-            },
-            SDAPIError::NetworkFailure => {
-                write!(f, "{}", localized_str!("Network failure", ""))
-            },
-            SDAPIError::ServiceUnavailable => {
-                write!(f, "{}", localized_str!("SafeDrive unavailable", ""))
-            },
-            SDAPIError::Authentication => {
-                write!(f, "{}", localized_str!("API authentication failed", ""))
-            },
-            SDAPIError::RetryUpload => {
-                write!(f, "{}", localized_str!("Retry upload", ""))
-            },
-            SDAPIError::Conflict => {
-                write!(f, "{}", localized_str!("API parameter conflict", ""))
-            },
-            SDAPIError::BlockMissing => {
-                write!(f, "{}", localized_str!("Block not found on server", ""))
-            },
-            SDAPIError::SessionMissing => {
-                write!(f, "{}", localized_str!("Session not found on server", ""))
-            },
+            SDAPIError::Internal(ref message) => write!(f, "{}", message),
+            SDAPIError::IO(ref err) => write!(f, "{}", err),
+            SDAPIError::RequestFailed(ref err) => write!(f, "{}", err),
+            SDAPIError::NetworkFailure => write!(f, "{}", localized_str!("Network failure", "")),
+            SDAPIError::ServiceUnavailable => write!(f, "{}", localized_str!("SafeDrive unavailable", "")),
+            SDAPIError::Authentication => write!(f, "{}", localized_str!("API authentication failed", "")),
+            SDAPIError::RetryUpload => write!(f, "{}", localized_str!("Retry upload", "")),
+            SDAPIError::Conflict => write!(f, "{}", localized_str!("API parameter conflict", "")),
+            SDAPIError::BlockMissing => write!(f, "{}", localized_str!("Block not found on server", "")),
+            SDAPIError::SessionMissing => write!(f, "{}", localized_str!("Session not found on server", "")),
         }
     }
 }
