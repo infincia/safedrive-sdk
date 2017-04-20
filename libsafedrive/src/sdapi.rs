@@ -94,7 +94,7 @@ pub enum APIEndpoint<'a> {
     ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a Vec<String> },
     RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
     UnregisterClient,
-    GetClients { email: &'a str, password: &'a str },
+    GetClients { email: &'a str, password: &'a str, },
     AccountStatus,
     AccountDetails,
     AccountKey { master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
@@ -139,7 +139,7 @@ impl<'a> APIEndpoint<'a> {
                     .clear()
                     .append_pair("date", &format!("{}", timestamp));
             },
-            _ => {}
+            _ => {},
         }
         trace!("constructed url request: {}", url);
         url

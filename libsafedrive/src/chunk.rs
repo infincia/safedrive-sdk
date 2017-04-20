@@ -77,7 +77,7 @@ impl<'a> BlockGenerator<'a> {
             discovered_chunk_smallest_size: std::u64::MAX,
             discovered_chunk_largest_size: 0,
             discovered_chunk_size_variance: 0,
-            version: version
+            version: version,
         }
     }
 

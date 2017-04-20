@@ -630,7 +630,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                 *error = ptr;
             }
             -1
-        }
+        },
     }
 }
 
@@ -1075,7 +1075,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
                 *error = ptr;
             }
             -1
-        }
+        },
     }
 }
 
@@ -1135,7 +1135,7 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
                 *error = ptr;
             }
             return -1
-        }
+        },
     };
 
     c.0.set_api_token(None);
@@ -1238,7 +1238,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
                 *error = ptr;
             }
             return -1
-        }
+        },
     };
 
     c.0.set_keys(Some(keyset.main), Some(keyset.hmac), Some(keyset.tweak));
@@ -2401,7 +2401,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                 *error = ptr;
             }
             -1
-        }
+        },
     }
 }
 
@@ -2523,7 +2523,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                 *error = ptr;
             }
             -1
-        }
+        },
     }
 }
 

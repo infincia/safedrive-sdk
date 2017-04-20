@@ -85,7 +85,7 @@ impl Block {
             },
             _ => {
                 panic!("Attempted to create invalid session version");
-            }
+            },
         };
 
 
@@ -235,7 +235,7 @@ impl WrappedBlock {
             Err(e) => {
                 debug!("block key unwrap failed: {:?}", e);
                 return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)))
-            }
+            },
         };
 
         let block_raw = match ::sodiumoxide::crypto::secretbox::open(&self.wrapped_data, &self.nonce, &block_key.as_sodium_secretbox_key()) {
@@ -243,7 +243,7 @@ impl WrappedBlock {
             Err(e) => {
                 debug!("block decrypt failed: {:?}", e);
                 return Err(SDError::CryptoError(Box::new(CryptoError::BlockDecryptFailed)))
-            }
+            },
         };
 
         let unpadded_data = match self.version {
@@ -280,14 +280,14 @@ impl WrappedBlock {
                     Incomplete(_) => {
                         debug!("block data cannot be unpadded, this should never happen");
                         return Err(SDError::BlockUnreadable)
-                    }
+                    },
                 };
 
                 let unpadded_data = unpadded.to_vec();
 
                 unpadded_data
             },
-            _ => panic!("unknown binary version")
+            _ => panic!("unknown binary version"),
         };
 
         let (maybe_uncompressed_data, maybe_compressed_size) = match self.version {
@@ -310,7 +310,7 @@ impl WrappedBlock {
                     }
                 }
             },
-            _ => panic!("unknown binary version")
+            _ => panic!("unknown binary version"),
         };
 
         let real_size = maybe_uncompressed_data.len();
@@ -372,7 +372,7 @@ impl WrappedBlock {
             Incomplete(_) => {
                 debug!("block file cannot be parsed, this should never happen");
                 return Err(SDError::BlockUnreadable)
-            }
+            },
         };
 
         debug!("got valid binary file: {}", &raw_block);
@@ -380,7 +380,7 @@ impl WrappedBlock {
         let block_ver = match raw_block.version {
             "01" => SyncVersion::Version1,
             "02" => SyncVersion::Version2,
-            _ => panic!("unknown binary version")
+            _ => panic!("unknown binary version"),
         };
         let wrapped_block_key_raw = raw_block.wrapped_key.to_vec();
         let nonce_raw = raw_block.nonce;

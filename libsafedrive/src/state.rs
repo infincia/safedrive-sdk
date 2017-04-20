@@ -36,7 +36,7 @@ impl State {
     pub fn get_api_token(&self) -> &Token {
         let tok = match self.api_token {
             Some(ref t) => t,
-            None => panic!("attempt to use api token before setting")
+            None => panic!("attempt to use api token before setting"),
         };
 
         tok
@@ -54,7 +54,7 @@ impl State {
     pub fn get_unique_client_id(&self) -> &str {
         let uid = match self.unique_client_id {
             Some(ref u) => u,
-            None => panic!("Attempted to use unique client id before it was set")
+            None => panic!("Attempted to use unique client id before it was set"),
         };
         uid
     }
@@ -68,7 +68,7 @@ impl State {
     pub fn get_account_username(&self) -> &str {
         let username = match self.username {
             Some(ref u) => u,
-            None => panic!("attempt to use account username before setting")
+            None => panic!("attempt to use account username before setting"),
         };
 
         username
@@ -78,7 +78,7 @@ impl State {
     pub fn get_account_password(&self) ->  &str {
         let password = match self.password {
             Some(ref p) => p,
-            None => panic!("attempt to use account password before setting")
+            None => panic!("attempt to use account password before setting"),
         };
         password
 
@@ -87,7 +87,7 @@ impl State {
     pub fn get_main_key(&self) -> &Key {
         let key = match self.main_key {
             Some(ref key) => key,
-            None => panic!("Attempted to use main key before it was set")
+            None => panic!("Attempted to use main key before it was set"),
         };
         key
     }
@@ -95,7 +95,7 @@ impl State {
     pub fn get_hmac_key(&self) -> &Key {
         let key = match self.hmac_key {
             Some(ref key) => key,
-            None => panic!("Attempted to use hmac key before it was set")
+            None => panic!("Attempted to use hmac key before it was set"),
         };
         key
     }
@@ -103,7 +103,7 @@ impl State {
     pub fn get_tweak_key(&self) -> &Key {
         let key = match self.tweak_key {
             Some(ref key) => key,
-            None => panic!("Attempted to use tweak key before it was set")
+            None => panic!("Attempted to use tweak key before it was set"),
         };
         key
     }

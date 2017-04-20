@@ -7,7 +7,7 @@ use error::SDError;
 
 #[derive(Debug)]
 pub struct FolderLock {
-    pub path: PathBuf
+    pub path: PathBuf,
 }
 
 
@@ -26,7 +26,7 @@ impl FolderLock {
             },
             false => {
                 File::create(&path)?;
-            }
+            },
         }
 
         return Ok(FolderLock { path: path })

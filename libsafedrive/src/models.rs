@@ -274,7 +274,7 @@ pub struct AccountStatus {
     pub host: String,
     pub port: u16,
     pub userName: String,
-    pub time: Option<u64>
+    pub time: Option<u64>,
 }
 
 
@@ -296,7 +296,7 @@ pub struct AccountDetails {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Notification {
     pub title: String,
-    pub message: String
+    pub message: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -304,18 +304,18 @@ pub struct WrappedKeysetBody {
     pub master: String,
     pub main: String,
     pub hmac: String,
-    pub tweak: String
+    pub tweak: String,
 }
 
 pub struct SyncSessionResponse<'a> {
     pub name: &'a str,
     pub folder_id: u64,
-    pub chunk_data: Vec<u8>
+    pub chunk_data: Vec<u8>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ServerErrorResponse {
-    pub message: String
+    pub message: String,
 }
 
 

@@ -31,7 +31,7 @@ impl Log for SDLogger {
                     let line = format!("{}", record.args());
 
                     (*log).push(line);
-                }
+                },
             }
         }
     }

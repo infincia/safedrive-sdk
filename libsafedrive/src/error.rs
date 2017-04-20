@@ -370,7 +370,7 @@ impl std::fmt::Display for SDError {
 impl From<KeychainError> for SDError {
     fn from(e: KeychainError) -> SDError {
         match e {
-            _ => SDError::KeychainError(Box::new(e))
+            _ => SDError::KeychainError(Box::new(e)),
         }
     }
 }
@@ -378,7 +378,7 @@ impl From<KeychainError> for SDError {
 impl From<std::io::Error> for SDError {
     fn from(e: std::io::Error) -> SDError {
         match e {
-            _ => SDError::IO(Box::new(e))
+            _ => SDError::IO(Box::new(e)),
         }
     }
 }
@@ -389,7 +389,7 @@ impl From<CryptoError> for SDError {
             CryptoError::RecoveryPhraseIncorrect => SDError::RecoveryPhraseIncorrect,
             CryptoError::KeyCorrupted => SDError::KeyCorrupted,
 
-            _ =>  SDError::CryptoError(Box::new(e))
+            _ => SDError::CryptoError(Box::new(e)),
         }
     }
 }
@@ -501,7 +501,7 @@ impl std::error::Error for SDAPIError {
 impl From<std::io::Error> for SDAPIError {
     fn from(e: std::io::Error) -> SDAPIError {
         match e {
-            _ => SDAPIError::IO(Box::new(e))
+            _ => SDAPIError::IO(Box::new(e)),
         }
     }
 }
@@ -509,7 +509,7 @@ impl From<std::io::Error> for SDAPIError {
 impl From<::reqwest::Error> for SDAPIError {
     fn from(e: ::reqwest::Error) -> SDAPIError {
         match e {
-            _ => SDAPIError::RequestFailed(Box::new(e))
+            _ => SDAPIError::RequestFailed(Box::new(e)),
         }
     }
 }
@@ -517,7 +517,7 @@ impl From<::reqwest::Error> for SDAPIError {
 impl From<::serde_json::Error> for SDAPIError {
     fn from(e: ::serde_json::Error) -> SDAPIError {
         match e {
-            _ => SDAPIError::RequestFailed(Box::new(e))
+            _ => SDAPIError::RequestFailed(Box::new(e)),
         }
     }
 }

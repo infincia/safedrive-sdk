@@ -331,7 +331,7 @@ impl WriteCache {
                         None => {
                             debug!("write cache has final item");
                             local_self.set_received_final_item(true);
-                        }
+                        },
                     };
                 }
             }
@@ -395,7 +395,7 @@ pub fn clean_cache(limit: u64) -> Result<u64, SDError> {
                     Ok(()) => deleted += size,
                     Err(e) => {
                         debug!("block could not be deleted: {}", e);
-                    }
+                    },
                 }
 
             }
@@ -435,7 +435,7 @@ pub fn clear_cache() -> Result<u64, SDError> {
             Ok(()) => {},
             Err(e) => {
                 debug!("item could not be deleted: {}", e);
-            }
+            },
         }
 
         deleted += stream_length;

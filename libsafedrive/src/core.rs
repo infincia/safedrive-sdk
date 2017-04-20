@@ -184,7 +184,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
                         // so it's not as though we can log the error :D
                         // luckily this is going to be incredibly rare unless the drive is out of
                         // space, which we could add a check for
-                    }
+                    },
                 }
             }
         },
@@ -238,17 +238,17 @@ pub fn login(unique_client_id: &str,
         Ok(t) => {
             match account_status(&t) {
                 Ok(s) => return Ok((t, s)),
-                Err(e) => Err(SDError::from(e))
+                Err(e) => Err(SDError::from(e)),
             }
         },
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     }
 }
 
 pub fn remove_software_client(token: &Token) -> Result<(), SDError> {
     match unregister_client(token) {
         Ok(()) => return Ok(()),
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     }
 }
 
@@ -256,21 +256,21 @@ pub fn get_software_clients(username: &str,
                             password:  &str) -> Result<Vec<SoftwareClient>, SDError> {
     match list_clients(username, password) {
         Ok(clients) => Ok(clients),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
 pub fn get_account_status(token: &Token) -> Result<AccountStatus, SDError> {
     match account_status(&token) {
         Ok(s) => return Ok(s),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
 pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
     match account_details(&token) {
         Ok(d) => return Ok(d),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -295,7 +295,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
     ///
     let new_wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
-        Err(_) => return Err(SDError::from(CryptoError::KeyGenerationFailed))
+        Err(_) => return Err(SDError::from(CryptoError::KeyGenerationFailed)),
     };
 
 
@@ -314,7 +314,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                     Err(e) => {
                         debug!("failed to decrypt keys: {}", e);
                         Err(SDError::RecoveryPhraseIncorrect)
-                    }
+                    },
                 }
             } else if let Some(p) = new_wrapped_keyset.recovery_phrase() {
                 match real_wrapped_keyset.to_keyset(&p) {
@@ -327,13 +327,13 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                     Err(e) => {
                         debug!("failed to decrypt keys: {}", e);
                         Err(SDError::from(e))
-                    }
+                    },
                 }
             } else {
                 unreachable!("");
             }
         },
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -342,7 +342,7 @@ pub fn get_sync_folder(token: &Token,
                        folder_id: u64) -> Result<RegisteredFolder, SDError> {
     let folders = match read_folders(token) {
         Ok(folders) => folders,
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
     for folder in folders {
         if folder.id == folder_id {
@@ -357,7 +357,7 @@ pub fn add_sync_folder(token: &Token,
                        path: &str) -> Result<u64, SDError> {
     match create_folder(token, path, name, true) {
         Ok(folder_id) => Ok(folder_id),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -368,7 +368,7 @@ pub fn update_sync_folder(token: &Token,
                           folder_id: u64) -> Result<(), SDError> {
     match update_folder(token, path, name, syncing, folder_id) {
         Ok(()) => Ok(()),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -376,14 +376,14 @@ pub fn remove_sync_folder(token: &Token,
                           folder_id: u64) -> Result<(), SDError> {
     match delete_folder(token, folder_id) {
         Ok(()) => Ok(()),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
 pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDError> {
     match read_folders(token) {
         Ok(folders) => Ok(folders),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -392,7 +392,7 @@ pub fn get_sync_session<'a>(token: &Token,
                             session: &'a str) -> Result<SyncSessionResponse<'a>, SDError> {
     let session = match read_session(token, folder_id, session, true) {
         Ok(session) => session,
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
 
     Ok(session)
@@ -401,11 +401,11 @@ pub fn get_sync_session<'a>(token: &Token,
 pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
     let res = match read_sessions(token) {
         Ok(res) => res,
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
     let s = match res.get("sessionDetails") {
         Some(s) => s,
-        None => return Err(SDError::Internal(format!("failed to get sessionDetails from sessions response")))
+        None => return Err(SDError::Internal(format!("failed to get sessionDetails from sessions response"))),
     };
 
     let mut v: Vec<SyncSession> = Vec::new();
@@ -447,7 +447,7 @@ pub fn clean_sync_sessions(token: &Token, schedule: SyncCleaningSchedule) -> Res
                 Ok(dt) => dt,
                 Err(e) => {
                     return Err(SDError::Internal(format!("{}", e)));
-                }
+                },
             };
 
             remove_sync_sessions_before(token, ::util::timestamp_to_ms(date.timestamp(), date.timestamp_subsec_millis()))
@@ -458,7 +458,7 @@ pub fn clean_sync_sessions(token: &Token, schedule: SyncCleaningSchedule) -> Res
                 Ok(dt) => dt,
                 Err(e) => {
                     return Err(SDError::Internal(format!("{}", e)));
-                }
+                },
             };
 
             remove_sync_sessions_before(token, ::util::timestamp_to_ms(date.timestamp(), date.timestamp_subsec_millis()))
@@ -516,7 +516,7 @@ pub fn remove_sync_sessions_before(token: &Token,
                                    timestamp: i64) -> Result<(), SDError> {
     match delete_sessions(token, timestamp) {
         Ok(()) => Ok(()),
-        Err(e) => Err(SDError::from(e))
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -548,7 +548,7 @@ pub fn sync(token: &Token,
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
 
     let folder_path = PathBuf::from(&folder.folderPath);
@@ -574,7 +574,7 @@ pub fn sync(token: &Token,
 
     match register_sync_session(token, folder_id, session_name, true) {
         Ok(()) => {},
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
 
 
@@ -697,7 +697,7 @@ pub fn sync(token: &Token,
                         Ok(msg) => {
                             match msg {
                                 Ok(_) => {},
-                                Err(e) => return Err(e)
+                                Err(e) => return Err(e),
                             };
                         },
                         Err(e) => {
@@ -716,7 +716,7 @@ pub fn sync(token: &Token,
                         Err(_) => {
                             block_failed = true;
                             break;
-                        }
+                        },
                     };
 
                     let block_real_size = block.real_size();
@@ -827,12 +827,12 @@ pub fn sync(token: &Token,
                         },
                         Err(e) => {
                             issue(&format!("failed to set symlink for {}: {}", full_path.display(), e));
-                        }
+                        },
                     };
                 },
                 Err(e) => {
                     issue(&format!("failed to set symlink for {}: {}", full_path.display(), e));
-                }
+                },
             };
 
             header.set_size(0); /// hmac list size is zero when file has no actual data
@@ -866,7 +866,7 @@ pub fn sync(token: &Token,
                             break;
                         }
                     },
-                    Err(e) => return Err(e)
+                    Err(e) => return Err(e),
                 };
             },
             Err(e) => {
@@ -943,7 +943,7 @@ pub fn sync(token: &Token,
         Err(e) => {
             issue(&format!("not able to finish sync: {}", e));
             return Err(SDError::RequestFailure(Box::new(e)));
-        }
+        },
     };
 
     progress(estimated_size, processed_size, 0, 100.0, false);
@@ -974,7 +974,7 @@ pub fn restore(token: &Token,
 
     let folder = match get_sync_folder(token, folder_id) {
         Ok(folder) => folder,
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
 
     let folder_name = &folder.folderName;
@@ -993,7 +993,7 @@ pub fn restore(token: &Token,
 
     let session_body = match read_session(token, folder_id, session_name, true) {
         Ok(session_data) => session_data,
-        Err(e) => return Err(SDError::from(e))
+        Err(e) => return Err(SDError::from(e)),
     };
     trace!("Session reading took {} seconds", read_session_start_time.elapsed().as_secs());
 
@@ -1044,7 +1044,7 @@ pub fn restore(token: &Token,
                 issue(&format!("not able to restore session entry: {}", e));
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
-            }
+            },
         };
 
         let mut full_path = PathBuf::from(&destination);
@@ -1054,14 +1054,14 @@ pub fn restore(token: &Token,
                 debug!("examining {}", &entry_path.display());
 
                 full_path.push(entry_path);
-            }
+            },
             Err(e) => {
                 issue(&format!("cannot restore invalid path in session {}:", e));
                 progress(session_size, processed_size, 0, percent_completed, false);
 
                 failed + failed + 1;
                 continue // we do care about errors here, but we can't really recover from them for this item
-            }
+            },
         };
 
 
@@ -1101,7 +1101,7 @@ pub fn restore(token: &Token,
 
                             return Err(SDError::SessionUnreadable)
                         },
-                        Incomplete(_) => panic!("should never happen")
+                        Incomplete(_) => panic!("should never happen"),
                     };
 
 
@@ -1134,7 +1134,7 @@ pub fn restore(token: &Token,
                                 wrapped_block = Some(br);
                                 debug!("cache provided block: {}", &block_hmac_hex);
                             },
-                            _ => {}
+                            _ => {},
                         };
 
                         while should_retry {
@@ -1191,7 +1191,7 @@ pub fn restore(token: &Token,
                                     let block_cache_write_time = ::std::time::Instant::now();
 
                                     match ::cache::write_binary(&wb) {
-                                        _ => {}
+                                        _ => {},
                                     };
                                     trace!("Block write to cache took {} seconds", block_cache_write_time.elapsed().as_secs());
 
@@ -1212,7 +1212,7 @@ pub fn restore(token: &Token,
                                         return Err(SDError::RequestFailure(err))
                                     }
                                 },
-                                _ => {}
+                                _ => {},
                             };
 
 
@@ -1277,7 +1277,7 @@ pub fn restore(token: &Token,
                     Err(e) => {
                         issue(&format!("not able to restore hard link {}: {}", full_path.display(), e));
                         continue;
-                    }
+                    },
                 };
 
 
@@ -1303,7 +1303,7 @@ pub fn restore(token: &Token,
                     Err(e) => {
                         issue(&format!("not able to restore symlink {}: {}", full_path.display(), e));
                         continue;
-                    }
+                    },
                 };
 
                 if src.iter().count() == 0 {

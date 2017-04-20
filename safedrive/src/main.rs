@@ -293,7 +293,7 @@ fn main() {
             },
             false => {
                 println!("{}", VERSION);
-            }
+            },
         }
         std::process::exit(0);
     }
@@ -342,7 +342,7 @@ fn main() {
         Err(e) => {
             error!("failed to initialize libsafedrive: {}", e);
             std::process::exit(1);
-        }
+        },
     }
 
     if let Some(m) = matches.subcommand_matches("bench") {
@@ -355,7 +355,7 @@ fn main() {
             false => {
                 println!("Benchmark: version1");
                 ::safedrive::SyncVersion::Version1
-            }
+            },
 
         };
 
@@ -364,7 +364,7 @@ fn main() {
             None => {
                 error!("failed to get path from argument list");
                 std::process::exit(1);
-            }
+            },
         };
 
         benchmark(version, p);
@@ -387,7 +387,7 @@ fn main() {
             },
             Err(e) => {
                 println!("cache cleaning error: {}", e);
-            }
+            },
         }
 
     } else if let Some(m) = matches.subcommand_matches("login") {
@@ -397,7 +397,7 @@ fn main() {
             None => {
                 error!("failed to get email from argument list");
                 std::process::exit(1);
-            }
+            },
         };
 
         local_login(&u);
@@ -409,7 +409,7 @@ fn main() {
             None => {
                 error!("failed to get path from argument list");
                 std::process::exit(1);
-            }
+            },
         };
 
         let (token, _) = sign_in();
@@ -510,7 +510,7 @@ fn main() {
                 Err(e) => {
                     error!("failed to remove sync session: {}", e);
                     std::process::exit(1);
-                }
+                },
             };
 
         } else {
@@ -575,7 +575,7 @@ pub fn sign_in() -> (Token, Keyset) {
         Err(e) => {
             error!("Login error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
 
@@ -585,7 +585,7 @@ pub fn sign_in() -> (Token, Keyset) {
         Err(e) => {
             error!("{}", e);
             std::process::exit(1);
-        }
+        },
     }
 
     // get the users recovery phrase, if they have one
@@ -607,14 +607,14 @@ pub fn sign_in() -> (Token, Keyset) {
             },
             Err(e) => {
                 warn!("Recovery phrase could not be saved in keychain: {}", e);
-            }
+            },
         }
     }) {
         Ok(keyset) => keyset,
         Err(e) => {
             error!("Key error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
     (token, keyset)
@@ -632,7 +632,7 @@ pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
         Err(e) => {
             error!("Read clients error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
     for client in client_list {
@@ -646,7 +646,7 @@ pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
             _ => {
                 error!("Your account has an invalid client present, contact support: {}", ucid_raw);
                 std::process::exit(1);
-            }
+            },
         };
 
         if let Some(single_client) = single {
@@ -674,7 +674,7 @@ pub fn remove_client(token: Token) {
         Err(e) => {
             error!("Remove client error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
 }
@@ -686,7 +686,7 @@ pub fn info_for_client() {
             error!("{}", e);
             error!("No account found, try 'safedrive login --email <user@example.com>'");
             std::process::exit(1);
-        }
+        },
     };
     println!("Current user: {}", username);
     println!();
@@ -716,7 +716,7 @@ pub fn add(token: Token, path: &str) {
         Ok(_) => {},
         Err(e) => {
             error!("failed to add new sync folder: {}", e);
-        }
+        },
     }
 }
 
@@ -730,7 +730,7 @@ pub fn remove(token: Token, id: u64) {
             Ok(_) => {},
             Err(e) => {
                 error!("failed to remove sync folder: {}", e);
-            }
+            },
         }
     }
         else {
@@ -745,7 +745,7 @@ pub fn sync_all(token: Token, keyset: Keyset) {
         Err(e) => {
             error!("Read folders error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
     let encrypted_folders: Vec<RegisteredFolder> = folder_list.into_iter().filter(|f| f.encrypted).collect();
@@ -825,7 +825,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
         Err(e) => {
             error!("Read folder error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
     //TODO: this is not portable to windows, must be fixed before use there
@@ -877,7 +877,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
             let message = format!("{}: sync failed: {}", &folder.folderName, e);
             pb.finish_print(&message);
             std::process::exit(1);
-        }
+        },
     }
 
     println!();
@@ -892,7 +892,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
         Err(e) => {
             error!("Read sessions error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
     let folder = match get_sync_folder(&token, id) {
@@ -900,7 +900,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
         Err(e) => {
             error!("Read folder error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 
     let mut sessions: Vec<SyncSession> = session_list.into_iter().filter(|ses| ses.folder_id.unwrap() == id).collect();
@@ -980,7 +980,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
             let message = format!("{}: restore failed: {}", &folder.folderName, e);
             pb.finish_print(&message);
             std::process::exit(1);
-        }
+        },
     }
 
     println!();
@@ -998,7 +998,7 @@ pub fn list_folders(token: Token) {
         Err(e) => {
             error!("Read folders error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
     for folder in folder_list {
         table.add_row(Row::new(vec![
@@ -1023,14 +1023,14 @@ pub fn list_sessions(token: Token) {
         Err(e) => {
             error!("Read folders error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
     let session_list = match get_sync_sessions(&token) {
         Ok(sl) => sl,
         Err(e) => {
             error!("Read sessions error: {}", e);
             std::process::exit(1);
-        }
+        },
     };
     for session in session_list {
         let session_size = ::safedrive::pretty_bytes(session.size.unwrap() as f64);
@@ -1067,7 +1067,7 @@ pub fn clean_sessions(token: Token, schedule: SyncCleaningSchedule) {
         Err(e) => {
             error!("failed to clean sync sessions: {}", e);
             std::process::exit(1);
-        }
+        },
     };
 }
 
@@ -1087,7 +1087,7 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
             println!("Failed to open file: {}", e);
 
             std::process::exit(1);
-        }
+        },
     };
 
     let md = match f.metadata() {
@@ -1136,7 +1136,7 @@ pub fn local_login(username: &str) {
         Err(e) => {
             error!("{}", e);
             std::process::exit(1);
-        }
+        },
     }
 
     // ask for password by prompting user
@@ -1148,7 +1148,7 @@ pub fn local_login(username: &str) {
         Err(e) => {
             error!("{}", e);
             std::process::exit(1);
-        }
+        },
     }
 
     // figure out if this is a new client or needs to replace another one
@@ -1167,10 +1167,10 @@ pub fn local_login(username: &str) {
                 },
                 _ => {
                     error!("{}", e);
-                }
+                },
             }
             std::process::exit(1);
-        }
+        },
     };
 
     println!("Account found");
@@ -1232,13 +1232,13 @@ pub fn local_login(username: &str) {
                         Err(e) => {
                             error!("{}", e);
                             std::process::exit(1);
-                        }
+                        },
                     }
                 },
                 None => {
                     println!("Not a valid client");
                     std::process::exit(1);
-                }
+                },
             }
 
         } else if &replace == &"1" || &replace == &"new" || &replace == &"New" {
@@ -1257,7 +1257,7 @@ pub fn local_login(username: &str) {
             Err(e) => {
                 error!("{}", e);
                 std::process::exit(1);
-            }
+            },
         }
     }
     println!();
@@ -1283,7 +1283,7 @@ pub fn local_login(username: &str) {
                     Err(e) => {
                         error!("{}", e);
                         std::process::exit(1);
-                    }
+                    },
                 }
             }
         },
@@ -1304,7 +1304,7 @@ pub fn local_login(username: &str) {
                     Err(e) => {
                         error!("{}", e);
                         std::process::exit(1);
-                    }
+                    },
                 }
             }
         },

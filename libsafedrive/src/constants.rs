@@ -3,7 +3,7 @@ use CONFIGURATION;
 #[derive(Debug, Clone)]
 pub enum Configuration {
     Staging,
-    Production
+    Production,
 }
 
 #[derive(Debug, Clone)]

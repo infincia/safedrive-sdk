@@ -69,7 +69,7 @@ impl SyncSession {
             },
             _ => {
                 panic!("Attempted to create invalid session version");
-            }
+            },
         };
 
         let c = CHANNEL.read();
@@ -177,12 +177,12 @@ impl WrappedSyncSession {
 
         let session_key = match self.wrapped_key.to_key(main, Some(&self.nonce)) {
             Ok(k) => k,
-            Err(_) => return Err(SDError::CryptoError(Box::new(CryptoError::SessionDecryptFailed)))
+            Err(_) => return Err(SDError::CryptoError(Box::new(CryptoError::SessionDecryptFailed))),
         };
 
         let session_raw = match ::sodiumoxide::crypto::secretbox::open(&self.wrapped_data, &self.nonce, &session_key.as_sodium_secretbox_key()) {
             Ok(s) => s,
-            Err(_) => return Err(SDError::CryptoError(Box::new(CryptoError::SessionDecryptFailed)))
+            Err(_) => return Err(SDError::CryptoError(Box::new(CryptoError::SessionDecryptFailed))),
         };
 
         let unpadded_data = match self.version {
@@ -226,7 +226,7 @@ impl WrappedSyncSession {
 
                 unpadded_data
             },
-            _ => panic!("unknown binary version")
+            _ => panic!("unknown binary version"),
         };
 
         let (maybe_uncompressed_data, maybe_compressed_size) = match self.version {
@@ -250,7 +250,7 @@ impl WrappedSyncSession {
                     }
                 }
             },
-            _ => panic!("unknown binary version")
+            _ => panic!("unknown binary version"),
         };
 
         let real_size = maybe_uncompressed_data.len();
@@ -297,7 +297,7 @@ impl WrappedSyncSession {
         let session_ver = match raw_session.version {
             "01" => SyncVersion::Version1,
             "02" => SyncVersion::Version2,
-            _ => panic!("Invalid binary session version")
+            _ => panic!("Invalid binary session version"),
         };
         let wrapped_session_key_raw = raw_session.wrapped_key.to_vec();
         let nonce_raw = raw_session.nonce;

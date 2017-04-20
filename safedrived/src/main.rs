@@ -40,7 +40,7 @@ const COPYRIGHT: &'static str = "(C) 2013-2017 SafeData Net S.R.L.";
 #[derive(Debug)]
 pub enum Configuration {
     Staging,
-    Production
+    Production,
 }
 
 
@@ -112,18 +112,18 @@ fn main() {
         println!("Registering for filesystem events: {:?}",  &pa.file_name().unwrap().to_str().unwrap());
         let mut evloop = match Core::new() {
             Ok(evloop) => evloop,
-            Err(e) => panic!("Failed to create event loop: {}", e)
+            Err(e) => panic!("Failed to create event loop: {}", e),
         };
 
         let inot = match AsyncINotify::init(&evloop.handle()) {
             Ok(inot) => inot,
-            Err(e) => panic!("Failed to get inotify handle: {}", e)
+            Err(e) => panic!("Failed to get inotify handle: {}", e),
         };
 
 
         match inot.add_watch(&pa, tokio_inotify::IN_DELETE) {
             Ok(r) => {},
-            Err(e) => panic!("Failed to register for folder events: {}", e)
+            Err(e) => panic!("Failed to register for folder events: {}", e),
         };
 
         let events = inot.for_each(|ev| {
