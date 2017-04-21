@@ -12,10 +12,8 @@ serde_json = "^0.9"
 serde_derive = "^0.9"
 log = "*"
 prettytable-rs = "*"
-tokio-inotify = "*"
-futures = "*"
-tokio-core = "*"
 simplelog = "*"
+notify = "*"
 
 [dependencies.libsafedrive]
 path = "../libsafedrive"
