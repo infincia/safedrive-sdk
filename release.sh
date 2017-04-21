@@ -66,15 +66,7 @@ source ./rustver.sh
 rustup override set $RUST_VER
 
 RUST_BACKTRACE=1 cargo build --release -p safedrive --target $TARGET > /dev/null
-
-# build safedrived on linux only
-case $TARGET in
-    x86_64-apple-darwin)
-        ;;
-    *)
-        RUST_BACKTRACE=1 cargo build --release -p safedrived --target $TARGET > /dev/null
-        ;;
-esac
+RUST_BACKTRACE=1 cargo build --release -p safedrived --target $TARGET > /dev/null
 
 cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
 
@@ -83,6 +75,7 @@ case $TARGET in
     x86_64-apple-darwin)
         cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib
         install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib
+        cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/io.safedrive.SafeDrive.daemon
         cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/io.safedrive.SafeDrive.cli
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)

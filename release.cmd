@@ -29,10 +29,14 @@ cargo.exe build --release -p libsafedrive --target %TARGET%
 cheddar -f "libsafedrive\src\c_api.rs" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h"
 
 cargo.exe build --release -p safedrive --target %TARGET%
+cargo.exe build --release -p safedrived --target %TARGET%
 
 ECHO copying "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll"
 copy /y "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll"
 
 ECHO copying "target\%TARGET%\release\safedrive.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
 copy /y "target\%TARGET%\release\safedrive.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
+
+ECHO copying "target\%TARGET%\release\safedrived.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
+copy /y "target\%TARGET%\release\safedrived.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
 
