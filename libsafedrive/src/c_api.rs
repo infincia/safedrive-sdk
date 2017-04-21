@@ -431,33 +431,33 @@ impl SDDKSyncCleaningSchedule {
 
 /// Initialize the library, must be called before any other function.
 ///
-/// If the application needs to switch users or the unique client ID changes, free the SDDKState and
+/// If the application needs to switch users or the unique client ID changes, free the `SDDKState` and
 /// call initialize again
 ///
 /// Will assert non-null on `local_storage_path` and `unique_client_id`
 ///
 /// Parameters:
 ///
-///     local_storage_path: a NULL-terminated string representing the location the app can store settings for a user
+///     `local_storage_path`: a NULL-terminated string representing the location the app can store settings for a user
 ///
-///     unique_client_id: a NULL-terminated string representing the current unique_client_id
+///     `unique_client_id`: a NULL-terminated string representing the current unique client id
 ///
-///     client_version: a NULL-terminated string representing the name and version of the current app
+///     `client_version`: a NULL-terminated string representing the name and version of the current app
 ///
-///     config: an enum variant of SDDKConfiguration which controls API endpoint and other things
+///     `config`: an enum variant of `SDDKConfiguration` which controls API endpoint and other things
 ///
-///             use SDDKConfigurationStaging for the staging environment
-///             use SDDKConfigurationProduction for the production environment
+///             use `SDDKConfigurationStaging` for the staging environment
+///             use `SDDKConfigurationProduction` for the production environment
 ///
 ///     state: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was 0
 ///
-///            must be freed by the caller using sddk_free_state()
+///            must be freed by the caller using `sddk_free_state()`
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///            must be freed by the caller using `sddk_free_error()`
 ///
 ///
 ///     -1: failure, `error` will be set with more information
@@ -619,19 +619,19 @@ pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
 ///
 /// Parameters:
 ///
-///     user: a pointer to a NULL-terminated string representing the SafeDrive user account name
+///     `user`: a pointer to a NULL-terminated string representing the user account name
 ///
-///  service: a pointer to a NULL-terminated string representing the SafeDrive service subdomain
+///  `service`: a pointer to a NULL-terminated string representing the service subdomain
 ///
-///   secret: an uninitialized pointer that will be allocated and initialized when the function
-///           returns if the return value was 0
+///   `secret`: an uninitialized pointer that will be allocated and initialized when the function
+///             returns if the return value was 0
 ///
-///           must be freed by the caller using sddk_free_string()
+///             must be freed by the caller using `sddk_free_string()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///    `error`: an uninitialized pointer that will be allocated and initialized when the function
+///             returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///             must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -715,16 +715,16 @@ pub extern "C" fn sddk_get_keychain_item(user: *const std::os::raw::c_char,
 ///
 /// Parameters:
 ///
-///     user: a pointer to a NULL-terminated string representing the SafeDrive user account name
+///     `user`: a pointer to a NULL-terminated string representing the user account name
 ///
-///  service: a pointer to a NULL-terminated string representing the SafeDrive service subdomain
+///  `service`: a pointer to a NULL-terminated string representing the service subdomain
 ///
-///   secret: a pointer to a NULL-terminated string representing the secret to store in the keychain
+///   `secret`: a pointer to a NULL-terminated string representing the secret to store in the keychain
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -811,14 +811,14 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 ///
 /// Parameters:
 ///
-///     user: a pointer to a NULL-terminated string representing the SafeDrive user account name
+///     `user`: a pointer to a NULL-terminated string representing the user account name
 ///
-///  service: a pointer to a NULL-terminated string representing the SafeDrive service subdomain
+///  `service`: a pointer to a NULL-terminated string representing the service subdomain
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -888,23 +888,23 @@ pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
 }
 
 
-/// Login to SafeDrive, must be called before any other function that interacts with the SFTP server
+/// Login - must be called before any other function that interacts with the SFTP server
 ///
 /// Will assert non-null on `state`, `username`, and `password`
 ///
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     username: a NULL-terminated string representing a username for a SafeDrive account
+///     `username`: a NULL-terminated string representing a username for an account
 ///
-///     password: a NULL-terminated string representing a password for a SafeDrive account
+///     `password`: a NULL-terminated string representing a password for an account
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1021,12 +1021,12 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1086,24 +1086,24 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer the caller can pass in and get access to in the callback
+///     `context`: an opaque pointer the caller can pass in and get access to in the callback
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     recovery_phrase: a pointer to a recovery phrase obtained by previous calls. can be null if
-///                      no phrase is available
+///     `recovery_phrase`: a pointer to a recovery phrase obtained by previous calls. can be null if
+///                        no phrase is available
 ///
-///     store_recovery_key: a C function pointer that will be called when the app should store a
-///                         recovery phrase
+///     `store_recovery_key`: a C function pointer that will be called when the app should store a
+///                           recovery phrase
 ///
-///     store_recovery_key(new_phrase): a pointer to a recovery phrase that should be stored by the app.
-///                                     note that the pointer becomes invalid after the callback function
-///                                     returns
+///     `store_recovery_key(new_phrase)`: a pointer to a recovery phrase that should be stored by the app.
+///                                       note that the pointer becomes invalid after the callback function
+///                                       returns
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1191,10 +1191,10 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
 ///
 /// Parameters:
 ///
-///     unique_client_id: an uninitialized pointer that will be allocated and initialized when the function
-///            returns
+///     `unique_client_id`: an uninitialized pointer that will be allocated and initialized when the function
+///                         returns
 ///
-///            must be freed by the caller using sddk_free_string()
+///                         must be freed by the caller using `sddk_free_string()`
 ///
 /// Return:
 ///
@@ -1227,7 +1227,7 @@ pub extern "C" fn sddk_generate_unique_client_id(mut unique_client_id: *mut *mut
     length as u32
 }
 
-/// Get account status from the SafeDrive server
+/// Get account status from the server
 ///
 /// The caller does not own the memory pointed to by `status` or `error` after this function returns,
 /// they must be returned and freed by the library.
@@ -1238,17 +1238,17 @@ pub extern "C" fn sddk_generate_unique_client_id(mut unique_client_id: *mut *mut
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     status: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was 0
+///     `status`: an uninitialized pointer that will be allocated and initialized when the function
+///               returns if the return value was 0
 ///
-///            must be freed by the caller using sddk_free_account_status()
+///               must be freed by the caller using `sddk_free_account_status()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1309,7 +1309,7 @@ pub extern "C" fn sddk_get_account_status(state: *mut SDDKState,
 }
 
 
-/// Get account details from the SafeDrive server
+/// Get account details from the server
 ///
 /// The caller does not own the memory pointed to by `details` or `error` after this function returns,
 /// they must be returned and freed by the library.
@@ -1320,17 +1320,17 @@ pub extern "C" fn sddk_get_account_status(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     details: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was 0
+///     `details`: an uninitialized pointer that will be allocated and initialized when the function
+///                returns if the return value was 0
 ///
-///            must be freed by the caller using sddk_free_account_details()
+///                must be freed by the caller using `sddk_free_account_details()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1390,7 +1390,7 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
     0
 }
 
-/// Get a list of all registered clients from the SafeDrive server
+/// Get a list of all registered clients from the server
 ///
 /// The caller does not own the memory pointed to by `clients` after this function returns, it must
 /// be returned and freed by the library.
@@ -1401,25 +1401,25 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     username: a NULL-terminated string representing a username for a SafeDrive account
+///     `username`: a NULL-terminated string representing a username for an account
 ///
-///     password: a NULL-terminated string representing a password for a SafeDrive account
+///     `password`: a NULL-terminated string representing a password for an account
 ///
-///     clients: an uninitialized pointer that will be allocated and initialized when the function
-///              returns if the return value was 0
+///     `clients`: an uninitialized pointer that will be allocated and initialized when the function
+///                returns if the return value was 0
 ///
-///              must be freed by the caller using sddk_free_software_clients()
+///                must be freed by the caller using `sddk_free_software_clients()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
 ///     -1: failure, `error` will be set with more information
 ///
-///     0+: number of registered clients found, and number of SDDKSoftwareClient structs allocated
+///     0+: number of registered clients found, and number of `SDDKSoftwareClient` structs allocated
 ///         in `client`
 ///
 /// # Examples
@@ -1502,16 +1502,16 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     name: a NULL terminated string representing the folder name
+///     `name`: a NULL terminated string representing the folder name
 ///
-///     path: a NULL terminated string representing the folder path in RFC3986 format
+///     `path`: a NULL terminated string representing the folder path in RFC3986 format
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1580,21 +1580,21 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     name: a NULL terminated string representing the folder name
+///     `name`: a NULL terminated string representing the folder name
 ///
-///     path: a NULL terminated string representing the folder path in RFC3986 format
+///     `path`: a NULL terminated string representing the folder path in RFC3986 format
 ///
-///     syncing: an 8-bit unsigned integer representing a boolean state: whether the folder
-///              should be actively syncing at the current time or not. Valid settings are 0 or 1
+///     `syncing`: an 8-bit unsigned integer representing a boolean state: whether the folder
+///                should be actively syncing at the current time or not. Valid settings are 0 or 1
 ///
-///     unique_id: a 64-bit unsigned integer representing the unique folder ID
+///     `unique_id`: a 64-bit unsigned integer representing the unique folder ID
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1669,14 +1669,14 @@ pub extern "C" fn sddk_update_sync_folder(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     folder_id: an unsigned 64-bit integer representing the registered folder ID
+///     `folder_id`: an unsigned 64-bit integer representing the registered folder ID
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1726,7 +1726,7 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
     }
 }
 
-/// Get a sync folder from the SafeDrive server
+/// Get a sync folder from the server
 ///
 /// The caller does not own the memory pointed to by `folder` or `error` after this function returns,
 /// they must be returned and freed by the library.
@@ -1737,25 +1737,25 @@ pub extern "C" fn sddk_remove_sync_folder(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     folder_id: an unsigned 64-bit integer representing a registered folder ID
+///     `folder_id`: an unsigned 64-bit integer representing a registered folder ID
 ///
-///     folder: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was 0
+///     `folder`: an uninitialized pointer that will be allocated and initialized when the function
+///               returns if the return value was 0
 ///
-///            must be freed by the caller using sddk_free_folder()
+///               must be freed by the caller using `sddk_free_folder()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
 ///     -1: failure, `error` will be set with more information
 ///
-///     0+: number of registered folders found, and number of SDDKFolder structs allocated in folders
+///     0+: number of registered folders found, and number of `SDDKFolder` structs allocated in folders
 ///
 /// # Examples
 ///
@@ -1812,7 +1812,7 @@ pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
 }
 
 
-/// Get a list of all sync folders from the SafeDrive server
+/// Get a list of all sync folders from the server
 ///
 /// The caller does not own the memory pointed to by `folders` after this function returns, it must
 /// be returned and freed by the library.
@@ -1823,23 +1823,23 @@ pub extern "C" fn sddk_get_sync_folder(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     folders: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was 0
+///     `folders`: an uninitialized pointer that will be allocated and initialized when the function
+///                returns if the return value was 0
 ///
-///            must be freed by the caller using sddk_free_folders()
+///                must be freed by the caller using `sddk_free_folders()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
 ///     -1: failure, `error` will be set with more information
 ///
-///     0+: number of registered folders found, and number of SDDKFolder structs allocated in folders
+///     0+: number of registered folders found, and number of `SDDKFolder` structs allocated in folders
 ///
 /// # Examples
 ///
@@ -1901,7 +1901,7 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
 
 
 
-/// Get a list of all sync sessions from the SafeDrive server
+/// Get a list of all sync sessions from the server
 ///
 /// The caller does not own the memory pointed to by `sessions` after this function returns, it must
 /// be returned and freed by the library.
@@ -1912,23 +1912,23 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     sessions: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was 0
+///     `sessions`: an uninitialized pointer that will be allocated and initialized when the function
+///                 returns if the return value was 0
 ///
-///            must be freed by the caller using sddk_free_sessions()
+///                 must be freed by the caller using `sddk_free_sessions()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
 ///      -1: failure, `error` will be set with more information
 ///
-///      0+: number of sessions found, and number of SDDKSyncSession structs allocated in sessions
+///      0+: number of sessions found, and number of `SDDKSyncSession` structs allocated in sessions
 ///
 /// # Examples
 ///
@@ -1996,14 +1996,14 @@ pub extern "C" fn sddk_get_sync_sessions(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     session_id: an unsigned 64-bit integer representing the session ID
+///     `session_id`: an unsigned 64-bit integer representing the session ID
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2061,18 +2061,18 @@ pub extern "C" fn sddk_remove_sync_session(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///  schedule: an SDDKSyncCleaningSchedule variant
+///  `schedule`: an `SDDKSyncCleaningSchedule` variant
 ///
-///      date: the date string used for SDDKSyncCleaningSchedule.ExactDateRFC* variants. Should be
-///            null for other enum variants.
+///      `date`: the date string used for `SDDKSyncCleaningSchedule.ExactDateRFC*` variants. Should be
+///              null for other enum variants.
 ///
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2143,12 +2143,12 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     state: an opaque pointer obtained from calling `sddk_initialize()`
 ///
 ///     error: an uninitialized pointer that will be allocated and initialized when the function
 ///            returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///            must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2185,12 +2185,12 @@ pub extern "C" fn sddk_gc(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     name: a NULL-terminated UUIDv4 string representing the name of the sync session
+///     `name`: a NULL-terminated `UUIDv4` string representing the name of the sync session
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2234,22 +2234,22 @@ pub extern "C" fn sddk_cancel_sync_task(name: *const std::os::raw::c_char,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer the caller can pass in and get access to in the progress callback
+///     `context`: an opaque pointer the caller can pass in and get access to in the progress callback
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     name: a NULL-terminated UUIDv4 string representing the name of the sync session
+///     `name`: a NULL-terminated `UUIDv4` string representing the name of the sync session
 ///
-///     folder_id: an unsigned 64-bit integer representing a registered folder ID
+///     `folder_id`: an unsigned 64-bit integer representing a registered folder ID
 ///
-///     progress: a C function pointer that will be called periodically to report progress
+///     `progress`: a C function pointer that will be called periodically to report progress
 ///
-///     issue: a C function pointer that will be called periodically to report sync issues
+///     `issue`: a C function pointer that will be called periodically to report sync issues
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2342,24 +2342,24 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
 ///
 /// Parameters:
 ///
-///     context: an opaque pointer the caller can pass in and get access to in the progress callback
+///     `context`: an opaque pointer the caller can pass in and get access to in the progress callback
 ///
-///     state: an opaque pointer obtained from calling sddk_initialize()
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     name: a NULL-terminated UTF-8 string representing the UUIDv4 name of the sync session
+///     `name`: a NULL-terminated UTF-8 string representing the `UUIDv4` name of the sync session
 ///
-///     folder_id: an unsigned 64-bit integer representing a registered folder ID
+///     `folder_id`: an unsigned 64-bit integer representing a registered folder ID
 ///
-///     destination: a NULL-terminated UTF-8 string representing the path the sync session will be restored to
+///     `destination`: a NULL-terminated UTF-8 string representing the path the sync session will be restored to
 ///
-///     progress: a C function pointer that will be called periodically to report progress
+///     `progress`: a C function pointer that will be called periodically to report progress
 ///
-///     issue: a C function pointer that will be called periodically to report restore issues
+///     `issue`: a C function pointer that will be called periodically to report restore issues
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2462,24 +2462,24 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
 
 
 
-/// Report an error to the SafeDrive server
+/// Report an error to the server
 ///
 /// Will return a failure code if the parameters are invalid or the request could not be completed
 ///
 ///
 /// Parameters:
 ///
-///     unique_client_id: a NULL terminated string representing the current UCID
+///     `unique_client_id`: a NULL terminated string representing the current UCID
 ///
-///     description: a NULL terminated string representing the error description
+///     `description`: a NULL terminated string representing the error description
 ///
-///     context: a NULL terminated string representing any context that should be included in the
+///     `context`: a NULL terminated string representing any context that should be included in the
 ///              error report
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using sddk_free_error()
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2611,9 +2611,9 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 ///
 /// Parameters:
 ///
-///     message: a NULL terminated string for the log message
+///     `message`: a NULL terminated string for the log message
 ///
-///     level: unsigned 8-bit integer:
+///     `level`: unsigned 8-bit integer:
 ///
 ///               0: error
 ///               1: warn
@@ -2661,13 +2661,13 @@ pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
 
 /// Free a pointer to a list of software clients
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     clients: a pointer obtained from calling sddk_get_software_clients()
+///     `clients`: a pointer obtained from calling `sddk_get_software_clients()`
 ///
-///     length: number of SDDKSoftwareClient structs that were allocated in the pointer
+///     `length`: number of `SDDKSoftwareClient` structs that were allocated in the pointer
 ///
 ///
 /// # Examples
@@ -2693,11 +2693,11 @@ pub extern "C" fn sddk_free_software_clients(clients: *mut *mut SDDKSoftwareClie
 
 /// Free a pointer to a sync folder
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     folder: a pointer obtained from calling sddk_get_sync_folder()
+///     `folder`: a pointer obtained from calling `sddk_get_sync_folder()`
 ///
 ///
 ///
@@ -2718,13 +2718,13 @@ pub extern "C" fn sddk_free_folder(folder: *mut *mut SDDKFolder) {
 
 /// Free a pointer to a list of sync folders
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     folders: a pointer obtained from calling sddk_get_sync_folders()
+///     `folders`: a pointer obtained from calling `sddk_get_sync_folders()`
 ///
-///     length: number of SDDKFolder structs that were allocated in the pointer
+///     `length`: number of `SDDKFolder` structs that were allocated in the pointer
 ///
 ///
 /// # Examples
@@ -2748,13 +2748,13 @@ pub extern "C" fn sddk_free_folders(folders: *mut *mut SDDKFolder,
 
 /// Free a pointer to a list of sync sessions
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     sessions: a pointer obtained from calling sddk_get_sync_sessions()
+///     `sessions`: a pointer obtained from calling `sddk_get_sync_sessions()`
 ///
-///     length: number of SDDKSyncSession structs that were allocated in the pointer
+///     `length`: number of `SDDKSyncSession` structs that were allocated in the pointer
 ///
 ///
 /// # Examples
@@ -2774,13 +2774,13 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession,
     }
 }
 
-/// Free an opaque pointer to an SDDKState
+/// Free an opaque pointer to an `SDDKState`
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     state: a pointer obtained from calling sddk_initialize()
+///     `state`: a pointer obtained from calling `sddk_initialize()`
 ///
 /// # Examples
 ///
@@ -2792,17 +2792,17 @@ pub extern "C" fn sddk_free_sync_sessions(sessions: *mut *mut SDDKSyncSession,
 pub extern "C" fn sddk_free_state(state: *mut *mut SDDKState) {
     assert!(!state.is_null());
 
-    let _: Box<SDDKState> = unsafe { Box::from_raw((*state)) };
+    let _: Box<SDDKState> = unsafe { Box::from_raw(*state) };
 }
 
 /// Free a pointer to a string
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 ///
 /// Parameters:
 ///
-///     string: a pointer obtained from calling a function that returns a C string
+///     `string`: a pointer obtained from calling a function that returns a C string
 ///
 /// # Examples
 ///
@@ -2818,13 +2818,13 @@ pub extern "C" fn sddk_free_string(string: *mut *mut std::os::raw::c_char) {
 
 
 
-/// Free a pointer to an SDDKError
+/// Free a pointer to an `SDDKError`
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     error: a pointer to an SDDKError obtained from another call
+///     `error`: a pointer to an `SDDKError` obtained from another call
 ///
 ///
 ///
@@ -2841,13 +2841,13 @@ pub extern "C" fn sddk_free_error(error: *mut *mut SDDKError) {
     let _ = unsafe { CString::from_raw(e.message as *mut std::os::raw::c_char) };
 }
 
-/// Free a pointer to an SDDKAccountStatus
+/// Free a pointer to an `SDDKAccountStatus`
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     status: a pointer to an SDDKStatus obtained from another call
+///     `status`: a pointer to an `SDDKStatus` obtained from another call
 ///
 ///
 ///
@@ -2873,13 +2873,13 @@ pub extern "C" fn sddk_free_account_status(status: *mut *mut SDDKAccountStatus) 
     }
 }
 
-/// Free a pointer to an SDDKAccountDetails
+/// Free a pointer to an `SDDKAccountDetails`
 ///
-/// Note: This is *not* the same as calling free() in C, they are not interchangeable
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
 ///
 /// Parameters:
 ///
-///     details: a pointer to an SDDKAccountDetails obtained from another call
+///     `details`: a pointer to an `SDDKAccountDetails` obtained from another call
 ///
 ///
 ///

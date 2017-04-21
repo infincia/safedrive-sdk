@@ -228,15 +228,11 @@ bitflags! {
 
 /// responses
 
-///private final String token
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Token {
     pub token: String,
 }
 
-///private final String uniqueId
-///private final String operatingSystem
-///private final String language
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SoftwareClient {
     pub uniqueId: String,
@@ -250,18 +246,11 @@ impl std::fmt::Display for SoftwareClient {
     }
 }
 
-
-///private final int id
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateFolderResponse {
     pub id: u64,
 }
 
-///private final String status;
-///private final String host;
-///private final int port;
-///private final String userName;
-///private final Long time;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountStatus {
     pub status: Option<String>,
@@ -271,13 +260,6 @@ pub struct AccountStatus {
     pub time: Option<u64>,
 }
 
-
-
-///private final long assignedStorage;
-///private final long usedStorage;
-///private final int lowFreeStorageThreshold;
-///private final long expirationDate;
-///private final Set<NotificationTO> notifications;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountDetails {
     pub assignedStorage: u64,
@@ -312,16 +294,6 @@ pub struct ServerErrorResponse {
     pub message: String,
 }
 
-
-/*
-Current sync folder model:
-
-"id" : 1,
-"folderName" : "Music",
-"folderPath" : /Volumes/MacOS/Music,
-"addedDate"  : 1435864769463,
-"encrypted"  : false
-*/
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RegisteredFolder {
     pub id: u64,
