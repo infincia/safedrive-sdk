@@ -58,8 +58,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         Ok(()) => {},
         Err(_) => {}, // ignore this for the moment, it's primarily going to be the directory existing already
     }
-    return Ok(storage_path);
-
+    Ok(storage_path)
 }
 
 #[cfg(not(target_os = "macos"))]

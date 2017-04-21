@@ -95,7 +95,7 @@ pub fn get_version() -> String {
 /// internal functions
 
 pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: &'a str, language_code: &'a str, config: Configuration, log_level: LogLevelFilter, local_storage_path: &Path) -> Result<(), SDError> {
-    if !::sodiumoxide::init() == true {
+    if !::sodiumoxide::init() {
         panic!("sodium initialization failed, cannot continue");
     }
 
@@ -129,7 +129,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     }
 
     let storage_s = match local_storage_path.to_str() {
-        Some(ref s) => s.to_string(),
+        Some(s) => s.to_string(),
         None => return Err(SDError::UnicodeError),
     };
 
@@ -142,7 +142,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     p.push("cache");
 
     let cache_s = match p.as_path().to_str() {
-        Some(ref s) => s.to_string(),
+        Some(s) => s.to_string(),
         None => return Err(SDError::UnicodeError),
     };
     if let Err(e) = fs::create_dir_all(&cache_s) {
@@ -166,10 +166,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
                 let log_backup_name = format!("safedrive-{}-{}.log", app_type, now);
 
                 match ::std::fs::rename(&log_name, &log_backup_name) {
-                    Ok(()) => {
-
-                    },
-                    Err(_) => {
+                    Ok(()) | Err(_) => {
                         // we're actually renaming the log file here, before logging is initialized
                         // so it's not as though we can log the error :D
                         // luckily this is going to be incredibly rare unless the drive is out of
@@ -227,18 +224,18 @@ pub fn login(unique_client_id: &str,
     match register_client(&**gos, &**lc, unique_client_id, username, password) {
         Ok(t) => {
             match account_status(&t) {
-                Ok(s) => return Ok((t, s)),
+                Ok(s) => Ok((t, s)),
                 Err(e) => Err(SDError::from(e)),
             }
         },
-        Err(e) => return Err(SDError::from(e)),
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
 pub fn remove_software_client(token: &Token) -> Result<(), SDError> {
     match unregister_client(token) {
-        Ok(()) => return Ok(()),
-        Err(e) => return Err(SDError::from(e)),
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e)),
     }
 }
 
@@ -251,15 +248,15 @@ pub fn get_software_clients(username: &str,
 }
 
 pub fn get_account_status(token: &Token) -> Result<AccountStatus, SDError> {
-    match account_status(&token) {
-        Ok(s) => return Ok(s),
+    match account_status(token) {
+        Ok(s) => Ok(s),
         Err(e) => Err(SDError::from(e)),
     }
 }
 
 pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
-    match account_details(&token) {
-        Ok(d) => return Ok(d),
+    match account_details(token) {
+        Ok(d) => Ok(d),
         Err(e) => Err(SDError::from(e)),
     }
 }
@@ -337,7 +334,7 @@ pub fn get_sync_folder(token: &Token,
             return Ok(folder);
         }
     }
-    return Err(SDError::Internal(format!("unexpected failure to find folder_id {}", folder_id)));
+    Err(SDError::Internal(format!("unexpected failure to find folder_id {}", folder_id)))
 }
 
 pub fn add_sync_folder(token: &Token,
@@ -378,12 +375,10 @@ pub fn get_sync_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDError>
 pub fn get_sync_session<'a>(token: &Token,
                             folder_id: u64,
                             session: &'a str) -> Result<SyncSessionResponse<'a>, SDError> {
-    let session = match read_session(token, folder_id, session, true) {
-        Ok(session) => session,
-        Err(e) => return Err(SDError::from(e)),
-    };
-
-    Ok(session)
+    match read_session(token, folder_id, session, true) {
+        Ok(session) => Ok(session),
+        Err(e) => Err(SDError::from(e)),
+    }
 }
 
 pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
@@ -393,7 +388,7 @@ pub fn get_sync_sessions(token: &Token) -> Result<Vec<SyncSession>, SDError> {
     };
     let s = match res.get("sessionDetails") {
         Some(s) => s,
-        None => return Err(SDError::Internal(format!("failed to get sessionDetails from sessions response"))),
+        None => return Err(SDError::Internal("failed to get sessionDetails from sessions response".to_string())),
     };
 
     let mut v: Vec<SyncSession> = Vec::new();
@@ -427,7 +422,7 @@ pub fn clean_sync_sessions(token: &Token, schedule: SyncCleaningSchedule) -> Res
     match schedule {
         SyncCleaningSchedule::Auto => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::ExactDateRFC3339 { date } => {
@@ -464,37 +459,37 @@ pub fn clean_sync_sessions(token: &Token, schedule: SyncCleaningSchedule) -> Res
         },
         SyncCleaningSchedule::BeforeThisWeek => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::BeforeThisMonth => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::BeforeThisYear => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::OneDay => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::OneWeek => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::OneMonth => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
         SyncCleaningSchedule::OneYear => {
 
-            return Err(SDError::Internal("not implemented".to_string()));
+            Err(SDError::Internal("not implemented".to_string()))
 
         },
     }
@@ -933,7 +928,7 @@ pub fn sync(token: &Token,
     /// allow caller to tick the progress display, if one exists
     progress(estimated_size, processed_size, 0, percent_completed, false);
     
-    match finish_sync_session(&token, folder_id, true, &s, processed_size as usize, move |total, current, new| {
+    match finish_sync_session(token, folder_id, true, &s, processed_size as usize, move |total, current, new| {
         debug!("session upload progress: {}/{}, {} new", current, total, new);
     }) {
         Ok(()) => {},
@@ -1163,7 +1158,7 @@ pub fn restore(token: &Token,
 
                             /// get block from the server
 
-                            match ::sdapi::read_block(&token, &block_hmac_hex) {
+                            match ::sdapi::read_block(token, &block_hmac_hex) {
                                 Ok(rb) => {
                                     trace!("Block read took {} seconds", block_read_start_time.elapsed().as_secs());
 
@@ -1408,7 +1403,7 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
     };
 
     match report_error(cv, os, unique_client_id, description, context, &log_messages) {
-        Ok(()) => return Ok(()),
+        Ok(()) => Ok(()),
         Err(e) => Err(SDError::from(e)),
     }
 }
