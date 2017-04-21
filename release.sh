@@ -84,9 +84,6 @@ case $TARGET in
         cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
         ;;
     i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
-        cp -a dep/$TARGET/lib/pkgconfig dist-$TARGET/lib/
-        cp -a dep/$TARGET/lib/*.so dist-$TARGET/lib/
-        cp -a dep/$TARGET/lib/.*_ver dist-$TARGET/lib/
         cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so
         cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/
         cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
