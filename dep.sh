@@ -82,6 +82,11 @@ if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
     curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz.asc -o libressl-${LIBRESSL_VER}.tar.gz.asc > /dev/null
 fi
 
+if [ ! -f openssh-${OPENSSH_VER}.tar.gz ]; then
+    echo "Downloading openssh-${OPENSSH_VER}.tar.gz"
+    curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz -o openssh-${OPENSSH_VER}.tar.gz > /dev/null
+    curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz.asc -o openssh-${OPENSSH_VER}.tar.gz.asc > /dev/null
+fi
 
 if [ ! -f rsync-${RSYNC_VER}.tar.gz ]; then
     echo "Downloading rsync-${RSYNC_VER}.tar.gz"
@@ -119,6 +124,10 @@ export GLIB_BRANCH=2.52
 export GLIB_VER=2.52.0
 export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
 export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-silent-rules --disable-dtrace --disable-libelf"
+
+export OPENSSH_VER=7.5p1
+export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
+export OPENSSH_ARGS="--without-openssl --without-ssl-engine --with-sandbox=darwin"
 
 export SSHFS_VER=2.8
 export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
@@ -158,6 +167,7 @@ export BUILD_LIBSODIUM=true
 export BUILD_ICONV=false
 export BUILD_GETTEXT=false
 export BUILD_GLIB=false
+export BUILD_OPENSSH=false
 export BUILD_RSYNC=false
 export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
@@ -182,6 +192,7 @@ case ${TARGET} in
         export BUILD_ICONV=true
         export BUILD_GETTEXT=true
         export BUILD_GLIB=true
+        export BUILD_OPENSSH=true
         export BUILD_RSYNC=true
         export BUILD_SSHFS=true
         export BUILD_LIBRESSL=true
@@ -391,6 +402,27 @@ else
     echo "Not building glib"
 fi
 
+if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh ] || [ ! -f ${OPENSSH_VER_FILE} ] || [ ! $(<${OPENSSH_VER_FILE}) = ${OPENSSH_VER} ]; then
+    if [ ${BUILD_OPENSSH} = true ]; then
+        echo "Building OpenSSH ${OPENSSH_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        rm -rf openssh-*
+        tar xf ../src/openssh-${OPENSSH_VER}.tar.gz > /dev/null
+        pushd openssh-${OPENSSH_VER} > /dev/null
+            patch < ../../always-askpass.patch
+            ./configure --prefix=${BUILD_PREFIX} ${OPENSSH_ARGS} > /dev/null
+            make install OPENSSL=no > /dev/null
+
+            cp ssh ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER}
+            cp ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh
+        popd > /dev/null
+        rm -rf openssh*
+        echo ${OPENSSH_VER} > ${OPENSSH_VER_FILE}
+    else
+        echo "Not set to build OpenSSH"
+    fi
+else
+    echo "Not building OpenSSH"
+fi
 
 if [ ! -f ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync ] || [ ! -f ${RSYNC_VER_FILE} ] || [ ! $(<${RSYNC_VER_FILE}) = ${RSYNC_VER} ]; then
     if [ ${BUILD_RSYNC} = true ]; then
