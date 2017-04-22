@@ -9,6 +9,8 @@ fi
 export BUILD_PREFIX=${PWD}/dep/${TARGET}
 export DIST_PREFIX=${PWD}/dist-${TARGET}
 
+export PATH=${BUILD_PREFIX}/bin:${PATH}
+
 mkdir -p ${BUILD_PREFIX}/lib
 mkdir -p ${BUILD_PREFIX}/include
 mkdir -p ${BUILD_PREFIX}/bin
