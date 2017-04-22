@@ -16,6 +16,8 @@ extern crate simplelog;
 
 extern crate chrono;
 
+extern crate chrono_humanize;
+
 extern crate number_prefix;
 
 extern crate reed_solomon;

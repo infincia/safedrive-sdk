@@ -158,6 +158,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "chrono-humanize"
+version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "clap"
 version = "2.23.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -462,6 +470,7 @@ dependencies = [
  "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono-humanize 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "clippy 0.0.125 (registry+https://github.com/rust-lang/crates.io-index)",
  "fuse_mt 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.10.9 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1524,6 +1533,7 @@ dependencies = [
 "checksum cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1a528d2f22b8d4919416388773048621a4dfd7c0cd652b6025dbe07265fc44ca"
 "checksum cfg-if 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de1e760d7b6535af4241fca8bd8adf68e2e7edacc6b29f5d399050c5e48cf88c"
 "checksum chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "158b0bd7d75cbb6bf9c25967a48a2e9f77da95876b858eadfabaa99cd069de6e"
+"checksum chrono-humanize 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)" = "ae6fa54958da10e66bac77726b814028e05773d3af11ce14ded4da44913f84a0"
 "checksum clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)" = "f57e9b63057a545ad2ecd773ea61e49422ed1b1d63d74d5da5ecaee55b3396cd"
 "checksum clippy 0.0.125 (registry+https://github.com/rust-lang/crates.io-index)" = "3e3c30f16d2ce7eda0372175af2b0e2cd113e7b463a7559b4f35c0987e32cf51"
 "checksum clippy_lints 0.0.125 (registry+https://github.com/rust-lang/crates.io-index)" = "c053103d24f3f4119dfde38a83baa9d273f49942a1dd2e6d01edf3fc61c0a49e"
