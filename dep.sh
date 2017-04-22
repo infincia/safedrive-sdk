@@ -51,6 +51,12 @@ if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
     curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
 fi
 
+if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
+    echo "Downloading iconv-${ICONV_VER}.tar.gz"
+    echo "From https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz"
+    curl -L https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz -o libiconv-${ICONV_VER}.tar.gz > /dev/null
+fi
+
 if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
     echo "Downloading libressl-${LIBRESSL_VER}.tar.gz"
     curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz -o libressl-${LIBRESSL_VER}.tar.gz > /dev/null
@@ -73,6 +79,12 @@ export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-sy
 export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
+
+export ICONV_VER=1.15
+export ICONV_VER_FILE=${BUILD_PREFIX}/.iconv_ver
+export ICONV_ARGS="--enable-shared=no --enable-static"
+export LIBICONV_CFLAGS=-I${BUILD_PREFIX}/include
+export LIBICONV_LIBS=-L${BUILD_PREFIX}/lib
 
 
 export LIBRESSL_VER=2.5.2
@@ -97,6 +109,7 @@ export ac_cv_func_mkostemps="no"
 export BUILD_EXPAT=false
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
+export BUILD_ICONV=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
@@ -116,6 +129,7 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
+        export BUILD_ICONV=true
         export BUILD_LIBRESSL=true
         export BUILD_FFI=true
         ;;
@@ -243,6 +257,25 @@ if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ !
     fi
 else
     echo "Not building LibreSSL"
+fi
+
+if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ ! $(<${ICONV_VER_FILE}) = ${ICONV_VER} ]; then
+    if [ ${BUILD_ICONV} = true ]; then
+        echo "Building iconv ${ICONV_VER} for ${TARGET} in ${BUILD_PREFIX}"
+
+        tar xf ../src/libiconv-${ICONV_VER}.tar.gz > /dev/null
+        pushd libiconv-${ICONV_VER}
+            ./configure --prefix=${BUILD_PREFIX} ${ICONV_ARGS} > /dev/null
+            make > /dev/null
+            make install > /dev/null
+        popd
+        rm -rf libiconv*
+        echo ${ICONV_VER} > ${ICONV_VER_FILE}
+    else
+        echo "Not set to build iconv"
+    fi
+else
+    echo "Not building iconv"
 fi
 
 if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
