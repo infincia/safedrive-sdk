@@ -134,6 +134,9 @@ fn main() {
             .conflicts_with("production")
             .help("use the staging environment")
         )
+        .subcommand(SubCommand::with_name("daemon")
+            .about("run SafeDrive daemon")
+        )
         .subcommand(SubCommand::with_name("login")
             .about("login to SafeDrive account")
             .arg(Arg::with_name("email")
@@ -390,6 +393,11 @@ fn main() {
             },
         }
 
+    } else if let Some(_) = matches.subcommand_matches("daemon") {
+        let (token, _) = sign_in();
+
+        daemon();
+
     } else if let Some(m) = matches.subcommand_matches("login") {
 
         let u = match m.value_of("email") {
@@ -618,6 +626,18 @@ pub fn sign_in() -> (Token, Keyset) {
     };
 
     (token, keyset)
+}
+
+pub fn daemon() {
+    match start_daemon() {
+        Ok(()) => {
+            println!("started daemon");
+        },
+        Err(e) => {
+            error!("starting daemon failed: {}", e);
+            std::process::exit(1);
+        },
+    }
 }
 
 pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
