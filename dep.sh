@@ -25,15 +25,15 @@ mkdir -p build
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
-export SODIUM_VER_FILE=${BUILD_PREFIX}/lib/.sodium_ver
+export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
 export SODIUM_ARGS="--enable-shared=no"
 
 export LIBDBUS_VER=1.10.14
-export LIBDBUS_VER_FILE=${BUILD_PREFIX}/lib/.dbus_ver
+export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
 export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
 export EXPAT_VER=2.2.0
-export EXPAT_VER_FILE=${BUILD_PREFIX}/lib/.expat_ver
+export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
 export BUILD_DBUS=true
