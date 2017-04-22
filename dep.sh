@@ -22,80 +22,6 @@ mkdir -p ${DIST_PREFIX}/bin
 mkdir -p src
 mkdir -p build
 
-# grab sources
-
-pushd src > /dev/null
-
-if [ ! -f expat-${EXPAT_VER}.tar.bz2 ]; then
-    echo "Downloading expat-${EXPAT_VER}.tar.bz2"
-    echo "From https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2"
-    curl -L https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2 -o expat-${EXPAT_VER}.tar.bz2 > /dev/null
-
-fi
-
-if [ ! -f dbus-${LIBDBUS_VER}.tar.gz ]; then
-    echo "Downloading dbus-${LIBDBUS_VER}.tar.gz"
-    echo "From https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz"
-    curl -L https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz -o dbus-${LIBDBUS_VER}.tar.gz> /dev/null
-fi
-
-if [ ! -f libffi-${FFI_VER}.tar.gz ]; then
-    echo "Downloading libffi-${FFI_VER}.tar.gz"
-    echo "From ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
-    curl -L ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
-    echo "Downloading libsodium-${SODIUM_VER}.tar.gz"
-    echo "From https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz"
-    curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f gettext-${GETTEXT_VER}.tar.gz ]; then
-    echo "Downloading gettext-${GETTEXT_VER}.tar.gz"
-    echo "From http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz"
-    curl -L http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
-    echo "Downloading iconv-${ICONV_VER}.tar.gz"
-    echo "From https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz"
-    curl -L https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz -o libiconv-${ICONV_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
-    echo "Downloading glib-${GLIB_VER}.tar.xz"
-    echo "From http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz"
-    curl -L http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
-fi
-
-if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
-    echo "Downloading sshfs-${SSHFS_VER}.tar.gz"
-    echo "From https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz"
-    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz -o sshfs-${SSHFS_VER}.tar.gz > /dev/null
-    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz.asc -o sshfs-${SSHFS_VER}.tar.gz.asc > /dev/null
-fi
-
-if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
-    echo "Downloading libressl-${LIBRESSL_VER}.tar.gz"
-    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz -o libressl-${LIBRESSL_VER}.tar.gz > /dev/null
-    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz.asc -o libressl-${LIBRESSL_VER}.tar.gz.asc > /dev/null
-fi
-
-if [ ! -f openssh-${OPENSSH_VER}.tar.gz ]; then
-    echo "Downloading openssh-${OPENSSH_VER}.tar.gz"
-    curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz -o openssh-${OPENSSH_VER}.tar.gz > /dev/null
-    curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz.asc -o openssh-${OPENSSH_VER}.tar.gz.asc > /dev/null
-fi
-
-if [ ! -f rsync-${RSYNC_VER}.tar.gz ]; then
-    echo "Downloading rsync-${RSYNC_VER}.tar.gz"
-    curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz -o rsync-${RSYNC_VER}.tar.gz > /dev/null
-    curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz.asc -o rsync-${RSYNC_VER}.tar.gz.asc > /dev/null
-fi
-popd > /dev/null
-
-
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
@@ -237,8 +163,78 @@ esac
 
 
 
+# grab sources
 
+pushd src > /dev/null
 
+if [ ! -f expat-${EXPAT_VER}.tar.bz2 ]; then
+    echo "Downloading expat-${EXPAT_VER}.tar.bz2"
+    echo "From https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2"
+    curl -L https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2 -o expat-${EXPAT_VER}.tar.bz2 > /dev/null
+
+fi
+
+if [ ! -f dbus-${LIBDBUS_VER}.tar.gz ]; then
+    echo "Downloading dbus-${LIBDBUS_VER}.tar.gz"
+    echo "From https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz"
+    curl -L https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz -o dbus-${LIBDBUS_VER}.tar.gz> /dev/null
+fi
+
+if [ ! -f libffi-${FFI_VER}.tar.gz ]; then
+    echo "Downloading libffi-${FFI_VER}.tar.gz"
+    echo "From ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
+    curl -L ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
+fi
+
+if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
+    echo "Downloading libsodium-${SODIUM_VER}.tar.gz"
+    echo "From https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz"
+    curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
+fi
+
+if [ ! -f gettext-${GETTEXT_VER}.tar.gz ]; then
+    echo "Downloading gettext-${GETTEXT_VER}.tar.gz"
+    echo "From http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz"
+    curl -L http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
+fi
+
+if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
+    echo "Downloading iconv-${ICONV_VER}.tar.gz"
+    echo "From https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz"
+    curl -L https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz -o libiconv-${ICONV_VER}.tar.gz > /dev/null
+fi
+
+if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
+    echo "Downloading glib-${GLIB_VER}.tar.xz"
+    echo "From http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz"
+    curl -L http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
+fi
+
+if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
+    echo "Downloading sshfs-${SSHFS_VER}.tar.gz"
+    echo "From https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz"
+    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz -o sshfs-${SSHFS_VER}.tar.gz > /dev/null
+    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz.asc -o sshfs-${SSHFS_VER}.tar.gz.asc > /dev/null
+fi
+
+if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
+    echo "Downloading libressl-${LIBRESSL_VER}.tar.gz"
+    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz -o libressl-${LIBRESSL_VER}.tar.gz > /dev/null
+    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz.asc -o libressl-${LIBRESSL_VER}.tar.gz.asc > /dev/null
+fi
+
+if [ ! -f openssh-${OPENSSH_VER}.tar.gz ]; then
+    echo "Downloading openssh-${OPENSSH_VER}.tar.gz"
+    curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz -o openssh-${OPENSSH_VER}.tar.gz > /dev/null
+    curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz.asc -o openssh-${OPENSSH_VER}.tar.gz.asc > /dev/null
+fi
+
+if [ ! -f rsync-${RSYNC_VER}.tar.gz ]; then
+    echo "Downloading rsync-${RSYNC_VER}.tar.gz"
+    curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz -o rsync-${RSYNC_VER}.tar.gz > /dev/null
+    curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz.asc -o rsync-${RSYNC_VER}.tar.gz.asc > /dev/null
+fi
+popd > /dev/null
 
 
 
