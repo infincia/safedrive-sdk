@@ -120,7 +120,7 @@ case ${TARGET} in
         export BUILD_ICONV=true
         export BUILD_GETTEXT=true
         export BUILD_GLIB=true
-        export BUILD_OPENSSH=true
+        export BUILD_OPENSSH=false
         export BUILD_RSYNC=true
         export BUILD_SSHFS=true
         export BUILD_LIBRESSL=true
