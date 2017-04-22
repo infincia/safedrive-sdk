@@ -55,6 +55,7 @@ export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
 export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
 export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
 
+export MACOSX_DEPLOYMENT_TARGET=10.9
 export OSX_VERSION_MIN="10.9"
 export OSX_CPU_ARCH="core2"
 export MAC_ARGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH}"
