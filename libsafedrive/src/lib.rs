@@ -2,6 +2,22 @@
 
 #![cfg_attr(feature="lint", plugin(clippy))]
 
+#![cfg_attr(feature="webui", feature(plugin))]
+#![cfg_attr(feature="webui", plugin(rocket_codegen))]
+#![cfg_attr(feature="webui", feature(rustc_attrs))]
+#![cfg_attr(feature="webui", feature(custom_attribute))]
+
+
+#[cfg(feature = "webui")]
+extern crate pulldown_cmark;
+#[cfg(feature = "webui")]
+#[macro_use] extern crate tera;
+#[cfg(feature = "webui")]
+extern crate rocket;
+#[cfg(feature = "webui")]
+extern crate rocket_contrib;
+
+
 extern crate semver;
 
 #[macro_use]
