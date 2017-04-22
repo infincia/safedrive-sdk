@@ -1,3 +1,7 @@
+#![cfg_attr(feature="lint", feature(plugin))]
+
+#![cfg_attr(feature="lint", plugin(clippy))]
+
 extern crate semver;
 
 #[macro_use]
