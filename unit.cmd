@@ -7,6 +7,7 @@ ECHO testing safedrive for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
 set SODIUM_LIB_DIR=%CD%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%\lib
 set SODIUM_STATIC=""
+set CARGO_INCREMENTAL="1"
 set RUST_BACKTRACE="1"
 set RUST_FLAGS=""
 
