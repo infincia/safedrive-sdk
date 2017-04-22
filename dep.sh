@@ -26,15 +26,15 @@ mkdir -p build
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
 export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
-export SODIUM_ARGS="--enable-shared=no"
+export SODIUM_ARGS="--enable-shared=no --enable-static"
 
 export LIBDBUS_VER=1.10.14
 export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
-export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
+export LIBDBUS_ARGS="--enable-shared=no --enable-static --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
 export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
-export EXPAT_ARGS="--enable-shared=no"
+export EXPAT_ARGS="--enable-shared=no --enable-static"
 
 export ICONV_VER=1.15
 export ICONV_VER_FILE=${BUILD_PREFIX}/.iconv_ver
@@ -64,7 +64,7 @@ export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -lo
 
 export LIBRESSL_VER=2.5.2
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
-export LIBRESSL_ARGS="--disable-dependency-tracking"
+export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no --enable-static"
 
 export RSYNC_VER=3.1.2
 export RSYNC_VER_FILE=${BUILD_PREFIX}/.rsync_ver
@@ -74,7 +74,7 @@ export RSYNC_LIBS="-L${BUILD_PREFIX}/lib"
 
 export FFI_VER=3.2.1
 export FFI_VER_FILE=${BUILD_PREFIX}/.ffi_ver
-export FFI_ARGS=""
+export FFI_ARGS="--enable-shared=no --enable-static"
 
 export ac_cv_func_timingsafe_bcmp="no"
 export ac_cv_func_basename_r="no"
