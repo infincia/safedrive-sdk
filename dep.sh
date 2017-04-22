@@ -278,7 +278,7 @@ else
     echo "Not building libdbus"
 fi
 
-if [ ! -f d${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
+if [ ! -f ${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
     if [ ${BUILD_LIBSODIUM} = true ]; then
 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${BUILD_PREFIX}"
