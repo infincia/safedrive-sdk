@@ -38,6 +38,9 @@ use SYNC_VERSION;
 use CHANNEL;
 use CANCEL_LIST;
 use LOG;
+use CURRENT_USER;
+use UNIQUE_CLIENT_ID;
+use TOKEN;
 
 use session::{SyncSession, WrappedSyncSession};
 
@@ -223,6 +226,15 @@ pub fn login(unique_client_id: &str,
 
     match register_client(&**gos, &**lc, unique_client_id, username, password) {
         Ok(t) => {
+            let mut cu = CURRENT_USER.write();
+            *cu = username.to_string();
+
+            let mut ucid = UNIQUE_CLIENT_ID.write();
+            *ucid = unique_client_id.to_string();
+
+            let mut token = TOKEN.write();
+            *token = t.clone();
+
             match account_status(&t) {
                 Ok(s) => Ok((t, s)),
                 Err(e) => Err(SDError::from(e)),

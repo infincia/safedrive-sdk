@@ -183,6 +183,18 @@ lazy_static! {
 }
 
 lazy_static! {
+    static ref UNIQUE_CLIENT_ID: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
+}
+
+lazy_static! {
+    static ref TOKEN: ::parking_lot::RwLock<Token> = ::parking_lot::RwLock::new(Token::default());
+}
+
+lazy_static! {
+    static ref CURRENT_USER: ::parking_lot::RwLock<::std::string::String> = ::parking_lot::RwLock::new(::std::string::String::new());
+}
+
+lazy_static! {
     static ref CANCEL_LIST: ::parking_lot::RwLock<Vec<String>> = ::parking_lot::RwLock::new(Vec::new());
 }
 
