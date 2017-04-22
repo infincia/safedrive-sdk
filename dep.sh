@@ -75,6 +75,8 @@ export RSYNC_LIBS="-L${BUILD_PREFIX}/lib"
 export FFI_VER=3.2.1
 export FFI_VER_FILE=${BUILD_PREFIX}/.ffi_ver
 export FFI_ARGS="--enable-shared=no --enable-static"
+export LIBFFI_CFLAGS="-I${BUILD_PREFIX}/lib/libffi-${FFI_VER}/include"
+export LIBFFI_LIBS="-L${BUILD_PREFIX}/lib -lffi"
 
 export ac_cv_func_timingsafe_bcmp="no"
 export ac_cv_func_basename_r="no"
