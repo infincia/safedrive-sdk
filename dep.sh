@@ -63,6 +63,12 @@ if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
     curl -L https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz -o libiconv-${ICONV_VER}.tar.gz > /dev/null
 fi
 
+if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
+    echo "Downloading glib-${GLIB_VER}.tar.xz"
+    echo "From http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz"
+    curl -L http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
+fi
+
 if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
     echo "Downloading libressl-${LIBRESSL_VER}.tar.gz"
     curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz -o libressl-${LIBRESSL_VER}.tar.gz > /dev/null
@@ -96,6 +102,11 @@ export GETTEXT_VER=0.19.8.1
 export GETTEXT_VER_FILE=${BUILD_PREFIX}/.gettext_ver
 export GETTEXT_ARGS="--enable-shared=no --enable-static --enable-fast-install --without-git"
 
+export GLIB_BRANCH=2.52
+export GLIB_VER=2.52.0
+export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
+export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-silent-rules --disable-dtrace --disable-libelf"
+
 
 export LIBRESSL_VER=2.5.2
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -121,6 +132,7 @@ export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
 export BUILD_ICONV=false
 export BUILD_GETTEXT=false
+export BUILD_GLIB=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
@@ -142,6 +154,7 @@ case ${TARGET} in
         export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
         export BUILD_ICONV=true
         export BUILD_GETTEXT=true
+        export BUILD_GLIB=true
         export BUILD_LIBRESSL=true
         export BUILD_FFI=true
         ;;
@@ -329,3 +342,23 @@ if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<
 else
     echo "Not building libffi"
 fi
+
+if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ ! $(<${GLIB_VER_FILE}) = ${GLIB_VER} ]; then
+    if [ ${BUILD_GLIB} = true ]; then
+        echo "Building glib ${GLIB_VER} for ${TARGET} in ${BUILD_PREFIX}"
+
+        tar xf ../src/glib-${GLIB_VER}.tar.xz > /dev/null
+        pushd glib-${GLIB_VER}
+            ./configure --prefix=${BUILD_PREFIX} ${GLIB_ARGS} > /dev/null
+            make > /dev/null
+            make install > /dev/null
+        popd
+        rm -rf glib*
+        echo ${GLIB_VER} > ${GLIB_VER_FILE}
+    else
+        echo "Not set to build glib"
+    fi
+else
+    echo "Not building glib"
+fi
+
