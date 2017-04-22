@@ -82,6 +82,12 @@ if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
     curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz.asc -o libressl-${LIBRESSL_VER}.tar.gz.asc > /dev/null
 fi
 
+
+if [ ! -f rsync-${RSYNC_VER}.tar.gz ]; then
+    echo "Downloading rsync-${RSYNC_VER}.tar.gz"
+    curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz -o rsync-${RSYNC_VER}.tar.gz > /dev/null
+    curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz.asc -o rsync-${RSYNC_VER}.tar.gz.asc > /dev/null
+fi
 popd > /dev/null
 
 
@@ -125,6 +131,12 @@ export LIBRESSL_VER=2.5.2
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
 export LIBRESSL_ARGS="--disable-dependency-tracking"
 
+export RSYNC_VER=3.1.2
+export RSYNC_VER_FILE=${BUILD_PREFIX}/.rsync_ver
+export RSYNC_ARGS="--with-included-popt --with-included-zlib"
+export RSYNC_CFLAGS="-I${BUILD_PREFIX}/include/openssl"
+export RSYNC_LIBS="-L${BUILD_PREFIX}/lib"
+
 export FFI_VER=3.2.1
 export FFI_VER_FILE=${BUILD_PREFIX}/.ffi_ver
 export FFI_ARGS=""
@@ -146,6 +158,7 @@ export BUILD_LIBSODIUM=true
 export BUILD_ICONV=false
 export BUILD_GETTEXT=false
 export BUILD_GLIB=false
+export BUILD_RSYNC=false
 export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
@@ -169,6 +182,7 @@ case ${TARGET} in
         export BUILD_ICONV=true
         export BUILD_GETTEXT=true
         export BUILD_GLIB=true
+        export BUILD_RSYNC=true
         export BUILD_SSHFS=true
         export BUILD_LIBRESSL=true
         export BUILD_FFI=true
@@ -377,6 +391,29 @@ else
     echo "Not building glib"
 fi
 
+
+if [ ! -f ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync ] || [ ! -f ${RSYNC_VER_FILE} ] || [ ! $(<${RSYNC_VER_FILE}) = ${RSYNC_VER} ]; then
+    if [ ${BUILD_RSYNC} = true ]; then
+
+        echo "Building Rsync ${RSYNC_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        rm -rf rsync-*
+        tar xf ../src/rsync-${RSYNC_VER}.tar.gz > /dev/null
+        pushd rsync-${RSYNC_VER} > /dev/null
+            ./configure --prefix=${BUILD_PREFIX} ${RSYNC_ARGS} > /dev/null
+            make install > /dev/null
+
+            cp rsync ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER}
+            cp ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync
+
+        popd > /dev/null
+        rm -rf rsync*
+        echo ${RSYNC_VER} > ${RSYNC_VER_FILE}
+    else
+        echo "Not set to build Rsync"
+    fi
+else
+    echo "Not building Rsync"
+fi
 
 if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
     if [ ${BUILD_SSHFS} = true ]; then
