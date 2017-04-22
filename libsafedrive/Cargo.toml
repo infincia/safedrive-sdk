@@ -47,7 +47,7 @@ clippy = { version = "*", optional = true }
 rocket = { version = "*", optional = true }
 rocket_codegen = { version = "*", optional = true }
 rocket_contrib = { version = "*", optional = true }
-tera = { version = "*", optional = true }
+tera = { version = "^0.9", optional = true }
 pulldown-cmark = { version = "0.0.8", optional = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
