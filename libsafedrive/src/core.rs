@@ -244,6 +244,12 @@ pub fn login(unique_client_id: &str,
     }
 }
 
+pub fn start_daemon() -> Result<(), SDError> {
+
+
+    Ok(())
+}
+
 pub fn remove_software_client(token: &Token) -> Result<(), SDError> {
     match unregister_client(token) {
         Ok(()) => Ok(()),
