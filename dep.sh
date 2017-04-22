@@ -51,6 +51,12 @@ if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
     curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
 fi
 
+if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
+    echo "Downloading libressl-${LIBRESSL_VER}.tar.gz"
+    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz -o libressl-${LIBRESSL_VER}.tar.gz > /dev/null
+    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz.asc -o libressl-${LIBRESSL_VER}.tar.gz.asc > /dev/null
+fi
+
 popd > /dev/null
 
 
@@ -67,6 +73,11 @@ export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-sy
 export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
+
+
+export LIBRESSL_VER=2.5.2
+export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
+export LIBRESSL_ARGS="--disable-dependency-tracking"
 
 export FFI_VER=3.2.1
 export FFI_VER_FILE=${BUILD_PREFIX}/.ffi_ver
@@ -86,6 +97,7 @@ export ac_cv_func_mkostemps="no"
 export BUILD_EXPAT=false
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
+export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
 export RUSTFLAGS=""
@@ -104,6 +116,7 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
+        export BUILD_LIBRESSL=true
         export BUILD_FFI=true
         ;;
     x86_64-unknown-linux-gnu)
@@ -210,6 +223,26 @@ if [ ! -f d${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [
     fi
 else
     echo "Not building libsodium"
+fi
+
+if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
+    if [ ${BUILD_LIBRESSL} = true ]; then
+
+        echo "Building LibreSSL ${LIBRESSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        rm -rf libressl*
+        tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
+        pushd libressl-${LIBRESSL_VER} > /dev/null
+            ./configure --prefix=${BUILD_PREFIX} ${LIBRESSL_ARGS} > /dev/null
+            make check > /dev/null
+            make install > /dev/null
+        popd > /dev/null
+        rm -rf libressl*
+        echo ${LIBRESSL_VER} > ${LIBRESSL_VER_FILE}
+    else
+        echo "Not set to build LibreSSL"
+    fi
+else
+    echo "Not building LibreSSL"
 fi
 
 if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
