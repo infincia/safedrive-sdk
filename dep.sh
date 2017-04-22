@@ -69,6 +69,13 @@ if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
     curl -L http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
 fi
 
+if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
+    echo "Downloading sshfs-${SSHFS_VER}.tar.gz"
+    echo "From https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz"
+    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz -o sshfs-${SSHFS_VER}.tar.gz > /dev/null
+    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz.asc -o sshfs-${SSHFS_VER}.tar.gz.asc > /dev/null
+fi
+
 if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
     echo "Downloading libressl-${LIBRESSL_VER}.tar.gz"
     curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${LIBRESSL_VER}.tar.gz -o libressl-${LIBRESSL_VER}.tar.gz > /dev/null
@@ -107,6 +114,12 @@ export GLIB_VER=2.52.0
 export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
 export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-silent-rules --disable-dtrace --disable-libelf"
 
+export SSHFS_VER=2.8
+export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
+export SSHFS_ARGS="--disable-dependency-tracking"
+export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I/usr/local/include/osxfuse -I/usr/local/include/osxfuse/fuse"
+export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0"
+
 
 export LIBRESSL_VER=2.5.2
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -133,6 +146,7 @@ export BUILD_LIBSODIUM=true
 export BUILD_ICONV=false
 export BUILD_GETTEXT=false
 export BUILD_GLIB=false
+export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
@@ -155,6 +169,7 @@ case ${TARGET} in
         export BUILD_ICONV=true
         export BUILD_GETTEXT=true
         export BUILD_GLIB=true
+        export BUILD_SSHFS=true
         export BUILD_LIBRESSL=true
         export BUILD_FFI=true
         ;;
@@ -362,5 +377,27 @@ else
     echo "Not building glib"
 fi
 
+
+if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
+    if [ ${BUILD_SSHFS} = true ]; then
+
+        echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
+
+        tar xf ../src/sshfs-${SSHFS_VER}.tar.gz > /dev/null
+        pushd sshfs-${SSHFS_VER}
+            ./configure --prefix=${BUILD_PREFIX} ${SSHFS_ARGS} > /dev/null
+            make > /dev/null
+            echo "Building static SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
+            cp sshfs ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER}
+            cp ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs
+        popd
+        rm -rf sshfs*
+        echo ${SSHFS_VER} > ${SSHFS_VER_FILE}
+    else
+        echo "Not set to build sshfs"
+    fi
+else
+    echo "Not building sshfs"
+fi
 
 popd > /dev/null
