@@ -22,6 +22,32 @@ mkdir -p ${DIST_PREFIX}/bin
 mkdir -p src
 mkdir -p build
 
+# grab sources
+
+pushd src > /dev/null
+
+if [ ! -f expat-${EXPAT_VER}.tar.bz2 ]; then
+    echo "Downloading expat-${EXPAT_VER}.tar.bz2"
+    echo "From https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2"
+    curl -L https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2 -o expat-${EXPAT_VER}.tar.bz2 > /dev/null
+
+fi
+
+if [ ! -f dbus-${LIBDBUS_VER}.tar.gz ]; then
+    echo "Downloading dbus-${LIBDBUS_VER}.tar.gz"
+    echo "From https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz"
+    curl -L https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz -o dbus-${LIBDBUS_VER}.tar.gz> /dev/null
+fi
+
+if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
+    echo "Downloading libsodium-${SODIUM_VER}.tar.gz"
+    echo "From https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz"
+    curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
+fi
+
+popd > /dev/null
+
+
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
@@ -47,6 +73,7 @@ export ac_cv_func_mkostemp="no"
 export ac_cv_func_mkostemps="no"
 
 
+export BUILD_EXPAT=false
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
 
@@ -71,6 +98,7 @@ case ${TARGET} in
         export CFLAGS="${CFLAGS}"
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
+        export BUILD_EXPAT=true
         export BUILD_DBUS=true
         ;;
     i686-unknown-linux-gnu)
@@ -78,6 +106,7 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS} -m32"
         export LDFLAGS="${LDFLAGS}"
         export PKG_CONFIG_ALLOW_CROSS=1
+        export BUILD_EXPAT=true
         export BUILD_DBUS=true
         ;;
     x86_64-unknown-linux-musl)
@@ -85,6 +114,7 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
+        export BUILD_EXPAT=true
         export BUILD_DBUS=true
         ;;
     i686-unknown-linux-musl)
@@ -93,20 +123,28 @@ case ${TARGET} in
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
         export PKG_CONFIG_ALLOW_CROSS=1
+        export BUILD_EXPAT=true
         export BUILD_DBUS=true
         ;;
     *)
         ;;
 esac
 
-if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
-    if [ ${BUILD_DBUS} = true ]; then
+
+
+
+
+
+
+
+
+pushd build > /dev/null
+
+if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! $(<${EXPAT_VER_FILE}) = ${EXPAT_VER} ]; then
+    if [ ${BUILD_EXPAT} = true ]; then
 
         echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
-
-        curl -L https://downloads.sourceforge.net/project/expat/expat/${EXPAT_VER}/expat-${EXPAT_VER}.tar.bz2 -o expat-${EXPAT_VER}.tar.bz2 > /dev/null
-        tar xf expat-${EXPAT_VER}.tar.bz2 > /dev/null
+        tar xf ../src/expat-${EXPAT_VER}.tar.bz2 > /dev/null
         pushd expat-${EXPAT_VER}
         ./configure --prefix=${BUILD_PREFIX} ${EXPAT_ARGS} > /dev/null
         make > /dev/null
@@ -114,11 +152,18 @@ if [ ! -f dep/${TARGET}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ !
         popd
         rm -rf expat*
         echo ${EXPAT_VER} > ${EXPAT_VER_FILE}
+    else
+        echo "Not set to build libexpat"
+    fi
+else
+    echo "Not building libexpat"
+fi
 
+if [ ! -f ${BUILD_PREFIX}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
+    if [ ${BUILD_DBUS} = true ]; then
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
-        curl -L https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz -o dbus-${LIBDBUS_VER}.tar.gz> /dev/null
-        tar xf dbus-${LIBDBUS_VER}.tar.gz > /dev/null
+        tar xf ../src/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         pushd dbus-${LIBDBUS_VER}
         ./configure --prefix=${BUILD_PREFIX} ${LIBDBUS_ARGS} > /dev/null
         make > /dev/null
@@ -138,8 +183,7 @@ if [ ! -f dep/${TARGET}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! 
 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
-        curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
-        tar xf libsodium-${SODIUM_VER}.tar.gz > /dev/null
+        tar xf ../src/libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
         ./configure --prefix=${BUILD_PREFIX} ${SODIUM_ARGS} > /dev/null
         make clean > /dev/null
