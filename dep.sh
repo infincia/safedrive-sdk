@@ -39,6 +39,12 @@ if [ ! -f dbus-${LIBDBUS_VER}.tar.gz ]; then
     curl -L https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz -o dbus-${LIBDBUS_VER}.tar.gz> /dev/null
 fi
 
+if [ ! -f libffi-${FFI_VER}.tar.gz ]; then
+    echo "Downloading libffi-${FFI_VER}.tar.gz"
+    echo "From ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
+    curl -L ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
+fi
+
 if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
     echo "Downloading libsodium-${SODIUM_VER}.tar.gz"
     echo "From https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz"
@@ -62,6 +68,10 @@ export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
+export FFI_VER=3.2.1
+export FFI_VER_FILE=${BUILD_PREFIX}/.ffi_ver
+export FFI_ARGS=""
+
 export ac_cv_func_timingsafe_bcmp="no"
 export ac_cv_func_basename_r="no"
 export ac_cv_func_clock_getres="no"
@@ -76,6 +86,7 @@ export ac_cv_func_mkostemps="no"
 export BUILD_EXPAT=false
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
+export BUILD_FFI=false
 
 export RUSTFLAGS=""
 export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
@@ -93,6 +104,7 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
+        export BUILD_FFI=true
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="${CFLAGS}"
@@ -198,4 +210,24 @@ if [ ! -f d${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [
     fi
 else
     echo "Not building libsodium"
+fi
+
+if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
+    if [ ${BUILD_FFI} = true ]; then
+
+        echo "Building libffi ${FFI_VER} for ${TARGET} in ${BUILD_PREFIX}"
+
+        tar xf ../src/libffi-${FFI_VER}.tar.gz > /dev/null
+        pushd libffi-${FFI_VER}
+            ./configure --prefix=${BUILD_PREFIX} ${FFI_ARGS} > /dev/null
+            make > /dev/null
+            make install > /dev/null
+        popd
+        rm -rf libffi*
+        echo ${FFI_VER} > ${FFI_VER_FILE}
+    else
+        echo "Not set to build libffi"
+    fi
+else
+    echo "Not building libffi"
 fi
