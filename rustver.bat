@@ -1,1 +1,1 @@
-set RUST_VER=1.16.0
+set RUST_VER=nightly-2017-04-21
