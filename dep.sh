@@ -36,6 +36,17 @@ export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
+export ac_cv_func_timingsafe_bcmp="no"
+export ac_cv_func_basename_r="no"
+export ac_cv_func_clock_getres="no"
+export ac_cv_func_clock_gettime="no"
+export ac_cv_func_clock_settime="no"
+export ac_cv_func_dirname_r="no"
+export ac_cv_func_getentropy="no"
+export ac_cv_func_mkostemp="no"
+export ac_cv_func_mkostemps="no"
+
+
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
 
