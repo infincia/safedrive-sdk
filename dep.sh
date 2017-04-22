@@ -362,3 +362,5 @@ else
     echo "Not building glib"
 fi
 
+
+popd > /dev/null
