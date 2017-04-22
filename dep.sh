@@ -80,7 +80,7 @@ export BUILD_LIBSODIUM=true
 export RUSTFLAGS=""
 export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
 export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+export LDFLAGS="-L${BUILD_PREFIX}/lib"
 
 export MACOSX_DEPLOYMENT_TARGET=10.9
 export OSX_VERSION_MIN="10.9"
