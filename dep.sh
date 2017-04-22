@@ -36,7 +36,7 @@ export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
-export BUILD_DBUS=true
+export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
 
 export RUSTFLAGS=""
@@ -59,18 +59,21 @@ case ${TARGET} in
         export CFLAGS="${CFLAGS}"
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
+        export BUILD_DBUS=true
         ;;
     i686-unknown-linux-gnu)
         export CFLAGS="${CFLAGS} -m32"
         export CPPFLAGS="${CPPFLAGS} -m32"
         export LDFLAGS="${LDFLAGS}"
         export PKG_CONFIG_ALLOW_CROSS=1
+        export BUILD_DBUS=true
         ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="${CFLAGS}"
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
+        export BUILD_DBUS=true
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -m32"
@@ -78,6 +81,7 @@ case ${TARGET} in
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
         export PKG_CONFIG_ALLOW_CROSS=1
+        export BUILD_DBUS=true
         ;;
     *)
         ;;
