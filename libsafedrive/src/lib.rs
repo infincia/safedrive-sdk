@@ -62,6 +62,8 @@ mod keychain;
 #[cfg(feature = "sessionfs")]
 mod sessionfs;
 mod sdlog;
+#[cfg(feature = "webui")]
+mod webui;
 
 /// public API
 ///
