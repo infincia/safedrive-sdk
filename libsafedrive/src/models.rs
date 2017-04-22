@@ -233,6 +233,14 @@ pub struct Token {
     pub token: String,
 }
 
+impl Default for Token {
+    fn default() -> Token {
+        Token {
+            token: "".to_string()
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SoftwareClient {
     pub uniqueId: String,
