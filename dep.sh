@@ -51,6 +51,12 @@ if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
     curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
 fi
 
+if [ ! -f gettext-${GETTEXT_VER}.tar.gz ]; then
+    echo "Downloading gettext-${GETTEXT_VER}.tar.gz"
+    echo "From http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz"
+    curl -L http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
+fi
+
 if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
     echo "Downloading iconv-${ICONV_VER}.tar.gz"
     echo "From https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz"
@@ -86,6 +92,10 @@ export ICONV_ARGS="--enable-shared=no --enable-static"
 export LIBICONV_CFLAGS=-I${BUILD_PREFIX}/include
 export LIBICONV_LIBS=-L${BUILD_PREFIX}/lib
 
+export GETTEXT_VER=0.19.8.1
+export GETTEXT_VER_FILE=${BUILD_PREFIX}/.gettext_ver
+export GETTEXT_ARGS="--enable-shared=no --enable-static --enable-fast-install --without-git"
+
 
 export LIBRESSL_VER=2.5.2
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -110,6 +120,7 @@ export BUILD_EXPAT=false
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
 export BUILD_ICONV=false
+export BUILD_GETTEXT=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
@@ -130,6 +141,7 @@ case ${TARGET} in
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
         export BUILD_ICONV=true
+        export BUILD_GETTEXT=true
         export BUILD_LIBRESSL=true
         export BUILD_FFI=true
         ;;
@@ -276,6 +288,26 @@ if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ !
     fi
 else
     echo "Not building iconv"
+fi
+
+if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ ! $(<${GETTEXT_VER_FILE}) = ${GETTEXT_VER} ]; then
+    if [ ${BUILD_GETTEXT} = true ]; then
+
+        echo "Building gettext ${GETTEXT_VER} for ${TARGET} in ${BUILD_PREFIX}"
+
+        tar xf ../src/gettext-${GETTEXT_VER}.tar.gz > /dev/null
+        pushd gettext-${GETTEXT_VER}
+            ./configure --prefix=${BUILD_PREFIX} ${GETTEXT_ARGS} > /dev/null
+            make > /dev/null
+            make install > /dev/null
+        popd
+        rm -rf gettext*
+        echo ${GETTEXT_VER} > ${GETTEXT_VER_FILE}
+    else
+        echo "Not set to build gettext"
+    fi
+else
+    echo "Not building gettext"
 fi
 
 if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
