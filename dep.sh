@@ -6,11 +6,19 @@ if [ -z "${TARGET}" ]; then
     export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 fi
 
-mkdir -p dep/$TARGET/lib
-mkdir -p dep/$TARGET/include
-mkdir -p dep/$TARGET/bin
+export BUILD_PREFIX=${PWD}/dep/${TARGET}
+export DIST_PREFIX=${PWD}/dist-${TARGET}
 
-export BUILD_PREFIX=$PWD/dep/${TARGET}
+mkdir -p ${BUILD_PREFIX}/lib
+mkdir -p ${BUILD_PREFIX}/include
+mkdir -p ${BUILD_PREFIX}/bin
+
+mkdir -p ${DIST_PREFIX}/lib
+mkdir -p ${DIST_PREFIX}/include
+mkdir -p ${DIST_PREFIX}/bin
+
+mkdir -p src
+mkdir -p build
 
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
