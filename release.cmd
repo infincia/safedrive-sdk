@@ -28,8 +28,6 @@ call rustver.bat
 
 rustup override set %RUST_VER%
 
-cargo.exe build --release -p libsafedrive --target %TARGET%
-cheddar -f "libsafedrive\src\c_api.rs" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h"
 ECHO Building safedrive CLI for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
 cargo.exe build --release -p safedrive --target %TARGET%
@@ -37,6 +35,10 @@ cargo.exe build --release -p safedrive --target %TARGET%
 ECHO Building safedrive daemon for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
 cargo.exe build --release -p safedrived --target %TARGET%
+
+ECHO Building SDDK headers for %TARGET% (%TOOLSET%-%LINKTYPE%)
+
+cheddar -f "libsafedrive\src\c_api.rs" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h"
 
 ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
