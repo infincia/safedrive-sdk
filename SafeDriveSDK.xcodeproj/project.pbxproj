@@ -187,6 +187,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA5DCFBB1D6CFFDA00FEDAFB /* Build configuration list for PBXNativeTarget "SafeDriveSDK" */;
 			buildPhases = (
+				AAA3E6C01EAD4DFE0083CE66 /* Build Rust SDK */,
 				AABF372A1E36E1EE003DC6C2 /* Update version */,
 				AA5DCF671D6CFFDA00FEDAFB /* Sources */,
 				AA5DCF6F1D6CFFDA00FEDAFB /* Frameworks */,
@@ -271,6 +272,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		AAA3E6C01EAD4DFE0083CE66 /* Build Rust SDK */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build Rust SDK";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "PATH=$HOME/.cargo/bin:$PATH\n${PROJECT_DIR}/release.sh";
+		};
 		AABF372A1E36E1EE003DC6C2 /* Update version */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
