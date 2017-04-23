@@ -7,6 +7,16 @@ set -ex
 . $(dirname $0)/utils.sh
 . $(dirname $0)/../rustver.sh
 
+install_fuse() {
+    case "$TRAVIS_OS_NAME" in
+        linux)
+            ;;
+        osx)
+            sudo brew cask install osxfuse
+            ;;
+    esac
+}
+
 install_rustup() {
     echo "Using Rust $RUST_VER"
     curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$RUST_VER
@@ -17,6 +27,7 @@ install_rustup() {
 }
 
 main() {
+    install_fuse
     install_rustup
 }
 
