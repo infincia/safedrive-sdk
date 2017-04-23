@@ -28,7 +28,7 @@ export SODIUM_VER=1.0.12
 export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
 export SODIUM_ARGS="--enable-shared=no --enable-static"
 
-export LIBDBUS_VER=1.10.14
+export LIBDBUS_VER=1.10.18
 export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
 export LIBDBUS_ARGS="--enable-shared=no --enable-static --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
@@ -47,7 +47,7 @@ export GETTEXT_VER_FILE=${BUILD_PREFIX}/.gettext_ver
 export GETTEXT_ARGS="--enable-shared=no --enable-static --enable-fast-install --without-git"
 
 export GLIB_BRANCH=2.52
-export GLIB_VER=2.52.0
+export GLIB_VER=2.52.1
 export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
 export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-silent-rules --disable-dtrace --disable-libelf"
 
@@ -55,14 +55,14 @@ export OPENSSH_VER=7.5p1
 export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
 export OPENSSH_ARGS="--without-openssl --without-ssl-engine --with-sandbox=darwin"
 
-export SSHFS_VER=2.8
+export SSHFS_VER=2.9
 export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
 export SSHFS_ARGS="--disable-dependency-tracking"
 export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I/usr/local/include/osxfuse -I/usr/local/include/osxfuse/fuse"
 export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0"
 
 
-export LIBRESSL_VER=2.5.2
+export LIBRESSL_VER=2.5.3
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
 export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no --enable-static"
 
