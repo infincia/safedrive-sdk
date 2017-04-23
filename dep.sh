@@ -309,7 +309,7 @@ if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ !
         tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
         pushd libressl-${LIBRESSL_VER} > /dev/null
             ./configure --prefix=${BUILD_PREFIX} ${LIBRESSL_ARGS} > /dev/null
-            make install > /dev/null
+            cp -a include/openssl ${BUILD_PREFIX}/include/ # we only care about the headers at the moment
         popd > /dev/null
         rm -rf libressl*
         echo ${LIBRESSL_VER} > ${LIBRESSL_VER_FILE}
