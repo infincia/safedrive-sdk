@@ -6,7 +6,7 @@ if [ -z "${TARGET}" ]; then
     export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 fi
 
-echo "Testing for $TARGET"
+echo "Testing release for $TARGET"
 
 export BUILD_PREFIX=$PWD/dep/${TARGET}
 
@@ -55,11 +55,14 @@ case ${TARGET} in
         ;;
 esac
 
+echo "Building test dependencies for $TARGET"
 
 bash dep.sh
 
 source ./rustver.sh
 
 rustup override set $RUST_VER
+
+echo "Testing libsafedrive for $TARGET"
 
 RUST_BACKTRACE=1 cargo test --release -p libsafedrive --target $TARGET
