@@ -396,8 +396,8 @@ else
     echo "Not set to build glib"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh ] || [ ! -f ${OPENSSH_VER_FILE} ] || [ ! $(<${OPENSSH_VER_FILE}) = ${OPENSSH_VER} ]; then
-    if [ ${BUILD_OPENSSH} = true ]; then
+if [ ${BUILD_OPENSSH} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${OPENSSH_VER_FILE} ] || [ ! $(<${OPENSSH_VER_FILE}) = ${OPENSSH_VER} ]; then
         echo "Building OpenSSH ${OPENSSH_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf openssh-*
         tar xf ../src/openssh-${OPENSSH_VER}.tar.gz > /dev/null
@@ -407,43 +407,36 @@ if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${DIST_PREFIX}/bin/
             make install OPENSSL=no > /dev/null
 
             cp ssh ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER}
-            cp ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh
         popd > /dev/null
         rm -rf openssh*
         echo ${OPENSSH_VER} > ${OPENSSH_VER_FILE}
-    else
-        echo "Not set to build OpenSSH"
     fi
+    cp ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh
 else
-    echo "Not building OpenSSH"
+    echo "Not set to build OpenSSH"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync ] || [ ! -f ${RSYNC_VER_FILE} ] || [ ! $(<${RSYNC_VER_FILE}) = ${RSYNC_VER} ]; then
-    if [ ${BUILD_RSYNC} = true ]; then
 
+if [ ${BUILD_RSYNC} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ] || [ ! -f ${RSYNC_VER_FILE} ] || [ ! $(<${RSYNC_VER_FILE}) = ${RSYNC_VER} ]; then
         echo "Building Rsync ${RSYNC_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf rsync-*
         tar xf ../src/rsync-${RSYNC_VER}.tar.gz > /dev/null
         pushd rsync-${RSYNC_VER} > /dev/null
             ./configure --prefix=${BUILD_PREFIX} ${RSYNC_ARGS} > /dev/null
             make install > /dev/null
-
             cp rsync ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER}
-            cp ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync
-
         popd > /dev/null
         rm -rf rsync*
         echo ${RSYNC_VER} > ${RSYNC_VER_FILE}
-    else
-        echo "Not set to build Rsync"
     fi
+    cp ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync
 else
-    echo "Not building Rsync"
+    echo "Not set to build Rsync"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
-    if [ ${BUILD_SSHFS} = true ]; then
-
+if [ ${BUILD_SSHFS} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
         echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         tar xf ../src/sshfs-${SSHFS_VER}.tar.gz > /dev/null
@@ -452,15 +445,13 @@ if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${DIST_PREFIX}/bin/
             make > /dev/null
             echo "Building static SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
             cp sshfs ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER}
-            cp ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs
         popd
         rm -rf sshfs*
         echo ${SSHFS_VER} > ${SSHFS_VER_FILE}
-    else
-        echo "Not set to build sshfs"
     fi
+    cp ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs
 else
-    echo "Not building sshfs"
+    echo "Not set to build sshfs"
 fi
 
 popd > /dev/null
