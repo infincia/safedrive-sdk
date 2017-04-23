@@ -48,7 +48,7 @@ export GETTEXT_ARGS="--enable-shared=no --enable-static --enable-fast-install --
 export GLIB_BRANCH=2.52
 export GLIB_VER=2.52.1
 export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
-export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-silent-rules --disable-dtrace --disable-libelf"
+export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-dtrace --disable-libelf"
 
 export OPENSSH_VER=7.5p1
 export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
