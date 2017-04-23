@@ -9,7 +9,6 @@ fi
 export BUILD_PREFIX=${PWD}/dep/${TARGET}
 export DIST_PREFIX=${PWD}/dist-${TARGET}
 
-export PATH=${BUILD_PREFIX}/bin:${PATH}
 
 mkdir -p ${BUILD_PREFIX}/lib
 mkdir -p ${BUILD_PREFIX}/include
@@ -386,9 +385,9 @@ if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ 
 
         tar xf ../src/glib-${GLIB_VER}.tar.xz > /dev/null
         pushd glib-${GLIB_VER}
-            ./configure --prefix=${BUILD_PREFIX} ${GLIB_ARGS} > /dev/null
-            make > /dev/null
-            make install > /dev/null
+            PATH=${BUILD_PREFIX}/bin:${PATH} ./configure --prefix=${BUILD_PREFIX} ${GLIB_ARGS} > /dev/null
+            PATH=${BUILD_PREFIX}/bin:${PATH} make > /dev/null
+            PATH=${BUILD_PREFIX}/bin:${PATH} make install > /dev/null
         popd
         rm -rf glib*
         echo ${GLIB_VER} > ${GLIB_VER_FILE}
