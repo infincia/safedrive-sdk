@@ -241,8 +241,8 @@ popd > /dev/null
 
 pushd build > /dev/null
 
-if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! $(<${EXPAT_VER_FILE}) = ${EXPAT_VER} ]; then
-    if [ ${BUILD_EXPAT} = true ]; then
+if [ ${BUILD_EXPAT} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! $(<${EXPAT_VER_FILE}) = ${EXPAT_VER} ]; then
 
         echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${BUILD_PREFIX}"
         tar xf ../src/expat-${EXPAT_VER}.tar.bz2 > /dev/null
@@ -254,14 +254,14 @@ if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! 
         rm -rf expat*
         echo ${EXPAT_VER} > ${EXPAT_VER_FILE}
     else
-        echo "Not set to build libexpat"
+        echo "Not building libexpat"
     fi
 else
-    echo "Not building libexpat"
+    echo "Not set to build libexpat"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
-    if [ ${BUILD_DBUS} = true ]; then
+if [ ${BUILD_DBUS} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         tar xf ../src/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
@@ -273,14 +273,14 @@ if [ ! -f ${BUILD_PREFIX}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [
         rm -rf dbus*
         echo ${LIBDBUS_VER} > ${LIBDBUS_VER_FILE}
     else
-        echo "Not set to build libdbus"
+        echo "Not building libdbus"
     fi
 else
-    echo "Not building libdbus"
+    echo "Not set to build libdbus"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
-    if [ ${BUILD_LIBSODIUM} = true ]; then
+if [ ${BUILD_LIBSODIUM} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
@@ -295,14 +295,14 @@ if [ ! -f ${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ 
         echo ${SODIUM_VER} > ${SODIUM_VER_FILE}
 
     else
-        echo "Not set to build libsodium"
+        echo "Not building libsodium"
     fi
 else
-    echo "Not building libsodium"
+    echo "Not set to build libsodium"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
-    if [ ${BUILD_LIBRESSL} = true ]; then
+if [ ${BUILD_LIBRESSL} = true ]; then
+    if [ ! -d ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
 
         echo "Building LibreSSL ${LIBRESSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf libressl*
@@ -314,14 +314,14 @@ if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ !
         rm -rf libressl*
         echo ${LIBRESSL_VER} > ${LIBRESSL_VER_FILE}
     else
-        echo "Not set to build LibreSSL"
+        echo "Not building LibreSSL"
     fi
 else
-    echo "Not building LibreSSL"
+    echo "Not set to build LibreSSL"
 fi
 
-if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ ! $(<${ICONV_VER_FILE}) = ${ICONV_VER} ]; then
-    if [ ${BUILD_ICONV} = true ]; then
+if [ ${BUILD_ICONV} = true ]; then
+    if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ ! $(<${ICONV_VER_FILE}) = ${ICONV_VER} ]; then
         echo "Building iconv ${ICONV_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         tar xf ../src/libiconv-${ICONV_VER}.tar.gz > /dev/null
@@ -333,15 +333,14 @@ if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ !
         rm -rf libiconv*
         echo ${ICONV_VER} > ${ICONV_VER_FILE}
     else
-        echo "Not set to build iconv"
+        echo "Not building iconv"
     fi
 else
-    echo "Not building iconv"
+    echo "Not set to build iconv"
 fi
 
-if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ ! $(<${GETTEXT_VER_FILE}) = ${GETTEXT_VER} ]; then
-    if [ ${BUILD_GETTEXT} = true ]; then
-
+if [ ${BUILD_GETTEXT} = true ]; then
+    if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ ! $(<${GETTEXT_VER_FILE}) = ${GETTEXT_VER} ]; then
         echo "Building gettext ${GETTEXT_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         tar xf ../src/gettext-${GETTEXT_VER}.tar.gz > /dev/null
@@ -353,15 +352,14 @@ if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ 
         rm -rf gettext*
         echo ${GETTEXT_VER} > ${GETTEXT_VER_FILE}
     else
-        echo "Not set to build gettext"
+        echo "Not building gettext"
     fi
 else
-    echo "Not building gettext"
+    echo "Not set to build gettext"
 fi
 
-if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
-    if [ ${BUILD_FFI} = true ]; then
-
+if [ ${BUILD_FFI} = true ]; then
+    if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
         echo "Building libffi ${FFI_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         tar xf ../src/libffi-${FFI_VER}.tar.gz > /dev/null
@@ -373,14 +371,14 @@ if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<
         rm -rf libffi*
         echo ${FFI_VER} > ${FFI_VER_FILE}
     else
-        echo "Not set to build libffi"
+        echo "Not building libffi"
     fi
 else
-    echo "Not building libffi"
+    echo "Not set to build libffi"
 fi
 
-if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ ! $(<${GLIB_VER_FILE}) = ${GLIB_VER} ]; then
-    if [ ${BUILD_GLIB} = true ]; then
+if [ ${BUILD_GLIB} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ ! $(<${GLIB_VER_FILE}) = ${GLIB_VER} ]; then
         echo "Building glib ${GLIB_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
         tar xf ../src/glib-${GLIB_VER}.tar.xz > /dev/null
@@ -392,10 +390,10 @@ if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ 
         rm -rf glib*
         echo ${GLIB_VER} > ${GLIB_VER_FILE}
     else
-        echo "Not set to build glib"
+        echo "Not building glib"
     fi
 else
-    echo "Not building glib"
+    echo "Not set to build glib"
 fi
 
 if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh ] || [ ! -f ${OPENSSH_VER_FILE} ] || [ ! $(<${OPENSSH_VER_FILE}) = ${OPENSSH_VER} ]; then
