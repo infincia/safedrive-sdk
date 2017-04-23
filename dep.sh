@@ -302,7 +302,7 @@ else
 fi
 
 if [ ${BUILD_LIBRESSL} = true ]; then
-    if [ ! -d ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
+    if [ ! -d ${BUILD_PREFIX}/include/openssl ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
 
         echo "Building LibreSSL ${LIBRESSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf libressl*
