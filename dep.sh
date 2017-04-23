@@ -25,30 +25,30 @@ mkdir -p build
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
 export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
-export SODIUM_ARGS="--enable-shared=no --enable-static"
+export SODIUM_ARGS="--enable-shared=no"
 
 export LIBDBUS_VER=1.10.18
 export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
-export LIBDBUS_ARGS="--enable-shared=no --enable-static --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
+export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
 export EXPAT_VER=2.2.0
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
-export EXPAT_ARGS="--enable-shared=no --enable-static"
+export EXPAT_ARGS="--enable-shared=no"
 
 export ICONV_VER=1.15
 export ICONV_VER_FILE=${BUILD_PREFIX}/.iconv_ver
-export ICONV_ARGS="--enable-shared=no --enable-static"
+export ICONV_ARGS="--enable-shared=no"
 export LIBICONV_CFLAGS=-I${BUILD_PREFIX}/include
 export LIBICONV_LIBS=-L${BUILD_PREFIX}/lib
 
 export GETTEXT_VER=0.19.8.1
 export GETTEXT_VER_FILE=${BUILD_PREFIX}/.gettext_ver
-export GETTEXT_ARGS="--enable-shared=no --enable-static --enable-fast-install --without-git"
+export GETTEXT_ARGS="--enable-shared=no --enable-fast-install --without-git"
 
 export GLIB_BRANCH=2.52
 export GLIB_VER=2.52.1
 export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
-export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-static --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-dtrace --disable-libelf"
+export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-dtrace --disable-libelf"
 
 export OPENSSH_VER=7.5p1
 export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
@@ -63,7 +63,7 @@ export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -lo
 
 export LIBRESSL_VER=2.5.3
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
-export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no --enable-static"
+export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no"
 
 export RSYNC_VER=3.1.2
 export RSYNC_VER_FILE=${BUILD_PREFIX}/.rsync_ver
