@@ -310,7 +310,6 @@ if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ !
         tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
         pushd libressl-${LIBRESSL_VER} > /dev/null
             ./configure --prefix=${BUILD_PREFIX} ${LIBRESSL_ARGS} > /dev/null
-            make check > /dev/null
             make install > /dev/null
         popd > /dev/null
         rm -rf libressl*
