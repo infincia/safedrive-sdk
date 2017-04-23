@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # `before_deploy` phase: here we package the build artifacts
 
 set -ex

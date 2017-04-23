@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 mktempd() {
     echo $(mktemp -d 2>/dev/null || mktemp -d -t tmp)
 }
