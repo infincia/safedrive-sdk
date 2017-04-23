@@ -214,8 +214,8 @@ fi
 if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
     echo "Downloading sshfs-${SSHFS_VER}.tar.gz"
     echo "From https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz"
-    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz -o sshfs-${SSHFS_VER}.tar.gz > /dev/null
-    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs_${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz.asc -o sshfs-${SSHFS_VER}.tar.gz.asc > /dev/null
+    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz -o sshfs-${SSHFS_VER}.tar.gz > /dev/null
+    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz.asc -o sshfs-${SSHFS_VER}.tar.gz.asc > /dev/null
 fi
 
 if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
