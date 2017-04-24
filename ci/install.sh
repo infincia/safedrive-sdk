@@ -12,7 +12,7 @@ install_fuse() {
         linux)
             ;;
         osx)
-            sudo brew cask install osxfuse
+            brew cask install osxfuse
             ;;
     esac
 }
