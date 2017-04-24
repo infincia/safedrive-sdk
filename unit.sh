@@ -12,9 +12,9 @@ export BUILD_PREFIX=$PWD/dep/${TARGET}
 
 export RUSTFLAGS=""
 export CARGO_INCREMENTAL=1
-export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-export LDFLAGS="-flto -L${BUILD_PREFIX}/lib"
+export CFLAGS=""
+export CPPFLAGS=""
+export LDFLAGS=""
 
 export OSX_VERSION_MIN="10.9"
 export OSX_CPU_ARCH="core2"
