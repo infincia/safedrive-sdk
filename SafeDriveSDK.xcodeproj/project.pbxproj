@@ -51,9 +51,9 @@
 		AA47B6401D7D3366005C134D /* SyncEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncEngine.swift; path = SyncEngine/SyncEngine.swift; sourceTree = "<group>"; };
 		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Wrappers/Swift/Constants.swift; sourceTree = "<group>"; };
-		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist-x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
-		AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsafedrive.dylib; path = "dist-x86_64-apple-darwin/lib/libsafedrive.dylib"; sourceTree = "<group>"; };
-		AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = "dist-x86_64-apple-darwin/lib/libsodium.18.dylib"; sourceTree = "<group>"; };
+		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist/x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
+		AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsafedrive.dylib; path = "dist/x86_64-apple-darwin/lib/libsafedrive.dylib"; sourceTree = "<group>"; };
+		AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = "dist/x86_64-apple-darwin/lib/libsodium.18.dylib"; sourceTree = "<group>"; };
 		AA97A1A91E2C645C00CAAD19 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeDriveSDKTests.swift; sourceTree = "<group>"; };
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Wrappers/Swift/SafeDriveSDK.swift; sourceTree = "<group>"; };
@@ -61,7 +61,7 @@
 		AA9D8AF01D6E9BCC0011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Wrappers/Swift/Info.plist; sourceTree = "<group>"; };
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
-		AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist-x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = "<group>"; };
+		AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
