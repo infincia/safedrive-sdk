@@ -100,7 +100,6 @@ export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
-export RUSTFLAGS=""
 export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
 export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
 export LDFLAGS="-L${BUILD_PREFIX}/lib"
@@ -115,7 +114,6 @@ case ${TARGET} in
         export CFLAGS="${CFLAGS} ${MAC_ARGS}"
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
-        export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
         export BUILD_ICONV=true
         export BUILD_GETTEXT=true
         export BUILD_GLIB=true
