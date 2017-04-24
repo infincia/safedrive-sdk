@@ -7,7 +7,7 @@ if [ -z "${TARGET}" ]; then
 fi
 
 export BUILD_PREFIX=${PWD}/dep/${TARGET}
-export DIST_PREFIX=${PWD}/dist-${TARGET}
+export DIST_PREFIX=${PWD}/dist/${TARGET}
 
 
 mkdir -p ${BUILD_PREFIX}/lib

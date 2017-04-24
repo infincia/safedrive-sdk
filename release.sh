@@ -9,6 +9,7 @@ fi
 echo "Building release for $TARGET"
 
 export BUILD_PREFIX=$PWD/dep/${TARGET}
+export DIST_PREFIX=$PWD/dist/${TARGET}
 
 export RUSTFLAGS=""
 export CARGO_INCREMENTAL=1
@@ -55,10 +56,10 @@ case ${TARGET} in
         ;;
 esac
 
-rm -rf dist-$TARGET
-mkdir -p dist-$TARGET/lib
-mkdir -p dist-$TARGET/include
-mkdir -p dist-$TARGET/bin
+rm -rf ${DIST_PREFIX}
+mkdir -p ${DIST_PREFIX}/lib
+mkdir -p ${DIST_PREFIX}/include
+mkdir -p ${DIST_PREFIX}/bin
 
 echo "Building dependencies for $TARGET"
 
@@ -78,26 +79,26 @@ RUST_BACKTRACE=1 cargo build --release -p safedrived --target $TARGET > /dev/nul
 
 echo "Building SDDK headers for $TARGET"
 
-cheddar -f libsafedrive/src/c_api.rs dist-$TARGET/include/sddk.h
+cheddar -f libsafedrive/src/c_api.rs ${DIST_PREFIX}/include/sddk.h
 
 echo "Copying build artifacts for $TARGET"
 
 case $TARGET in
     x86_64-apple-darwin)
-        cp -a target/$TARGET/release/libsafedrive.dylib dist-$TARGET/lib/libsafedrive.dylib
-        install_name_tool -id "@rpath/libsafedrive.dylib" dist-$TARGET/lib/libsafedrive.dylib
-        cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/io.safedrive.SafeDrive.daemon
-        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/io.safedrive.SafeDrive.cli
+        cp -a target/${TARGET}/release/libsafedrive.dylib ${DIST_PREFIX}/lib/libsafedrive.dylib
+        install_name_tool -id "@rpath/libsafedrive.dylib" ${DIST_PREFIX}/lib/libsafedrive.dylib
+        cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.daemon
+        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.cli
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)
-        cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so
-        cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/
-        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+        cp -a target/${TARGET}/release/libsafedrive.so ${DIST_PREFIX}/lib/libsafedrive.so
+        cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/
+        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
         ;;
     i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
-        cp -a target/$TARGET/release/libsafedrive.so dist-$TARGET/lib/libsafedrive.so
-        cp -a target/$TARGET/release/safedrived dist-$TARGET/bin/
-        cp -a target/$TARGET/release/safedrive dist-$TARGET/bin/
+        cp -a target/${TARGET}/release/libsafedrive.so ${DIST_PREFIX}/lib/libsafedrive.so
+        cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/
+        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
         ;;
     *)
         ;;
