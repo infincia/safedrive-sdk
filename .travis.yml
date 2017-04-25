@@ -41,7 +41,7 @@ install:
   - bash ci/install.sh
 
 script:
-  - bash unit.sh
+  - travis_wait 30 bash unit.sh
   - bash release.sh
 
 before_deploy:
