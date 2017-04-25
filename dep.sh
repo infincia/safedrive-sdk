@@ -100,8 +100,8 @@ export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 
-export CFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
-export CPPFLAGS="-O2 -g -I${BUILD_PREFIX}/include"
+export CFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
+export CPPFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
 export LDFLAGS="-L${BUILD_PREFIX}/lib"
 
 export MACOSX_DEPLOYMENT_TARGET=10.9
