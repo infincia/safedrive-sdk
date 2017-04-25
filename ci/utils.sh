@@ -5,7 +5,7 @@ mktempd() {
 }
 
 host() {
-    case "$TRAVIS_OS_NAME" in
+    case "${TRAVIS_OS_NAME}" in
         linux)
             echo x86_64-unknown-linux-gnu
             ;;
@@ -16,7 +16,7 @@ host() {
 }
 
 gcc_prefix() {
-    case "$TARGET" in
+    case "${TARGET}" in
         aarch64-unknown-linux-gnu)
             echo aarch64-linux-gnu-
             ;;
@@ -33,13 +33,12 @@ gcc_prefix() {
 }
 
 dobin() {
-    [ -z $MAKE_DEB ] && die 'dobin: $MAKE_DEB not set'
+    [ -z ${MAKE_DEB} ] && die 'dobin: ${MAKE_DEB} not set'
     [ $# -lt 1 ] && die "dobin: at least one argument needed"
 
     local f prefix=$(gcc_prefix)
     for f in "$@"; do
-        install -m0755 $f $dtd/debian/usr/bin/
-        #${prefix}strip -s $dtd/debian/usr/bin/$(basename $f)
+        install -m0755 ${f} ${dtd}/debian/usr/bin/
     done
 }
 
@@ -55,7 +54,7 @@ architecture() {
             echo armhf
             ;;
         *)
-            die "architecture: unexpected target $TARGET"
+            die "architecture: unexpected target ${TARGET}"
             ;;
     esac
 }

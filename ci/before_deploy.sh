@@ -21,15 +21,15 @@ mk_tarball() {
 # fully conform to Debian packaging guideliens (`lintian` raises a few warnings/errors)
 mk_deb() {
     # TODO update this part to package the artifacts that make sense for your project
-    dobin dist/$TARGET/bin/safedrive
-    dobin dist/$TARGET/bin/safedrived
+    dobin dist/${TARGET}/bin/safedrive
+    dobin dist/${TARGET}/bin/safedrived
 }
 
 main() {
     mk_tarball
 
-    if [ $TRAVIS_OS_NAME = linux ]; then
-        if [ ! -z $MAKE_DEB ]; then
+    if [ ${TRAVIS_OS_NAME} = linux ]; then
+        if [ ! -z ${MAKE_DEB} ]; then
             dtd=$(mktempd)
             mkdir -p $dtd/debian/usr/bin
 
@@ -37,15 +37,15 @@ main() {
 
             mkdir -p $dtd/debian/DEBIAN
             cat >$dtd/debian/DEBIAN/control <<EOF
-Package: $PROJECT_NAME
+Package: ${PROJECT_NAME}
 Version: ${TRAVIS_TAG#v}
-Architecture: $(architecture $TARGET)
-Maintainer: $DEB_MAINTAINER
-Description: $DEB_DESCRIPTION
+Architecture: $(architecture ${TARGET})
+Maintainer: ${DEB_MAINTAINER}
+Description: ${DEB_DESCRIPTION}
 EOF
 
             fakeroot dpkg-deb --build $dtd/debian
-            mv $dtd/debian.deb $PROJECT_NAME-$TRAVIS_TAG-$TARGET.deb
+            mv $dtd/debian.deb ${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.deb
             rm -r $dtd
         fi
     fi

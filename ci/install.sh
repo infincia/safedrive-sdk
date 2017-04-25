@@ -8,7 +8,7 @@ set -ex
 . $(dirname $0)/../rustver.sh
 
 install_fuse() {
-    case "$TRAVIS_OS_NAME" in
+    case "${TRAVIS_OS_NAME}" in
         linux)
             ;;
         osx)
@@ -18,9 +18,9 @@ install_fuse() {
 }
 
 install_rustup() {
-    echo "Using Rust $RUST_VER"
-    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=$RUST_VER
-    rustup target add $TARGET || true
+    echo "Using Rust ${RUST_VER}"
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=${RUST_VER}
+    rustup target add ${TARGET} || true
     rustc -V
     cargo -V
     cargo install rusty-cheddar
