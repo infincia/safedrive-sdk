@@ -5,12 +5,12 @@ IF [%LINKTYPE%]==[] set LINKTYPE=static
 
 ECHO Building release for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-del /q dist-%TARGET%-%TOOLSET%-%LINKTYPE%
+del /q dist\%TARGET%\%TOOLSET%\%LINKTYPE%
 
-mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%
-mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib
-mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include
-mkdir dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\lib
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\include
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin
 
 set NATIVE_BUILD_PREFIX=dep\%TARGET%\%TOOLSET%\%LINKTYPE%
 
@@ -38,16 +38,16 @@ cargo.exe build --release -p safedrived --target %TARGET%
 
 ECHO Building SDDK headers for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-cheddar -f "libsafedrive\src\c_api.rs" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\include\sddk.h"
+cheddar -f "libsafedrive\src\c_api.rs" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\include\sddk.h"
 
 ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-ECHO copying "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll"
-copy /y "target\%TARGET%\release\safedrive.dll" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\lib\safedrive.dll"
+ECHO copying "target\%TARGET%\release\safedrive.dll" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\safedrive.dll"
+copy /y "target\%TARGET%\release\safedrive.dll" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\lib\safedrive.dll"
 
-ECHO copying "target\%TARGET%\release\safedrive.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
-copy /y "target\%TARGET%\release\safedrive.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
+ECHO copying "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin\"
+copy /y "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin\"
 
-ECHO copying "target\%TARGET%\release\safedrived.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
-copy /y "target\%TARGET%\release\safedrived.exe" "dist-%TARGET%-%TOOLSET%-%LINKTYPE%\bin\"
+ECHO copying "target\%TARGET%\release\safedrived.exe" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin\"
+copy /y "target\%TARGET%\release\safedrived.exe" "dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin\"
 
