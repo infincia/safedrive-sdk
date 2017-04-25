@@ -23,7 +23,11 @@ install_rustup() {
     rustup target add ${TARGET} || true
     rustc -V
     cargo -V
-    cargo install rusty-cheddar
+    if [ ! -f ${HOME}/.cargo/bin/cheddar ]; then
+        cargo install rusty-cheddar
+    else
+        echo "cheddar already installed, skipping"
+    fi
 }
 
 main() {
