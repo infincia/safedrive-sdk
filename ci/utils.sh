@@ -42,6 +42,26 @@ dobin() {
     done
 }
 
+dolib() {
+    [ -z {$MAKE_DEB} ] && die 'dolib: ${MAKE_DEB} not set'
+    [ $# -lt 1 ] && die "dolib: at least one argument needed"
+
+    local f prefix=$(gcc_prefix)
+    for f in "$@"; do
+        install -m0755 ${f} ${dtd}/debian/usr/lib/
+    done
+}
+
+doinclude() {
+    [ -z ${MAKE_DEB} ] && die 'doinclude: ${MAKE_DEB} not set'
+    [ $# -lt 1 ] && die "doinclude: at least one argument needed"
+
+    local f prefix=$(gcc_prefix)
+    for f in "$@"; do
+        install -m0755 ${f} ${dtd}/debian/usr/include/
+    done
+}
+
 architecture() {
     case $1 in
         x86_64-unknown-linux-gnu|x86_64-unknown-linux-musl)
