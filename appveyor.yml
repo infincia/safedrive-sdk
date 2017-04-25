@@ -58,6 +58,11 @@ install:
   - cargo -V
   - cargo install rusty-cheddar
 
+cache:
+  - dep
+  - target
+  - '%USERPROFILE%\.cargo'
+
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
 # source: https://github.com/starkat99/appveyor-rust/blob/master/appveyor.yml#L113
