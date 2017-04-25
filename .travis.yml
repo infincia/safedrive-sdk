@@ -26,6 +26,14 @@ matrix:
       osx_image: xcode8.3
       env: TARGET=x86_64-apple-darwin
 
+
+cache:
+  directories:
+    - src
+    - dep
+    - target
+    - $HOME/.cargo
+
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
 
