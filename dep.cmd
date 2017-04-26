@@ -5,9 +5,6 @@ IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141_xp
 IF [%LINKTYPE%]==[] set LINKTYPE=static
 
-set LIBPREFIX=
-IF [%TOOLSET%]==[v141_xp] set LIBPREFIX=lib
-
 set LIBSUFFIX=dll
 IF [%LINKTYPE%]==[dll] set LIBSUFFIX=dll
 IF [%LINKTYPE%]==[static] set LIBSUFFIX=lib
