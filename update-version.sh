@@ -27,7 +27,7 @@ xcodeproj="SafeDriveSDK.xcodeproj"
 # target. If not set, the script will try to guess the correct file from the list it gathers from
 # the xcodeproj file, but this can be overriden by setting the path here.
 #
-plist="Wrappers/Swift/Info.plist"
+plist="Swift/Info.plist"
 
 # We use PlistBuddy to handle the Info.plist values. Here we define where it lives.
 plistBuddy="/usr/libexec/PlistBuddy"
