@@ -43,10 +43,13 @@ set SODIUM_VER_FILE="%BUILD_PREFIX%\sodium_ver"
 pushd "%SRC_PREFIX%"
 
 IF NOT EXIST libsodium-%SODIUM_VER%.tar.gz (
-    curl -L https://github.com/jedisct1/libsodium/releases/download/%SODIUM_VER%/libsodium-%SODIUM_VER%.tar.gz -o libsodium-%SODIUM_VER%.tar.gz || goto :error
+    curl -L https://github.com/jedisct1/libsodium/releases/download/%SODIUM_VER%/libsodium-%SODIUM_VER%.tar.gz -o libsodium-%SODIUM_VER%.tar.gz
 )
 
 popd
+
+IF NOT EXIST "%SRC_PREFIX%\libsodium-%SODIUM_VER%.tar.gz" goto :error
+
 
 IF NOT EXIST "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%" goto :build
 
