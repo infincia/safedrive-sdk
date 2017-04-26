@@ -295,10 +295,18 @@ if [ ${BUILD_LIBSODIUM} = true ]; then
 
         tar xf ../src/libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
-        ./configure --prefix=${BUILD_PREFIX} ${SODIUM_ARGS} > /dev/null
-        make clean > /dev/null
-        make > /dev/null
-        make install > /dev/null
+        ${CONFIGURE_PREFIX} ./configure --prefix=${BUILD_PREFIX} ${SODIUM_ARGS} > /dev/null
+        case ${TARGET} in
+            wasm32-unknown-emscripten)
+                emmake make -j4 install-exec install-data V=1
+                emcc -s BINARYEN=1 "${CFLAGS}" --llvm-lto 1 --memory-init-file 0 ${CPPFLAGS} ${JS_EXPORTS_FLAGS} "${BUILD_PREFIX}/lib/libsodium.a" -o "${BUILD_PREFIX}/lib/libsodium.js"
+                ;;
+            *)
+                make clean > /dev/null
+                make > /dev/null
+                make install > /dev/null
+                ;;
+        esac
         popd
         rm -rf libsodium*
         echo ${SODIUM_VER} > ${SODIUM_VER_FILE}
