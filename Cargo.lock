@@ -1,9 +1,9 @@
 [root]
 name = "safedrived"
-version = "0.6.13"
+version = "0.6.14"
 dependencies = [
  "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.6.13",
+ "libsafedrive 0.6.14",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "notify 4.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -521,7 +521,7 @@ dependencies = [
 
 [[package]]
 name = "libsafedrive"
-version = "0.6.13"
+version = "0.6.14"
 dependencies = [
  "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1130,11 +1130,11 @@ replace = "rustls 0.5.8 (git+https://github.com/infincia/rustls.git?branch=infin
 
 [[package]]
 name = "safedrive"
-version = "0.6.13"
+version = "0.6.14"
 dependencies = [
  "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.6.13",
+ "libsafedrive 0.6.14",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "pbr 1.0.0 (git+https://github.com/infincia/pb.git?branch=infincia)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
