@@ -298,11 +298,8 @@ dependencies = [
 
 [[package]]
 name = "deque"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "dtoa"
@@ -968,7 +965,7 @@ name = "rayon-core"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "deque 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "deque 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
  "num_cpus 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1710,7 +1707,7 @@ dependencies = [
 "checksum csv 0.14.7 (registry+https://github.com/rust-lang/crates.io-index)" = "266c1815d7ca63a5bd86284043faf91e8c95e943e55ce05dc0ae08e952de18bc"
 "checksum dbghelp-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "97590ba53bcb8ac28279161ca943a924d1fd4a8fb3fa63302591647c4fc5b850"
 "checksum dbus 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "b4a0c10ea61042b7555729ab0608727bbbb06ce709c11e6047cfa4e10f6d052d"
-"checksum deque 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "1614659040e711785ed8ea24219140654da1729f3ec8a47a9719d041112fe7bf"
+"checksum deque 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "a694dae478589798d752c7125542f8a5ae8b6e59476172baf2eed67357bdfa27"
 "checksum dtoa 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "80c8b71fd71146990a9742fc06dcbbde19161a267e0ad4e572c35162f4578c90"
 "checksum encode_unicode 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ebaa362d9b3b3a22633c78c58c87da02ec16c0541abfe3eecdd022eb4a08ede8"
 "checksum error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d9435d864e017c3c6afeac1654189b06cdb491cf2ff73dbf0d73b0f292f42ff8"
