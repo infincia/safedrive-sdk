@@ -9,10 +9,10 @@ ECHO Building release for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
 del /q dist\%TARGET%\%TOOLSET%\%LINKTYPE%
 
-mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%
-mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\lib
-mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\include
-mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE% > NUL
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\lib > NUL
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\include > NUL
+mkdir dist\%TARGET%\%TOOLSET%\%LINKTYPE%\bin > NUL
 
 set NATIVE_BUILD_PREFIX=dep\%TARGET%\%TOOLSET%\%LINKTYPE%
 

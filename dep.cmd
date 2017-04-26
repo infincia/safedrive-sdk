@@ -14,12 +14,12 @@ set SRC_PREFIX=%cd%\src
 
 ECHO building libsodium for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-mkdir "%BUILD_PREFIX%"
-mkdir "%BUILD_PREFIX%\lib"
-mkdir "%BUILD_PREFIX%\include"
+mkdir "%BUILD_PREFIX%" > NUL
+mkdir "%BUILD_PREFIX%\lib" > NUL
+mkdir "%BUILD_PREFIX%\include" > NUL
 
-mkdir "%SRC_PREFIX%"
-mkdir build
+mkdir "%SRC_PREFIX%" > NUL
+mkdir build > NUL
 
 IF "%LINKTYPE%"=="static" (
     set CONFIGURATION=Release
