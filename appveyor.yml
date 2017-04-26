@@ -60,6 +60,7 @@ install:
 
 cache:
   - dep
+  - src
   - target
   - '%USERPROFILE%\.cargo'
 
