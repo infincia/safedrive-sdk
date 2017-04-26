@@ -1,4 +1,0 @@
-module sddk [system][extern_c] {
-    header "../dist/x86_64-apple-darwin/include/sddk.h"
-    export *
-}

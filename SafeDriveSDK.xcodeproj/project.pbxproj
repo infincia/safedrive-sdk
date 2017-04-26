@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		AA498ABA1E29927000DAA1C8 /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
-		AA498ABB1E29927000DAA1C8 /* libsodium.18.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */; };
 		AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA686A1D1E81C0AA00C9F33B /* Constants.swift */; };
 		AA80B0C21D6F963F00512FC7 /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AA8CCDCC1E2947B90002B1FF /* libsafedrive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */; };
@@ -41,24 +40,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		AA47B6351D7BCD60005C134D /* SafeDriveSDK.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SafeDriveSDK.cpp; path = "C++/SafeDriveSDK.cpp"; sourceTree = "<group>"; };
-		AA47B6361D7BCD60005C134D /* SafeDriveSDK.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = SafeDriveSDK.hpp; path = "C++/SafeDriveSDK.hpp"; sourceTree = "<group>"; };
-		AA47B6391D7D3366005C134D /* ArchiveHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ArchiveHandler.swift; path = SyncEngine/ArchiveHandler.swift; sourceTree = "<group>"; };
-		AA47B63A1D7D3366005C134D /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Models.swift; path = SyncEngine/Models.swift; sourceTree = "<group>"; };
-		AA47B63B1D7D3366005C134D /* SDEncryptionHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDEncryptionHandler.h; path = SyncEngine/SDEncryptionHandler.h; sourceTree = "<group>"; };
-		AA47B63C1D7D3366005C134D /* SDEncryptionHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SDEncryptionHandler.m; path = SyncEngine/SDEncryptionHandler.m; sourceTree = "<group>"; };
-		AA47B63F1D7D3366005C134D /* SyncEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyncEngine.h; path = SyncEngine/SyncEngine.h; sourceTree = "<group>"; };
-		AA47B6401D7D3366005C134D /* SyncEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SyncEngine.swift; path = SyncEngine/SyncEngine.swift; sourceTree = "<group>"; };
 		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Mac/Constants.swift; sourceTree = "<group>"; };
 		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist/x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
 		AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsafedrive.dylib; path = "dist/x86_64-apple-darwin/lib/libsafedrive.dylib"; sourceTree = "<group>"; };
-		AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsodium.18.dylib; path = "dist/x86_64-apple-darwin/lib/libsodium.18.dylib"; sourceTree = "<group>"; };
-		AA97A1A91E2C645C00CAAD19 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeDriveSDKTests.swift; sourceTree = "<group>"; };
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Mac/SafeDriveSDK.swift; sourceTree = "<group>"; };
 		AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafeDriveSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9D8AF01D6E9BCC0011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Mac/Info.plist; sourceTree = "<group>"; };
+		AAAD31311EB14B9D00221427 /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.map; path = Mac/module.map; sourceTree = "<group>"; };
+		AAAD31321EB14C9E00221427 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = "<group>"; };
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = "<group>"; };
@@ -79,62 +70,53 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA498ABA1E29927000DAA1C8 /* libsafedrive.dylib in Frameworks */,
-				AA498ABB1E29927000DAA1C8 /* libsodium.18.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AA47B6341D7BCD2D005C134D /* C++ */ = {
-			isa = PBXGroup;
-			children = (
-				AA47B6351D7BCD60005C134D /* SafeDriveSDK.cpp */,
-				AA47B6361D7BCD60005C134D /* SafeDriveSDK.hpp */,
-			);
-			name = "C++";
-			sourceTree = "<group>";
-		};
-		AA47B6491D7D336E005C134D /* Old */ = {
-			isa = PBXGroup;
-			children = (
-				AA47B6391D7D3366005C134D /* ArchiveHandler.swift */,
-				AA47B63A1D7D3366005C134D /* Models.swift */,
-				AA47B63B1D7D3366005C134D /* SDEncryptionHandler.h */,
-				AA47B63C1D7D3366005C134D /* SDEncryptionHandler.m */,
-				AA47B63F1D7D3366005C134D /* SyncEngine.h */,
-				AA47B6401D7D3366005C134D /* SyncEngine.swift */,
-			);
-			name = Old;
-			sourceTree = "<group>";
-		};
 		AA97A1A81E2C645C00CAAD19 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				AA97A1A91E2C645C00CAAD19 /* Info.plist */,
+				AAAD31301EB14B5B00221427 /* Supporting Files */,
 				AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */,
 			);
 			name = Tests;
 			path = Mac/Tests;
 			sourceTree = "<group>";
 		};
-		AA9D8AD31D6E96890011DE1F /* Swift */ = {
+		AAAD312F1EB14B3E00221427 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				AA97A1A81E2C645C00CAAD19 /* Tests */,
+				AAAD31311EB14B9D00221427 /* module.map */,
 				AA9D8AF01D6E9BCC0011DE1F /* Info.plist */,
-				AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */,
-				AA686A1D1E81C0AA00C9F33B /* Constants.swift */,
 			);
-			name = Swift;
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		AAAD31301EB14B5B00221427 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				AAAD31321EB14C9E00221427 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		AAAD31331EB14CB800221427 /* libsafedrive */ = {
+			isa = PBXGroup;
+			children = (
+				AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */,
+				AA8CCDC81E2947B90002B1FF /* sddk.h */,
+				AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */,
+			);
+			name = libsafedrive;
 			sourceTree = "<group>";
 		};
 		AABFDD551DC4E91000B4EAC7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AA8CCDC81E2947B90002B1FF /* sddk.h */,
-				AA8CCDC91E2947B90002B1FF /* libsafedrive.dylib */,
-				AA8CCDCA1E2947B90002B1FF /* libsodium.18.dylib */,
+				AAAD31331EB14CB800221427 /* libsafedrive */,
 				AABFDD561DC4E91000B4EAC7 /* libz.tbd */,
 			);
 			name = Frameworks;
@@ -143,13 +125,13 @@
 		AAE34C781CF8EAAA0067B401 = {
 			isa = PBXGroup;
 			children = (
-				AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */,
-				AABF37281E36E19C003DC6C2 /* update-version.sh */,
-				AA47B6341D7BCD2D005C134D /* C++ */,
-				AA9D8AD31D6E96890011DE1F /* Swift */,
-				AA47B6491D7D336E005C134D /* Old */,
-				AAE34C831CF8EAAA0067B401 /* Products */,
+				AA686A1D1E81C0AA00C9F33B /* Constants.swift */,
 				AABFDD551DC4E91000B4EAC7 /* Frameworks */,
+				AAAD312F1EB14B3E00221427 /* Supporting Files */,
+				AAE34C831CF8EAAA0067B401 /* Products */,
+				AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */,
+				AA97A1A81E2C645C00CAAD19 /* Tests */,
+				AABF37281E36E19C003DC6C2 /* update-version.sh */,
 			);
 			sourceTree = "<group>";
 		};
@@ -334,7 +316,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/dist/x86_64-apple-darwin/include";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist/x86_64-apple-darwin/include";
-				INFOPLIST_FILE = Mac/Info.plist;
+				INFOPLIST_FILE = "Mac/Supporting Files/Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -346,7 +328,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.sdk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = $SRCROOT/Swift;
+				SWIFT_INCLUDE_PATHS = $SRCROOT/Mac;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -371,7 +353,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/dist/x86_64-apple-darwin/include";
 				FRAMEWORK_VERSION = A;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist/x86_64-apple-darwin/include";
-				INFOPLIST_FILE = Mac/Info.plist;
+				INFOPLIST_FILE = "Mac/Supporting Files/Info.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -383,7 +365,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.sdk;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_INCLUDE_PATHS = $SRCROOT/Swift;
+				SWIFT_INCLUDE_PATHS = $SRCROOT/Mac;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_VERSION = 3.0;
 			};
@@ -398,7 +380,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G738Z89QKM;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist/x86_64-apple-darwin/include";
-				INFOPLIST_FILE = Mac/Tests/Info.plist;
+				INFOPLIST_FILE = "Mac/Tests/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -422,7 +404,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = G738Z89QKM;
 				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/dist/x86_64-apple-darwin/include";
-				INFOPLIST_FILE = Mac/Tests/Info.plist;
+				INFOPLIST_FILE = "Mac/Tests/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
