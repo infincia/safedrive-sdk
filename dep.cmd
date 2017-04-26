@@ -10,13 +10,16 @@ IF [%LINKTYPE%]==[dll] set LIBSUFFIX=dll
 IF [%LINKTYPE%]==[static] set LIBSUFFIX=lib
 
 set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%
-
+set SRC_PREFIX=%cd%\src
 
 ECHO building libsodium for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
 mkdir "%BUILD_PREFIX%"
 mkdir "%BUILD_PREFIX%\lib"
 mkdir "%BUILD_PREFIX%\include"
+
+mkdir "%SRC_PREFIX%"
+mkdir build
 
 IF "%LINKTYPE%"=="static" (
     set CONFIGURATION=Release
