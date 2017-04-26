@@ -23,7 +23,7 @@ mk_deb() {
     # TODO update this part to package the artifacts that make sense for your project
     dobin dist/${TARGET}/bin/safedrive
     dobin dist/${TARGET}/bin/safedrived
-    case $1 in
+    case ${TARGET} in
         i686-unknown-linux-musl|x86_64-unknown-linux-musl)
             ;;
         *)
