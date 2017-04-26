@@ -56,7 +56,7 @@ install:
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
   - rustc -Vv
   - cargo -V
-  - cargo install --force rusty-cheddar
+  - if not exist "%USERPROFILE%\.cargo\bin\cheddar.exe" cargo install rusty-cheddar
 
 cache:
   - dep
