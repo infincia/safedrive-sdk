@@ -23,8 +23,15 @@ mk_deb() {
     # TODO update this part to package the artifacts that make sense for your project
     dobin dist/${TARGET}/bin/safedrive
     dobin dist/${TARGET}/bin/safedrived
-    dolib dist/${TARGET}/lib/libsafedrive.so
-    doinclude dist/${TARGET}/include/sddk.h
+    case $1 in
+        i686-unknown-linux-musl|x86_64-unknown-linux-musl)
+            ;;
+        *)
+            dolib dist/${TARGET}/lib/libsafedrive.so
+            doinclude dist/${TARGET}/include/sddk.h
+            ;;
+    esac
+
 }
 
 main() {
