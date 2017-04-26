@@ -52,6 +52,12 @@ case ${TARGET} in
         export CC=musl-gcc
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
+    wasm32-unknown-emscripten)
+        export CPPFLAGS="${CPPFLAGS}"
+        export CFLAGS="-Os"
+        export CC=emcc
+        export PKG_CONFIG_ALLOW_CROSS=1
+        ;;
     *)
         ;;
 esac
@@ -69,13 +75,23 @@ source ./rustver.sh
 
 rustup override set ${RUST_VER}
 
-echo "Building safedrive CLI for ${TARGET}"
+case ${TARGET} in
+    wasm32-unknown-emscripten)
+            echo "Building libsafedrive for ${TARGET}"
 
-RUST_BACKTRACE=1 cargo build --release -p safedrive --target ${TARGET} > /dev/null
+        RUST_BACKTRACE=1 cargo build --release -p libsafedrive --target ${TARGET} > /dev/null
 
-echo "Building safedrive daemon for ${TARGET}"
+        ;;
+    *)
+        echo "Building safedrive CLI for ${TARGET}"
 
-RUST_BACKTRACE=1 cargo build --release -p safedrived --target ${TARGET} > /dev/null
+        RUST_BACKTRACE=1 cargo build --release -p safedrive --target ${TARGET} > /dev/null
+
+        echo "Building safedrive daemon for ${TARGET}"
+
+        RUST_BACKTRACE=1 cargo build --release -p safedrived --target ${TARGET} > /dev/null
+        ;;
+esac
 
 echo "Building SDDK headers for ${TARGET}"
 
@@ -98,6 +114,11 @@ case ${TARGET} in
         cp -a target/${TARGET}/release/libsafedrive.so ${DIST_PREFIX}/lib/libsafedrive.so
         cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
+        ;;
+    wasm32-unknown-emscripten)
+        cp -a target/${TARGET}/release/libsafedrive.wasm ${DIST_PREFIX}/lib/libsafedrive.wasm
+        cp -a target/${TARGET}/release/libsafedrive.js ${DIST_PREFIX}/lib/libsafedrive.js
+        cp -a target/${TARGET}/release/libsafedrive.html ${DIST_PREFIX}/lib/libsafedrive.html
         ;;
     *)
         ;;
