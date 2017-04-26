@@ -40,22 +40,38 @@ IF "%ARCH%"=="x86" (
 set SODIUM_VER=1.0.12
 set SODIUM_VER_FILE="%BUILD_PREFIX%\sodium_ver"
 
-set BUILD=false
+pushd "%SRC_PREFIX%"
 
-findstr /c:"%SODIUM_VER%" %SODIUM_VER_FILE% > NUL
-if errorlevel 1 set BUILD=true
-
-IF "%BUILD%"=="true" (
-    curl -L https://github.com/jedisct1/libsodium/releases/download/%SODIUM_VER%/libsodium-%SODIUM_VER%.tar.gz -o libsodium-%SODIUM_VER%.tar.gz
-    7z x -y libsodium-%SODIUM_VER%.tar.gz
-    7z x -y libsodium-%SODIUM_VER%.tar
-    cd libsodium-%SODIUM_VER%
-    msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln
-    cd ..
-    del /q libsodium-%SODIUM_VER%
-    del /q libsodium-%SODIUM_VER%.tar
-    del /q libsodium-%SODIUM_VER%.tar.gz
-    ECHO copying "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%"
-    copy /y "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%"
-    @echo %SODIUM_VER%> %SODIUM_VER_FILE%
+IF NOT EXIST libsodium-%SODIUM_VER%.tar.gz (
+    curl -L https://github.com/jedisct1/libsodium/releases/download/%SODIUM_VER%/libsodium-%SODIUM_VER%.tar.gz -o libsodium-%SODIUM_VER%.tar.gz || goto :error
 )
+
+popd
+
+findstr /c:"%SODIUM_VER%" %SODIUM_VER_FILE% > NUL || goto :build
+goto :EOF
+
+
+
+:build
+
+pushd build
+@echo unpacking source
+del /q libsodium-%SODIUM_VER%
+7z x -y "%SRC_PREFIX%\libsodium-%SODIUM_VER%.tar.gz" || goto :error
+7z x -y "%SRC_PREFIX%\libsodium-%SODIUM_VER%.tar" || goto :error
+pushd libsodium-%SODIUM_VER%
+@echo building
+msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln || goto :error
+popd
+del /q libsodium-%SODIUM_VER%
+@echo copying "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%"
+copy /y "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%" || goto :error
+@echo %SODIUM_VER%> %SODIUM_VER_FILE%
+popd
+goto :EOF
+
+
+:error
+echo Failed with error #!errorlevel!.
+exit /b !errorlevel!
