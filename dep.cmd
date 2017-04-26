@@ -48,6 +48,9 @@ IF NOT EXIST libsodium-%SODIUM_VER%.tar.gz (
 
 popd
 
+IF NOT EXIST "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%" || goto :build
+goto :EOF
+
 findstr /c:"%SODIUM_VER%" %SODIUM_VER_FILE% > NUL || goto :build
 goto :EOF
 
