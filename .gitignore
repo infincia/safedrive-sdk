@@ -4,12 +4,6 @@ dist*
 .idea
 .vscode
 test
-SyncEngine
-SyncEngineTests
-test-osx
-libsodium-*
-dbus-*
-dep/x86_64-apple-darwin/*
 libsafedrive/testdata
 
 build/
