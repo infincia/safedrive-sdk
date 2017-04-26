@@ -15,7 +15,7 @@ set RUST_FLAGS=""
 
 ECHO Building test dependencies for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-call dep.cmd
+call dep.cmd || goto :error
 
 call rustver.bat
 
@@ -23,4 +23,9 @@ rustup override set %RUST_VER%
 
 ECHO Testing libsafedrive for %TARGET% (%TOOLSET%-%LINKTYPE%)
 
-cargo.exe test --verbose --release -p libsafedrive --target %TARGET%
+cargo.exe test --verbose --release -p libsafedrive --target %TARGET% || goto :error
+goto :EOF
+
+:error
+echo Failed with error #!errorlevel!.
+exit /b !errorlevel!
