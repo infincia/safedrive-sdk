@@ -3,7 +3,7 @@ dist*
 *.bk
 .idea
 .vscode
-test
+/test
 libsafedrive/testdata
 
 build/
