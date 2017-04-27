@@ -77,6 +77,10 @@ export FFI_ARGS="--enable-shared=no --enable-static"
 export LIBFFI_CFLAGS="-I${BUILD_PREFIX}/lib/libffi-${FFI_VER}/include"
 export LIBFFI_LIBS="-L${BUILD_PREFIX}/lib -lffi"
 
+export LIBSSH2_VER=1.8.0
+export LIBSSH2_VER_FILE=${BUILD_PREFIX}/.libssh2_ver
+export LIBSSH2_ARGS="--enable-shared=no"
+
 export ac_cv_func_timingsafe_bcmp="no"
 export ac_cv_func_basename_r="no"
 export ac_cv_func_clock_getres="no"
@@ -99,6 +103,7 @@ export BUILD_RSYNC=false
 export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
+export BUILD_LIBSSH2=true
 
 export CFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
 export CPPFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
@@ -244,11 +249,37 @@ if [ ! -f rsync-${RSYNC_VER}.tar.gz ]; then
     curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz -o rsync-${RSYNC_VER}.tar.gz > /dev/null
     curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz.asc -o rsync-${RSYNC_VER}.tar.gz.asc > /dev/null
 fi
+
+
+if [ ! -f libssh2-${LIBSSH2_VER}.tar.gz ]; then
+    echo "Downloading libssh2-${LIBSSH2_VER}.tar.gz"
+    curl -L https://www.libssh2.org/download/libssh2-${LIBSSH2_VER}.tar.gz -o libssh2-${LIBSSH2_VER}.tar.gz > /dev/null
+    curl -L https://www.libssh2.org/download/libssh2-${LIBSSH2_VER}.tar.gz.asc -o libssh2-${LIBSSH2_VER}.tar.gz.asc > /dev/null
+fi
 popd > /dev/null
 
 
 
 pushd build > /dev/null
+
+
+if [ ${BUILD_LIBSSH2} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/lib/libssh2.a ] || [ ! -f ${LIBSSH2_VER_FILE} ] || [ ! $(<${LIBSSH2_VER_FILE}) = ${LIBSSH2_VER} ]; then
+        echo "Building libssh2 ${LIBSSH2_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        rm -rf libssh2-*
+        tar xf ../src/libssh2-${LIBSSH2_VER}.tar.gz > /dev/null
+        pushd libssh2-${LIBSSH2_VER} > /dev/null
+        ./configure --prefix=${BUILD_PREFIX} ${LIBSSH2_ARGS} > /dev/null
+        make install > /dev/null
+        popd > /dev/null
+        rm -rf libssh2*
+        echo ${LIBSSH2_VER} > ${LIBSSH2_VER_FILE}
+    else
+        echo "Not building libssh2"
+    fi
+else
+    echo "Not set to build libssh2"
+fi
 
 if [ ${BUILD_EXPAT} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! $(<${EXPAT_VER_FILE}) = ${EXPAT_VER} ]; then
