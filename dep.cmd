@@ -39,15 +39,15 @@ IF "%ARCH%"=="x86" (
     set VSARCH=Win32
 )
 
-IF "%TOOLSET%"="v120_xp" (
+IF "%TOOLSET%"=="v120_xp" (
     set VS=Visual Studio 12 2013
 )
 
-IF "%TOOLSET%"="v140_xp" (
+IF "%TOOLSET%"=="v140_xp" (
     set VS=Visual Studio 14 2015
 )
 
-IF "%TOOLSET%"="v141_xp" (
+IF "%TOOLSET%"=="v141_xp" (
     set VS=Visual Studio 15 2017
 )
 
