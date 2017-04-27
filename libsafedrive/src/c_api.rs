@@ -2285,7 +2285,7 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                                                 context2: *mut std::os::raw::c_void,
                                                 total: std::os::raw::c_ulonglong,
                                                 current: std::os::raw::c_ulonglong,
-                                                new: std::os::raw::c_ulonglong,
+                                                new_bytes: std::os::raw::c_ulonglong,
                                                 percent: std::os::raw::c_double,
                                                 tick: std::os::raw::c_uint),
                             issue: extern fn(context: *mut std::os::raw::c_void,
@@ -2311,13 +2311,13 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                hmac_key,
                tweak_key,
                id,
-               &mut |total, current, new, progress_percent, tick| {
+               &mut |total, current, new_bytes, progress_percent, tick| {
                    let c_total: std::os::raw::c_ulonglong = total;
                    let c_current: std::os::raw::c_ulonglong = current;
-                   let c_new: std::os::raw::c_ulonglong = new;
+                   let c_new_bytes: std::os::raw::c_ulonglong = new_bytes;
                    let c_percent: std::os::raw::c_double = progress_percent;
                    let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                   progress(context, context2, c_total, c_current, c_new, c_percent, c_tick);
+                   progress(context, context2, c_total, c_current, c_new_bytes, c_percent, c_tick);
                },
                &mut |message| {
                    let c_message = CString::new(message).expect("failed to get sync message");
@@ -2398,7 +2398,7 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                                    context2: *mut std::os::raw::c_void,
                                                    total: std::os::raw::c_ulonglong,
                                                    current: std::os::raw::c_ulonglong,
-                                                   new: std::os::raw::c_ulonglong,
+                                                   new_bytes: std::os::raw::c_ulonglong,
                                                    percent: std::os::raw::c_double,
                                                    tick: std::os::raw::c_uint),
                                issue: extern fn(context: *mut std::os::raw::c_void,
@@ -2433,13 +2433,13 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                   id,
                   p,
                   ses_size,
-                  &mut |total, current, new, progress_percent, tick| {
+                  &mut |total, current, new_bytes, progress_percent, tick| {
                       let c_total: std::os::raw::c_ulonglong = total;
                       let c_current: std::os::raw::c_ulonglong = current;
                       let c_percent: std::os::raw::c_double = progress_percent;
-                      let c_new: std::os::raw::c_ulonglong = new;
+                      let c_new_bytes: std::os::raw::c_ulonglong = new_bytes;
                       let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                      progress(context, context2, c_total, c_current, c_new, c_percent, c_tick);
+                      progress(context, context2, c_total, c_current, c_new_bytes, c_percent, c_tick);
                   },
                   &mut |message| {
                       let c_message = CString::new(message).expect("failed to get sync message");
