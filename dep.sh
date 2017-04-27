@@ -79,7 +79,7 @@ export LIBFFI_LIBS="-L${BUILD_PREFIX}/lib -lffi"
 
 export LIBSSH2_VER=1.8.0
 export LIBSSH2_VER_FILE=${BUILD_PREFIX}/.libssh2_ver
-export LIBSSH2_ARGS="--enable-shared=no"
+export LIBSSH2_ARGS="--enable-shared=no --with-sysroot=${BUILD_PREFIX}"
 
 export ac_cv_func_timingsafe_bcmp="no"
 export ac_cv_func_basename_r="no"
