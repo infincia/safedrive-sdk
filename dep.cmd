@@ -3,16 +3,16 @@ setlocal enabledelayedexpansion
 IF [%ARCH%]==[] set ARCH=x86_64
 IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141_xp
-IF [%LINKTYPE%]==[] set LINKTYPE=static
+IF [%CONFIGURATION%]==[] set CONFIGURATION=Release
 
 set LIBSUFFIX=dll
-IF [%LINKTYPE%]==[dll] set LIBSUFFIX=dll
-IF [%LINKTYPE%]==[static] set LIBSUFFIX=lib
+IF [%CONFIGURATION%]==[ReleaseDLL] set LIBSUFFIX=dll
+IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
 
-set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%LINKTYPE%
+set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%CONFIGURATION%
 set SRC_PREFIX=%cd%\src
 
-ECHO building dependencies for %TARGET% (%TOOLSET%-%LINKTYPE%)
+ECHO building dependencies for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
 mkdir "%BUILD_PREFIX%" > NUL
 mkdir "%BUILD_PREFIX%\lib" > NUL
@@ -20,14 +20,6 @@ mkdir "%BUILD_PREFIX%\include" > NUL
 
 mkdir "%SRC_PREFIX%" > NUL
 mkdir build > NUL
-
-IF "%LINKTYPE%"=="static" (
-    set CONFIGURATION=Release
-)
-
-IF "%LINKTYPE%"=="dll" (
-    set CONFIGURATION=ReleaseDLL
-)
 
 IF "%ARCH%"=="x86_64" (
     set PLATFORM=x64
