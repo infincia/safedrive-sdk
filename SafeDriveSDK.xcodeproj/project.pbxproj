@@ -202,12 +202,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0820;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = SafeDrive;
 				TargetAttributes = {
 					AA5DCF651D6CFFDA00FEDAFB = {
 						DevelopmentTeam = G738Z89QKM;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 					AA9D8AD91D6E9A300011DE1F = {
