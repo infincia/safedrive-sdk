@@ -266,6 +266,24 @@ popd > /dev/null
 
 pushd build > /dev/null
 
+if [ ${BUILD_LIBRESSL} = true ]; then
+    if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
+
+        echo "Building LibreSSL ${LIBRESSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        rm -rf libressl*
+        tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
+        pushd libressl-${LIBRESSL_VER} > /dev/null
+            ./configure --prefix=${BUILD_PREFIX} ${LIBRESSL_ARGS} > /dev/null
+            make install > /dev/null
+        popd > /dev/null
+        rm -rf libressl*
+        echo ${LIBRESSL_VER} > ${LIBRESSL_VER_FILE}
+    else
+        echo "Not building LibreSSL"
+    fi
+else
+    echo "Not set to build LibreSSL"
+fi
 
 if [ ${BUILD_LIBSSH2} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libssh2.a ] || [ ! -f ${LIBSSH2_VER_FILE} ] || [ ! $(<${LIBSSH2_VER_FILE}) = ${LIBSSH2_VER} ]; then
@@ -351,25 +369,6 @@ if [ ${BUILD_LIBSODIUM} = true ]; then
     fi
 else
     echo "Not set to build libsodium"
-fi
-
-if [ ${BUILD_LIBRESSL} = true ]; then
-    if [ ! -d ${BUILD_PREFIX}/include/openssl ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
-
-        echo "Building LibreSSL ${LIBRESSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
-        rm -rf libressl*
-        tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
-        pushd libressl-${LIBRESSL_VER} > /dev/null
-            ./configure --prefix=${BUILD_PREFIX} ${LIBRESSL_ARGS} > /dev/null
-            cp -a include/openssl ${BUILD_PREFIX}/include/ # we only care about the headers at the moment
-        popd > /dev/null
-        rm -rf libressl*
-        echo ${LIBRESSL_VER} > ${LIBRESSL_VER_FILE}
-    else
-        echo "Not building LibreSSL"
-    fi
-else
-    echo "Not set to build LibreSSL"
 fi
 
 if [ ${BUILD_ICONV} = true ]; then
