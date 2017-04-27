@@ -134,6 +134,7 @@ case ${TARGET} in
         export LDFLAGS="${LDFLAGS}"
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
+        export BUILD_LIBRESSL=true
         ;;
     i686-unknown-linux-gnu)
         export CFLAGS="${CFLAGS} -m32"
@@ -142,6 +143,7 @@ case ${TARGET} in
         export PKG_CONFIG_ALLOW_CROSS=1
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
+        export BUILD_LIBRESSL=true
         ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="${CFLAGS}"
@@ -150,6 +152,7 @@ case ${TARGET} in
         export CC=musl-gcc
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
+        export BUILD_LIBRESSL=true
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -m32"
@@ -159,6 +162,7 @@ case ${TARGET} in
         export PKG_CONFIG_ALLOW_CROSS=1
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
+        export BUILD_LIBRESSL=true
         ;;
     wasm32-unknown-emscripten)
         export SODIUM_ARGS="${SODIUM_ARGS}"
