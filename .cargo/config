@@ -3,6 +3,11 @@ rustc-link-search = ["native=dep/x86_64-apple-darwin/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/x86_64-apple-darwin/lib"
 
+[target.x86_64-apple-darwin.ssh2]
+rustc-link-search = ["native=dep/x86_64-apple-darwin/lib"]
+rustc-link-lib = ["static=ssh2"]
+root = "dep/x86_64-apple-darwin/lib"
+
 
 [target.x86_64-unknown-linux-gnu.sodium]
 rustc-link-search = ["native=dep/x86_64-unknown-linux-gnu/lib"]
