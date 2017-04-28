@@ -71,6 +71,33 @@ class SAFEDRIVESDK_API SafeDriveNotification {
 	std::string message;
 };
 
+enum SAFEDRIVESDK_API SDKErrorType {
+	StateMissing = 0x0000,
+	Internal = 0x0001,
+	RequestFailure = 0x0002,
+	NetworkFailure = 0x0003,
+	Conflict = 0x0004,
+	BlockMissing = 0x0005,
+	SessionMissing = 0x0006,
+	RecoveryPhraseIncorrect = 0x0007,
+	InsufficientFreeSpace = 0x0008,
+	Authentication = 0x0009,
+	UnicodeError = 0x000A,
+	TokenExpired = 0x000B,
+	CryptoError = 0x000C,
+	IO = 0x000D,
+	SyncAlreadyInProgress = 0x000E,
+	RestoreAlreadyInProgress = 0x000F,
+	ExceededRetries = 0x0010,
+	KeychainError = 0x0011,
+	BlockUnreadable = 0x0012,
+	SessionUnreadable = 0x0013,
+	ServiceUnavailable = 0x0014,
+	Cancelled = 0x0015,
+	FolderMissing = 0x0016,
+	KeyCorrupted = 0x0017,
+};
+
 class SAFEDRIVESDK_API SafeDriveSDK {
 public:
 	SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, std::string storage_directory);
