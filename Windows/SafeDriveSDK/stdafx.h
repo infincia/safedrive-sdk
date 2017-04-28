@@ -22,3 +22,4 @@
 #include <stdexcept>
 #include <thread>
 #include <optional>
+#include <atomic>
