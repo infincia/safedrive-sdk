@@ -109,7 +109,7 @@ public:
 	~SafeDriveSDK();
 	std::string SafeDriveSDK::channel();
 	std::string SafeDriveSDK::version();
-	void login(std::string username, std::string password, std::string unique_client_id);
+	void login(std::string username, std::string password, std::string unique_client_id, std::function<void(SDDKAccountStatus status)> success, std::function<void(SDKException error)> failure);
 	void load_keys(const char * phrase);
 	void log(std::string message, LogLevel level);
 	void add_folder(std::string name, std::string path);

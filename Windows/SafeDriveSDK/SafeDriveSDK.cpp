@@ -59,16 +59,17 @@ std::string SafeDriveSDK::version() {
 	return version;
 }
 
-void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id) {
+void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, std::function<void(SDDKAccountStatus status)> success, std::function<void(SDKException error)> failure) {
 	std::thread t1([&] {
 		SDDKError* error = NULL;
 		SDDKAccountStatus* status = NULL;
 		int res = sddk_login(state, unique_client_id.c_str(), username.c_str(), password.c_str(), &status, &error);
 		if (res == -1) {
 			std::cout << "Error logging in: %s", error->message;
+			failure(SDKException(*error));
 			sddk_free_error(&error);
-			throw SDKException();
 		} else {
+			success(*status);
 			sddk_free_account_status(&status);
 		}
 	});
