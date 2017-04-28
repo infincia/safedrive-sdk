@@ -70,7 +70,6 @@ public:
 	unsigned long long usedStorage;
 	long long lowFreeStorageThreshold;
 	unsigned long long expirationDate;
-	std::optional<std::vector<SafeDriveNotification>> notifications;
 	AccountDetails(SDDKAccountDetails* cdetails);
 	~AccountDetails();
 private:
