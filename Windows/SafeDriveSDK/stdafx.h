@@ -21,3 +21,4 @@
 #include <vector>
 #include <stdexcept>
 #include <thread>
+#include <optional>
