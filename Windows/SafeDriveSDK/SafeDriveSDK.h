@@ -24,7 +24,6 @@ public:
 	long long id;
 	std::string name;
 	std::string path;
-	std::string path;
 	unsigned long long date;
 	bool encrypted;
 	bool syncing;
