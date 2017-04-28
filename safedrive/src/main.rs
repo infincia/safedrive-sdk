@@ -321,7 +321,7 @@ fn main() {
         println!("Environment: staging");
     }
 
-    let channel = ::safedrive::get_channel();
+    let channel = get_channel();
     println!("Channel: {}", channel);
 
     match channel {
@@ -353,11 +353,11 @@ fn main() {
         let version = match m.is_present("versiontwo") {
             true => {
                 println!("Benchmark: version2");
-                ::safedrive::SyncVersion::Version2
+                SyncVersion::Version2
             },
             false => {
                 println!("Benchmark: version1");
-                ::safedrive::SyncVersion::Version1
+                SyncVersion::Version1
             },
 
         };
@@ -377,14 +377,14 @@ fn main() {
         let mut result = Ok(0);
 
         if m.is_present("remove") {
-            result = ::safedrive::clear_cache();
+            result = clear_cache();
         } else if m.is_present("clean") {
-            result = ::safedrive::clean_cache(512_000_000);
+            result = clean_cache(512_000_000);
         }
 
         match result {
             Ok(deleted) => {
-                let deleted_size = ::safedrive::pretty_bytes(deleted as f64);
+                let deleted_size = pretty_bytes(deleted as f64);
 
                 println!("cache cleaned: {}", deleted_size);
             },
@@ -549,8 +549,8 @@ fn main() {
 
 pub fn find_credentials() -> Result<(String, String), SDError> {
 
-    let username = get_keychain_item("currentuser", ::safedrive::KeychainService::CurrentUser)?;
-    let password = get_keychain_item(&username, ::safedrive::KeychainService::Account)?;
+    let username = get_keychain_item("currentuser", KeychainService::CurrentUser)?;
+    let password = get_keychain_item(&username, KeychainService::Account)?;
 
     Ok((username, password))
 }
@@ -588,7 +588,7 @@ pub fn sign_in() -> (Token, Keyset) {
 
 
     // save auth token
-    match set_keychain_item(&username, ::safedrive::KeychainService::AuthToken, &token.token) {
+    match set_keychain_item(&username, KeychainService::AuthToken, &token.token) {
         Ok(()) => {},
         Err(e) => {
             error!("{}", e);
@@ -609,7 +609,7 @@ pub fn sign_in() -> (Token, Keyset) {
         println!("---------------------------------------------------------------------");
         println!("Recovery phrase: {}", new_phrase);
         println!("---------------------------------------------------------------------");
-        match set_keychain_item(&username, ::safedrive::KeychainService::RecoveryPhrase, new_phrase) {
+        match set_keychain_item(&username, KeychainService::RecoveryPhrase, new_phrase) {
             Ok(()) => {
                 println!("Recovery phrase saved in keychain");
             },
@@ -1053,7 +1053,7 @@ pub fn list_sessions(token: Token) {
         },
     };
     for session in session_list {
-        let session_size = ::safedrive::pretty_bytes(session.size.unwrap() as f64);
+        let session_size = pretty_bytes(session.size.unwrap() as f64);
 
         let session_folder_id = format!("{}", &session.folder_id.unwrap());
         let session_id = format!("{}", &session.id.unwrap());
@@ -1092,7 +1092,7 @@ pub fn clean_sessions(token: Token, schedule: SyncCleaningSchedule) {
 }
 
 
-pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
+pub fn benchmark(version: SyncVersion, path: &str) {
 
     let pa = PathBuf::from(path);
 
@@ -1124,9 +1124,9 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
 
     let reader: BufReader<File> = BufReader::new(f);
     let byte_iter = reader.bytes().map(|b| b.expect("failed to unwrap test data"));
-    let tweak_key = ::safedrive::Key::new(::safedrive::KeyType::Tweak);
+    let tweak_key = Key::new(KeyType::Tweak);
 
-    let chunk_iter = ::safedrive::ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
+    let chunk_iter = ChunkGenerator::new(byte_iter, &tweak_key, stream_length, version);
 
     let start = std::time::Instant::now();
 
@@ -1137,11 +1137,11 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
     }
     println!("Benchmarking finished with {} chunks", nb_chunk);
 
-    let avg = ::safedrive::pretty_bytes(stream_length as f64 / nb_chunk as f64);
+    let avg = pretty_bytes(stream_length as f64 / nb_chunk as f64);
 
     println!("Benchmarking average chunk size: {} bytes", avg);
 
-    let speed = ::safedrive::pretty_bytes(stream_length as f64 / start.elapsed().as_secs() as f64);
+    let speed = pretty_bytes(stream_length as f64 / start.elapsed().as_secs() as f64);
 
     println!("Benchmarking took {} seconds", start.elapsed().as_secs());
     println!("Benchmarking throughput average: {} per second", speed);
@@ -1151,7 +1151,7 @@ pub fn benchmark(version: ::safedrive::SyncVersion, path: &str) {
 
 pub fn local_login(username: &str) {
 
-    match set_keychain_item("currentuser", ::safedrive::KeychainService::CurrentUser, username) {
+    match set_keychain_item("currentuser", KeychainService::CurrentUser, username) {
         Ok(()) => {},
         Err(e) => {
             error!("{}", e);
@@ -1163,7 +1163,7 @@ pub fn local_login(username: &str) {
     let password = ::rpassword::prompt_password_stdout("Password: ").unwrap();
     let password = password.trim();
 
-    match set_keychain_item(username, ::safedrive::KeychainService::Account, &password) {
+    match set_keychain_item(username, KeychainService::Account, &password) {
         Ok(()) => {},
         Err(e) => {
             error!("{}", e);
@@ -1247,7 +1247,7 @@ pub fn local_login(username: &str) {
                     };
 
                     println!("Replacing client {}", &ucid);
-                    match set_keychain_item(username, ::safedrive::KeychainService::UniqueClientID, &ucid) {
+                    match set_keychain_item(username, KeychainService::UniqueClientID, &ucid) {
                         Ok(()) => {},
                         Err(e) => {
                             error!("{}", e);
@@ -1272,7 +1272,7 @@ pub fn local_login(username: &str) {
         let ucid = generate_unique_client_id();
         println!("Setting up new client {}", &ucid);
 
-        match set_keychain_item(username, ::safedrive::KeychainService::UniqueClientID, &ucid) {
+        match set_keychain_item(username, KeychainService::UniqueClientID, &ucid) {
             Ok(()) => {},
             Err(e) => {
                 error!("{}", e);
@@ -1298,7 +1298,7 @@ pub fn local_login(username: &str) {
                 println!();
                 let recovery_phrase = ::rpassword::prompt_response_stdout("Enter your recovery phrase: ").unwrap();
 
-                match set_keychain_item(username, ::safedrive::KeychainService::RecoveryPhrase, &recovery_phrase) {
+                match set_keychain_item(username, KeychainService::RecoveryPhrase, &recovery_phrase) {
                     Ok(()) => {},
                     Err(e) => {
                         error!("{}", e);
@@ -1319,7 +1319,7 @@ pub fn local_login(username: &str) {
                 println!();
                 let recovery_phrase = ::rpassword::prompt_response_stdout("Recovery phrase: ").unwrap();
 
-                match set_keychain_item(username, ::safedrive::KeychainService::RecoveryPhrase, &recovery_phrase) {
+                match set_keychain_item(username, KeychainService::RecoveryPhrase, &recovery_phrase) {
                     Ok(()) => {},
                     Err(e) => {
                         error!("{}", e);
@@ -1338,7 +1338,7 @@ pub fn local_login(username: &str) {
 
 pub fn find_recovery_phrase(username: &str) -> Option<String> {
 
-    let recovery_phrase = match get_keychain_item(&username, ::safedrive::KeychainService::RecoveryPhrase) {
+    let recovery_phrase = match get_keychain_item(&username, KeychainService::RecoveryPhrase) {
         Ok(phrase) => Some(phrase),
         Err(_) => None,
     };
@@ -1348,7 +1348,7 @@ pub fn find_recovery_phrase(username: &str) -> Option<String> {
 
 pub fn find_unique_client_id(username: &str) -> Option<String> {
 
-    let unique_client_id = match get_keychain_item(&username, ::safedrive::KeychainService::UniqueClientID) {
+    let unique_client_id = match get_keychain_item(&username, KeychainService::UniqueClientID) {
         Ok(ucid) => Some(ucid),
         Err(_) => None,
     };
