@@ -21,9 +21,9 @@ call rustver.bat
 
 rustup override set %RUST_VER%
 
-ECHO Testing libsafedrive for %TARGET% (%TOOLSET%-%CONFIGURATION%)
+ECHO Testing sddk for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-cargo.exe test --verbose --release -p libsafedrive --target %TARGET% || goto :error
+cargo.exe test --verbose --release -p sddk --target %TARGET% || goto :error
 goto :EOF
 
 :error

@@ -15,5 +15,5 @@ prettytable-rs = "*"
 simplelog = "*"
 notify = "*"
 
-[dependencies.libsafedrive]
-path = "../libsafedrive"
+[dependencies.sddk]
+path = "../sddk"

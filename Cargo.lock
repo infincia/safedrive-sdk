@@ -1,16 +1,49 @@
 [root]
-name = "safedrived"
+name = "sddk"
 version = "0.6.15"
 dependencies = [
- "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.6.15",
+ "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "blake2-rfc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
+ "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono-humanize 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy 0.0.126 (registry+https://github.com/rust-lang/crates.io-index)",
+ "fuse_mt 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hyper 0.10.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=infincia)",
+ "lazy_static 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libsodium-sys 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "notify 4.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lz4 1.20.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nom 2.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "number_prefix 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "objc 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "objc-foundation 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parking_lot 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pulldown-cmark 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "reed-solomon 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "regex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "reqwest 0.5.1 (git+https://github.com/infincia/reqwest.git?branch=rustls)",
+ "rocket 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rocket_codegen 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rocket_contrib 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)",
+ "scopeguard 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "semver 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "simplelog 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sodiumoxide 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "tar 0.4.11 (git+https://github.com/infincia/tar-rs.git?branch=append_long_name)",
+ "tera 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "time 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uuid 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "walkdir 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -517,54 +550,6 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "libsafedrive"
-version = "0.6.15"
-dependencies = [
- "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "blake2-rfc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
- "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "chrono-humanize 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy 0.0.126 (registry+https://github.com/rust-lang/crates.io-index)",
- "fuse_mt 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "hyper 0.10.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=infincia)",
- "lazy_static 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsodium-sys 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "lz4 1.20.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "nom 2.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "number_prefix 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "objc 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "objc-foundation 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "parking_lot 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pulldown-cmark 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "reed-solomon 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "regex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "reqwest 0.5.1 (git+https://github.com/infincia/reqwest.git?branch=rustls)",
- "rocket 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "rocket_codegen 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "rocket_contrib 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)",
- "scopeguard 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "semver 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "simplelog 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "sodiumoxide 0.0.14 (registry+https://github.com/rust-lang/crates.io-index)",
- "tar 0.4.11 (git+https://github.com/infincia/tar-rs.git?branch=append_long_name)",
- "tera 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "time 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
- "uuid 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "walkdir 1.0.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1134,15 +1119,30 @@ version = "0.6.15"
 dependencies = [
  "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsafedrive 0.6.15",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "pbr 1.0.0 (git+https://github.com/infincia/pb.git?branch=infincia)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sddk 0.6.15",
  "serde 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "uuid 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "safedrived"
+version = "0.6.15"
+dependencies = [
+ "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "notify 4.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sddk 0.6.15",
+ "serde 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "simplelog 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

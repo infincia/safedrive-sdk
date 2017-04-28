@@ -43,8 +43,8 @@ use uuid::Uuid;
 extern crate chrono;
 use chrono::{Local, UTC, TimeZone};
 
-extern crate safedrive;
-use safedrive::*;
+extern crate sddk;
+use sddk::*;
 
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
@@ -343,7 +343,7 @@ fn main() {
     match initialize(&VERSION, false, operating_system, "en_US", config, log_level, &app_directory) {
         Ok(()) => {},
         Err(e) => {
-            error!("failed to initialize libsafedrive: {}", e);
+            error!("failed to initialize sddk: {}", e);
             std::process::exit(1);
         },
     }

@@ -1,5 +1,5 @@
 [package]
-name = "libsafedrive"
+name = "sddk"
 version = "0.6.15"
 authors = ["Stephen Oliver <steve@infincia.com>"]
 build = "build.rs"
@@ -55,7 +55,7 @@ objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
 
 [lib]
-name = "safedrive"
+name = "sddk"
 crate-type = ["rlib", "cdylib", "staticlib"]
 doctest = false
 

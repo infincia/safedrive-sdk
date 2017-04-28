@@ -77,9 +77,9 @@ rustup override set ${RUST_VER}
 
 case ${TARGET} in
     wasm32-unknown-emscripten)
-            echo "Building libsafedrive for ${TARGET}"
+            echo "Building sddk for ${TARGET}"
 
-        RUST_BACKTRACE=1 cargo build --release -p libsafedrive --target ${TARGET} > /dev/null
+        RUST_BACKTRACE=1 cargo build --release -p sddk --target ${TARGET} > /dev/null
 
         ;;
     *)
@@ -95,14 +95,14 @@ esac
 
 echo "Building SDDK headers for ${TARGET}"
 
-cheddar -f libsafedrive/src/c_api.rs ${DIST_PREFIX}/include/sddk.h
+cheddar -f sddk/src/c_api.rs ${DIST_PREFIX}/include/sddk.h
 
 echo "Copying build artifacts for ${TARGET}"
 
 case ${TARGET} in
     x86_64-apple-darwin)
-        cp -a target/${TARGET}/release/libsafedrive.dylib ${DIST_PREFIX}/lib/libsafedrive.dylib
-        install_name_tool -id "@rpath/libsafedrive.dylib" ${DIST_PREFIX}/lib/libsafedrive.dylib
+        cp -a target/${TARGET}/release/libsddk.dylib ${DIST_PREFIX}/lib/libsddk.dylib
+        install_name_tool -id "@rpath/libsddk.dylib" ${DIST_PREFIX}/lib/libsddk.dylib
         cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.daemon
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.cli
         ;;
@@ -111,14 +111,14 @@ case ${TARGET} in
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
         ;;
     i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
-        cp -a target/${TARGET}/release/libsafedrive.so ${DIST_PREFIX}/lib/libsafedrive.so
+        cp -a target/${TARGET}/release/libsddk.so ${DIST_PREFIX}/lib/libsddk.so
         cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
         ;;
     wasm32-unknown-emscripten)
-        cp -a target/${TARGET}/release/libsafedrive.wasm ${DIST_PREFIX}/lib/libsafedrive.wasm
-        cp -a target/${TARGET}/release/libsafedrive.js ${DIST_PREFIX}/lib/libsafedrive.js
-        cp -a target/${TARGET}/release/libsafedrive.html ${DIST_PREFIX}/lib/libsafedrive.html
+        cp -a target/${TARGET}/release/libsddk.wasm ${DIST_PREFIX}/lib/libsddk.wasm
+        cp -a target/${TARGET}/release/libsddk.js ${DIST_PREFIX}/lib/libsddk.js
+        cp -a target/${TARGET}/release/libsddk.html ${DIST_PREFIX}/lib/libsddk.html
         ;;
     *)
         ;;

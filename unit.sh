@@ -63,6 +63,6 @@ source ./rustver.sh
 
 rustup override set ${RUST_VER}
 
-echo "Testing libsafedrive for ${TARGET}"
+echo "Testing sddk for ${TARGET}"
 
-RUST_BACKTRACE=1 cargo test --release -p libsafedrive --target ${TARGET}
+RUST_BACKTRACE=1 cargo test --release -p sddk --target ${TARGET}

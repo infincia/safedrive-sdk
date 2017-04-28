@@ -47,7 +47,7 @@ int main() {
 
 	SDDKError * init_error = NULL;
 	if (0 != sddk_initialize("1.0", "Windows", "EN_us", SDDKConfigurationStaging, "C:\\Users\\steve", &state, &init_error)) {
-		printf("C<test/main>: Failed to initialize libsafedrive: %s", init_error->message);
+		printf("C<test/main>: Failed to initialize sddk: %s", init_error->message);
 		sddk_free_error(&init_error);
 		return 1;
 	}

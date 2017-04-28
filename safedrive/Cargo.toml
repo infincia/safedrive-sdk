@@ -17,8 +17,8 @@ log = "*"
 prettytable-rs = "*"
 chrono = "^0.3"
 
-[dependencies.libsafedrive]
-path = "../libsafedrive"
+[dependencies.sddk]
+path = "../sddk"
 
 
 [features]

@@ -48,7 +48,7 @@ cargo.exe build --release -p safedrived --target %TARGET% || goto :error
 
 ECHO Building SDDK headers for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-cheddar -f "libsafedrive\src\c_api.rs" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\include\sddk.h" || goto :error
+cheddar -f "sddk\src\c_api.rs" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\include\sddk.h" || goto :error
 
 ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
