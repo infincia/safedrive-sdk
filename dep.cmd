@@ -23,10 +23,12 @@ mkdir build > NUL
 
 IF "%ARCH%"=="x86_64" (
     set PLATFORM=x64
+    set SSH2_PLATFORM=x64
 )
 
 IF "%ARCH%"=="x86" (
     set PLATFORM=Win32
+    set SSH2_PLATFORM=x86
 )
 
 IF "%TOOLSET%"=="v120_xp" (
@@ -111,7 +113,7 @@ del /q libssh2-%LIBSSH2_VER%
 pushd libssh2-%LIBSSH2_VER%
 @echo building libssh2
 cmake . -G"!VS! Win64" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=Release" -D"CRYPTO_BACKEND=WinCNG"
-msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libssh2.sln || goto :error
+msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%SSH2_PLATFORM%;PlatformToolset=%TOOLSET% libssh2.sln || goto :error
 popd
 del /q libssh2-%LIBSSH2_VER%
 @echo copying "%BUILD_PREFIX%\lib\libssh2.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssh2.%LIBSUFFIX%"
