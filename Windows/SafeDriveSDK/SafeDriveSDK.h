@@ -27,11 +27,48 @@ enum SAFEDRIVESDK_API LogLevel {
 
 class SAFEDRIVESDK_API Folder {
 public:
+	long long id;
 	std::string name;
 	std::string path;
-	long long id;
+	std::string path;
+	unsigned long long date;
 	bool encrypted;
 	bool syncing;
+};
+
+class SAFEDRIVESDK_API SyncSession {
+	std::string name;
+	unsigned long long size;
+	long long date;
+	unsigned long long folder_id;
+	unsigned long long session_id;
+};
+
+class SAFEDRIVESDK_API AccountStatus {
+	std::optional<std::string> status;
+	std::string host;
+	unsigned short port;
+	std::string user_name;
+	std::optional<long long> time;
+};
+
+class SAFEDRIVESDK_API SoftwareClient {
+	std::string unique_client_id;
+	std::string operating_system;
+	std::string language;
+};
+
+class SAFEDRIVESDK_API AccountDetails {
+	unsigned long long assignedStorage;
+	unsigned long long usedStorage;
+	long long lowFreeStorageThreshold;
+	unsigned long long expirationDate;
+	std::optional<std::vector<SafeDriveNotification>> notifications;
+};
+
+class SAFEDRIVESDK_API SafeDriveNotification {
+	std::string title;
+	std::string message;
 };
 
 class SAFEDRIVESDK_API SafeDriveSDK {
