@@ -6,12 +6,6 @@
 
 #include <sddk.h>
 
-
-class SDKException : public std::runtime_error {
-public:
-	SDKException() : std::runtime_error("SDKException") { };
-};
-
 enum SAFEDRIVESDK_API Configuration {
 	Production,
 	Staging,
@@ -96,6 +90,17 @@ enum SAFEDRIVESDK_API SDKErrorType {
 	Cancelled = 0x0015,
 	FolderMissing = 0x0016,
 	KeyCorrupted = 0x0017,
+};
+
+class SAFEDRIVESDK_API SDKException : public std::runtime_error {
+public:
+	std::string message;
+	SDKErrorType kind;
+	int code() {
+		return this->kind;
+	};
+	SDKException(SDKErrorType kind, std::string message);
+	SDKException(SDDKError sdkError);
 };
 
 class SAFEDRIVESDK_API SafeDriveSDK {

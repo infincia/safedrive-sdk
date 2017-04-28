@@ -5,6 +5,16 @@
 #include "SafeDriveSDK.h"
 #include "sddk.h"
 
+SDKException SDKExceptionFromSDDKError(SDDKError sdkError) {
+	std::string s = sdkError.message;
+	SDKErrorType kind = SDKErrorType(sdkError.error_type);
+	return SDKException(kind, s);
+};
+
+SDKException::SDKException(SDKErrorType kind, std::string message) : runtime_error("SDKException"), message(message), kind(kind) {};
+SDKException::SDKException(SDDKError sdkError) : runtime_error("SDKException"), message(sdkError.message), kind(SDKErrorType(sdkError.error_type)) {};
+
+
 SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, std::string storage_directory) {
 	std::cout << "\n SafeDriveSDK Constructor called \n";
 
@@ -26,7 +36,7 @@ SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_sys
 	SDDKError * error = NULL;
 	if (0 != sddk_initialize(cv, os, l, c, s, &state, &error)) {
 		std::cout << "Error initializing SDK: %s", error->message;
-		throw SDKException();
+		throw SDKException(*error);
 	}
 }
 
@@ -69,7 +79,7 @@ void SafeDriveSDK::load_keys(const char * phrase) {
 		SDDKError * error = NULL;
 		if (0 != sddk_load_keys(NULL, state, &error, phrase, NULL)) {
 			std::cout << "Error loading keys: %s", error->message;
-			throw SDKException();
+			throw SDKException(*error);
 		}
 	});
 }
@@ -106,7 +116,7 @@ void SafeDriveSDK::add_folder(std::string name, std::string path) {
 		SDDKError * error = NULL;
 		if (0 != sddk_add_sync_folder(state, name.c_str(), path.c_str(), &error)) {
 			std::cout << "Error adding folder: %s", error->message;
-			throw SDKException();
+			throw SDKException(*error);
 		}
 	});
 }
@@ -116,7 +126,7 @@ void SafeDriveSDK::remove_folder(unsigned long long folderID) {
 		SDDKError * error = NULL;
 		if (0 != sddk_remove_sync_folder(state, folderID, &error)) {
 			std::cout << "Error adding folder: %s", error->message;
-			throw SDKException();
+			throw SDKException(*error);
 		}
 	});
 }
@@ -127,7 +137,7 @@ std::vector<Folder> SafeDriveSDK::get_folders() {
 	int64_t length = sddk_get_sync_folders(state, &folder_ptr, &error);
 	if (length == -1) {
 		std::cout << "Error getting folders: %s", error->message;
-		throw SDKException();
+		throw SDKException(*error);
 	}
 	SDDKFolder * head = folder_ptr;
 	std::cout << "Got % folders\n";
