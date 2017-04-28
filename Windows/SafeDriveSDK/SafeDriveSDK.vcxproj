@@ -39,7 +39,7 @@
     <ProjectGuid>{CEC24843-6FB2-4DC0-94DF-048C907B5250}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SafeDriveSDK</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>7.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
