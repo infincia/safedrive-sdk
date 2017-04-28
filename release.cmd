@@ -55,6 +55,9 @@ ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 ECHO copying "target\%TARGET%\release\safedrive.dll" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\safedrive.dll"
 copy /y "target\%TARGET%\release\safedrive.dll" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\safedrive.dll" || goto :error
 
+ECHO copying "target\%TARGET%\release\safedrive.lib" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\safedrive.lib"
+copy /y "target\%TARGET%\release\safedrive.lib" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\safedrive.lib" || goto :error
+
 ECHO copying "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\"
 copy /y "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\" || goto :error
 

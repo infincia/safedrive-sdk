@@ -103,14 +103,17 @@ case ${TARGET} in
     x86_64-apple-darwin)
         cp -a target/${TARGET}/release/libsddk.dylib ${DIST_PREFIX}/lib/libsddk.dylib
         install_name_tool -id "@rpath/libsddk.dylib" ${DIST_PREFIX}/lib/libsddk.dylib
+        cp -a target/${TARGET}/release/libsddk.a ${DIST_PREFIX}/lib/libsddk.a
         cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.daemon
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.cli
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)
+        cp -a target/${TARGET}/release/libsddk.a ${DIST_PREFIX}/lib/libsddk.a
         cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
         ;;
     i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
+        cp -a target/${TARGET}/release/libsddk.a ${DIST_PREFIX}/lib/libsddk.a
         cp -a target/${TARGET}/release/libsddk.so ${DIST_PREFIX}/lib/libsddk.so
         cp -a target/${TARGET}/release/safedrived ${DIST_PREFIX}/bin/
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
