@@ -115,7 +115,7 @@ public:
 	void add_folder(std::string name, std::string path);
 	void remove_folder(unsigned long long folderID);
 	std::vector<Folder> get_folders();
-protected:
+private:
 	SDDKState * state;
 };
 
