@@ -29,7 +29,7 @@ IF "%ARCH%"=="x86_64" (
 
 IF "%ARCH%"=="x86" (
     set PLATFORM=Win32
-    set SSH2_PLATFORM=x86
+    set SSH2_PLATFORM=Win32
     set SSH2_GENERATOR_PLATFORM=
 )
 
