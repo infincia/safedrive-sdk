@@ -106,6 +106,9 @@ extern crate time;
 
 extern crate keyring;
 
+#[cfg(target_os = "macos")]
+extern crate ssh2;
+
 #[cfg(feature = "sessionfs")]
 extern crate fuse_mt;
 

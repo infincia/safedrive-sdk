@@ -53,6 +53,7 @@ pulldown-cmark = { version = "0.0.8", optional = true }
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
+ssh2 = "*"
 
 [lib]
 name = "sddk"
