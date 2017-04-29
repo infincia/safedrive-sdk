@@ -1502,16 +1502,19 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
 ///
 /// Parameters:
 ///
-///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///        `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     `name`: a NULL terminated string representing the folder name
+///         `name`: a NULL terminated string representing the folder name
 ///
-///     `path`: a NULL terminated string representing the folder path in RFC3986 format
+///         `path`: a NULL terminated string representing the folder path in RFC3986 format
 ///
-///     `error`: an uninitialized pointer that will be allocated and initialized when the function
-///              returns if the return value was -1
+///    `encrypted`: an 8-bit integer representing a boolean where value >= 1 is true, 0 is false
 ///
-///              must be freed by the caller using `sddk_free_error()`
+///
+///        `error`: an uninitialized pointer that will be allocated and initialized when the function
+///                 returns if the return value was -1
+///
+///                 must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -1611,8 +1614,9 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
 /// ```c
 /// SDDKState *state; // retrieve from sddk_initialize()
 /// SDDKError *error = NULL;
+/// unsigned char syncing = 1;
 ///
-/// if (0 != sddk_update_sync_folder(&state, "Documents", "/Users/name/Documents", 1, 56, &error)) {
+/// if (0 != sddk_update_sync_folder(&state, "Documents", "/Users/name/Documents", syncing, 56, &error)) {
 ///     printf("Failed to update folder");
 ///     // do something with error here, then free it
 ///     sddk_free_error(&error);
