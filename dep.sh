@@ -103,7 +103,7 @@ export BUILD_RSYNC=false
 export BUILD_SSHFS=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
-export BUILD_LIBSSH2=true
+export BUILD_LIBSSH2=false
 
 export CFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
 export CPPFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
@@ -127,6 +127,7 @@ case ${TARGET} in
         export BUILD_SSHFS=true
         export BUILD_LIBRESSL=true
         export BUILD_FFI=true
+        export BUILD_LIBSSH2=true
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="${CFLAGS}"
@@ -135,6 +136,7 @@ case ${TARGET} in
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
         export BUILD_LIBRESSL=true
+        export BUILD_LIBSSH2=true
         ;;
     i686-unknown-linux-gnu)
         export CFLAGS="${CFLAGS} -m32"
@@ -144,6 +146,7 @@ case ${TARGET} in
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
         export BUILD_LIBRESSL=true
+        export BUILD_LIBSSH2=true
         ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="${CFLAGS}"
@@ -152,7 +155,6 @@ case ${TARGET} in
         export CC=musl-gcc
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
-        export BUILD_LIBRESSL=true
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -m32"
@@ -162,7 +164,6 @@ case ${TARGET} in
         export PKG_CONFIG_ALLOW_CROSS=1
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
-        export BUILD_LIBRESSL=true
         ;;
     wasm32-unknown-emscripten)
         export SODIUM_ARGS="${SODIUM_ARGS}"
