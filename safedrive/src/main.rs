@@ -777,6 +777,7 @@ pub fn add(token: Token, path: &str) {
         Ok(_) => {},
         Err(e) => {
             error!("failed to add new sync folder: {}", e);
+            std::process::exit(1);
         },
     }
 }
