@@ -433,7 +433,7 @@ fn main() {
         }
 
     } else if let Some(_) = matches.subcommand_matches("daemon") {
-        let (token, _) = sign_in();
+        let (_, _) = sign_in();
 
         daemon();
 
