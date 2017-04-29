@@ -23,7 +23,7 @@ rustup override set %RUST_VER%
 
 ECHO Testing sddk for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-cargo.exe test --verbose --release -p sddk --target %TARGET% || goto :error
+cargo.exe test --release -p sddk --target %TARGET% || goto :error
 goto :EOF
 
 :error
