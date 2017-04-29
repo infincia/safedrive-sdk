@@ -96,6 +96,23 @@ fn main() {
                 .required(false)
             )
         )
+        .subcommand(SubCommand::with_name("doctor")
+            .about("fix installation issues")
+            .arg(Arg::with_name("uid")
+                .short("u")
+                .long("uid")
+                .value_name("UID")
+                .help("user id")
+                .required(true)
+            )
+            .arg(Arg::with_name("gid")
+                .short("g")
+                .long("gid")
+                .value_name("GID")
+                .help("group id")
+                .required(true)
+            )
+        )
         .subcommand(SubCommand::with_name("cache")
             .about("clean the local cache")
             .arg(Arg::with_name("clean")
@@ -375,6 +392,25 @@ fn main() {
 
         benchmark(version, p);
 
+    }  else if let Some(m) = matches.subcommand_matches("doctor") {
+
+        let uid: u32 = m.value_of("uid").expect("Expected a uid")
+            .trim()
+            .parse()
+            .expect("Expected a number");
+
+        let gid: u32 = m.value_of("gid").expect("Expected a gid")
+            .trim()
+            .parse()
+            .expect("Expected a number");
+
+        match doctor(uid, gid) {
+            Ok(()) => {},
+            Err(err) => {
+                error!("{}", err);
+                std::process::exit(1);
+            }
+        }
     }  else if let Some(m) = matches.subcommand_matches("cache") {
 
         let mut result = Ok(0);
