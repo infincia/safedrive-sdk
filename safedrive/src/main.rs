@@ -771,7 +771,9 @@ pub fn add(token: Token, path: &str) {
     //TODO: this is not portable to windows, must be fixed before use there
     println!("Adding new sync folder {:?}",  &pa.file_name().unwrap().to_str().unwrap());
 
-    match add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), path) {
+    let encrypted = true; // CLI can't do anything with unencrypted folders, they aren't implemented inside the SDK
+
+    match add_sync_folder(&token, &pa.file_name().unwrap().to_str().unwrap(), path, encrypted) {
         Ok(_) => {},
         Err(e) => {
             error!("failed to add new sync folder: {}", e);
