@@ -1402,7 +1402,7 @@ pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
         binary_path = PathBuf::from("C:\\Program Files\\SafeDrive");
 
     } else {
-        binary_path = PathBuf::from("/usr/local/bin2");
+        binary_path = PathBuf::from("/usr/local/bin");
     }
 
     match std::fs::create_dir_all(&binary_path) {
