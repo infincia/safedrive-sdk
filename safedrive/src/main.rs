@@ -13,6 +13,7 @@ extern crate serde;
 extern crate serde_json;
 
 use std::str;
+use std::ffi::{CString};
 
 #[cfg(target_os = "linux")]
 use std::ffi::OsStr;
@@ -42,6 +43,8 @@ use uuid::Uuid;
 
 extern crate chrono;
 use chrono::{Local, UTC, TimeZone};
+
+extern crate libc;
 
 extern crate sddk;
 use sddk::*;
@@ -1354,4 +1357,63 @@ pub fn find_unique_client_id(username: &str) -> Option<String> {
     };
 
     unique_client_id
+}
+
+pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
+    let binary_path: PathBuf;
+
+    if cfg!(target_os="windows") {
+        binary_path = PathBuf::from("C:\\Program Files\\SafeDrive");
+
+    } else {
+        binary_path = PathBuf::from("/usr/local/bin2");
+    }
+
+    match std::fs::create_dir_all(&binary_path) {
+        Ok(()) => {},
+        Err(err) => {
+            return Err(SDError::Internal(format!("failed to create directory '{}': {}", binary_path.display(), err)))
+        },
+    }
+
+    #[cfg(target_os = "macos")]
+    unsafe {
+        let p: &str = &binary_path.to_str().expect("failed to get path");
+
+        let s: CString = CString::new(p).expect("failed to get path");
+
+        match ::libc::chown(s.into_raw(), uid, gid) {
+            0 => {
+                Ok(())
+            },
+            _ => {
+                Err(SDError::Internal(format!("failed to set permissions on directory '{}'", binary_path.display())))
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    unsafe {
+        let p: &str = &binary_path.to_str().expect("failed to get path");
+
+        let s: CString = CString::new(p).expect("failed to get path");
+
+        match ::libc::chown(s.into_raw(), uid, gid) {
+            0 => {
+                Ok(())
+            },
+            _ => {
+                Err(SDError::Internal(format!("failed to set permissions on directory '{}'", binary_path.display())))
+            }
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    unsafe {
+        let p: &str = &binary_path.to_str().expect("failed to get path");
+
+        let s: CString = CString::new(p).expect("failed to get path");
+
+        Ok(())
+    }
 }
