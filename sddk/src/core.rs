@@ -357,8 +357,9 @@ pub fn get_sync_folder(token: &Token,
 
 pub fn add_sync_folder(token: &Token,
                        name: &str,
-                       path: &str) -> Result<u64, SDError> {
-    match create_folder(token, path, name, true) {
+                       path: &str,
+                       encrypted: bool) -> Result<u64, SDError> {
+    match create_folder(token, path, name, encrypted) {
         Ok(folder_id) => Ok(folder_id),
         Err(e) => Err(SDError::from(e)),
     }

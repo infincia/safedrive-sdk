@@ -1525,8 +1525,9 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
 /// ```c
 /// SDDKState *state; // retrieve from sddk_initialize()
 /// SDDKError *error = NULL;
+/// unsigned char encrypted = 1;
 ///
-/// if (0 != sddk_add_sync_folder(&state, "Documents", "/Users/name/Documents", &error)) {
+/// if (0 != sddk_add_sync_folder(&state, "Documents", "/Users/name/Documents", encrypted, &error)) {
 ///     printf("Failed to add folder");
 ///     // do something with error here, then free it
 ///     sddk_free_error(&error);
@@ -1540,6 +1541,7 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
 pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
                                        name: *const std::os::raw::c_char,
                                        path: *const std::os::raw::c_char,
+                                       encrypted: std::os::raw::c_uchar,
                                        mut error: *mut *mut SDDKError) -> std::os::raw::c_longlong {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
@@ -1556,8 +1558,9 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
         Err(err) => panic!("string is not valid UTF-8: {}", err),
     };
 
+    let c_encrypted = encrypted >= 1;
 
-    match add_sync_folder(c.0.get_api_token(), &n, &p) {
+    match add_sync_folder(c.0.get_api_token(), &n, &p, c_encrypted) {
         Ok(folder_id) => folder_id as i64,
         Err(err) => {
             let c_err = SDDKError::from(err);
