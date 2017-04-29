@@ -16,6 +16,7 @@ serde_derive = "^0.9"
 log = "*"
 prettytable-rs = "*"
 chrono = "^0.3"
+libc = "*"
 
 [dependencies.sddk]
 path = "../sddk"
