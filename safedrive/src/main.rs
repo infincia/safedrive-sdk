@@ -433,7 +433,7 @@ fn main() {
         }
 
     } else if let Some(_) = matches.subcommand_matches("daemon") {
-        let (_, _) = sign_in();
+        let (_, _, _) = sign_in();
 
         daemon();
 
@@ -459,7 +459,7 @@ fn main() {
             },
         };
 
-        let (token, _) = sign_in();
+        let (token, _, _) = sign_in();
 
         add(token, p);
 
@@ -470,13 +470,13 @@ fn main() {
             .parse()
             .expect("Expected a number");
 
-        let (token, _) = sign_in();
+        let (token, _, _) = sign_in();
 
         remove(token, id);
 
     } else if let Some(_) = matches.subcommand_matches("syncall") {
 
-        let (token, keyset) = sign_in();
+        let (token, keyset, _) = sign_in();
 
         sync_all(token, keyset);
 
@@ -487,7 +487,7 @@ fn main() {
             .parse()
             .expect("Expected a number");
 
-        let (token, keyset) = sign_in();
+        let (token, keyset, _) = sign_in();
 
         sync_one(token, keyset, id);
 
@@ -502,13 +502,13 @@ fn main() {
 
         let session_name = m.value_of("session");
 
-        let (token, keyset) = sign_in();
+        let (token, keyset, _) = sign_in();
 
         restore_one(token, keyset, id, destination, session_name);
 
     } else if let Some(_) = matches.subcommand_matches("list") {
 
-        let (token, _) = sign_in();
+        let (token, _, _) = sign_in();
 
         list_folders(token);
 
@@ -531,14 +531,14 @@ fn main() {
             info_for_client()
 
         } else if m.is_present("remove") {
-            let (token, _) = sign_in();
+            let (token, _, _) = sign_in();
 
             remove_client(token);
         }
 
     } else if let Some(_) = matches.subcommand_matches("sessions") {
 
-        let (token, _) = sign_in();
+        let (token, _, _) = sign_in();
 
         list_sessions(token);
 
@@ -548,7 +548,7 @@ fn main() {
         if let Some(ids) = m.value_of("id") {
             let id: u64 = ids.trim().parse().expect("Expected a number");
 
-            let (token, _) = sign_in();
+            let (token, _, _) = sign_in();
 
             println!("Removing sync session {}", id);
 
@@ -579,7 +579,7 @@ fn main() {
                 schedule = SyncCleaningSchedule::Auto
             };
 
-            let (token, _) = sign_in();
+            let (token, _, _) = sign_in();
 
             clean_sessions(token, schedule);
         }
@@ -594,7 +594,7 @@ pub fn find_credentials() -> Result<(String, String), SDError> {
     Ok((username, password))
 }
 
-pub fn sign_in() -> (Token, Keyset) {
+pub fn sign_in() -> (Token, Keyset, AccountStatus) {
 
     println!("Signing in to SafeDrive...");
 
@@ -617,7 +617,7 @@ pub fn sign_in() -> (Token, Keyset) {
         },
     };
 
-    let (token, _) = match login(&uid, &username, &password) {
+    let (token, status) = match login(&uid, &username, &password) {
         Ok((t, a)) => (t, a),
         Err(e) => {
             error!("Login error: {}", e);
@@ -664,7 +664,7 @@ pub fn sign_in() -> (Token, Keyset) {
         },
     };
 
-    (token, keyset)
+    (token, keyset, status)
 }
 
 pub fn daemon() {
@@ -1372,7 +1372,7 @@ pub fn local_login(username: &str) {
         },
     }
 
-    let (_, _) = sign_in();
+    let (_, _, _) = sign_in();
 
     println!("SafeDrive is now ready to use");
 
