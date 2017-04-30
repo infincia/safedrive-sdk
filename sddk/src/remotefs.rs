@@ -75,5 +75,72 @@ impl<'a> RemoteFS<'a> {
 
 
 
+    pub fn mkdir(&mut self, recursive: bool, remote_path: &Path) -> Result<(), SDError> {
+        self.connect()?;
+
+        let ses: &Session = match self.session {
+            Some(ref ses) => ses,
+            None => return Err(SDError::Internal("no ssh session available".to_string()))
+        };
+
+        let sftp: Sftp = match ses.sftp() {
+            Ok(sftp) => sftp,
+            Err(err) => return Err(SDError::Internal("no sftp channel available".to_string()))
+        };
+
+        debug!("mkdir: {}", remote_path.display());
+
+        if recursive {
+            debug!("mkdir: mode recursive");
+
+            let mut current: PathBuf = PathBuf::from("/");
+
+            for component in remote_path.components() {
+                debug!("mkdir: directory component check: {:?}", component);
+
+                match component {
+                    Component::Prefix(_) => {
+
+                    },
+                    Component::RootDir => {
+
+                    },
+                    Component::CurDir => {
+
+                    },
+                    Component::ParentDir => {
+
+                    },
+                    Component::Normal(s) =>{
+                        let mut path = PathBuf::new();
+                        path.push(s);
+                        current.push(&path);
+                        match sftp.opendir(&current) {
+                            Ok(s) => {
+                                debug!("mkdir: directory component already exists {:?}", component);
+                            },
+                            Err(err) => {
+                                sftp.mkdir(&current, 0o755)?;
+                            }
+                        }
+                    },
+                }
+            }
+        } else {
+            debug!("mkdir: mode normal");
+
+            match sftp.opendir(remote_path) {
+                Ok(s) => {
+                    debug!("mkdir: directory already exists {}", remote_path.display());
+                },
+                Err(err) => {
+                    sftp.mkdir(remote_path, 0o755)?;
+                }
+            }
+
+        }
+
+        Ok(())
+    }
 }
 
