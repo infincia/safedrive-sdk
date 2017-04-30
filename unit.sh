@@ -15,6 +15,7 @@ export CARGO_INCREMENTAL=1
 export CFLAGS=""
 export CPPFLAGS=""
 export LDFLAGS=""
+export OPENSSL_DIR=${BUILD_PREFIX}
 
 export OSX_VERSION_MIN="10.9"
 export OSX_CPU_ARCH="core2"
