@@ -481,13 +481,18 @@ public class SafeDriveSDK: NSObject {
         return String(cString: unique_client_id!)
     }
     
-    public func addFolder(_ name: String, path: String, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: UInt64) -> Void, failure: @escaping SDKFailure) {
+    public func addFolder(_ name: String, path: String, encrypted: Bool, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: UInt64) -> Void, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
             
             var error: UnsafeMutablePointer<SDDKError>? = nil
             
-            let res = sddk_add_sync_folder(self.state!, name, path, &error)
+            var c_encrypted: UInt8 = 0
+            if encrypted {
+                c_encrypted = 1
+            }
+            
+            let res = sddk_add_sync_folder(self.state!, name, path, c_encrypted, &error)
             defer {
                 if res == -1 {
                     sddk_free_error(&error)
