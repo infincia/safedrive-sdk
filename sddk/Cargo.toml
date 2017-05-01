@@ -57,7 +57,7 @@ ssh2 = "*"
 
 [lib]
 name = "sddk"
-crate-type = ["rlib", "cdylib", "staticlib"]
+crate-type = ["rlib", "staticlib"]
 doctest = false
 
 [features]
