@@ -8,7 +8,7 @@
 
 import Foundation
 
-import sddk
+import SDDK
 
 public enum SDKConfiguration {
     case Production
