@@ -46,7 +46,7 @@
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Mac/SafeDriveSDK.swift; sourceTree = "<group>"; };
 		AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafeDriveSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9D8AF01D6E9BCC0011DE1F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Mac/Info.plist; sourceTree = "<group>"; };
-		AAAD31311EB14B9D00221427 /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.map; path = Mac/module.map; sourceTree = "<group>"; };
+		AAAD31311EB14B9D00221427 /* module.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = module.map; path = "Mac/Supporting Files/module.map"; sourceTree = "<group>"; };
 		AAAD31321EB14C9E00221427 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = "<group>"; };
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
