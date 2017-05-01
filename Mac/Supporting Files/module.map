@@ -1,4 +1,5 @@
-module sddk [system][extern_c] {
-    header "../../dist/x86_64-apple-darwin/include/sddk.h"
+module SDDK {
+    umbrella header "../../dist/x86_64-apple-darwin/include/sddk.h"
+    module * { export * }
     export *
 }
