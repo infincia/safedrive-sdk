@@ -19,3 +19,12 @@ public enum SDKLogLevel: UInt8 {
     case debug = 3
     case trace = 4
 }
+
+
+// MARK: RemoteFS operations
+
+public enum RemoteFSOperation {
+    case createFolder
+    case deleteFolder
+    case moveFolder
+}
