@@ -92,7 +92,7 @@ public struct SDKError {
     public var message: String
     public var kind: SDKErrorType
     
-    var code: Int {
+    public var code: Int {
         return self.kind.rawValue
     }
     
