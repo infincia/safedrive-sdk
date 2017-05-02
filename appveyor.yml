@@ -1,6 +1,10 @@
 environment:
   global:
     PROJECT_NAME: safedrive-sdk
+    TEST_USER:
+      secure: l9NGI3oeUceB/UpM5Bnz1GZmXu+Ffqn8VpY1QrY5vKMayVSMKLbu3dDd+JGRYpcd
+    TEST_PASSWORD:
+      secure: 0KxiBlc00CJbHhy1jkz4Yg==
   matrix:
     - TARGET: i686-pc-windows-msvc
       ARCH: x86
