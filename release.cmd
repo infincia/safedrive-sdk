@@ -53,9 +53,6 @@ cheddar -f "sddk\src\c_api.rs" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\include\
 
 ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-ECHO copying "target\%TARGET%\release\sddk.dll" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\sddk.dll"
-copy /y "target\%TARGET%\release\sddk.dll" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\sddk.dll" || goto :error
-
 ECHO copying "target\%TARGET%\release\sddk.lib" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\sddk.lib"
 copy /y "target\%TARGET%\release\sddk.lib" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\sddk.lib" || goto :error
 
