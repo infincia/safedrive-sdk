@@ -1447,6 +1447,15 @@ pub fn remote_rmdir(host: &str, port: u16, remote_path: &Path, username: &str, p
     }
 }
 
+pub fn remote_rm(host: &str, port: u16, remote_path: &Path, recursive: bool, username: &str, password: &str) -> Result<(), SDError> {
+    let mut remote_fs = RemoteFS::new(host, port, username, password);
+
+    match remote_fs.rm(remote_path, recursive) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e)),
+    }
+}
+
 pub fn remote_mv(host: &str, port: u16, remote_path: &Path, new_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
     let mut remote_fs = RemoteFS::new(host, port, username, password);
 
