@@ -1,4 +1,4 @@
-use ssh2::{Session, Sftp};
+use ssh2::{Session, Sftp, Channel};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf, Component};
 
@@ -183,7 +183,7 @@ impl<'a> RemoteFS<'a> {
         Ok(())
     }
 
-    pub fn rm(&mut self, remote_path: &Path) -> Result<(), SDError> {
+    pub fn rm(&mut self, remote_path: &Path, recursive: bool) -> Result<(), SDError> {
         self.connect()?;
 
         debug!("rm");
@@ -193,16 +193,38 @@ impl<'a> RemoteFS<'a> {
             None => return Err(SDError::Internal("no ssh session available".to_string()))
         };
 
-        let sftp: Sftp = match ses.sftp() {
-            Ok(sftp) => sftp,
-            Err(err) => return Err(SDError::Internal("no sftp channel available".to_string()))
-        };
+        // we use remote commands for recursive because SFTP has no "rm -r" equivalent in `unlink()`
+        if recursive {
+            let mut channel: Channel = match ses.channel_session() {
+                Ok(sftp) => sftp,
+                Err(err) => return Err(SDError::Internal("no exec channel available".to_string()))
+            };
 
-        debug!("rm: {}", remote_path.display());
+            debug!("rm -r: {}", remote_path.display());
 
-        sftp.unlink(remote_path)?;
+            match remote_path.to_str() {
+                Some(s) => {
+                    let command = format!("rm -rf {}", s);
 
-        Ok(())
+                    channel.exec(&command)?;
+
+                    Ok(())
+                },
+                None => Err(SDError::UnicodeError)
+            }
+        } else {
+            debug!("rm: {}", remote_path.display());
+
+            match ses.sftp() {
+                Ok(sftp) => {
+
+                    sftp.unlink(remote_path)?;
+
+                    Ok(())
+                },
+                Err(err) => Err(SDError::Internal("no sftp channel available".to_string()))
+            }
+        }
     }
 }
 
