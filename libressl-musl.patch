@@ -1,7 +1,5 @@
-diff --git a/crypto/compat/getentropy_linux.c b/crypto/compat/getentropy_linux.c
-index ac97658..d581204 100644
---- a/crypto/compat/getentropy_linux.c
-+++ b/crypto/compat/getentropy_linux.c
+--- crypto/compat/getentropy_linux.c
++++ crypto/compat/getentropy_linux.c
 @@ -27,9 +27,6 @@
  #include <sys/ioctl.h>
  #include <sys/resource.h>
