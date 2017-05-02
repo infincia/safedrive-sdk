@@ -1128,6 +1128,8 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
 ///
 ///     `context`: an opaque pointer the caller can pass in and get access to in the callback
 ///
+///     `context2`: an opaque pointer the caller can pass in and get access to in the callback
+///
 ///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
 ///     `recovery_phrase`: a pointer to a recovery phrase obtained by previous calls. can be null if
@@ -1139,6 +1141,8 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
 ///     `store_recovery_key(new_phrase)`: a pointer to a recovery phrase that should be stored by the app.
 ///                                       note that the pointer becomes invalid after the callback function
 ///                                       returns
+///
+///     `issue`: a C function pointer that will be called to report non-fatal key loading issues
 ///
 ///     `error`: an uninitialized pointer that will be allocated and initialized when the function
 ///              returns if the return value was -1
@@ -1175,11 +1179,16 @@ pub extern "C" fn sddk_remove_client(state: *mut SDDKState,
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
+                                 context2: *mut std::os::raw::c_void,
                                  state: *mut SDDKState,
                                  mut error: *mut *mut SDDKError,
                                  recovery_phrase: *const std::os::raw::c_char,
                                  store_recovery_key: extern fn(context: *mut std::os::raw::c_void,
-                                                               new_phrase: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
+                                                               context2: *mut std::os::raw::c_void,
+                                                               new_phrase: *mut std::os::raw::c_char),
+                                 issue: extern fn(context: *mut std::os::raw::c_void,
+                                                  context2: *mut std::os::raw::c_void,
+                                                  message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let phrase: Option<String> = unsafe {
@@ -1198,7 +1207,11 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
     let keyset = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         /// call back to C to store phrase
         let mut c_new_phrase = CString::new(new_phrase).unwrap();
-        store_recovery_key(context, c_new_phrase.into_raw());
+        store_recovery_key(context, context2, c_new_phrase.into_raw());
+    }, &|message| {
+        /// call back to C to report non-fatal issue with keys
+        let mut c_message = CString::new(message).unwrap();
+        issue(context, context2, c_message.into_raw());
     }) {
         Ok(ks) => ks,
         Err(err) => {

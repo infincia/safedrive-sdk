@@ -281,7 +281,7 @@ pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
     }
 }
 
-pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str)) -> Result<Keyset, SDError> {
+pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str), issue: &Fn(&str)) -> Result<Keyset, SDError> {
     /// generate new keys in all cases, the account *may* already have some stored, we only
     /// find out for sure while trying to store them.
     ///
@@ -315,7 +315,12 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
 
             if let Some(p) = recovery_phrase {
                 match real_wrapped_keyset.to_keyset(&p) {
-                    Ok(ks) => Ok(ks),
+                    Ok(ks) => {
+                        if !ks.has_ecc {
+                            issue("Warning: keys are legacy key type")
+                        }
+                        Ok(ks)
+                    },
                     Err(e) => {
                         warn!("failed to decrypt keys: {}", e);
                         Err(SDError::from(e))
@@ -324,6 +329,10 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
             } else if let Some(p) = new_wrapped_keyset.recovery_phrase() {
                 match real_wrapped_keyset.to_keyset(&p) {
                     Ok(ks) => {
+                        if !ks.has_ecc {
+                            issue("Warning: keys are legacy key type")
+                        }
+
                         /// a new keyset was generated so we must return the phrase to the caller so it
                         /// can be stored and displayed
                         store_recovery_key(&p);
