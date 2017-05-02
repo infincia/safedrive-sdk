@@ -17,6 +17,7 @@ ECHO building dependencies for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 mkdir "%BUILD_PREFIX%" > NUL
 mkdir "%BUILD_PREFIX%\lib" > NUL
 mkdir "%BUILD_PREFIX%\include" > NUL
+mkdir "%BUILD_PREFIX%\include\openssl" > NUL
 
 mkdir "%SRC_PREFIX%" > NUL
 mkdir build > NUL
