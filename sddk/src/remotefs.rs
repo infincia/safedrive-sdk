@@ -208,5 +208,170 @@ impl<'a> RemoteFS<'a> {
     }
 }
 
+#[cfg(test)]
+mod remote_fs_test {
+    use super::*;
+    use rand;
+    use rand::Rng;
+
+    static USERNAME: &str = env!("TEST_USER");
+    static USERNAME: &str = env!("TEST_PASSWORD");
+    
+    static HOST: &str = "sftp-client.safedrive.io";
+    static PORT: u16 = 2221;
+
+    #[test]
+    fn connect() {
+        let mut remote_fs = RemoteFS::new(HOST, PORT, USERNAME, PASSWORD);
+
+        match remote_fs.connect() {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+    }
+
+    #[test]
+    fn mkdir_flat() {
+        let mut remote_fs = RemoteFS::new(HOST, PORT, USERNAME, PASSWORD);
+        let s = rand::thread_rng()
+            .gen_ascii_chars()
+            .take(10)
+            .collect::<String>();
+        let root = PathBuf::from("/storage");
+
+        let path = root.join(format!("test-{}", s));
+
+        match remote_fs.mkdir(false, &path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+    }
+
+    #[test]
+    fn mkdir_recursive() {
+        let s = rand::thread_rng()
+            .gen_ascii_chars()
+            .take(10)
+            .collect::<String>();
+
+        let mut remote_fs = RemoteFS::new(HOST, PORT, USERNAME, PASSWORD);
+
+        let root = PathBuf::from("/storage");
+
+        let path = root.join(format!("test-{}/{}", s, s));
+
+        match remote_fs.mkdir(true, &path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+    }
+
+
+    #[test]
+    #[should_panic]
+    fn mkdir_nonrecursive_not_exists() {
+        let s = rand::thread_rng()
+            .gen_ascii_chars()
+            .take(10)
+            .collect::<String>();
+
+        let mut remote_fs = RemoteFS::new(HOST, PORT, USERNAME, PASSWORD);
+
+        let root = PathBuf::from("/storage");
+
+        let path = root.join(format!("test-{}/{}", s, s));
+
+        match remote_fs.mkdir(false, &path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+    }
+
+    #[test]
+    fn mv_flat() {
+        let mut remote_fs = RemoteFS::new(HOST, PORT, USERNAME, PASSWORD);
+        let s = rand::thread_rng()
+            .gen_ascii_chars()
+            .take(10)
+            .collect::<String>();
+        let root = PathBuf::from("/storage");
+
+        let path = root.join(format!("test-{}", s));
+
+        match remote_fs.mkdir(false, &path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+
+        let new_path = root.join(format!("testmoved-{}", s));
+
+
+        match remote_fs.mv(&path, &new_path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+    }
+
+    #[test]
+    fn rmdir_flat() {
+        let mut remote_fs = RemoteFS::new(HOST, PORT, USERNAME, PASSWORD);
+        let s = rand::thread_rng()
+            .gen_ascii_chars()
+            .take(10)
+            .collect::<String>();
+        let root = PathBuf::from("/storage");
+
+        let path = root.join(format!("test-{}", s));
+
+        match remote_fs.mkdir(false, &path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+
+        match remote_fs.rmdir(&path) {
+            Ok(()) => {
+
+            },
+            Err(err) => {
+                panic!("{}", err);
+                return;
+            },
+        };
+    }
 }
 
