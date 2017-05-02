@@ -656,6 +656,9 @@ pub fn sign_in() -> (Token, Keyset, AccountStatus) {
                 warn!("Recovery phrase could not be saved in keychain: {}", e);
             },
         }
+    }, &|message| {
+        warn!("{}", message);
+
     }) {
         Ok(keyset) => keyset,
         Err(e) => {
