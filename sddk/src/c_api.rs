@@ -1227,7 +1227,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
         },
     };
 
-    c.0.set_keys(Some(keyset.main), Some(keyset.hmac), Some(keyset.tweak));
+    c.0.set_keys(Some(keyset.master), Some(keyset.main), Some(keyset.hmac), Some(keyset.tweak));
     0
 }
 

@@ -35,7 +35,8 @@ impl State {
         }
     }
 
-    pub fn set_keys(&mut self, main_key: Option<Key>, hmac_key: Option<Key>, tweak_key: Option<Key>) {
+    pub fn set_keys(&mut self, master_key: Option<Key>, main_key: Option<Key>, hmac_key: Option<Key>, tweak_key: Option<Key>) {
+        self.master_key = master_key;
         self.main_key = main_key;
         self.hmac_key = hmac_key;
         self.tweak_key = tweak_key;
