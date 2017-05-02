@@ -697,5 +697,70 @@ public class SafeDriveSDK: NSObject {
             return
         }
     }
+    
+    // remote fs
+    
+    public func remoteFSCreateDirectory(path: String, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_remote_mkdir(self.state!, &error, path)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
+        }
+    }
+    
+    public func remoteFSDeleteDirectory(path: String, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_remote_rmdir(self.state!, &error, path)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
+        }
+    }
+    
+    public func remoteFSMoveDirectory(path: String, newPath: String, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            let res = sddk_remote_mv(self.state!, &error, path, newPath)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
+        }
+    }
 }
 
