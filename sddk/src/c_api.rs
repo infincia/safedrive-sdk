@@ -55,6 +55,7 @@ use core::send_error_report;
 use core::remote_mkdir;
 use core::remote_mv;
 use core::remote_rmdir;
+use core::remote_rm;
 
 use error::SDError;
 
@@ -3058,6 +3059,74 @@ pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut 
     let p = PathBuf::from(c_path);
 
     match remote_rmdir(c.0.get_host(), c.0.get_port(), &p, c.0.get_ssh_username(), c.0.get_account_password()) {
+        Ok(()) => 0,
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let boxed_error = Box::new(c_err);
+            let ptr = Box::into_raw(boxed_error);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Remove a path on the remote filesystem
+///
+/// Parameters:
+///
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
+///
+///              must be freed by the caller using `sddk_free_error()`
+///
+///     `remote_path`: a NULL terminated string representing the path of the directory to remove
+///
+///     `recursive`: an 8-bit integer representing a boolean where value >= 1 is true, 0 is false
+///
+///
+/// # Examples
+///
+/// ```c
+/// if (0 != sddk_remote_rm(state, &error, "/storage/test", 1) {
+///     printf("Failed to remove path");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Path removed");
+///
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remote_rm(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char, recursive: std::os::raw::c_uchar) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let c_path: String = unsafe {
+        assert!(!remote_path.is_null());
+
+        let c_path: &CStr = CStr::from_ptr(remote_path);
+
+        let path: String = match c_path.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(err) => panic!("string is not valid UTF-8: {}", err),
+        };
+
+        path
+    };
+
+    let p = PathBuf::from(c_path);
+
+    let c_recursive = recursive >= 1;
+
+
+    match remote_rm(c.0.get_host(), c.0.get_port(), &p, c_recursive, c.0.get_ssh_username(), c.0.get_account_password()) {
         Ok(()) => 0,
         Err(err) => {
             let c_err = SDDKError::from(err);
