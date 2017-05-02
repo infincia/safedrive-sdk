@@ -269,6 +269,30 @@ pub struct AccountStatus {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub enum AccountState {
+    Unknown,         // invalid state, display error or halt
+    #[serde(rename="active")]
+    Active,          // the SFTP connection will be continued by the client
+    #[serde(rename="trial")]
+    Trial,           // the SFTP connection will be continued by the client
+    #[serde(rename="trial-expired")]
+    TrialExpired,    // trial expired, trial expiration date will be returned
+                     // from the server and formatted with the user's locale format
+    #[serde(rename="expired")]
+    Expired,         // account expired, expiration date will be returned from
+                      // the server and formatted with the user's locale format
+    #[serde(rename="locked")]
+    Locked,          // account locked, date will be returned from the server
+                     // and formatted with the user's locale format
+    #[serde(rename="reset-password")]
+
+    ResetPassword,   // password being reset
+    #[serde(rename="pending-creation")]
+
+    PendingCreation, // account not ready yet
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AccountDetails {
     pub assignedStorage: u64,
     pub usedStorage: u64,
