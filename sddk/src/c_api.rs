@@ -1013,9 +1013,16 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 
     match login(&uid, &un, &pa) {
         Ok((token, account_status)) => {
-            c.0.set_account(Some(un.to_owned()), Some(pa.to_owned()));
-            c.0.set_api_token(Some(token));
-            c.0.set_unique_client_id(Some(uid));
+            {
+                let ref s = account_status;
+
+                c.0.set_account(Some(un.to_owned()), Some(pa.to_owned()));
+                c.0.set_api_token(Some(token));
+                c.0.set_unique_client_id(Some(uid));
+                c.0.set_host(Some(s.host.clone()));
+                c.0.set_port(Some(s.port));
+                c.0.set_ssh_username(Some(s.userName.clone()));
+            }
             let c_s = SDDKAccountStatus::from(account_status);
 
             let b = Box::new(c_s);
