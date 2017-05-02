@@ -52,6 +52,10 @@ use core::get_software_clients;
 
 use core::send_error_report;
 
+use core::remote_mkdir;
+use core::remote_mv;
+use core::remote_rmdir;
+
 use error::SDError;
 
 /// exports
@@ -2940,4 +2944,171 @@ pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetail
             }
         };
     }*/
+}
+
+
+/// Create a directory on the remote filesystem
+///
+/// Parameters:
+///
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///
+///     `remote_path`: a NULL terminated string representing the path of the directory to create
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_sync_sessions(&sessions, length);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let c_path: String = unsafe {
+        assert!(!remote_path.is_null());
+
+        let c_path: &CStr = CStr::from_ptr(remote_path);
+
+        let path: String = match c_path.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(err) => panic!("string is not valid UTF-8: {}", err),
+        };
+
+        path
+    };
+
+    let p = PathBuf::from(c_path);
+
+    match remote_mkdir(c.0.get_host(), c.0.get_port(), &p, c.0.get_ssh_username(), c.0.get_account_password()) {
+        Ok(()) => 0,
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let boxed_error = Box::new(c_err);
+            let ptr = Box::into_raw(boxed_error);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Remove a directory on the remote filesystem
+///
+/// Parameters:
+///
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///
+///     `remote_path`: a NULL terminated string representing the path of the directory to remove
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_sync_sessions(&sessions, length);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let c_path: String = unsafe {
+        assert!(!remote_path.is_null());
+
+        let c_path: &CStr = CStr::from_ptr(remote_path);
+
+        let path: String = match c_path.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(err) => panic!("string is not valid UTF-8: {}", err),
+        };
+
+        path
+    };
+
+    let p = PathBuf::from(c_path);
+
+    match remote_rmdir(c.0.get_host(), c.0.get_port(), &p, c.0.get_ssh_username(), c.0.get_account_password()) {
+        Ok(()) => 0,
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let boxed_error = Box::new(c_err);
+            let ptr = Box::into_raw(boxed_error);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
+}
+
+/// Move a directory on the remote filesystem
+///
+/// Parameters:
+///
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///
+///     `remote_path`: a NULL terminated string representing the path of the file to move
+///
+///     `new_path`: a NULL terminated string representing the new path of the file to move
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_sync_sessions(&sessions, length);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_remote_mv(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char, new_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let c_path: String = unsafe {
+        assert!(!remote_path.is_null());
+
+        let c_path: &CStr = CStr::from_ptr(remote_path);
+
+        let path: String = match c_path.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(err) => panic!("string is not valid UTF-8: {}", err),
+        };
+
+        path
+    };
+
+    let c_newpath: String = unsafe {
+        assert!(!new_path.is_null());
+
+        let c_newpath: &CStr = CStr::from_ptr(new_path);
+
+        let path: String = match c_newpath.to_str() {
+            Ok(s) => s.to_owned(),
+            Err(err) => panic!("string is not valid UTF-8: {}", err),
+        };
+
+        path
+    };
+
+    let path = PathBuf::from(c_path);
+
+    let new_path = PathBuf::from(c_newpath);
+
+    match remote_mv(c.0.get_host(), c.0.get_port(), &path, &new_path, c.0.get_ssh_username(), c.0.get_account_password()) {
+        Ok(()) => 0,
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let boxed_error = Box::new(c_err);
+            let ptr = Box::into_raw(boxed_error);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
 }
