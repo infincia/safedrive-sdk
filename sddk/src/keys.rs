@@ -131,6 +131,7 @@ impl WrappedKeyset {
                main: main_key,
                hmac: hmac_key,
                tweak: tweak_key,
+               has_ecc: self.master.has_ecc && self.main.has_ecc && self.hmac.has_ecc && self.tweak.has_ecc,
            })
     }
 
@@ -172,6 +173,7 @@ pub struct Keyset {
     pub main: Key,
     pub hmac: Key,
     pub tweak: Key,
+    pub has_ecc: bool,
 }
 
 impl Keyset {
