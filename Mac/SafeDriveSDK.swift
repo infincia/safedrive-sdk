@@ -133,20 +133,32 @@ public class SafeDriveSDK: NSObject {
         }
     }
 
-    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase, issue: @escaping Issue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
     
         DispatchQueue.global(priority: .default).async {
             
             var error: UnsafeMutablePointer<SDDKError>? = nil
             
-            let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self), self.state!, &error, recoveryPhrase) { (context, phrase) in
+            let res = sddk_load_keys(unsafeBitCast(storePhrase, to: UnsafeMutableRawPointer.self),
+                                     unsafeBitCast(issue, to: UnsafeMutableRawPointer.self),
+                                     self.state!,
+                                     &error,
+                                     recoveryPhrase,
+                                     { (context, context2, phrase) in
                 // call back to Swift to save the phrase somewhere
                 let b = unsafeBitCast(context, to: SaveRecoveryPhrase.self)
                 let p = String(cString: phrase!)
                 var m = phrase
                 b(p)
                 sddk_free_string(&m)
-            }
+            }, { (context, context2, message) in
+                // call back to Swift to report the issue
+                let b = unsafeBitCast(context2, to: Issue.self)
+                let p = String(cString: message!)
+                var m = message
+                b(p)
+                sddk_free_string(&m)
+            })
             defer {
                 if res == -1 {
                     sddk_free_error(&error)
