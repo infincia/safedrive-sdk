@@ -44,6 +44,8 @@ use TOKEN;
 
 use session::{SyncSession, WrappedSyncSession};
 
+use remotefs::RemoteFS;
+
 /// crypto exports
 
 pub fn sha256(input: &[u8]) -> String {
@@ -1426,3 +1428,32 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
         Err(e) => Err(SDError::from(e)),
     }
 }
+
+pub fn remote_mkdir(host: &str, port: u16, remote_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
+    let mut remote_fs = RemoteFS::new(host, port, username, password);
+
+    match remote_fs.mkdir(true, remote_path) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e)),
+    }
+}
+
+pub fn remote_rmdir(host: &str, port: u16, remote_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
+    let mut remote_fs = RemoteFS::new(host, port, username, password);
+
+    match remote_fs.rmdir(remote_path) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e)),
+    }
+}
+
+pub fn remote_mv(host: &str, port: u16, remote_path: &Path, new_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
+    let mut remote_fs = RemoteFS::new(host, port, username, password);
+
+    match remote_fs.mv(remote_path, new_path) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(SDError::from(e)),
+    }
+}
+
+
