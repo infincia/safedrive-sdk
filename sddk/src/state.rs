@@ -12,6 +12,7 @@ pub struct State {
     pub username: Option<String>,
     pub password: Option<String>,
     pub api_token: Option<Token>,
+    pub master_key: Option<Key>,
     pub main_key: Option<Key>,
     pub hmac_key: Option<Key>,
     pub tweak_key: Option<Key>,
@@ -27,6 +28,7 @@ impl State {
             username: None,
             password: None,
             api_token: None,
+            master_key: None,
             main_key: None,
             hmac_key: None,
             tweak_key: None,
@@ -127,6 +129,14 @@ impl State {
         };
         password
 
+    }
+
+    pub fn get_master_key(&self) -> &Key {
+        let key = match self.master_key {
+            Some(ref key) => key,
+            None => panic!("Attempted to use master key before it was set"),
+        };
+        key
     }
 
     pub fn get_main_key(&self) -> &Key {
