@@ -26,5 +26,6 @@ public enum SDKLogLevel: UInt8 {
 public enum RemoteFSOperation {
     case createFolder
     case deleteFolder
+    case deletePath(recursive: Bool)
     case moveFolder
 }
