@@ -44,7 +44,7 @@ public struct SDSyncSession {
 }
 
 public struct AccountStatus {
-    public let status: Optional<String>
+    public let state: AccountState
     public let host: String
     public let port: UInt16
     public let userName: String

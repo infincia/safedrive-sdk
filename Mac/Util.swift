@@ -10,21 +10,21 @@ import Foundation
 import SDDK
 // MARK: Private
 
-func AccountStateFromString(_ string: String) -> AccountState {
-    switch string {
-    case "active":
+func AccountStateFromSDDKAcountState(_ state: SDDKAccountState) -> AccountState {
+    switch state {
+    case SDDKAccountStateUnknown:
+        return .unknown
+    case SDDKAccountStateActive:
         return .active
-    case "trial":
+    case SDDKAccountStateTrial:
         return .trial
-    case "trial-expired":
+    case SDDKAccountStateTrialExpired:
         return .trialExpired
-    case "expired":
-        return .expired
-    case "locked":
+    case SDDKAccountStateLocked:
         return .locked
-    case "reset-password":
+    case SDDKAccountStateResetPassword:
         return .resetPassword
-    case "pending-creation":
+    case SDDKAccountStatePendingCreation:
         return .pendingCreation
     default:
         return .unknown
@@ -32,15 +32,12 @@ func AccountStateFromString(_ string: String) -> AccountState {
 }
 
 func SDDKAccountStatusToAccountStatus(account_status: SDDKAccountStatus) -> AccountStatus {
-    var s: Optional<String> = nil
-    if account_status.status != nil {
-        s = String(cString: account_status.status)
-    }
+    let state = AccountStateFromSDDKAcountState(account_status.state)
     var t: Optional<UInt64> = nil
     if account_status.time != nil {
         t = account_status.time.pointee
     }
-    let accountStatus = AccountStatus(status: s, host: String(cString: account_status.host), port: account_status.port, userName: String(cString: account_status.user_name), time: t)
+    let accountStatus = AccountStatus(state: state, host: String(cString: account_status.host), port: account_status.port, userName: String(cString: account_status.user_name), time: t)
     
     return accountStatus
 }
