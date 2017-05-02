@@ -160,8 +160,8 @@ del /q libssh2-%LIBSSH2_VER%
 7z x -y "%SRC_PREFIX%\libssh2-%LIBSSH2_VER%.tar.gz" || goto :error
 7z x -y "libssh2-%LIBSSH2_VER%.tar" || goto :error
 pushd libssh2-%LIBSSH2_VER%
-@echo building libssh2
-cmake . -G"!VS!!SSH2_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=Release" -D"CRYPTO_BACKEND=WinCNG"
+@echo building libssh2 for "!VS!!LIBRESSL_GENERATOR_PLATFORM!"
+cmake . -G"!VS!!SSH2_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=Release" -D"OPENSSL_USE_STATIC_LIBS=TRUE" -D"CRYPTO_BACKEND=OpenSSL" -D"OPENSSL_ROOT_DIR="%BUILD_PREFIX%\\" -D"OPENSSL_INCLUDE_DIR="%BUILD_PREFIX%\include\\"
 msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%SSH2_PLATFORM%;PlatformToolset=%TOOLSET% libssh2.sln || goto :error
 popd
 del /q libssh2-%LIBSSH2_VER%
