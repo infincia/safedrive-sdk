@@ -185,5 +185,28 @@ impl<'a> RemoteFS<'a> {
         Ok(())
     }
 
+    pub fn rm(&mut self, remote_path: &Path) -> Result<(), SDError> {
+        self.connect()?;
+
+        debug!("rm");
+
+        let ses: &Session = match self.session {
+            Some(ref ses) => ses,
+            None => return Err(SDError::Internal("no ssh session available".to_string()))
+        };
+
+        let sftp: Sftp = match ses.sftp() {
+            Ok(sftp) => sftp,
+            Err(err) => return Err(SDError::Internal("no sftp channel available".to_string()))
+        };
+
+        debug!("rm: {}", remote_path.display());
+
+        sftp.unlink(remote_path)?;
+
+        Ok(())
+    }
+}
+
 }
 
