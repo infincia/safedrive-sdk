@@ -24,7 +24,7 @@ mkdir build > NUL
 IF "%ARCH%"=="x86_64" (
     set PLATFORM=x64
     set SSH2_PLATFORM=x64
-    set SSH2_GENERATOR_PLATFORM=" Win64"
+    set SSH2_GENERATOR_PLATFORM= Win64
 )
 
 IF "%ARCH%"=="x86" (
