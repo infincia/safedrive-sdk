@@ -742,6 +742,32 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
+    public func remoteFSDeletePath(path: String, recursive: Bool, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+        
+        DispatchQueue.global(priority: .default).async {
+            var error: UnsafeMutablePointer<SDDKError>? = nil
+            
+            var c_recursive: UInt8 = 0
+            if recursive {
+                c_recursive = 1
+            }
+            
+            let res = sddk_remote_rm(self.state!, &error, path, c_recursive)
+            defer {
+                if res == -1 {
+                    sddk_free_error(&error)
+                }
+            }
+            switch res {
+            case 0:
+                queue.async { success() }
+            default:
+                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                queue.async { failure(e) }
+            }
+        }
+    }
+    
     public func remoteFSMoveDirectory(path: String, newPath: String, completionQueue queue: DispatchQueue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
