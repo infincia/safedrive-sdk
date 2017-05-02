@@ -41,7 +41,6 @@
 		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Mac/Constants.swift; sourceTree = "<group>"; };
 		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist/x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
-		AA8CCDC91E2947B90002B1FF /* libsddk.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsddk.dylib; path = "dist/x86_64-apple-darwin/lib/libsddk.dylib"; sourceTree = "<group>"; };
 		AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeDriveSDKTests.swift; sourceTree = "<group>"; };
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Mac/SafeDriveSDK.swift; sourceTree = "<group>"; };
 		AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafeDriveSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,7 +105,6 @@
 				AA3808701EB7B47400BA5F3E /* libsddk.a */,
 				AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */,
 				AA8CCDC81E2947B90002B1FF /* sddk.h */,
-				AA8CCDC91E2947B90002B1FF /* libsddk.dylib */,
 			);
 			name = libsddk;
 			sourceTree = "<group>";
