@@ -215,7 +215,7 @@ mod remote_fs_test {
     use rand::Rng;
 
     static USERNAME: &str = env!("TEST_USER");
-    static USERNAME: &str = env!("TEST_PASSWORD");
+    static PASSWORD: &str = env!("TEST_PASSWORD");
     
     static HOST: &str = "sftp-client.safedrive.io";
     static PORT: u16 = 2221;
