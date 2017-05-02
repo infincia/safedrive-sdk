@@ -208,7 +208,10 @@ impl WrappedKey {
 
         // short path if the key has no ecc info
         if key.len() == 48 {
+            warn!("Key type {} is a legacy key", key_type);
             return Ok(WrappedKey::from(key, key_type));
+        } else {
+            info!("Key type {} is a modern ECC key", key_type);
         }
 
         let recovered = WrappedKey::from_rs(key, key_type)?;
