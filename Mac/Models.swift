@@ -66,6 +66,30 @@ public enum AccountState {
     case pendingCreation // account not ready yet
 }
 
+extension AccountState : CustomStringConvertible {
+     public var description: String {
+        switch self {
+        case .unknown:
+            return NSLocalizedString("unknown", comment: "account status")
+        case .active:
+            return NSLocalizedString("active", comment: "account status")
+        case .trial:
+            return NSLocalizedString("trial", comment: "account status")
+        case .trialExpired:
+            return NSLocalizedString("trial expired", comment: "account status")
+        case .expired:
+            return NSLocalizedString("expired", comment: "account status")
+        case .locked:
+            return NSLocalizedString("locked", comment: "account status")
+        case .resetPassword:
+            return NSLocalizedString("reset password", comment: "account status")
+        case .pendingCreation:
+            return NSLocalizedString("pending creation", comment: "account status")
+        }
+    }
+}
+
+
 
 public struct SoftwareClient {
     public let uniqueClientID: String
