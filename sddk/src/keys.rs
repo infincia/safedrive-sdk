@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 
 /// external crate imports
 
@@ -5,6 +6,7 @@ use bip39::{Bip39, Language};
 use rustc_serialize::hex::{ToHex, FromHex};
 use reed_solomon::Encoder as RSEncoder;
 use reed_solomon::Decoder as RSDecoder;
+use reed_solomon::Buffer as RSBuffer;
 
 /// internal imports
 
@@ -198,7 +200,15 @@ impl WrappedKey {
 
         let dec = RSDecoder::new(KEY_ECC_LEN);
 
-        let recovered = dec.correct(&mut key, None)?;
+        let recovered: RSBuffer = dec.correct(&mut key, None)?;
+
+        let recovered_data = recovered.data();
+        let original_data = &key[..recovered.data().len()];
+        if &recovered_data != &original_data {
+            warn!("KEY CORRUPTION DETECTED: {}", key_type);
+            warn!("KEY CORRUPTION ORIGINAL: {:?}", original_data);
+            warn!("KEY CORRUPTION RECOVERED: {:?}", recovered_data);
+        }
 
         Ok(WrappedKey::from(recovered.data().to_vec(), key_type))
     }
