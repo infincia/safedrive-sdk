@@ -2189,12 +2189,12 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
 ///
 /// Parameters:
 ///
-///     state: an opaque pointer obtained from calling `sddk_initialize()`
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
-///     error: an uninitialized pointer that will be allocated and initialized when the function
-///            returns if the return value was -1
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
 ///
-///            must be freed by the caller using `sddk_free_error()`
+///              must be freed by the caller using `sddk_free_error()`
 ///
 /// Return:
 ///
@@ -2953,13 +2953,26 @@ pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetail
 ///
 ///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
+///
+///              must be freed by the caller using `sddk_free_error()`
+///
 ///     `remote_path`: a NULL terminated string representing the path of the directory to create
 ///
 ///
 /// # Examples
 ///
 /// ```c
-///sddk_free_sync_sessions(&sessions, length);
+/// if (0 != sddk_remote_mkdir(state, &error, "/storage/test") {
+///     printf("Failed to create directory");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Directory created");
+///
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -3003,13 +3016,26 @@ pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut 
 ///
 ///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
+///
+///              must be freed by the caller using `sddk_free_error()`
+///
 ///     `remote_path`: a NULL terminated string representing the path of the directory to remove
 ///
 ///
 /// # Examples
 ///
 /// ```c
-///sddk_free_sync_sessions(&sessions, length);
+/// if (0 != sddk_remote_rmdir(state, &error, "/storage/test") {
+///     printf("Failed to remove directory");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Directory removed");
+///
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
@@ -3053,6 +3079,11 @@ pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut 
 ///
 ///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
 ///
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
+///
+///              must be freed by the caller using `sddk_free_error()`
+///
 ///     `remote_path`: a NULL terminated string representing the path of the file to move
 ///
 ///     `new_path`: a NULL terminated string representing the new path of the file to move
@@ -3060,7 +3091,15 @@ pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut 
 /// # Examples
 ///
 /// ```c
-///sddk_free_sync_sessions(&sessions, length);
+/// if (0 != sddk_remote_mv(state, &error, "/storage/test", "/storage/test2") {
+///     printf("Failed to move path");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Path moved");
+///
+/// }
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
