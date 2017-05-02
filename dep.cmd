@@ -25,12 +25,16 @@ IF "%ARCH%"=="x86_64" (
     set PLATFORM=x64
     set SSH2_PLATFORM=x64
     set SSH2_GENERATOR_PLATFORM= Win64
+    set LIBRESSL_PLATFORM=x64
+    set LIBRESSL_GENERATOR_PLATFORM= Win64
 )
 
 IF "%ARCH%"=="x86" (
     set PLATFORM=Win32
     set SSH2_PLATFORM=Win32
     set SSH2_GENERATOR_PLATFORM=
+    set LIBRESSL_PLATFORM=Win32
+    set LIBRESSL_GENERATOR_PLATFORM=
 )
 
 IF "%TOOLSET%"=="v120_xp" (
@@ -51,6 +55,9 @@ set SODIUM_VER_FILE="%BUILD_PREFIX%\sodium_ver"
 set LIBSSH2_VER=1.8.0
 set LIBSSH2_VER_FILE="%BUILD_PREFIX%\ssh2_ver"
 
+set LIBRESSL_VER=2.5.3
+set LIBRESSL_VER_FILE="%BUILD_PREFIX%\libressl_ver"
+
 pushd "%SRC_PREFIX%"
 
 IF NOT EXIST libsodium-%SODIUM_VER%.tar.gz (
@@ -63,10 +70,16 @@ IF NOT EXIST libssh2-%LIBSSH2_VER%.tar.gz (
     curl -L https://www.libssh2.org/download/libssh2-%LIBSSH2_VER%.tar.gz -o libssh2-%LIBSSH2_VER%.tar.gz
 )
 
+IF NOT EXIST libressl-%LIBRESSL_VER%.tar.gz (
+    @echo downloading libressl
+    curl -L https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-%LIBRESSL_VER%.tar.gz -o libressl-%LIBRESSL_VER%.tar.gz
+)
+
 popd
 
 IF NOT EXIST "%SRC_PREFIX%\libsodium-%SODIUM_VER%.tar.gz" goto :error
 IF NOT EXIST "%SRC_PREFIX%\libssh2-%LIBSSH2_VER%.tar.gz" goto :error
+IF NOT EXIST "%SRC_PREFIX%\libressl-%LIBRESSL_VER%.tar.gz" goto :error
 
 
 :checksodium
@@ -74,7 +87,7 @@ IF NOT EXIST "%SRC_PREFIX%\libssh2-%LIBSSH2_VER%.tar.gz" goto :error
 IF NOT EXIST "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%" goto :buildsodium
 
 findstr /c:"%SODIUM_VER%" %SODIUM_VER_FILE% > NUL || goto :buildsodium
-goto :checkssh2
+goto :checklibressl
 
 
 
@@ -93,6 +106,38 @@ del /q libsodium-%SODIUM_VER%
 @echo copying "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%"
 copy /y "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%" || goto :error
 @echo %SODIUM_VER%> %SODIUM_VER_FILE%
+popd
+goto :checklibressl
+
+
+
+:checklibressl
+
+IF NOT EXIST "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%" goto :buildlibressl
+
+findstr /c:"%LIBRESSL_VER%" %LIBRESSL_VER_FILE% > NUL || goto :buildlibressl
+goto :checkssh2
+
+:buildlibressl
+
+pushd build
+@echo unpacking libressl source
+del /q libressl-%LIBRESSL_VER%
+7z x -y "%SRC_PREFIX%\libressl-%LIBRESSL_VER%.tar.gz" || goto :error
+7z x -y "libressl-%LIBRESSL_VER%.tar" || goto :error
+pushd libressl-%LIBRESSL_VER%
+@echo building libressl for "!VS!!LIBRESSL_GENERATOR_PLATFORM!"
+cmake . -G"!VS!!LIBRESSL_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=Release"
+msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%LIBRESSL_PLATFORM%;PlatformToolset=%TOOLSET% libressl.sln || goto :error
+popd
+del /q libressl-%LIBRESSL_VER%
+@echo copying "%BUILD_PREFIX%\lib\libssl.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%"
+copy /y "%BUILD_PREFIX%\lib\libssl.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%" || goto :error
+@echo copying "%BUILD_PREFIX%\lib\libtls.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%"
+copy /y "%BUILD_PREFIX%\lib\libtls.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%" || goto :error
+@echo copying "%BUILD_PREFIX%\lib\libcrypto.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\crypto.%LIBSUFFIX%"
+copy /y "%BUILD_PREFIX%\lib\libcrypto.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\crypto.%LIBSUFFIX%" || goto :error
+@echo %LIBRESSL_VER%> %LIBRESSL_VER_FILE%
 popd
 goto :checkssh2
 
