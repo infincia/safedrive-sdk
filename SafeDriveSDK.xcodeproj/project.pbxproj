@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		AA3808721EB7B4AB00BA5F3E /* libsddk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA3808701EB7B47400BA5F3E /* libsddk.a */; };
 		AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA686A1D1E81C0AA00C9F33B /* Constants.swift */; };
+		AA789B141EB81C5700883240 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA789B131EB81C5700883240 /* Util.swift */; };
+		AA789B161EB81C7000883240 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA789B151EB81C7000883240 /* Models.swift */; };
+		AA789B181EB81D2900883240 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA789B171EB81D2900883240 /* Errors.swift */; };
 		AA80B0C21D6F963F00512FC7 /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AA97A1AD1E2C64C100CAAD19 /* SafeDriveSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */; };
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
@@ -40,6 +43,9 @@
 		AA3808701EB7B47400BA5F3E /* libsddk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsddk.a; path = "dist/x86_64-apple-darwin/lib/libsddk.a"; sourceTree = "<group>"; };
 		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Mac/Constants.swift; sourceTree = "<group>"; };
+		AA789B131EB81C5700883240 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Util.swift; path = Mac/Util.swift; sourceTree = "<group>"; };
+		AA789B151EB81C7000883240 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Models.swift; path = Mac/Models.swift; sourceTree = "<group>"; };
+		AA789B171EB81D2900883240 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Mac/Errors.swift; sourceTree = "<group>"; };
 		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist/x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
 		AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeDriveSDKTests.swift; sourceTree = "<group>"; };
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Mac/SafeDriveSDK.swift; sourceTree = "<group>"; };
@@ -121,6 +127,9 @@
 		AAE34C781CF8EAAA0067B401 = {
 			isa = PBXGroup;
 			children = (
+				AA789B171EB81D2900883240 /* Errors.swift */,
+				AA789B151EB81C7000883240 /* Models.swift */,
+				AA789B131EB81C5700883240 /* Util.swift */,
 				AA686A1D1E81C0AA00C9F33B /* Constants.swift */,
 				AABFDD551DC4E91000B4EAC7 /* Frameworks */,
 				AAAD312F1EB14B3E00221427 /* Supporting Files */,
@@ -278,7 +287,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */,
+				AA789B181EB81D2900883240 /* Errors.swift in Sources */,
+				AA789B141EB81C5700883240 /* Util.swift in Sources */,
 				AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */,
+				AA789B161EB81C7000883240 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
