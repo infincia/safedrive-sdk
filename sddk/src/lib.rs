@@ -64,7 +64,6 @@ mod sessionfs;
 mod sdlog;
 #[cfg(feature = "webui")]
 mod webui;
-#[cfg(target_os = "macos")]
 mod remotefs;
 
 /// public API
@@ -82,7 +81,6 @@ pub use keychain::KeychainService;
 #[cfg(feature = "sessionfs")]
 pub use sessionfs::*;
 
-#[cfg(target_os = "macos")]
 pub use remotefs::RemoteFS;
 
 
@@ -111,7 +109,6 @@ extern crate time;
 
 extern crate keyring;
 
-#[cfg(target_os = "macos")]
 extern crate ssh2;
 
 #[cfg(feature = "sessionfs")]

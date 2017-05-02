@@ -1,5 +1,3 @@
-#![cfg(target_os = "macos")]
-
 use ssh2::{Session, Sftp};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf, Component};
