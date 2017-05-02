@@ -1,0 +1,10 @@
+--- rsync.h.old	2015-08-08 15:47:03.000000000 -0400
++++ rsync.h	2017-04-30 13:10:37.000000000 -0400
+@@ -1291,3 +1291,7 @@
+ #ifdef MAINTAINER_MODE
+ const char *get_panic_action(void);
+ #endif
++
++#ifdef __APPLE__
++void bg_thread_handler();
++#endif
