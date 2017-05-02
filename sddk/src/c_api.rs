@@ -84,6 +84,34 @@ impl From<Notification> for SDDKNotification {
 
 #[derive(Debug)]
 #[repr(C)]
+pub enum SDDKAccountState {
+    SDDKAccountStateUnknown,
+    SDDKAccountStateActive,
+    SDDKAccountStateTrial,
+    SDDKAccountStateTrialExpired,
+    SDDKAccountStateExpired,
+    SDDKAccountStateLocked,
+    SDDKAccountStateResetPassword,
+    SDDKAccountStatePendingCreation,
+}
+
+impl From<AccountState> for SDDKAccountState {
+    fn from(e: AccountState) -> SDDKAccountState {
+        match e {
+            AccountState::Unknown => SDDKAccountState::SDDKAccountStateUnknown,
+            AccountState::Active => SDDKAccountState::SDDKAccountStateActive,
+            AccountState::Trial => SDDKAccountState::SDDKAccountStateTrial,
+            AccountState::TrialExpired => SDDKAccountState::SDDKAccountStateTrialExpired,
+            AccountState::Expired => SDDKAccountState::SDDKAccountStateExpired,
+            AccountState::Locked => SDDKAccountState::SDDKAccountStateLocked,
+            AccountState::ResetPassword => SDDKAccountState::SDDKAccountStateResetPassword,
+            AccountState::PendingCreation => SDDKAccountState::SDDKAccountStatePendingCreation,
+        }
+    }
+}
+
+#[derive(Debug)]
+#[repr(C)]
 pub struct SDDKAccountStatus {
     pub status: *const std::os::raw::c_char,
     pub host: *const std::os::raw::c_char,
