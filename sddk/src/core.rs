@@ -317,8 +317,8 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                 match real_wrapped_keyset.to_keyset(&p) {
                     Ok(ks) => Ok(ks),
                     Err(e) => {
-                        debug!("failed to decrypt keys: {}", e);
-                        Err(SDError::RecoveryPhraseIncorrect)
+                        warn!("failed to decrypt keys: {}", e);
+                        Err(SDError::from(e))
                     },
                 }
             } else if let Some(p) = new_wrapped_keyset.recovery_phrase() {
@@ -330,7 +330,7 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                         Ok(ks)
                     },
                     Err(e) => {
-                        debug!("failed to decrypt keys: {}", e);
+                        warn!("failed to decrypt keys: {}", e);
                         Err(SDError::from(e))
                     },
                 }
