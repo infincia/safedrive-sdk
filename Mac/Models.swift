@@ -19,6 +19,8 @@ public typealias SyncSessionIssue = @convention(block) (_ message: String) -> Vo
 
 public typealias SaveRecoveryPhrase = @convention(block) (_ phrase: String) -> Void
 
+public typealias Issue = @convention(block) (_ message: String) -> Void
+
 
 public enum SDKConfiguration {
     case Production
