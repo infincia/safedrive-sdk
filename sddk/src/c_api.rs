@@ -32,7 +32,7 @@ use core::cancel_sync_task;
 
 use constants::Configuration;
 
-use models::{RegisteredFolder, AccountStatus, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
+use models::{RegisteredFolder, AccountStatus, AccountState, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
 
 use keychain::KeychainService;
 use core::get_keychain_item;
@@ -113,7 +113,7 @@ impl From<AccountState> for SDDKAccountState {
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKAccountStatus {
-    pub status: *const std::os::raw::c_char,
+    pub state: SDDKAccountState,
     pub host: *const std::os::raw::c_char,
     pub port: u16,
     pub user_name: *const std::os::raw::c_char,
@@ -123,11 +123,11 @@ pub struct SDDKAccountStatus {
 impl From<AccountStatus> for SDDKAccountStatus {
     fn from(status: AccountStatus) -> SDDKAccountStatus {
         SDDKAccountStatus {
-            status: {
-                if let Some(s) = status.status {
-                    CString::new(s.as_str()).unwrap().into_raw()
+            state: {
+                if let Some(state) = status.state {
+                    SDDKAccountState::from(state)
                 } else {
-                    std::ptr::null()
+                    SDDKAccountState::SDDKAccountStateUnknown
                 }
             },
             host: CString::new(status.host.as_str()).unwrap().into_raw(),
@@ -2896,11 +2896,6 @@ pub extern "C" fn sddk_free_error(error: *mut *mut SDDKError) {
 pub extern "C" fn sddk_free_account_status(status: *mut *mut SDDKAccountStatus) {
     assert!(!status.is_null());
     let s: Box<SDDKAccountStatus> = unsafe { Box::from_raw(*status) };
-    if !s.status.is_null() {
-        let _ = unsafe {
-            CString::from_raw(s.status as *mut std::os::raw::c_char)
-        };
-    }
     if !s.time.is_null() {
         let _ = unsafe {
             Box::from_raw(s.time as *mut std::os::raw::c_ulonglong)

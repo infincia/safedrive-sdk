@@ -261,7 +261,8 @@ pub struct CreateFolderResponse {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountStatus {
-    pub status: Option<String>,
+    #[serde(rename="status")]
+    pub state: Option<AccountState>,
     pub host: String,
     pub port: u16,
     pub userName: String,
