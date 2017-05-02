@@ -184,6 +184,7 @@ impl Keyset {
 pub struct WrappedKey {
     bytes: Vec<u8>,
     key_type: KeyType,
+    has_ecc: bool,
 }
 
 impl WrappedKey {
@@ -192,6 +193,7 @@ impl WrappedKey {
         WrappedKey {
             bytes: key,
             key_type: key_type,
+            has_ecc: false,
         }
     }
 
@@ -224,7 +226,8 @@ impl WrappedKey {
             info!("Key type {} is a modern ECC key", key_type);
         }
 
-        let recovered = WrappedKey::from_rs(key, key_type)?;
+        let mut recovered = WrappedKey::from_rs(key, key_type)?;
+        recovered.has_ecc = true;
 
         Ok(recovered)
     }
