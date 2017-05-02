@@ -129,6 +129,8 @@ pushd libressl-%LIBRESSL_VER%
 @echo building libressl for "!VS!!LIBRESSL_GENERATOR_PLATFORM!"
 cmake . -G"!VS!!LIBRESSL_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=Release"
 msbuild /m /v:n /p:Configuration=%CONFIGURATION%;Platform=%LIBRESSL_PLATFORM%;PlatformToolset=%TOOLSET% libressl.sln || goto :error
+@echo copying "include\openssl" to "%BUILD_PREFIX%\include\"
+copy /y "include\openssl"  "%BUILD_PREFIX%\include\openssl\" || goto :error
 @echo copying "ssl\%CONFIGURATION%\ssl.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%"
 copy /y "ssl\%CONFIGURATION%\ssl.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%" || goto :error
 @echo copying "tls\%CONFIGURATION%\tls.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%"
