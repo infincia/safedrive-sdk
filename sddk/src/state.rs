@@ -6,6 +6,9 @@ use models::Token;
 #[derive(Debug)]
 pub struct State {
     pub unique_client_id: Option<String>,
+    pub host: Option<String>,
+    pub port: Option<u16>,
+    pub ssh_username: Option<String>,
     pub username: Option<String>,
     pub password: Option<String>,
     pub api_token: Option<Token>,
@@ -18,6 +21,9 @@ impl State {
     pub fn new() -> State {
         State {
             unique_client_id: None,
+            host: None,
+            port: None,
+            ssh_username: None,
             username: None,
             password: None,
             api_token: None,
@@ -57,6 +63,45 @@ impl State {
             None => panic!("Attempted to use unique client id before it was set"),
         };
         uid
+    }
+
+    pub fn set_host(&mut self, host: Option<String>) {
+        self.host = host;
+    }
+
+    #[allow(dead_code)]
+    pub fn get_host(&self) -> &str {
+        let host = match self.host {
+            Some(ref host) => host,
+            None => panic!("Attempted to use host before it was set"),
+        };
+        host
+    }
+
+    pub fn set_port(&mut self, port: Option<u16>) {
+        self.port = port;
+    }
+
+    #[allow(dead_code)]
+    pub fn get_port(&self) -> u16 {
+        let port = match self.port {
+            Some(port) => port,
+            None => panic!("Attempted to use port before it was set"),
+        };
+        port
+    }
+
+    pub fn set_ssh_username(&mut self, ssh_username: Option<String>) {
+        self.ssh_username = ssh_username;
+    }
+
+    #[allow(dead_code)]
+    pub fn get_ssh_username(&self) -> &str {
+        let ssh_username = match self.ssh_username {
+            Some(ref ssh_username) => ssh_username,
+            None => panic!("Attempted to use ssh username before it was set"),
+        };
+        ssh_username
     }
 
     pub fn set_account(&mut self, username: Option<String>, password: Option<String>) {
