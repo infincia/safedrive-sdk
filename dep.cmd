@@ -128,16 +128,16 @@ del /q libressl-%LIBRESSL_VER%
 pushd libressl-%LIBRESSL_VER%
 @echo building libressl for "!VS!!LIBRESSL_GENERATOR_PLATFORM!"
 cmake . -G"!VS!!LIBRESSL_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=Release"
-msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%LIBRESSL_PLATFORM%;PlatformToolset=%TOOLSET% libressl.sln || goto :error
+msbuild /m /v:n /p:Configuration=%CONFIGURATION%;Platform=%LIBRESSL_PLATFORM%;PlatformToolset=%TOOLSET% libressl.sln || goto :error
+@echo copying "ssl\%CONFIGURATION%\ssl.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%"
+copy /y "ssl\%CONFIGURATION%\ssl.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%" || goto :error
+@echo copying "tls\%CONFIGURATION%\tls.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%"
+copy /y "tls\%CONFIGURATION%\tls.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%" || goto :error
+@echo copying "crypto\%CONFIGURATION%\crypto.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\crypto.%LIBSUFFIX%"
+copy /y "crypto\%CONFIGURATION%\crypto.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\crypto.%LIBSUFFIX%" || goto :error
+@echo %LIBRESSL_VER%> %LIBRESSL_VER_FILE%
 popd
 del /q libressl-%LIBRESSL_VER%
-@echo copying "%BUILD_PREFIX%\lib\libssl.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%"
-copy /y "%BUILD_PREFIX%\lib\libssl.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%" || goto :error
-@echo copying "%BUILD_PREFIX%\lib\libtls.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%"
-copy /y "%BUILD_PREFIX%\lib\libtls.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\tls.%LIBSUFFIX%" || goto :error
-@echo copying "%BUILD_PREFIX%\lib\libcrypto.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\crypto.%LIBSUFFIX%"
-copy /y "%BUILD_PREFIX%\lib\libcrypto.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\crypto.%LIBSUFFIX%" || goto :error
-@echo %LIBRESSL_VER%> %LIBRESSL_VER_FILE%
 popd
 goto :checkssh2
 
