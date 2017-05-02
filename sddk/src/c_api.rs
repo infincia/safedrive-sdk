@@ -1188,7 +1188,7 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
                                                                new_phrase: *mut std::os::raw::c_char),
                                  issue: extern fn(context: *mut std::os::raw::c_void,
                                                   context2: *mut std::os::raw::c_void,
-                                                  message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
+                                                  message: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
     let phrase: Option<String> = unsafe {
