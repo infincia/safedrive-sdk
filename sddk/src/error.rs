@@ -370,6 +370,13 @@ impl From<::ssh2::Error> for SDError {
 }
 
 
+impl From<::serde_json::Error> for SDError {
+    fn from(e: ::serde_json::Error) -> SDError {
+        match e {
+            _ => SDError::KeyCorrupted
+        }
+    }
+}
 
 #[derive(Debug)]
 pub enum SDAPIError {
