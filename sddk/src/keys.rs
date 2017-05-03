@@ -460,6 +460,32 @@ fn keyset_generate_test() {
 }
 
 #[test]
+fn keyset_backup_test() {
+    let wks = match WrappedKeyset::new() {
+        Ok(wks) => wks,
+        Err(_) => {
+            assert!(true == false);
+            return;
+        },
+    };
+
+    let cargo_path: &str = env!("CARGO_MANIFEST_DIR");
+
+
+    let mut p: ::std::path::PathBuf = ::std::path::PathBuf::from(cargo_path);
+    p.push("target");
+
+    match ::util::write_backup_keyset(Some(p), &wks, "user@safedrive.io") {
+        Ok(()) => {
+
+        },
+        Err(err) => {
+            panic!("{}", err);
+        }
+    }
+}
+
+#[test]
 fn key_generate_test() {
     let key = Key::new(KeyType::Master);
 
