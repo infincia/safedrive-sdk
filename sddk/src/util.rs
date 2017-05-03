@@ -72,7 +72,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
 
-    let evar: &str;
+    let mut evar: &str;
 
     if cfg!(target_os="windows") {
         evar = "APPDATA";
@@ -109,7 +109,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
 pub fn get_current_os() -> &'static str {
 
-    let os: &str;
+    let mut os: &str;
 
     if cfg!(target_os="windows") {
         os = "Windows";
