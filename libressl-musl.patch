@@ -1,4 +1,4 @@
---- crypto/compat/getentropy_linux.c
+--- crypto/compat/getentropy_linux.c.old
 +++ crypto/compat/getentropy_linux.c
 @@ -27,9 +27,6 @@
  #include <sys/ioctl.h>
