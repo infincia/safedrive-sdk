@@ -83,7 +83,6 @@ impl WrappedKeyset {
         let mnemonic = Bip39::new(&mnemonic_keytype, Language::English, "")?;
         let recovery_phrase = { mnemonic.mnemonic.clone() };
         let recovery_key = Key::from(mnemonic);
-        debug!("phrase: {}", recovery_phrase);
 
         /// generate a master key and encrypt it with the recovery phrase and static nonce
         /// We assign a specific, non-random nonce to use once for each key. Still safe, not reused.
@@ -105,12 +104,11 @@ impl WrappedKeyset {
         let tweak_key_type = KeyType::Tweak;
         let tweak_key = Key::new(tweak_key_type);
         let tweak_key_wrapped = tweak_key.to_wrapped(&master_key, None)?;
-        debug!("generated key set");
-        debug!("new recovery phrase: {}", recovery_phrase);
-        debug!("new master key: {}", master_key_wrapped.to_hex());
-        debug!("new main key: {}", main_key_wrapped.to_hex());
-        debug!("new hmac key: {}", hmac_key_wrapped.to_hex());
-        debug!("new tweak key: {}", tweak_key_wrapped.to_hex());
+        info!("new recovery phrase: {}", recovery_phrase);
+        info!("new master key: {}", master_key_wrapped.to_hex());
+        info!("new main key: {}", main_key_wrapped.to_hex());
+        info!("new hmac key: {}", hmac_key_wrapped.to_hex());
+        info!("new tweak key: {}", tweak_key_wrapped.to_hex());
 
 
         Ok(WrappedKeyset {
