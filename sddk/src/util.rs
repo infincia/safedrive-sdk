@@ -1,9 +1,7 @@
 use std::path::PathBuf;
 use std::fs::{self, File};
-use std::io::{Read, Write};
 
-use serde::Serialize;
-use serde_json::{to_writer_pretty, from_reader};
+use serde_json::{to_writer_pretty};
 
 // external crate imports
 

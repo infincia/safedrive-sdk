@@ -1,4 +1,3 @@
-use std::cmp::PartialEq;
 
 /// external crate imports
 
@@ -7,8 +6,6 @@ use rustc_serialize::hex::{ToHex, FromHex};
 use reed_solomon::Encoder as RSEncoder;
 use reed_solomon::Decoder as RSDecoder;
 use reed_solomon::Buffer as RSBuffer;
-
-use serde::{Serialize, Deserialize, Serializer, Deserializer};
 
 /// internal imports
 

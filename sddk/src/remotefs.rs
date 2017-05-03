@@ -83,7 +83,7 @@ impl<'a> RemoteFS<'a> {
 
         let sftp: Sftp = match ses.sftp() {
             Ok(sftp) => sftp,
-            Err(err) => return Err(SDError::Internal("no sftp channel available".to_string()))
+            Err(_) => return Err(SDError::Internal("no sftp channel available".to_string()))
         };
 
         debug!("mv: {} -> {}", remote_path.display(), new_path.display());
@@ -103,7 +103,7 @@ impl<'a> RemoteFS<'a> {
 
         let sftp: Sftp = match ses.sftp() {
             Ok(sftp) => sftp,
-            Err(err) => return Err(SDError::Internal("no sftp channel available".to_string()))
+            Err(_) => return Err(SDError::Internal("no sftp channel available".to_string()))
         };
 
         debug!("mkdir: {}", remote_path.display());
@@ -134,10 +134,10 @@ impl<'a> RemoteFS<'a> {
                         path.push(s);
                         current.push(&path);
                         match sftp.opendir(&current) {
-                            Ok(s) => {
+                            Ok(_) => {
                                 debug!("mkdir: directory component already exists {:?}", component);
                             },
-                            Err(err) => {
+                            Err(_) => {
                                 sftp.mkdir(&current, 0o755)?;
                             }
                         }
@@ -148,10 +148,10 @@ impl<'a> RemoteFS<'a> {
             debug!("mkdir: mode normal");
 
             match sftp.opendir(remote_path) {
-                Ok(s) => {
+                Ok(_) => {
                     debug!("mkdir: directory already exists {}", remote_path.display());
                 },
-                Err(err) => {
+                Err(_) => {
                     sftp.mkdir(remote_path, 0o755)?;
                 }
             }
@@ -173,7 +173,7 @@ impl<'a> RemoteFS<'a> {
 
         let sftp: Sftp = match ses.sftp() {
             Ok(sftp) => sftp,
-            Err(err) => return Err(SDError::Internal("no sftp channel available".to_string()))
+            Err(_) => return Err(SDError::Internal("no sftp channel available".to_string()))
         };
 
         debug!("rmdir: {}", remote_path.display());
@@ -197,7 +197,7 @@ impl<'a> RemoteFS<'a> {
         if recursive {
             let mut channel: Channel = match ses.channel_session() {
                 Ok(sftp) => sftp,
-                Err(err) => return Err(SDError::Internal("no exec channel available".to_string()))
+                Err(_) => return Err(SDError::Internal("no exec channel available".to_string()))
             };
 
             debug!("rm -r: {}", remote_path.display());
@@ -222,7 +222,7 @@ impl<'a> RemoteFS<'a> {
 
                     Ok(())
                 },
-                Err(err) => Err(SDError::Internal("no sftp channel available".to_string()))
+                Err(_) => Err(SDError::Internal("no sftp channel available".to_string()))
             }
         }
     }
