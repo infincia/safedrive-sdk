@@ -42,6 +42,7 @@ fuse_mt = { version = "*", optional = true }
 time = "*"
 reed-solomon = "*"
 ssh2 = "*"
+openssl-sys = "*"
 
 clippy = { version = "*", optional = true }
 
