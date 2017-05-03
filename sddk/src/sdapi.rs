@@ -62,7 +62,7 @@ impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync +
 
         match r {
             Ok(size) => {
-                debug!("read {}", size);
+                trace!("read {}", size);
 
                 self.current += size as u64;
 
@@ -1475,7 +1475,7 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
         trace!("reading response");
         result.read_to_string(&mut response)?;
 
-        debug!("response: {}", response);
+        trace!("response: {}", response);
 
         match result.status() {
             &::reqwest::StatusCode::Ok | &::reqwest::StatusCode::Created => {
