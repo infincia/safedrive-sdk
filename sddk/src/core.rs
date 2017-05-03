@@ -212,9 +212,9 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     };
 
 
-    debug!("libsodium {}", sodium_version);
+    info!("libsodium {}", sodium_version);
 
-    debug!("ready");
+    info!("sddk ready");
 
     Ok(())
 }
