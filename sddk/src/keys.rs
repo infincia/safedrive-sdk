@@ -8,12 +8,15 @@ use reed_solomon::Encoder as RSEncoder;
 use reed_solomon::Decoder as RSDecoder;
 use reed_solomon::Buffer as RSBuffer;
 
+use serde::{Serialize, Deserialize, Serializer, Deserializer};
+
 /// internal imports
 
 use error::CryptoError;
 use models::WrappedKeysetBody;
 use constants::*;
 
+#[derive(Serialize, Deserialize)]
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 pub enum KeyType {
@@ -61,8 +64,11 @@ impl<'a> ::std::fmt::Display for KeyType {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Debug, Clone)]
 pub struct WrappedKeyset {
+    #[serde(skip_serializing)]
+    #[serde(skip_deserializing)]
     recovery: Option<String>,
     pub master: WrappedKey,
     pub main: WrappedKey,
@@ -181,7 +187,7 @@ impl Keyset {
 }
 
 
-
+#[derive(Serialize, Deserialize)]
 #[derive(Debug, Clone)]
 pub struct WrappedKey {
     bytes: Vec<u8>,
