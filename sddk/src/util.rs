@@ -1,5 +1,9 @@
 use std::path::PathBuf;
-use std::fs;
+use std::fs::{self, File};
+use std::io::{Read, Write};
+
+use serde::Serialize;
+use serde_json::{to_writer_pretty, from_reader};
 
 // external crate imports
 
@@ -19,6 +23,9 @@ use byteorder::ByteOrder;
 // internal imports
 
 use constants::*;
+use error::SDError;
+use keys::WrappedKeyset;
+use STORAGE_DIR;
 
 pub fn generate_uuid() -> String {
     let sync_uuid = format!("{}{}", ::uuid::Uuid::new_v4().simple().to_string(), ::uuid::Uuid::new_v4().simple().to_string());
@@ -115,6 +122,25 @@ pub fn get_current_os() -> &'static str {
     }
 
     os
+}
+
+pub fn write_backup_keyset(path: Option<PathBuf>, keyset: &WrappedKeyset, user: &str) -> Result<(), SDError> {
+    let backup_path = match path {
+        Some(path) => path,
+        None => {
+            let sd = STORAGE_DIR.read();
+            let mut backup_path = PathBuf::from(&*sd);
+            let filename = format!("{}.keyset", user);
+            backup_path.push(&filename);
+
+            backup_path
+        }
+    };
+
+    let mut f = File::create(&backup_path)?;
+    to_writer_pretty(&mut f, keyset)?;
+
+    Ok(())
 }
 
 // crypto helpers
