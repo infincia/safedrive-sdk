@@ -137,7 +137,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     *ua = format!("SafeDrive/{} ({}; {}) SafeDriveSDK/{} libsodium/{}", client_version, operating_system, app_type, sdk_version, sodium_version);
 
     if let Err(e) = fs::create_dir_all(local_storage_path) {
-        debug!("failed to create local directories: {}", e);
+        warn!("failed to create local directories: {}", e);
         return Err(SDError::from(e));
     }
 
@@ -159,7 +159,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
         None => return Err(SDError::UnicodeError),
     };
     if let Err(e) = fs::create_dir_all(&cache_s) {
-        debug!("failed to create local directories: {}", e);
+        warn!("failed to create cache directories: {}", e);
         return Err(SDError::from(e));
     }
     let mut cd = CACHE_DIR.write();
