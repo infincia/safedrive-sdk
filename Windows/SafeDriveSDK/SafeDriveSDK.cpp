@@ -390,7 +390,7 @@ void SafeDriveSDK::log(std::string message, LogLevel level) {
 }
 
 
-void SafeDriveSDK::report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, std::optional<std::string> operating_system, std::optional<std::string> client_version, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, sd_optional<std::string> operating_system, sd_optional<std::string> client_version, SDKSuccess success, SDKFailure failure) {
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		const char* c_client_version = NULL;

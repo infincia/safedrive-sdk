@@ -20,5 +20,11 @@
 #include <vector>
 #include <stdexcept>
 #include <thread>
+#ifdef _WIN32
 #include <optional>
+template<typename T> using sd_optional = std::optional<T>;
+#else
+#include <experimental/optional>
+template<typename T> using sd_optional = std::experimental::optional<T>;
+#endif
 #include <atomic>
