@@ -15,8 +15,7 @@ endif()
 
 
 if(CMAKE_HOST_WIN32)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
-
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
     set(PLATFORM_SOURCES
             stdafx.cpp
             stdafx.h
