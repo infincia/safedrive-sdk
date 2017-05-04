@@ -162,10 +162,10 @@ std::string SafeDriveSDK::generate_unique_client_id() {
 	return s;
 }
 
-void SafeDriveSDK::add_folder(std::string name, std::string path, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::add_folder(std::string name, std::string path, bool encrypted, SDKSuccess success, SDKFailure failure) {
 	std::thread t1([&] {
 		SDDKError * error = NULL;
-		if (0 != sddk_add_sync_folder(state, name.c_str(), path.c_str(), &error)) {
+		if (0 != sddk_add_sync_folder(state, name.c_str(), path.c_str(), encrypted, &error)) {
 			std::cout << "Error adding folder: " << error->message << endl;
 			failure(SDKException(error));
 		}
