@@ -3,6 +3,9 @@ project(SafeDriveSDK)
 
 set(CMAKE_CXX_STANDARD 17)
 
+get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
+set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 endif()
@@ -21,13 +24,13 @@ if(CMAKE_HOST_WIN32)
             dllmain.cpp)
 endif()
 
-set(LIBRARY_OUTPUT_PATH ../dist/$ENV{TARGET}/lib/)
-
-include_directories(../dist/$ENV{TARGET}/include)
-link_directories("../dist/$ENV{TARGET}/lib")
-
 set(HEADER_FILES ../dist/$ENV{TARGET}/include/sddk.h)
+set(LIBRARY_OUTPUT_PATH "${DIST_DIR}/lib")
 
+include_directories("${DEP_DIR}/include")
+include_directories("${DIST_DIR}/include")
+link_directories("${DEP_DIR}/lib")
+link_directories("${DIST_DIR}/lib")
 
 set(SOURCE_FILES
         AccountDetails.cpp
