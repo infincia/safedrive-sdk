@@ -75,8 +75,6 @@ public:
 	std::string operating_system;
 	std::string language;
 	SoftwareClient(SDDKSoftwareClient* cclient);
-private:
-	SDDKSoftwareClient* cclient;
 };
 
 class SAFEDRIVESDK_API AccountDetails {
