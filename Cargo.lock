@@ -7,9 +7,9 @@ dependencies = [
  "blake2-rfc 0.2.17 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "chrono-humanize 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy 0.0.128 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono-humanize 0.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy 0.0.130 (registry+https://github.com/rust-lang/crates.io-index)",
  "fuse_mt 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.10.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "keyring 0.4.0 (git+https://github.com/infincia/keyring-rs.git?branch=infincia)",
@@ -213,7 +213,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "chrono"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "num 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -222,10 +222,10 @@ dependencies = [
 
 [[package]]
 name = "chrono-humanize"
-version = "0.0.8"
+version = "0.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -245,16 +245,16 @@ dependencies = [
 
 [[package]]
 name = "clippy"
-version = "0.0.128"
+version = "0.0.130"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cargo_metadata 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy_lints 0.0.128 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy_lints 0.0.130 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "clippy_lints"
-version = "0.0.128"
+version = "0.0.130"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "matches 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1034,7 +1034,7 @@ dependencies = [
 
 [[package]]
 name = "ring"
-version = "0.7.5"
+version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "gcc 0.3.45 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1133,7 +1133,7 @@ source = "git+https://github.com/infincia/rustls.git?branch=infincia#dee1eda7b47
 dependencies = [
  "base64 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "ring 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ring 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
  "untrusted 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "webpki 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1149,7 +1149,7 @@ replace = "rustls 0.5.8 (git+https://github.com/infincia/rustls.git?branch=infin
 name = "safedrive"
 version = "0.6.17"
 dependencies = [
- "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1441,7 +1441,7 @@ name = "tera"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "chrono 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glob 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "humansize 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1670,7 +1670,7 @@ name = "webpki"
 version = "0.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "ring 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "ring 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
  "untrusted 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1737,11 +1737,11 @@ dependencies = [
 "checksum cargo_metadata 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "34fdab49a2904acb112c83b62f0118de3de3ce28e52a9188dec2858e43878f25"
 "checksum cdc 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "1a528d2f22b8d4919416388773048621a4dfd7c0cd652b6025dbe07265fc44ca"
 "checksum cfg-if 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de1e760d7b6535af4241fca8bd8adf68e2e7edacc6b29f5d399050c5e48cf88c"
-"checksum chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "158b0bd7d75cbb6bf9c25967a48a2e9f77da95876b858eadfabaa99cd069de6e"
-"checksum chrono-humanize 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)" = "ae6fa54958da10e66bac77726b814028e05773d3af11ce14ded4da44913f84a0"
+"checksum chrono 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "d9123be86fd2a8f627836c235ecdf331fdd067ecf7ac05aa1a68fbcf2429f056"
+"checksum chrono-humanize 0.0.9 (registry+https://github.com/rust-lang/crates.io-index)" = "5ac98ae0f530c16ca2ded24388cd7982450ecfd4be11d039b4b8926a3bde01e3"
 "checksum clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)" = "f57e9b63057a545ad2ecd773ea61e49422ed1b1d63d74d5da5ecaee55b3396cd"
-"checksum clippy 0.0.128 (registry+https://github.com/rust-lang/crates.io-index)" = "861e87541cdb043cc0a911d169e366a5a199f58230980304b4545b99a59dbbf6"
-"checksum clippy_lints 0.0.128 (registry+https://github.com/rust-lang/crates.io-index)" = "c621b7d41a3d821ea3bddf01f23b6af730185c68de5700731498993acdb1c138"
+"checksum clippy 0.0.130 (registry+https://github.com/rust-lang/crates.io-index)" = "a55ee0eccfd801afcd8f1ebe19ae780e962923e32c3ff50763d4855f3c533ebf"
+"checksum clippy_lints 0.0.130 (registry+https://github.com/rust-lang/crates.io-index)" = "9fdbc3c4eddf13df636f173f8f2bad92f6e12c0749d43d932f8efa355065f096"
 "checksum cmake 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)" = "d18d68987ed4c516dcc3e7913659bfa4076f5182eea4a7e0038bb060953e76ac"
 "checksum constant_time_eq 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "07dcb7959f0f6f1cf662f9a7ff389bcb919924d99ac41cf31f10d611d8721323"
 "checksum cookie 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ce776927cd64cbe74ebd1d9b375edb9d1b6bfa808618ddf9548645e019ebdfbb"
@@ -1831,7 +1831,7 @@ dependencies = [
 "checksum regex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4278c17d0f6d62dfef0ab00028feb45bd7d2102843f80763474eeb1be8a10c01"
 "checksum regex-syntax 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2f9191b1f57603095f105d317e375d19b1c9c5c3185ea9633a99a6dcbed04457"
 "checksum reqwest 0.5.1 (git+https://github.com/infincia/reqwest.git?branch=rustls)" = "<none>"
-"checksum ring 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)" = "6210568620e7b9d3f6e27f4bef63140cb88a15fbfb49b041bd3343b92c109166"
+"checksum ring 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)" = "621adad0185f587ad058bbecededfa2413f5f2e999563bc96349dead9e00d25c"
 "checksum rocket 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "ee95097db80eac85e071dd44f5a842f8e40ef40bef83bd72d320710e3efea9a2"
 "checksum rocket_codegen 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "060ea4d2c0af966c73420c3a64b5b8814a16247dc7e16e815e6ff5b4dfb01ba2"
 "checksum rocket_contrib 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "6cf1c3677525e17abc1e7564e294dee079f2725a6e5886c807bd4e9732b4b316"
