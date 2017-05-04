@@ -92,7 +92,7 @@ copy /y "target\%TARGET%\release\safedrived.exe" "%DIST_PREFIX%\bin\" || goto :e
 pushd Windows
 @echo building C++ SDK for "!VS!!CMAKE_GENERATOR_PLATFORM!"
 
-cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"%TOOLSET%" -D"TARGET=%TARGET%" -D"TOOLSET=%TOOLSET%" -D"CONFIGURATION=%CONFIGURATION%"
+cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"%TOOLSET%" -D"TARGET=%TARGET%" -D"TOOLSET=%TOOLSET%" -D"CONFIGURATION=%CONFIGURATION%" || goto :error
 msbuild /m /v:n /p:Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% SafeDriveSDK.sln || goto :error
 popd
 @echo copying "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" to "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
