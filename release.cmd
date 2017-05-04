@@ -5,6 +5,10 @@ IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141_xp
 IF [%CONFIGURATION%]==[] set CONFIGURATION=Release
 
+set LIBSUFFIX=dll
+IF [%CONFIGURATION%]==[ReleaseDLL] set LIBSUFFIX=dll
+IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
+
 ECHO Building release for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
 del /q dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
@@ -22,6 +26,28 @@ set SODIUM_STATIC=""
 set CARGO_INCREMENTAL="1"
 set RUST_BACKTRACE="1"
 set RUST_FLAGS=""
+
+IF "%ARCH%"=="x86_64" (
+    set PLATFORM=x64
+    set CMAKE_GENERATOR_PLATFORM= Win64
+)
+
+IF "%ARCH%"=="x86" (
+    set PLATFORM=Win32
+    set CMAKE_GENERATOR_PLATFORM=
+)
+
+IF "%TOOLSET%"=="v120_xp" (
+    set VS=Visual Studio 12 2013
+)
+
+IF "%TOOLSET%"=="v140_xp" (
+    set VS=Visual Studio 14 2015
+)
+
+IF "%TOOLSET%"=="v141_xp" (
+    set VS=Visual Studio 15 2017
+)
 
 if "%CONFIGURATION"=="Release" (
     set RUST_FLAGS="-C target-feature=+crt-static"
@@ -62,6 +88,14 @@ copy /y "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%CONFIG
 ECHO copying "target\%TARGET%\release\safedrived.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\"
 copy /y "target\%TARGET%\release\safedrived.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\" || goto :error
 
+pushd Windows
+@echo building C++ SDK for "!VS!!CMAKE_GENERATOR_PLATFORM!"
+
+cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -D"CMAKE_BUILD_TYPE=%CONFIGURATION%"
+msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% SafeDriveSDK.sln || goto :error
+popd
+@echo copying "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
+copy /y "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%" || goto :error
 goto :EOF
 
 :error
