@@ -45,6 +45,7 @@ use TOKEN;
 
 use session::{SyncSession, WrappedSyncSession};
 
+#[cfg(target_os = "macos")]
 use remotefs::RemoteFS;
 
 /// crypto exports
@@ -105,6 +106,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
         panic!("sodium initialization failed, cannot continue");
     }
 
+    #[cfg(target_os = "macos")]
     let openssl_version = unsafe {
         let c_openssl_version = ::openssl_sys::SSLeay_version(::openssl_sys::SSLEAY_VERSION);
 
@@ -222,6 +224,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 
     info!("libsodium {}", sodium_version);
 
+    #[cfg(target_os = "macos")]
     info!("{}", openssl_version);
 
     info!("sddk ready");
@@ -1448,6 +1451,7 @@ pub fn send_error_report<'a>(client_version: Option<String>, operating_system: O
     }
 }
 
+#[cfg(target_os = "macos")]
 pub fn remote_mkdir(host: &str, port: u16, remote_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
     let mut remote_fs = RemoteFS::new(host, port, username, password);
 
@@ -1457,6 +1461,7 @@ pub fn remote_mkdir(host: &str, port: u16, remote_path: &Path, username: &str, p
     }
 }
 
+#[cfg(target_os = "macos")]
 pub fn remote_rmdir(host: &str, port: u16, remote_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
     let mut remote_fs = RemoteFS::new(host, port, username, password);
 
@@ -1466,6 +1471,7 @@ pub fn remote_rmdir(host: &str, port: u16, remote_path: &Path, username: &str, p
     }
 }
 
+#[cfg(target_os = "macos")]
 pub fn remote_rm(host: &str, port: u16, remote_path: &Path, recursive: bool, username: &str, password: &str) -> Result<(), SDError> {
     let mut remote_fs = RemoteFS::new(host, port, username, password);
 
@@ -1475,6 +1481,7 @@ pub fn remote_rm(host: &str, port: u16, remote_path: &Path, recursive: bool, use
     }
 }
 
+#[cfg(target_os = "macos")]
 pub fn remote_mv(host: &str, port: u16, remote_path: &Path, new_path: &Path, username: &str, password: &str) -> Result<(), SDError> {
     let mut remote_fs = RemoteFS::new(host, port, username, password);
 
