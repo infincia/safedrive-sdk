@@ -363,6 +363,7 @@ impl From<SDAPIError> for SDError {
     }
 }
 
+#[cfg(target_os = "macos")]
 impl From<::ssh2::Error> for SDError {
     fn from(err: ::ssh2::Error) -> SDError {
         SDError::IO(Box::new(err))

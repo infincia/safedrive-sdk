@@ -82,6 +82,7 @@ pub use keychain::KeychainService;
 #[cfg(feature = "sessionfs")]
 pub use sessionfs::*;
 
+#[cfg(target_os = "macos")]
 pub use remotefs::RemoteFS;
 
 
