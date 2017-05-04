@@ -1,7 +1,11 @@
+#ifdef _WIN32
 #ifdef SAFEDRIVESDK_EXPORTS
 #define SAFEDRIVESDK_API __declspec(dllexport)
 #else
 #define SAFEDRIVESDK_API __declspec(dllimport)
+#endif
+#else
+#define SAFEDRIVESDK_API
 #endif
 
 #include "stdafx.h"
