@@ -49,7 +49,14 @@ if(CMAKE_HOST_WIN32)
 else()
     link_libraries(SafeDriveSDK sddk.a)
 endif()
-target_link_libraries(SafeDriveSDK z "-framework Foundation" "-framework Security" objc)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    target_link_libraries(SafeDriveSDK z "-framework Foundation" "-framework Security" objc)
+endif()
+
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    target_link_libraries(SafeDriveSDK z)
+endif()
 
 
 add_executable(SafeDriveSDKTest SafeDriveSDK.h test.cpp test.h)
