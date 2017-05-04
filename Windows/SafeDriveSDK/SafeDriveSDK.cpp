@@ -394,12 +394,12 @@ void SafeDriveSDK::report_error(std::exception exc, std::string context, std::st
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		const char* c_client_version = NULL;
-		if (client_version.has_value()) {
-			c_client_version = client_version.value().c_str();
+		if (client_version) {
+			c_client_version = (*client_version).c_str();
 		}
 		const char* c_operating_system = NULL;
-		if (operating_system.has_value()) {
-			c_operating_system = operating_system.value().c_str();
+		if (operating_system) {
+			c_operating_system = (*operating_system).c_str();
 		}
 		if (0 != sddk_report_error(c_client_version, 
 			                       c_operating_system, 
