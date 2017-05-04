@@ -121,7 +121,7 @@ void SafeDriveSDK::get_clients(std::string username, std::string password, std::
 				new_array.push_back(client);
 			}
 			success(new_array);
-			sddk_free_software_clients(&clients, (unsigned long long)res);
+			sddk_free_software_clients(&head, (unsigned long long)res);
 		}
 	});
 }
