@@ -1,6 +1,6 @@
 [root]
 name = "sddk"
-version = "0.6.18"
+version = "0.6.19"
 dependencies = [
  "bip39 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1147,7 +1147,7 @@ replace = "rustls 0.5.8 (git+https://github.com/infincia/rustls.git?branch=infin
 
 [[package]]
 name = "safedrive"
-version = "0.6.18"
+version = "0.6.19"
 dependencies = [
  "chrono 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1156,7 +1156,7 @@ dependencies = [
  "pbr 1.0.0 (git+https://github.com/infincia/pb.git?branch=infincia)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sddk 0.6.18",
+ "sddk 0.6.19",
  "serde 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1165,13 +1165,13 @@ dependencies = [
 
 [[package]]
 name = "safedrived"
-version = "0.6.18"
+version = "0.6.19"
 dependencies = [
  "clap 2.23.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "notify 4.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "prettytable-rs 0.6.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sddk 0.6.18",
+ "sddk 0.6.19",
  "serde 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.9.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.9.10 (registry+https://github.com/rust-lang/crates.io-index)",
