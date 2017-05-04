@@ -136,6 +136,7 @@ typedef std::function<void(SDKException error)> SDKFailure;
 typedef std::function<void(unsigned long long total, unsigned long long current, unsigned long long new_bytes, double percent)> SyncSessionProgress;
 typedef std::function<void(std::string message)> SyncSessionIssue;
 typedef std::function<void(std::string message)> SaveRecoveryPhrase;
+typedef std::function<void(std::string message)> Issue;
 
 
 
