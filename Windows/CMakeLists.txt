@@ -3,9 +3,6 @@ project(SafeDriveSDK)
 
 set(CMAKE_CXX_STANDARD 17)
 
-if(NOT DEFINED ENV{TARGET})
-    set(ENV{TARGET} x86_64-apple-darwin)
-endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 endif()
