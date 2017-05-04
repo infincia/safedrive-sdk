@@ -54,7 +54,7 @@ enum SAFEDRIVESDK_API AccountState {
 
 class SAFEDRIVESDK_API AccountStatus {
 public:
-	std::optional<std::string> status;
+    AccountState state;
 	std::string host;
 	unsigned short port;
 	std::string user_name;
