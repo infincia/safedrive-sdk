@@ -6,8 +6,6 @@
 #include "sddk.h"
 
 SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, std::string storage_directory) {
-	std::cout << "\n SafeDriveSDK Constructor called \n"; 
-
 	const char *s = storage_directory.c_str();
 	const char *cv = client_version.c_str();
 	const char *os = operating_system.c_str();
@@ -35,7 +33,6 @@ bool SafeDriveSDK::ready() {
 }
 
 SafeDriveSDK::~SafeDriveSDK() {
-	std::cout << "\n SafeDriveSDK Destructor called \n";
 	sddk_free_state(&state);
 }
 
