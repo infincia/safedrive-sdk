@@ -28,3 +28,4 @@ dep
 /src/
 .vs
 x64
+cmake-build-debug
