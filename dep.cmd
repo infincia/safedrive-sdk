@@ -82,7 +82,7 @@ IF NOT EXIST "%SRC_PREFIX%\libressl-%LIBRESSL_VER%.tar.gz" goto :error
 IF NOT EXIST "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%" goto :buildsodium
 
 findstr /c:"%SODIUM_VER%" %SODIUM_VER_FILE% > NUL || goto :buildsodium
-goto :checklibressl
+goto :EOF
 
 
 
