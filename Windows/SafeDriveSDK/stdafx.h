@@ -18,6 +18,7 @@
 #include <string>
 #include <cstdint>
 #include <iostream>
+#include <iomanip>
 #include <numeric>
 #include <iterator>
 #include <vector>
@@ -31,3 +32,6 @@ template<typename T> using sd_optional = std::optional<T>;
 template<typename T> using sd_optional = std::experimental::optional<T>;
 #endif
 #include <atomic>
+
+using namespace std;
+
