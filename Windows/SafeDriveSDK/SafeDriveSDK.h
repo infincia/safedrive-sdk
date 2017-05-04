@@ -41,6 +41,17 @@ public:
 	SyncSession(SDDKSyncSession* csyncsession);
 };
 
+enum SAFEDRIVESDK_API AccountState {
+    Unknown,
+    Active,
+    Trial,
+    TrialExpired,
+    Expired,
+    Locked,
+    ResetPassword,
+    PendingCreation,
+};
+
 class SAFEDRIVESDK_API AccountStatus {
 public:
 	std::optional<std::string> status;
