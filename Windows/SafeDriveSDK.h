@@ -168,7 +168,7 @@ public:
 	void cancel_sync_task(std::string session_name, SDKSuccess success, SDKFailure failure);
 	void sync_folder(unsigned long long folder_id, std::string session_name, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
 	void restore_folder(unsigned long long folder_id, std::string session_name, std::string destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
-	void SafeDriveSDK::report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, sd_optional<std::string> operating_system, sd_optional<std::string> client_version, SDKSuccess success, SDKFailure failure);
+	void report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, sd_optional<std::string> operating_system, sd_optional<std::string> client_version, SDKSuccess success, SDKFailure failure);
 	bool ready();
 private:
 	SDDKState * state;
