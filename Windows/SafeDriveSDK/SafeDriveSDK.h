@@ -172,7 +172,7 @@ public:
 	bool ready();
 private:
 	SDDKState * state;
-	std::atomic<bool> _ready = false;
+	std::atomic<bool> _ready = ATOMIC_VAR_INIT(false);
 };
 
 
