@@ -27,7 +27,7 @@ mk_deb() {
         i686-unknown-linux-musl|x86_64-unknown-linux-musl)
             ;;
         *)
-            dolib dist/${TARGET}/lib/libsddk.so
+            dolib dist/${TARGET}/lib/libsddk.a
             doinclude dist/${TARGET}/include/sddk.h
             ;;
     esac
