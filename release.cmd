@@ -11,17 +11,18 @@ IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
 
 ECHO Building release for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-del /q dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
+set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%CONFIGURATION%
+set DIST_PREFIX=%cd%\dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
 
-mkdir dist\%TARGET%\%TOOLSET%\%CONFIGURATION% > NUL
-mkdir dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib > NUL
-mkdir dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\include > NUL
-mkdir dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin > NUL
+del /q "%DIST_PREFIX%"
 
-set NATIVE_BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%CONFIGURATION%
+mkdir "%DIST_PREFIX%" > NUL
+mkdir "%DIST_PREFIX%\lib" > NUL
+mkdir "%DIST_PREFIX%\include" > NUL
+mkdir "%DIST_PREFIX%\bin" > NUL
 
-set OPENSSL_DIR=%NATIVE_BUILD_PREFIX%\lib
-set SODIUM_LIB_DIR=%NATIVE_BUILD_PREFIX%\lib
+set OPENSSL_DIR=%BUILD_PREFIX%\lib
+set SODIUM_LIB_DIR=%BUILD_PREFIX%\lib
 set SODIUM_STATIC=""
 set CARGO_INCREMENTAL="1"
 set RUST_BACKTRACE="1"
@@ -75,27 +76,27 @@ cargo.exe build --release -p safedrived --target %TARGET% || goto :error
 
 ECHO Building SDDK headers for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-cheddar -f "sddk\src\c_api.rs" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\include\sddk.h" || goto :error
+cheddar -f "sddk\src\c_api.rs" "%DIST_PREFIX%\include\sddk.h" || goto :error
 
 ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-ECHO copying "target\%TARGET%\release\sddk.lib" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\sddk.lib"
-copy /y "target\%TARGET%\release\sddk.lib" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\lib\sddk.lib" || goto :error
+ECHO copying "target\%TARGET%\release\sddk.lib" "%DIST_PREFIX%\lib\sddk.lib"
+copy /y "target\%TARGET%\release\sddk.lib" "%DIST_PREFIX%\sddk.lib" || goto :error
 
-ECHO copying "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\"
-copy /y "target\%TARGET%\release\safedrive.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\" || goto :error
+ECHO copying "target\%TARGET%\release\safedrive.exe" "%DIST_PREFIX%\bin\"
+copy /y "target\%TARGET%\release\safedrive.exe" "%DIST_PREFIX%\bin\" || goto :error
 
-ECHO copying "target\%TARGET%\release\safedrived.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\"
-copy /y "target\%TARGET%\release\safedrived.exe" "dist\%TARGET%\%TOOLSET%\%CONFIGURATION%\bin\" || goto :error
+ECHO copying "target\%TARGET%\release\safedrived.exe" "%DIST_PREFIX%\bin\"
+copy /y "target\%TARGET%\release\safedrived.exe" "%DIST_PREFIX%\bin\" || goto :error
 
 pushd Windows
 @echo building C++ SDK for "!VS!!CMAKE_GENERATOR_PLATFORM!"
 
-cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -D"CMAKE_BUILD_TYPE=%CONFIGURATION%"
-msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% SafeDriveSDK.sln || goto :error
+cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"%TOOLSET%" -D"TARGET=%TARGET%" -D"TOOLSET=%TOOLSET%" -D"CONFIGURATION=%CONFIGURATION%"
+msbuild /m /v:n /p:Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% SafeDriveSDK.sln || goto :error
 popd
-@echo copying "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
-copy /y "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" "%BUILD_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%" || goto :error
+@echo copying "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" to "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
+copy /y "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%" || goto :error
 goto :EOF
 
 :error
