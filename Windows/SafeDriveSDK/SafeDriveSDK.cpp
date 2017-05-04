@@ -77,14 +77,18 @@ void SafeDriveSDK::remove_client(std::string unique_client_id, SDKSuccess succes
 	});
 }
 
-void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phrase, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phrase, Issue issue, SDKSuccess success, SDKFailure failure) {
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		void * c = static_cast<void*>(&store_phrase);
+        void * c2 = static_cast<void*>(&issue);
 
-		if (0 != sddk_load_keys(c, state, &error, phrase, [](void* context, char* new_phrase) {
+		if (0 != sddk_load_keys(c, c2, state, &error, phrase, [](void* context, void* context2, char* new_phrase) {
 			(*static_cast<SaveRecoveryPhrase*>(context))(new_phrase);
-		})) {
+		}, [](void* context, void* context2, char* message) {
+            (*static_cast<Issue*>(context))(message);
+
+        })) {
 			std::cout << "Error loading keys: " << error->message << endl;
 			_ready = false;
 			throw SDKException(error);
