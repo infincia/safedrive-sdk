@@ -13,11 +13,11 @@ walkdir = "*"
 cdc = "*"
 tar = { version = "*", git = "https://github.com/infincia/tar-rs.git", branch = "append_long_name" }
 rustc-serialize = "*"
-reqwest = { version = "*", git = "https://github.com/infincia/reqwest.git", branch = "rustls"  }
+reqwest = { version = "*", git = "https://github.com/infincia/reqwest.git", branch = "infincia"  }
 hyper = { version = "*" , default-features = false }
-serde = "^0.9"
-serde_json = "^0.9"
-serde_derive = "^0.9"
+serde = "^1.0"
+serde_json = "^1.0"
+serde_derive = "^1.0"
 bip39 = "*"
 rand = "*"
 log = "*"
@@ -47,7 +47,7 @@ clippy = { version = "*", optional = true }
 rocket = { version = "*", optional = true }
 rocket_codegen = { version = "*", optional = true }
 rocket_contrib = { version = "*", optional = true }
-tera = { version = "^0.9", optional = true }
+tera = { version = "*", optional = true }
 pulldown-cmark = { version = "0.0.8", optional = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
