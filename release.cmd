@@ -38,6 +38,14 @@ IF "%ARCH%"=="x86" (
     set CMAKE_GENERATOR_PLATFORM=
 )
 
+IF "%CONFIGURATION%"=="Release" (
+    set RUNTIME_LIBRARY="MultiThreaded"
+)
+
+IF "%CONFIGURATION%"=="ReleaseDLL" (
+    set RUNTIME_LIBRARY="MultiThreadedDLL"
+)
+
 IF "%TOOLSET%"=="v120_xp" (
     set VS=Visual Studio 12 2013
 )
@@ -91,9 +99,8 @@ copy /y "target\%TARGET%\release\safedrived.exe" "%DIST_PREFIX%\bin\" || goto :e
 
 pushd Windows
 @echo building C++ SDK for "!VS!!CMAKE_GENERATOR_PLATFORM!"
-
-cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"%TOOLSET%" -D"TARGET=%TARGET%" -D"TOOLSET=%TOOLSET%" -D"CONFIGURATION=%CONFIGURATION%" || goto :error
-msbuild /m /v:n /p:Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% SafeDriveSDK.sln || goto :error
+cmake "%CMAKE_PREFIX%" -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"TARGET=!TARGET!" -D"TOOLSET=!TOOLSET!" -D"CONFIGURATION=!CONFIGURATION!" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" || goto :error
+msbuild /m /v:n /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! SafeDriveSDK.sln || goto :error
 popd
 @echo copying "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" to "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
 copy /y "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%" || goto :error
