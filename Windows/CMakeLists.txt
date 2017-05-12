@@ -20,7 +20,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
             targetver.h)
 endif()
 
-set(HEADER_FILES ../dist/$ENV{TARGET}/include/sddk.h)
 include_directories("${DEP_DIR}/include")
 include_directories("${DIST_DIR}/include")
 link_directories("${DEP_DIR}/lib")
