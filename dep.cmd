@@ -32,6 +32,14 @@ IF "%ARCH%"=="x86" (
     set CMAKE_GENERATOR_PLATFORM=
 )
 
+IF "!CONFIGURATION!"=="Release" (
+    set RUNTIME_LIBRARY="MultiThreaded"
+)
+
+IF "!CONFIGURATION!"=="ReleaseDLL" (
+    set RUNTIME_LIBRARY="MultiThreadedDLL"
+)
+
 IF "%TOOLSET%"=="v120_xp" (
     set VS=Visual Studio 12 2013
 )
@@ -95,7 +103,7 @@ del /q libsodium-%SODIUM_VER%
 7z x -y "libsodium-%SODIUM_VER%.tar" || goto :error
 pushd libsodium-%SODIUM_VER%
 @echo building libsodium
-msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libsodium.sln || goto :error
+msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libsodium.sln || goto :error
 popd
 del /q libsodium-%SODIUM_VER%
 @echo copying "%BUILD_PREFIX%\lib\libsodium.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\sodium.%LIBSUFFIX%"
@@ -122,8 +130,8 @@ del /q libressl-%LIBRESSL_VER%
 7z x -y "libressl-%LIBRESSL_VER%.tar" || goto :error
 pushd libressl-%LIBRESSL_VER%
 @echo building libressl for "!VS!!CMAKE_GENERATOR_PLATFORM!"
-cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=%CONFIGURATION%"
-msbuild /m /v:n /p:Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libressl.sln || goto :error
+cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!"  -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!"
+msbuild /m /v:n /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libressl.sln || goto :error
 @echo copying "include\openssl" to "%BUILD_PREFIX%\include\"
 copy /y "include\openssl"  "%BUILD_PREFIX%\include\openssl\" || goto :error
 @echo copying "ssl\%CONFIGURATION%\ssl.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssl.%LIBSUFFIX%"
@@ -156,8 +164,8 @@ del /q libssh2-%LIBSSH2_VER%
 7z x -y "libssh2-%LIBSSH2_VER%.tar" || goto :error
 pushd libssh2-%LIBSSH2_VER%
 @echo building libssh2 for "!VS!!CMAKE_GENERATOR_PLATFORM!"
-cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=%CONFIGURATION%" -D"OPENSSL_USE_STATIC_LIBS=TRUE" -D"CRYPTO_BACKEND=OpenSSL" -D"OPENSSL_ROOT_DIR="%BUILD_PREFIX%\\" -D"OPENSSL_INCLUDE_DIR="%BUILD_PREFIX%\include\\"
-msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";Configuration=%CONFIGURATION%;Platform=%PLATFORM%;PlatformToolset=%TOOLSET% libssh2.sln || goto :error
+cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"%TOOLSET%" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"OPENSSL_USE_STATIC_LIBS=TRUE" -D"CRYPTO_BACKEND=OpenSSL" -D"OPENSSL_ROOT_DIR="%BUILD_PREFIX%\\" -D"OPENSSL_INCLUDE_DIR="%BUILD_PREFIX%\include\\"
+msbuild /m /v:n /p:OutDir="%BUILD_PREFIX%\lib\\";RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libssh2.sln || goto :error
 popd
 del /q libssh2-%LIBSSH2_VER%
 @echo copying "%BUILD_PREFIX%\lib\libssh2.%LIBSUFFIX%" to "%BUILD_PREFIX%\lib\ssh2.%LIBSUFFIX%"
