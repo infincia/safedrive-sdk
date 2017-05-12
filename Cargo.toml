@@ -4,5 +4,5 @@ members = ["sddk", "safedrive", "safedrived"]
 [replace]
 "security-framework:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "security-framework-sys:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
-"rustls:0.5.8" = { git = "https://github.com/infincia/rustls.git", branch = "infincia" }
+"rustls:0.7.0" = { git = "https://github.com/infincia/rustls.git", branch = "infincia" }
 "secret-service:0.3.1" = { git = "https://github.com/infincia/secret-service-rs.git", branch = "nogmp" }
