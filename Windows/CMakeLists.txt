@@ -6,11 +6,6 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 set(CMAKE_CXX_STANDARD 17)
 
 get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
-set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
-set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
-set(BUILD_DIR "${PARENT_DIR}/build/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
-
-
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
@@ -28,10 +23,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MT")
         set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
     endif()
-
+    set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
+    set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
+    set(BUILD_DIR "${PARENT_DIR}/build/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
     set(PLATFORM_SOURCES
             stdafx.h
             targetver.h)
+else()
+    set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/")
+    set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/")
+    set(BUILD_DIR "${PARENT_DIR}/build/${TARGET}/")
 endif()
 
 include_directories("${DEP_DIR}/include")
