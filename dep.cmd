@@ -10,6 +10,8 @@ IF [%CONFIGURATION%]==[] set CONFIGURATION=Release
 set LIBSUFFIX=dll
 IF [%CONFIGURATION%]==[ReleaseDLL] set LIBSUFFIX=dll
 IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
+IF [%CONFIGURATION%]==[DebugDLL] set LIBSUFFIX=dll
+IF [%CONFIGURATION%]==[Debug] set LIBSUFFIX=lib
 
 set BUILD_PREFIX=%cd%\dep\!TARGET!\!TOOLSET!\!CONFIGURATION!
 set SRC_PREFIX=%cd%\src
@@ -40,6 +42,14 @@ IF "!CONFIGURATION!"=="Release" (
 
 IF "!CONFIGURATION!"=="ReleaseDLL" (
     set RUNTIME_LIBRARY="MultiThreadedDLL"
+)
+
+IF "!CONFIGURATION!"=="Debug" (
+    set RUNTIME_LIBRARY="MultiThreadedDebug"
+)
+
+IF "!CONFIGURATION!"=="DebugDLL" (
+    set RUNTIME_LIBRARY="MultiThreadedDebugDLL"
 )
 
 IF "!TOOLSET!"=="v120_xp" (

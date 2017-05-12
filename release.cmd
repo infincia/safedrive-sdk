@@ -10,6 +10,8 @@ IF [%CONFIGURATION%]==[] set CONFIGURATION=Release
 set LIBSUFFIX=dll
 IF [%CONFIGURATION%]==[ReleaseDLL] set LIBSUFFIX=dll
 IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
+IF [%CONFIGURATION%]==[DebugDLL] set LIBSUFFIX=dll
+IF [%CONFIGURATION%]==[Debug] set LIBSUFFIX=lib
 
 ECHO Building release for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
@@ -55,6 +57,14 @@ IF "!CONFIGURATION!"=="ReleaseDLL" (
     set RUNTIME_LIBRARY="MultiThreadedDLL"
 )
 
+IF "!CONFIGURATION!"=="Debug" (
+    set RUNTIME_LIBRARY="MultiThreadedDebug"
+)
+
+IF "!CONFIGURATION!"=="DebugDLL" (
+    set RUNTIME_LIBRARY="MultiThreadedDebugDLL"
+)
+
 IF "!TOOLSET!"=="v120_xp" (
     set VS=Visual Studio 12 2013
 )
@@ -72,6 +82,14 @@ if "!CONFIGURATION!"=="Release" (
 )
 
 if "!CONFIGURATION!"=="ReleaseDLL" (
+    set RUST_FLAGS="-C target-feature=-crt-static"
+)
+
+if "!CONFIGURATION!"=="Debug" (
+    set RUST_FLAGS="-C target-feature=+crt-static"
+)
+
+if "!CONFIGURATION!"=="DebugDLL" (
     set RUST_FLAGS="-C target-feature=-crt-static"
 )
 
