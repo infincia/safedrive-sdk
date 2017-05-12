@@ -152,8 +152,8 @@ public:
 	~SafeDriveSDK();
 	std::string channel();
 	std::string version();
-	void login(std::string username, std::string password, std::string unique_client_id, std::function<void(SDDKAccountStatus status)> success, SDKFailure failure);
-	void get_clients(std::string username, std::string password, std::function<void(std::vector<SoftwareClient>)> success, SDKFailure failure);
+	void login(std::string username, std::string password, std::string unique_client_id, SDKLoginSuccess success, SDKFailure failure);
+	void get_clients(std::string username, std::string password, SDKGetClientsSuccess success, SDKFailure failure);
 	void remove_client(std::string unique_client_id, SDKSuccess success, SDKFailure failure);
 	void get_account_status(SDKSuccess success, SDKFailure failure);
 	void get_account_details(SDKSuccess success, SDKFailure failure);
