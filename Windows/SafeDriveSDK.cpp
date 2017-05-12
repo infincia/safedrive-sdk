@@ -90,10 +90,11 @@ void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phras
 
         })) {
 			_ready = false;
-			throw SDKException(error);
+			failure(SDKException(error));
 		}
 		else {
 			_ready = true;
+			success();
 		}
 	});
 
