@@ -60,7 +60,6 @@ int main(int argc, char* argv[]) {
         SafeDriveSDK::Log("login failed", Info);
 
 	    std::stringstream ss;
-        ss << "error: " << error.message();
 		SafeDriveSDK::Log(ss.str(), Info);
 	});
 

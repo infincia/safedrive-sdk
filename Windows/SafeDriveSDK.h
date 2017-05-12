@@ -64,11 +64,7 @@ public:
 	std::string user_name;
     sd_optional<long long> time;
 	AccountStatus(SDDKAccountStatus* cstatus);
-	~AccountStatus();
 	friend ostream& operator<<(ostream& os, const AccountStatus& status);
-
-private:
-	//SDDKAccountStatus* cstatus;
 };
 
 class SAFEDRIVESDK_API SoftwareClient {
@@ -86,9 +82,6 @@ public:
 	long long lowFreeStorageThreshold;
 	unsigned long long expirationDate;
 	AccountDetails(SDDKAccountDetails* cdetails);
-	~AccountDetails();
-private:
-	SDDKAccountDetails* cdetails;
 };
 
 class SAFEDRIVESDK_API SafeDriveNotification {
@@ -126,13 +119,10 @@ enum SAFEDRIVESDK_API SDKErrorType {
 
 class SAFEDRIVESDK_API SDKException {
 public:
-	SDKErrorType type();
-	std::string message();
-	int code();
 	SDKException(SDDKError* error);
-	~SDKException();
-private:
-	SDDKError* error;
+    SDKErrorType type;
+    std::string message;
+    int code;
 };
 
 typedef std::function<void()> SDKSuccess;

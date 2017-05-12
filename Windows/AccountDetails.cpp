@@ -8,9 +8,4 @@ AccountDetails::AccountDetails(SDDKAccountDetails* details) {
 	usedStorage = details->used_storage;
 	lowFreeStorageThreshold = details->low_free_space_threshold;
 	expirationDate = details->expiration_date;
-	cdetails = details;
-}
-
-AccountDetails::~AccountDetails() {
-	//sddk_free_account_details(&cdetails);
 }

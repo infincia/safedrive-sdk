@@ -21,7 +21,9 @@ SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_sys
 
 	SDDKError * error = NULL;
 	if (0 != sddk_initialize(cv, os, l, c, s, &state, &error)) {
-		throw SDKException(error);
+	    SDKException e(error);
+   	    sddk_free_error(&error);
+		throw e;
 	}
 }
 
@@ -53,7 +55,9 @@ void SafeDriveSDK::login(std::string username, std::string password, std::string
 		SDDKAccountStatus* status = NULL;
 		int res = sddk_login(state, unique_client_id.c_str(), username.c_str(), password.c_str(), &status, &error);
 		if (res == -1) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		} else {
 			AccountStatus s = AccountStatus(status);
             sddk_free_account_status(&status);
@@ -68,7 +72,9 @@ void SafeDriveSDK::remove_client(std::string unique_client_id, SDKSuccess succes
 	std::thread t1([&] {
 		SDDKError* error = NULL;
 		if (0 != sddk_remove_client(state, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		} else {
 			success();
 		}
@@ -90,7 +96,9 @@ void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phras
 
         })) {
 			_ready = false;
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			_ready = true;
@@ -110,7 +118,9 @@ void SafeDriveSDK::get_clients(std::string username, std::string password, SDKGe
 		long long res = sddk_get_software_clients(username.c_str(), password.c_str(), &clients, &error);
 
 		if (res == -1) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			std::vector<SoftwareClient> new_array;
@@ -135,7 +145,9 @@ void SafeDriveSDK::get_account_status(SDKSuccess success, SDKFailure failure) {
 		SDDKAccountStatus* cstatus = NULL;
 
 		if (0 != sddk_get_account_status(state, &cstatus, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			AccountStatus s = AccountStatus(cstatus);
@@ -153,10 +165,13 @@ void SafeDriveSDK::get_account_details(SDKSuccess success, SDKFailure failure) {
 		SDDKAccountDetails* cdetails = NULL;
 
 		if (0 != sddk_get_account_details(state, &cdetails, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			AccountDetails s = AccountDetails(cdetails);
+			sddk_free_account_details(&cdetails);
 			success();
 		}
 	});
@@ -176,7 +191,9 @@ void SafeDriveSDK::add_folder(std::string name, std::string path, bool encrypted
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		if (0 != sddk_add_sync_folder(state, name.c_str(), path.c_str(), encrypted, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -195,7 +212,9 @@ void SafeDriveSDK::update_folder(std::string name, std::string path, bool syncin
 
 		SDDKError * error = NULL;
 		if (0 != sddk_update_sync_folder(state, name.c_str(), path.c_str(), c_syncing, unique_id, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -209,7 +228,9 @@ void SafeDriveSDK::remove_folder(unsigned long long folderID, SDKSuccess success
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		if (0 != sddk_remove_sync_folder(state, folderID, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -225,7 +246,9 @@ void SafeDriveSDK::get_folder(unsigned long long folderID, SDKSuccess success, S
 		SDDKFolder* cfolder = NULL;
 		long long res = sddk_get_sync_folder(state, folderID, &cfolder, &error);
 		if (res == -1) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			Folder new_folder = Folder(cfolder);
@@ -243,7 +266,9 @@ void SafeDriveSDK::get_folders(SDKSuccess success, SDKFailure failure) {
 		SDDKError* error = NULL;
 		int64_t res = sddk_get_sync_folders(state, &cfolders, &error);
 		if (res == -1) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			SDDKFolder * head = cfolders;
@@ -267,7 +292,9 @@ void SafeDriveSDK::get_sessions(SDKSuccess success, SDKFailure failure) {
 		SDDKError * error = NULL;
 		int64_t res = sddk_get_sync_sessions(state, &csessions, &error);
 		if (res == -1) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 			return;
 		}
 		else {
@@ -290,7 +317,9 @@ void SafeDriveSDK::remove_session(unsigned long long session_id, SDKSuccess succ
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		if (0 != sddk_remove_sync_session(state, session_id, &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -304,7 +333,9 @@ void SafeDriveSDK::cancel_sync_task(std::string session_name, SDKSuccess success
 	std::thread t1([&] {
 		SDDKError * error = NULL;
 		if (0 != sddk_cancel_sync_task(session_name.c_str(), &error)) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -334,7 +365,9 @@ void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::string session
 			});
 
 		if (0 != res) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -366,7 +399,9 @@ void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string sess
 			});
 
 		if (0 != res) {
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();
@@ -424,7 +459,9 @@ void SafeDriveSDK::report_error(std::exception exc, std::string context, std::st
 			                       context.c_str(),
 			                       &error)) {
 			std::cout << "Error reporting error: " << error->message << endl;
-			failure(SDKException(error));
+		    SDKException e(error);
+		    sddk_free_error(&error);
+			failure(e);
 		}
 		else {
 			success();

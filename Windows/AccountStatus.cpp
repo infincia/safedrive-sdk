@@ -42,11 +42,6 @@ AccountStatus::AccountStatus(SDDKAccountStatus* status) {
     host = status->host;
     port = status->port;
     user_name = status->user_name;
-    //cstatus = status;
-}
-
-AccountStatus::~AccountStatus() {
-    //sddk_free_account_status(&cstatus);
 }
 
 
