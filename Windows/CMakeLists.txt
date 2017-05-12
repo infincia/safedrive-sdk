@@ -21,8 +21,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 set(HEADER_FILES ../dist/$ENV{TARGET}/include/sddk.h)
-set(LIBRARY_OUTPUT_PATH "${DIST_DIR}/lib")
-
 include_directories("${DEP_DIR}/include")
 include_directories("${DIST_DIR}/include")
 link_directories("${DEP_DIR}/lib")
