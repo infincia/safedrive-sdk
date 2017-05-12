@@ -60,6 +60,8 @@ void SafeDriveSDK::login(std::string username, std::string password, std::string
 			success(s);
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::remove_client(std::string unique_client_id, SDKSuccess success, SDKFailure failure) {
@@ -71,6 +73,8 @@ void SafeDriveSDK::remove_client(std::string unique_client_id, SDKSuccess succes
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phrase, Issue issue, SDKSuccess success, SDKFailure failure) {
@@ -92,6 +96,8 @@ void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phras
 			_ready = true;
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::get_clients(std::string username, std::string password, SDKGetClientsSuccess success, SDKFailure failure) {
@@ -118,6 +124,8 @@ void SafeDriveSDK::get_clients(std::string username, std::string password, SDKGe
 			sddk_free_software_clients(&head, (unsigned long long)res);
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::get_account_status(SDKSuccess success, SDKFailure failure) {
@@ -133,6 +141,8 @@ void SafeDriveSDK::get_account_status(SDKSuccess success, SDKFailure failure) {
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::get_account_details(SDKSuccess success, SDKFailure failure) {
@@ -148,6 +158,8 @@ void SafeDriveSDK::get_account_details(SDKSuccess success, SDKFailure failure) {
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 std::string SafeDriveSDK::generate_unique_client_id() {
@@ -168,6 +180,8 @@ void SafeDriveSDK::add_folder(std::string name, std::string path, bool encrypted
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::update_folder(std::string name, std::string path, bool syncing, unsigned long long unique_id, SDKSuccess success, SDKFailure failure) {
@@ -185,6 +199,8 @@ void SafeDriveSDK::update_folder(std::string name, std::string path, bool syncin
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::remove_folder(unsigned long long folderID, SDKSuccess success, SDKFailure failure) {
@@ -197,6 +213,8 @@ void SafeDriveSDK::remove_folder(unsigned long long folderID, SDKSuccess success
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::get_folder(unsigned long long folderID, SDKSuccess success, SDKFailure failure) {
@@ -213,6 +231,8 @@ void SafeDriveSDK::get_folder(unsigned long long folderID, SDKSuccess success, S
 			sddk_free_folder(&cfolder);
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::get_folders(SDKSuccess success, SDKFailure failure) {
@@ -235,6 +255,8 @@ void SafeDriveSDK::get_folders(SDKSuccess success, SDKFailure failure) {
 			sddk_free_folders(&head, res);
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::get_sessions(SDKSuccess success, SDKFailure failure) {
@@ -258,6 +280,8 @@ void SafeDriveSDK::get_sessions(SDKSuccess success, SDKFailure failure) {
 			sddk_free_sync_sessions(&head, res);
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::remove_session(unsigned long long session_id, SDKSuccess success, SDKFailure failure) {
@@ -270,6 +294,8 @@ void SafeDriveSDK::remove_session(unsigned long long session_id, SDKSuccess succ
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::cancel_sync_task(std::string session_name, SDKSuccess success, SDKFailure failure) {
@@ -282,6 +308,8 @@ void SafeDriveSDK::cancel_sync_task(std::string session_name, SDKSuccess success
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::string session_name, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure) {
@@ -310,6 +338,8 @@ void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::string session
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string session_name, std::string destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure) {
@@ -340,6 +370,8 @@ void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string sess
 			success();
 		}
 	});
+
+	t1.detach();
 }
 
 void SafeDriveSDK::log(std::string message, LogLevel level) {
@@ -367,6 +399,8 @@ void SafeDriveSDK::log(std::string message, LogLevel level) {
 
 		sddk_log(m, l);
 	});
+
+	t1.detach();
 }
 
 
@@ -394,4 +428,6 @@ void SafeDriveSDK::report_error(std::exception exc, std::string context, std::st
 			success();
 		}
 	});
+
+	t1.detach();
 }
