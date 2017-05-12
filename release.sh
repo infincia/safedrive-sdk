@@ -10,6 +10,8 @@ echo "Building release for ${TARGET}"
 
 export BUILD_PREFIX=$PWD/dep/${TARGET}
 export DIST_PREFIX=$PWD/dist/${TARGET}
+export INTR_PREFIX=$PWD/build/${TARGET}
+export CMAKE_PREFIX=$PWD/Windows
 
 export RUSTFLAGS=""
 export CARGO_INCREMENTAL=1
@@ -127,3 +129,14 @@ case ${TARGET} in
     *)
         ;;
 esac
+
+echo "Building C++ SDK for ${TARGET}"
+
+pushd "${INTR_PREFIX}"
+
+cmake "${CMAKE_PREFIX}" -G Xcode -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
+xcodebuild
+popd
+
+echo copying ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a to ${DIST_PREFIX}/lib/
+cp -a ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a ${DIST_PREFIX}/lib/
