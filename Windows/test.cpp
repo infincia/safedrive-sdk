@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
 
     std::stringstream is;
     is << "SafeDriveSDK<" << channel << "> " << version;
-	SafeDriveSDK::Log(is.str(), Info);
+    SafeDriveSDK::Log(is.str(), Info);
 
     #ifdef _WIN32
     std::string user;
@@ -34,12 +34,12 @@ int main(int argc, char* argv[]) {
 
     std::stringstream us;
 
-	us << "login: " << user;
-	SafeDriveSDK::Log(us.str(), Info);
+    us << "login: " << user;
+    SafeDriveSDK::Log(us.str(), Info);
 
     std::stringstream ps;
-	ps << "password: " << password;
-	SafeDriveSDK::Log(ps.str(), Info);
+    ps << "password: " << password;
+    SafeDriveSDK::Log(ps.str(), Info);
 
     #ifdef _WIN32
     std::string ucid;
@@ -51,12 +51,12 @@ int main(int argc, char* argv[]) {
     #endif
 
     sdk.login(user, password, ucid, [](AccountStatus status) {
-   		SafeDriveSDK::Log("login succeeded", Info);
+        SafeDriveSDK::Log("login succeeded", Info);
 
-    	std::stringstream ss;
+        std::stringstream ss;
         ss << "account status: " << status;
-	    SafeDriveSDK::Log(ss.str(), Info);
-	}, [](SDKException error) {
+        SafeDriveSDK::Log(ss.str(), Info);
+    }, [](SDKException error) {
         SafeDriveSDK::Log("login failed", Info);
 
 	    std::stringstream ss;
