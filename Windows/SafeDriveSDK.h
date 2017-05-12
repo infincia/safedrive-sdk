@@ -159,7 +159,7 @@ public:
 	void get_account_details(SDKSuccess success, SDKFailure failure);
 	std::string generate_unique_client_id();
 	void load_keys(const char * phrase, SaveRecoveryPhrase store_phrase, Issue issue, SDKSuccess success, SDKFailure failure);
-	void log(std::string message, LogLevel level);
+	static void Log(std::string message, LogLevel level);
 	void add_folder(std::string name, std::string path, bool encrypted, SDKSuccess success, SDKFailure failure);
 	void update_folder(std::string name, std::string path, bool syncing, unsigned long long unique_id, SDKSuccess success, SDKFailure failure);
 	void remove_folder(unsigned long long folderID, SDKSuccess success, SDKFailure failure);

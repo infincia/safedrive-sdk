@@ -375,8 +375,8 @@ void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string sess
 	t1.detach();
 }
 
-void SafeDriveSDK::log(std::string message, LogLevel level) {
-	std::thread t1([&] {
+void SafeDriveSDK::Log(std::string message, LogLevel level) {
+	std::thread t1([message, level] {
 		const char *m = message.c_str();
 
 		unsigned char l = 0;
