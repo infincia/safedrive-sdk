@@ -35,13 +35,13 @@ AccountStatus::AccountStatus(SDDKAccountStatus* status) {
             break;
         }
     }
-
-    if (cstatus->time != NULL) {
-		time = *status->time;
-	}
-	host = cstatus->host;
-	port = cstatus->port;
-	user_name = cstatus->user_name;
+    
+    if (status->time) {
+        time = *status->time;
+    }
+    host = status->host;
+    port = status->port;
+    user_name = status->user_name;
     //cstatus = status;
 }
 
