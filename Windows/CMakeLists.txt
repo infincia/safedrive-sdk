@@ -55,7 +55,7 @@ set(SOURCE_FILES
 add_library(SafeDriveSDK ${PLATFORM_SOURCES} ${SOURCE_FILES})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(SafeDriveSDK crypt32.lib sddk.lib)
+    target_link_libraries(SafeDriveSDK secur32.lib userenv.lib ncrypt.lib crypt32.lib sddk.lib sodium.lib ws2_32.lib )
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
