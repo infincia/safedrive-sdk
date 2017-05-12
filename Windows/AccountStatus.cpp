@@ -46,6 +46,6 @@ AccountStatus::AccountStatus(SDDKAccountStatus* status) {
 }
 
 AccountStatus::~AccountStatus() {
-	sddk_free_account_status(&cstatus);
+    //sddk_free_account_status(&cstatus);
 }
 
