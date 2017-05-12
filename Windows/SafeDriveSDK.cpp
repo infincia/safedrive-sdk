@@ -138,6 +138,7 @@ void SafeDriveSDK::get_account_status(SDKSuccess success, SDKFailure failure) {
 		}
 		else {
 			AccountStatus s = AccountStatus(cstatus);
+			sddk_free_account_status(&cstatus);
 			success();
 		}
 	});
