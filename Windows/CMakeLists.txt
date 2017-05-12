@@ -42,18 +42,16 @@ set(SOURCE_FILES
 
 add_library(SafeDriveSDK ${HEADER_FILES} ${PLATFORM_SOURCES} ${SOURCE_FILES} test.cpp test.h)
 
-if(CMAKE_HOST_WIN32)
-    link_libraries(SafeDriveSDK sddk.lib)
-else()
-    link_libraries(SafeDriveSDK sddk.a)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(SafeDriveSDK crypt32.lib sddk.lib)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    target_link_libraries(SafeDriveSDK z "-framework Foundation" "-framework Security" objc)
+    target_link_libraries(SafeDriveSDK z "-framework Foundation" "-framework Security" objc sddk.a)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    target_link_libraries(SafeDriveSDK z)
+    target_link_libraries(SafeDriveSDK z sddk.a)
 endif()
 
 
