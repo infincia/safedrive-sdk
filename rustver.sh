@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-export RUST_VER=nightly-2017-04-26
+export RUST_VER=nightly-2017-05-10
