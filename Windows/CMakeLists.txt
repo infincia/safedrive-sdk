@@ -17,8 +17,7 @@ if(CMAKE_HOST_WIN32)
     set(PLATFORM_SOURCES
             stdafx.cpp
             stdafx.h
-            targetver.h
-            dllmain.cpp)
+            targetver.h)
 endif()
 
 set(HEADER_FILES ../dist/$ENV{TARGET}/include/sddk.h)
