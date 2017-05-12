@@ -12,7 +12,7 @@ set(BUILD_DIR "${PARENT_DIR}/build/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
 
 
 
-if(CMAKE_HOST_WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
     set(PLATFORM_SOURCES
             stdafx.cpp
