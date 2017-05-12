@@ -55,3 +55,47 @@ ostream & operator<<(ostream & os, const AccountStatus & status) {
     return os;
 }
 
+ostream& operator<<(ostream& os, const AccountState& state) {
+    switch (state) {
+        case Unknown: {
+            os << "Unknown";
+            break;
+        }
+        case Active: {
+            os << "Active";
+            
+            break;
+        }
+        case Trial: {
+            os << "Trial";
+            
+            break;
+        }
+        case TrialExpired: {
+            os << "TrialExpired";
+            
+            break;
+        }
+        case Expired: {
+            os << "Expired";
+            
+            break;
+        }
+        case Locked: {
+            os << "Locked";
+            
+            break;
+        }
+        case ResetPassword: {
+            os << "ResetPassword";
+            
+            break;
+        }
+        case PendingCreation: {
+            os << "PendingCreation";
+            
+            break;
+        }
+    }
+    return os;
+}
