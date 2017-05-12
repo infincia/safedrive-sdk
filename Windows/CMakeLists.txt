@@ -55,26 +55,26 @@ set(SOURCE_FILES
 add_library(SafeDriveSDK ${PLATFORM_SOURCES} ${SOURCE_FILES})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(SafeDriveSDK secur32.lib userenv.lib ncrypt.lib crypt32.lib sddk.lib sodium.lib ws2_32.lib )
+    target_link_libraries(SafeDriveSDK)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    target_link_libraries(SafeDriveSDK z "-framework Foundation" "-framework Security" objc sddk.a)
+    target_link_libraries(SafeDriveSDK)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    target_link_libraries(SafeDriveSDK z sddk.a)
+    target_link_libraries(SafeDriveSDK)
 endif()
 
 
 add_executable(SafeDriveSDKTest test.cpp)
 add_dependencies(SafeDriveSDKTest SafeDriveSDK)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(SafeDriveSDKTest sddk.lib SafeDriveSDK)
+    target_link_libraries(SafeDriveSDKTest sddk.lib user32.lib secur32.lib userenv.lib ncrypt.lib crypt32.lib sodium.lib ws2_32.lib SafeDriveSDK)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    target_link_libraries(SafeDriveSDKTest z "-framework Foundation" "-framework Security" objc sddk.a SafeDriveSDK)
+    target_link_libraries(SafeDriveSDKTest z "-framework Foundation" "-framework Security" resolv objc sddk.a SafeDriveSDK)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
