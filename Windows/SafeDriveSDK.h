@@ -124,7 +124,7 @@ enum SAFEDRIVESDK_API SDKErrorType {
 	SDKErrorTypeKeyCorrupted = 0x0017,
 };
 
-class SAFEDRIVESDK_API SDKException : public std::runtime_error {
+class SAFEDRIVESDK_API SDKException {
 public:
 	SDKErrorType type();
 	std::string message();

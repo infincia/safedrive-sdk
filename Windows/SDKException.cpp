@@ -1,6 +1,6 @@
 #include "SafeDriveSDK.h"
 
-SDKException::SDKException(SDDKError* error) : runtime_error("SDKException"), error(error) {};
+SDKException::SDKException(SDDKError* error) : error(error) {};
 
 SDKErrorType SDKException::type() {
 	return SDKErrorType(error->error_type);
