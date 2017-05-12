@@ -18,4 +18,4 @@ int SDKException::code() {
 
 SDKException::~SDKException() {
 	sddk_free_error(&error);
-} 
+}
