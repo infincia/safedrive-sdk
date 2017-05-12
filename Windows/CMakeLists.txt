@@ -38,7 +38,7 @@ set(SOURCE_FILES
         )
 
 
-add_library(SafeDriveSDK ${HEADER_FILES} ${PLATFORM_SOURCES} ${SOURCE_FILES} test.cpp test.h)
+add_library(SafeDriveSDK ${PLATFORM_SOURCES} ${SOURCE_FILES})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_link_libraries(SafeDriveSDK crypt32.lib sddk.lib)
