@@ -2,6 +2,7 @@
 #include "SafeDriveSDK.h"
 #include "sddk.h"
 
+
 AccountDetails::AccountDetails(SDDKAccountDetails* details) {
 	assignedStorage = details->assigned_storage;
 	usedStorage = details->used_storage;
