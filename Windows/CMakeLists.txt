@@ -67,7 +67,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 
-add_executable(SafeDriveSDKTest test.cpp test.h)
+add_executable(SafeDriveSDKTest test.cpp)
 add_dependencies(SafeDriveSDKTest SafeDriveSDK)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_link_libraries(SafeDriveSDKTest sddk.lib SafeDriveSDK)

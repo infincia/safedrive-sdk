@@ -1,6 +1,4 @@
-#include "stdafx.h"
 #include "SafeDriveSDK.h"
-#include "sddk.h"
 
 AccountStatus::AccountStatus(SDDKAccountStatus* status) {
     switch (status->state) {

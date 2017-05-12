@@ -1,6 +1,4 @@
-#include "stdafx.h"
 #include "SafeDriveSDK.h"
-#include "sddk.h"
 
 SDKException::SDKException(SDDKError* error) : runtime_error("SDKException"), error(error) {};
 

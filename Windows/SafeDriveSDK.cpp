@@ -1,9 +1,7 @@
 // SafeDriveSDK.cpp : Defines the exported functions for the DLL application.
 //
 
-#include "stdafx.h"
 #include "SafeDriveSDK.h"
-#include "sddk.h"
 
 SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, std::string storage_directory) {
 	const char *s = storage_directory.c_str();
