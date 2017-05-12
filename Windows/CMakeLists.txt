@@ -30,7 +30,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     endif()
 
     set(PLATFORM_SOURCES
-            stdafx.cpp
             stdafx.h
             targetver.h)
 endif()
