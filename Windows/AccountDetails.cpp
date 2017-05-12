@@ -12,5 +12,5 @@ AccountDetails::AccountDetails(SDDKAccountDetails* details) {
 }
 
 AccountDetails::~AccountDetails() {
-	sddk_free_account_details(&cdetails);
+	//sddk_free_account_details(&cdetails);
 }
