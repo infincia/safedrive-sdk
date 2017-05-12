@@ -1,8 +1,8 @@
 #ifdef _WIN32
 #ifdef SAFEDRIVESDK_EXPORTS
-#define SAFEDRIVESDK_API __declspec(dllexport)
+#define SAFEDRIVESDK_API
 #else
-#define SAFEDRIVESDK_API __declspec(dllimport)
+#define SAFEDRIVESDK_API
 #endif
 #else
 #define SAFEDRIVESDK_API
