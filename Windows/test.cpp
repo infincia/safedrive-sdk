@@ -6,7 +6,7 @@
 #include "SafeDriveSDK.h"
 
 int main(int argc, char* argv[]) {
-    SafeDriveSDK sdk("1.0", "variable", "en_US", Configuration::Staging, "/var/tmp");
+    SafeDriveSDK sdk("1.0", "variable", "en_US", Configuration::Staging, "C:\\Program Files\\SafeDrive\\");
 
     std::string channel = sdk.channel();
     std::string version = sdk.version();
