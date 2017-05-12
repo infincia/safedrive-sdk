@@ -134,6 +134,8 @@ private:
 };
 
 typedef std::function<void()> SDKSuccess;
+typedef std::function<void(AccountStatus status)> SDKLoginSuccess;
+typedef std::function<void(std::vector<SoftwareClient>)> SDKGetClientsSuccess;
 typedef std::function<void(SDKException error)> SDKFailure;
 typedef std::function<void(unsigned long long total, unsigned long long current, unsigned long long new_bytes, double percent)> SyncSessionProgress;
 typedef std::function<void(std::string message)> SyncSessionIssue;

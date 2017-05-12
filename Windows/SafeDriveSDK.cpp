@@ -48,7 +48,7 @@ std::string SafeDriveSDK::version() {
 	return version;
 }
 
-void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, std::function<void(SDDKAccountStatus status)> success, SDKFailure failure) {
+void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, SDKLoginSuccess success, SDKFailure failure) {
 	std::thread t1([&] {
 		SDDKError* error = NULL;
 		SDDKAccountStatus* status = NULL;
@@ -57,8 +57,9 @@ void SafeDriveSDK::login(std::string username, std::string password, std::string
 			std::cout << "Error logging in: " << error->message << endl;
 			failure(SDKException(error));
 		} else {
-			success(*status);
-			sddk_free_account_status(&status);
+			AccountStatus s = AccountStatus(status);
+            sddk_free_account_status(&status);
+			success(s);
 		}
 	});
 }
@@ -97,7 +98,7 @@ void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phras
 	});
 }
 
-void SafeDriveSDK::get_clients(std::string username, std::string password, std::function<void(std::vector<SoftwareClient>)> success, SDKFailure failure) {
+void SafeDriveSDK::get_clients(std::string username, std::string password, SDKGetClientsSuccess success, SDKFailure failure) {
 
 	std::thread t1([&] {
 
