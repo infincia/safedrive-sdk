@@ -59,9 +59,10 @@ int main(int argc, char* argv[]) {
     }, [](SDKException error) {
         SafeDriveSDK::Log("login failed", Info);
 
-	    std::stringstream ss;
-		SafeDriveSDK::Log(ss.str(), Info);
-	});
+        std::stringstream ss;
+        ss << "error: " << error.message;
+        SafeDriveSDK::Log(ss.str(), Error);
+    });
 
 
     std::this_thread::sleep_for(std::chrono::seconds(15));
