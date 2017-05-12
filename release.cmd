@@ -67,11 +67,11 @@ IF "%TOOLSET%"=="v141_xp" (
     set VS=Visual Studio 15 2017
 )
 
-if "%CONFIGURATION"=="Release" (
+if "!CONFIGURATION!"=="Release" (
     set RUST_FLAGS="-C target-feature=+crt-static"
 )
 
-if "%CONFIGURATION"=="ReleaseDLL" (
+if "!CONFIGURATION!"=="ReleaseDLL" (
     set RUST_FLAGS="-C target-feature=-crt-static"
 )
 
