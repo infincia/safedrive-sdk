@@ -42,7 +42,7 @@ AccountStatus::AccountStatus(SDDKAccountStatus* status) {
 	host = cstatus->host;
 	port = cstatus->port;
 	user_name = cstatus->user_name;
-	cstatus = status;
+    //cstatus = status;
 }
 
 AccountStatus::~AccountStatus() {

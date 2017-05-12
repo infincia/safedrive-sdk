@@ -66,7 +66,7 @@ public:
 	AccountStatus(SDDKAccountStatus* cstatus);
 	~AccountStatus();
 private:
-	SDDKAccountStatus* cstatus;
+	//SDDKAccountStatus* cstatus;
 };
 
 class SAFEDRIVESDK_API SoftwareClient {
