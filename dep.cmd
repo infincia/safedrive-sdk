@@ -1,3 +1,5 @@
+@echo off
+
 setlocal enabledelayedexpansion
 
 IF [%ARCH%]==[] set ARCH=x86_64
