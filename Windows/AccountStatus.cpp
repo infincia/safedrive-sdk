@@ -49,3 +49,9 @@ AccountStatus::~AccountStatus() {
     //sddk_free_account_status(&cstatus);
 }
 
+
+ostream & operator<<(ostream & os, const AccountStatus & status) {
+    os << status.user_name << ":" << status.host << ":" << status.port;
+    return os;
+}
+

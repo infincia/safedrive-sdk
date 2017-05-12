@@ -65,6 +65,8 @@ public:
     sd_optional<long long> time;
 	AccountStatus(SDDKAccountStatus* cstatus);
 	~AccountStatus();
+	friend ostream& operator<<(ostream& os, const AccountStatus& status);
+
 private:
 	//SDDKAccountStatus* cstatus;
 };
