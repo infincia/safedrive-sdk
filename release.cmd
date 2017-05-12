@@ -11,7 +11,7 @@ IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
 
 ECHO Building release for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-set INTR_PREFIX=%cd%\build\%TARGET%\%TOOLSET%\%CONFIGURATION%
+set INTR_PREFIX=%cd%\build\%TARGET%\%TOOLSET%
 
 set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%CONFIGURATION%
 set DIST_PREFIX=%cd%\dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
@@ -109,8 +109,8 @@ pushd "%INTR_PREFIX%"
 cmake "%CMAKE_PREFIX%" -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"TARGET=!TARGET!" -D"TOOLSET=!TOOLSET!" -D"CONFIGURATION=!CONFIGURATION!" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" || goto :error
 msbuild /m /v:n /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! SafeDriveSDK.sln || goto :error
 popd
-@echo copying "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" to "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
-copy /y "%BUILD_PREFIX%\lib\libSafeDriveSDK.%LIBSUFFIX%" "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%" || goto :error
+@echo copying "%INTR_PREFIX%\!CONFIGURATION!\SafeDriveSDK.%LIBSUFFIX%" to "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%"
+copy /y "%INTR_PREFIX%\!CONFIGURATION!\SafeDriveSDK.%LIBSUFFIX%" "%DIST_PREFIX%\lib\SafeDriveSDK.%LIBSUFFIX%" || goto :error
 goto :EOF
 
 :error
