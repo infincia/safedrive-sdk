@@ -11,15 +11,22 @@ IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
 
 ECHO Building release for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
+set INTR_PREFIX=%cd%\build\%TARGET%\%TOOLSET%\%CONFIGURATION%
+
 set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%CONFIGURATION%
 set DIST_PREFIX=%cd%\dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
+set CMAKE_PREFIX=%cd%\Windows
 
 del /q "%DIST_PREFIX%"
+
+del /q "%INTR_PREFIX%"
 
 mkdir "%DIST_PREFIX%" > NUL
 mkdir "%DIST_PREFIX%\lib" > NUL
 mkdir "%DIST_PREFIX%\include" > NUL
 mkdir "%DIST_PREFIX%\bin" > NUL
+
+mkdir "%INTR_PREFIX%" > NUL
 
 set OPENSSL_DIR=%BUILD_PREFIX%\lib
 set SODIUM_LIB_DIR=%BUILD_PREFIX%\lib
@@ -97,7 +104,7 @@ copy /y "target\%TARGET%\release\safedrive.exe" "%DIST_PREFIX%\bin\" || goto :er
 ECHO copying "target\%TARGET%\release\safedrived.exe" "%DIST_PREFIX%\bin\"
 copy /y "target\%TARGET%\release\safedrived.exe" "%DIST_PREFIX%\bin\" || goto :error
 
-pushd Windows
+pushd "%INTR_PREFIX%"
 @echo building C++ SDK for "!VS!!CMAKE_GENERATOR_PLATFORM!"
 cmake "%CMAKE_PREFIX%" -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"TARGET=!TARGET!" -D"TOOLSET=!TOOLSET!" -D"CONFIGURATION=!CONFIGURATION!" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" || goto :error
 msbuild /m /v:n /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! SafeDriveSDK.sln || goto :error
