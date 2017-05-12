@@ -88,8 +88,8 @@ cheddar -f "sddk\src\c_api.rs" "%DIST_PREFIX%\include\sddk.h" || goto :error
 
 ECHO Copying build artifacts for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-ECHO copying "target\%TARGET%\release\sddk.lib" "%DIST_PREFIX%\lib\sddk.lib"
-copy /y "target\%TARGET%\release\sddk.lib" "%DIST_PREFIX%\sddk.lib" || goto :error
+ECHO copying "target\%TARGET%\release\sddk.lib" "%DIST_PREFIX%\lib\"
+copy /y "target\%TARGET%\release\sddk.lib" "%DIST_PREFIX%\lib\" || goto :error
 
 ECHO copying "target\%TARGET%\release\safedrive.exe" "%DIST_PREFIX%\bin\"
 copy /y "target\%TARGET%\release\safedrive.exe" "%DIST_PREFIX%\bin\" || goto :error
