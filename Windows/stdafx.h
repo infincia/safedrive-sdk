@@ -17,7 +17,12 @@
 #include <stdio.h>
 #include <string>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
+#include <sstream>
+#include <ostream>
+#include <fstream>
+#include <istream>
 #include <iomanip>
 #include <numeric>
 #include <iterator>
