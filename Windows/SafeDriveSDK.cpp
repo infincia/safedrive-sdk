@@ -73,7 +73,7 @@ std::string SafeDriveSDK::app_directory(Configuration configuration) {
 
 
 
-void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, SDKLoginSuccess success, SDKFailure failure) {
+void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, SDKAccountStatusSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError* error = NULL;
         SDDKAccountStatus* status = NULL;
@@ -163,7 +163,7 @@ void SafeDriveSDK::get_clients(std::string username, std::string password, SDKGe
     t1.detach();
 }
 
-void SafeDriveSDK::get_account_status(SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::get_account_status(SDKAccountStatusSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError* error = NULL;
         SDDKAccountStatus* cstatus = NULL;
@@ -176,14 +176,14 @@ void SafeDriveSDK::get_account_status(SDKSuccess success, SDKFailure failure) {
         else {
             AccountStatus s = AccountStatus(cstatus);
             sddk_free_account_status(&cstatus);
-            success();
+            success(s);
         }
     });
 
     t1.detach();
 }
 
-void SafeDriveSDK::get_account_details(SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::get_account_details(SDKAccountDetailsSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError* error = NULL;
         SDDKAccountDetails* cdetails = NULL;
@@ -194,9 +194,9 @@ void SafeDriveSDK::get_account_details(SDKSuccess success, SDKFailure failure) {
             failure(e);
         }
         else {
-            AccountDetails s = AccountDetails(cdetails);
+            AccountDetails d = AccountDetails(cdetails);
             sddk_free_account_details(&cdetails);
-            success();
+            success(d);
         }
     });
 

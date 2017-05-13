@@ -126,7 +126,8 @@ public:
 };
 
 typedef std::function<void()> SDKSuccess;
-typedef std::function<void(AccountStatus status)> SDKLoginSuccess;
+typedef std::function<void(AccountStatus status)> SDKAccountStatusSuccess;
+typedef std::function<void(AccountDetails details)> SDKAccountDetailsSuccess;
 typedef std::function<void(std::vector<SoftwareClient>)> SDKGetClientsSuccess;
 typedef std::function<void(SDKException error)> SDKFailure;
 typedef std::function<void(unsigned long long total, unsigned long long current, unsigned long long new_bytes, double percent)> SyncSessionProgress;
@@ -142,12 +143,12 @@ public:
     ~SafeDriveSDK();
     std::string channel();
     std::string version();
-    void login(std::string username, std::string password, std::string unique_client_id, SDKLoginSuccess success, SDKFailure failure);
+    void login(std::string username, std::string password, std::string unique_client_id, SDKAccountStatusSuccess success, SDKFailure failure);
     void get_clients(std::string username, std::string password, SDKGetClientsSuccess success, SDKFailure failure);
     void remove_client(std::string unique_client_id, SDKSuccess success, SDKFailure failure);
     std::string app_directory(Configuration configuration);
-    void get_account_status(SDKSuccess success, SDKFailure failure);
-    void get_account_details(SDKSuccess success, SDKFailure failure);
+    void get_account_status(SDKAccountStatusSuccess success, SDKFailure failure);
+    void get_account_details(SDKAccountDetailsSuccess success, SDKFailure failure);
     std::string generate_unique_client_id();
     void load_keys(const char * phrase, SaveRecoveryPhrase store_phrase, Issue issue, SDKSuccess success, SDKFailure failure);
     static void Log(std::string message, LogLevel level);
