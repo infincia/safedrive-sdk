@@ -2,7 +2,7 @@
 #![allow(unused_mut)]
 
 use std;
-use std::ffi::{CStr, CString};
+use std::ffi::{CStr, CString, OsString};
 use std::str;
 use std::path::{Path, PathBuf};
 
@@ -640,6 +640,76 @@ pub extern "C" fn sddk_get_channel() -> *mut std::os::raw::c_char {
 pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
     let version = ::core::get_version();
     CString::new(version.as_str()).unwrap().into_raw()
+}
+
+/// Get local app storage directory
+///
+/// Returned string must be passed back to the SDK to free it
+///
+///     `config`: an enum variant of `SDDKConfiguration` which is used to keep the two environments separate
+///
+///             use `SDDKConfigurationStaging` for the staging environment
+///             use `SDDKConfigurationProduction` for the production environment
+///
+///`storage_path`: an uninitialized pointer that will be allocated and initialized when the function
+///                returns if the return value was 0
+///
+///                must be freed by the caller using `sddk_free_string()`
+///
+///    `error`: an uninitialized pointer that will be allocated and initialized when the function
+///             returns if the return value was -1
+///
+///             must be freed by the caller using `sddk_free_error()`
+///
+/// # Examples
+///
+/// ```c
+/// char *storage_path = NULL;
+/// SDDKError* error = NULL;
+/// if (0 != sddk_get_app_directory(SDDKConfigurationStaging, &path, &error)) {
+///     //do something with error here, then free it
+///     sddk_free_error(&error);
+/// } else {
+///     //do something with storage_path here, store it somewhere, then free it later on
+///     sddk_free_string(&storage_path);
+/// }
+/// ```
+///
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_app_directory(config: SDDKConfiguration, mut storage_path: *mut *mut std::os::raw::c_char, mut error: *mut *mut SDDKError) -> std::os::raw::c_char {
+
+    let c = match config {
+        SDDKConfiguration::SDDKConfigurationProduction => Configuration::Production,
+        SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
+    };
+
+    let directory: PathBuf = match ::core::get_app_directory(&c) {
+        Ok(p) => p,
+        Err(err) => panic!("string is not valid UTF-8: {}", err),
+    };
+
+    let osp: OsString = directory.into_os_string();
+
+    match osp.into_string() {
+        Ok(s) => {
+            unsafe {
+                *storage_path = CString::new(s).expect("Failed to get directory").into_raw();
+            }
+            0
+        },
+        Err(_) => {
+            let c_err = SDDKError::from(SDError::UnicodeError);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        }
+    }
 }
 
 

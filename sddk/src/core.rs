@@ -58,7 +58,6 @@ pub fn sha256(input: &[u8]) -> String {
 
 pub use util::pretty_bytes;
 
-pub use util::get_app_directory;
 pub use util::generate_uuid as generate_unique_client_id;
 pub use util::get_current_os;
 
@@ -97,6 +96,10 @@ pub fn get_version() -> String {
     let version: &str = env!("CARGO_PKG_VERSION");
 
     version.to_owned()
+}
+
+pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
+    ::util::get_app_directory(config)
 }
 
 /// internal functions
