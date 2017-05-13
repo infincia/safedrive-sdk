@@ -44,7 +44,7 @@ before_install:
           linux)
           ;;
           osx)
-          brew install cmake
+          brew upgrade cmake
           ;;
       esac;
 
