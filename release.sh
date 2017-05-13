@@ -138,8 +138,17 @@ echo "Building C++ SDK for ${TARGET}"
 
 pushd "${INTR_PREFIX}"
 
-cmake "${CMAKE_PREFIX}" -G Xcode -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
-xcodebuild
+case ${TARGET} in
+    x86_64-apple-darwin)
+        cmake "${CMAKE_PREFIX}" -G Xcode -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
+        xcodebuild
+        ;;
+    *)
+        cmake "${CMAKE_PREFIX}" -G"Unix Makefiles" -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
+        make
+        ;;
+esac
+
 popd
 
 echo copying ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a to ${DIST_PREFIX}/lib/
