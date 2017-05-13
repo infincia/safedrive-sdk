@@ -2,7 +2,7 @@
 
 setlocal enabledelayedexpansion
 
-IF [%ARCH%]==[] set ARCH=x86_64
+IF [%ARCH%]==[] set ARCH=x64
 IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
 IF [%TOOLSET%]==[] set TOOLSET=v141_xp
 IF [%CONFIGURATION%]==[] set CONFIGURATION=Release
