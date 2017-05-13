@@ -4,7 +4,7 @@
 use std;
 use std::ffi::{CStr, CString, OsString};
 use std::str;
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 
 use std::u64;
 /// internal imports
@@ -560,23 +560,28 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
         SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
     };
 
-    let storage_directory: String = match local_storage_path.is_null() {
+    let storage_path: PathBuf = match local_storage_path.is_null() {
         true => {
-            "/var/tmp/safedrive".to_owned() //sane default if nothing was passed in,
+            //sane default if nothing was passed in,
+            match ::core::get_app_directory(&c) {
+                Ok(p) => p,
+                Err(err) => panic!("string is not valid UTF-8: {}", err),
+            }
         },
         false => {
             let lstorage: &CStr = unsafe { CStr::from_ptr(local_storage_path) };
 
-            match lstorage.to_str() {
-                Ok(s) => s.to_owned(),
+            let s = match lstorage.to_str() {
+                Ok(s) => s,
                 Err(err) => panic!("string is not valid UTF-8: {}", err),
-            }
+            };
+
+            PathBuf::from(s)
         },
     };
 
-    let storage_path = Path::new(&storage_directory);
 
-    match initialize(&cv, true, &os, &langc, c, ::log::LogLevelFilter::Info, storage_path) {
+    match initialize(&cv, true, &os, &langc, c, ::log::LogLevelFilter::Info, &storage_path) {
         Ok(()) => {
 
             let sstate = State::new();
