@@ -69,6 +69,10 @@ rm -rf ${DIST_PREFIX}
 mkdir -p ${DIST_PREFIX}/lib
 mkdir -p ${DIST_PREFIX}/include
 mkdir -p ${DIST_PREFIX}/bin
+mkdir -p ${INTR_PREFIX}
+mkdir -p ${INTR_PREFIX}/Release
+mkdir -p ${INTR_PREFIX}/Debug
+
 
 echo "Building dependencies for ${TARGET}"
 
