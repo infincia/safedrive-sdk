@@ -625,7 +625,7 @@ pub extern "C" fn sddk_get_channel() -> *mut std::os::raw::c_char {
 
 /// Get SDK version
 ///
-/// Returned string must be pased back to the SDK to free it
+/// Returned string must be passed back to the SDK to free it
 ///
 /// # Examples
 ///
