@@ -32,9 +32,12 @@
 #ifdef _WIN32
 #include <optional>
 template<typename T> using sd_optional = std::optional<T>;
+template<typename T> using sd_optional_none = std::optional::nullopt
+
 #else
 #include <experimental/optional>
 template<typename T> using sd_optional = std::experimental::optional<T>;
+template<typename T> using sd_optional_none = std::experimental::nullopt_t;
 #endif
 #include <atomic>
 
