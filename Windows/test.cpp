@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
 
     std::string channel = sdk.channel();
     std::string version = sdk.version();
+    std::string storage = sdk.app_directory(Configuration::Staging);
 
     std::stringstream is;
     is << "SafeDriveSDK<" << channel << "> " << version;
