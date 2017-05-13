@@ -141,7 +141,7 @@ pushd "${INTR_PREFIX}"
 case ${TARGET} in
     x86_64-apple-darwin)
         cmake "${CMAKE_PREFIX}" -G Xcode -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
-        xcodebuild
+        xcodebuild -configuration ${CONFIGURATION}
 
         echo copying ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a to ${DIST_PREFIX}/lib/
         cp -a ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a ${DIST_PREFIX}/lib/
