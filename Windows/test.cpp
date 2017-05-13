@@ -15,6 +15,9 @@ int main(int argc, char* argv[]) {
     is << "SafeDriveSDK<" << channel << "> " << version;
     SafeDriveSDK::Log(is.str(), Info);
 
+#ifdef USE_KEYCHAIN
+    std::string user = sdk.get_keychain_item("currentuser", "currentuser.safedrive.io");
+#else
     #ifdef _WIN32
     std::string user;
     user.resize(65535);
@@ -23,7 +26,12 @@ int main(int argc, char* argv[]) {
     #else
     std::string user = std::getenv("TEST_USER");
     #endif
+#endif
 
+#ifdef USE_KEYCHAIN
+    std::string password = sdk.get_keychain_item(user, "safedrive.io");
+
+#else
     #ifdef _WIN32
     std::string password;
     password.resize(65535);
@@ -32,7 +40,8 @@ int main(int argc, char* argv[]) {
     #else
     std::string password = std::getenv("TEST_PASSWORD");
     #endif
-
+#endif
+    
     std::stringstream us;
 
     us << "login: " << user;
@@ -42,6 +51,9 @@ int main(int argc, char* argv[]) {
     ps << "password: " << password;
     SafeDriveSDK::Log(ps.str(), Info);
 
+#ifdef USE_KEYCHAIN
+    std::string ucid = sdk.get_keychain_item(user, "ucid.safedrive.io");
+#else
     #ifdef _WIN32
     std::string ucid;
     ucid.resize(65535);
@@ -50,7 +62,8 @@ int main(int argc, char* argv[]) {
     #else
     std::string ucid = std::getenv("TEST_UCID");
     #endif
-
+#endif
+    
     sdk.login(user, password, ucid, [](AccountStatus status) {
         SafeDriveSDK::Log("login succeeded", Info);
 
