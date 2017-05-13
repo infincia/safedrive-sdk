@@ -4,6 +4,8 @@ project(SafeDriveSDK)
 set(CMAKE_SUPPRESS_REGENERATION true)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+
 
 get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
@@ -30,6 +32,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
             stdafx.h
             targetver.h)
 else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" "${CFLAGS}")
+    set(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS}" "${CPPFLAGS}")
+
     set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/")
     set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/")
     set(BUILD_DIR "${PARENT_DIR}/build/${TARGET}/")
