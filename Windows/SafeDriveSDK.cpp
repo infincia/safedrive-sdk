@@ -49,6 +49,30 @@ std::string SafeDriveSDK::version() {
     return version;
 }
 
+std::string SafeDriveSDK::app_directory(Configuration configuration) {
+    char* path = NULL;
+    SDDKError* error = NULL;
+    SDDKConfiguration c;
+    switch (configuration) {
+        case Production:
+            c = SDDKConfigurationProduction;
+            break;
+        case Staging:
+            c = SDDKConfigurationStaging;
+            break;
+    }
+    
+    if (0 != sddk_get_app_directory(c, &path, &error)) {
+        SDKException e(error);
+        throw e;
+    }
+    std::string s = path;
+    sddk_free_string(&path);
+    return s;
+}
+
+
+
 void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, SDKLoginSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError* error = NULL;
