@@ -524,7 +524,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                                   mut state: *mut *mut SDDKState,
                                   mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let cv: String = match client_version.is_null() {
-        true => "0.0".to_owned(),
+        true => "9999".to_owned(),
         false => {
             let cvs: &CStr = unsafe { CStr::from_ptr(client_version) };
 
