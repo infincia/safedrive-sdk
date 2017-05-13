@@ -274,7 +274,13 @@ if [ ${BUILD_LIBRESSL} = true ]; then
         rm -rf libressl*
         tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
         pushd libressl-${LIBRESSL_VER} > /dev/null
-            patch -p0 < ../../libressl-musl.patch
+            case ${TARGET} in
+                i686-unknown-linux-musl|x86_64-unknown-linux-musl)
+                    patch -p0 < ../../libressl-musl.patch
+                    ;;
+                *)
+                    ;;
+            esac
             ./configure --prefix=${BUILD_PREFIX} ${LIBRESSL_ARGS} > /dev/null
             make install > /dev/null
         popd > /dev/null
