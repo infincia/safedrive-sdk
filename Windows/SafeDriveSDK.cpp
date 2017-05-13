@@ -500,3 +500,39 @@ void SafeDriveSDK::report_error(std::exception exc, std::string context, std::st
 
     t1.detach();
 }
+
+
+std::string SafeDriveSDK::get_keychain_item(std::string username, std::string service) {
+    char* secret = NULL;
+    SDDKError* error = NULL;
+    
+    if (0 != sddk_get_keychain_item(username.c_str(), service.c_str(), &secret, &error)) {
+        SDKException e(error);
+        sddk_free_error(&error);
+        throw e;
+    }
+
+    std::string s = secret;
+    sddk_free_string(&secret);
+    return s;
+}
+
+void SafeDriveSDK::delete_keychain_item(std::string username, std::string service) {
+    SDDKError* error = NULL;
+    if (0 != sddk_delete_keychain_item(username.c_str(), service.c_str(), &error)) {
+        SDKException e(error);
+        sddk_free_error(&error);
+        throw e;
+    }
+}
+
+void SafeDriveSDK::set_keychain_item(std::string username, std::string service, std::string secret) {
+    SDDKError* error = NULL;
+    if (0 != sddk_set_keychain_item(username.c_str(), service.c_str(), secret.c_str(), &error)) {
+        SDKException e(error);
+        sddk_free_error(&error);
+        throw e;
+    }
+}
+
+

@@ -164,6 +164,11 @@ public:
     void restore_folder(unsigned long long folder_id, std::string session_name, std::string destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
     void report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, sd_optional<std::string> operating_system, sd_optional<std::string> client_version, SDKSuccess success, SDKFailure failure);
     bool ready();
+    std::string get_keychain_item(std::string username, std::string service);
+    void delete_keychain_item(std::string username, std::string service);
+    void set_keychain_item(std::string username, std::string service, std::string secret);
+
+
 private:
     SDDKState * state;
     std::atomic<bool> _ready = ATOMIC_VAR_INIT(false);
