@@ -142,14 +142,14 @@ case ${TARGET} in
     x86_64-apple-darwin)
         cmake "${CMAKE_PREFIX}" -G Xcode -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
         xcodebuild
+
+        echo copying ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a to ${DIST_PREFIX}/lib/
+        cp -a ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a ${DIST_PREFIX}/lib/
         ;;
     *)
-        cmake "${CMAKE_PREFIX}" -G"Unix Makefiles" -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
-        make
+        #cmake "${CMAKE_PREFIX}" -G"Unix Makefiles" -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
+        #make
         ;;
 esac
 
 popd
-
-echo copying ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a to ${DIST_PREFIX}/lib/
-cp -a ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a ${DIST_PREFIX}/lib/
