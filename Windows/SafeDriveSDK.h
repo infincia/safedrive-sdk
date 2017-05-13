@@ -64,7 +64,7 @@ public:
     std::string user_name;
     sd_optional<long long> time;
     AccountStatus(SDDKAccountStatus* cstatus);
-    friend ostream& operator<<(ostream& os, const AccountStatus& status);
+    friend std::ostream& operator<<(std::ostream& os, const AccountStatus& status);
 };
 
 class SAFEDRIVESDK_API SoftwareClient {

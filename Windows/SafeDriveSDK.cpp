@@ -482,7 +482,7 @@ void SafeDriveSDK::report_error(std::exception exc, std::string context, std::st
                                    description.c_str(), 
                                    context.c_str(),
                                    &error)) {
-            std::cout << "Error reporting error: " << error->message << endl;
+            std::cout << "Error reporting error: " << error->message << std::endl;
             SDKException e(error);
             sddk_free_error(&error);
             failure(e);

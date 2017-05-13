@@ -38,5 +38,4 @@ template<typename T> using sd_optional = std::experimental::optional<T>;
 #endif
 #include <atomic>
 
-using namespace std;
 

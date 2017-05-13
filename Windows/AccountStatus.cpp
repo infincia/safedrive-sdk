@@ -45,12 +45,12 @@ AccountStatus::AccountStatus(SDDKAccountStatus* status) {
 }
 
 
-ostream & operator<<(ostream & os, const AccountStatus & status) {
+std::ostream & operator<<(std::ostream & os, const AccountStatus & status) {
     os << status.user_name << ":" << status.host << ":" << status.port;
     return os;
 }
 
-ostream& operator<<(ostream& os, const AccountState& state) {
+std::ostream& operator<<(std::ostream& os, const AccountState& state) {
     switch (state) {
         case Unknown: {
             os << "Unknown";
