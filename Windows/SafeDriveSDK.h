@@ -139,7 +139,7 @@ typedef std::function<void(std::string message)> Issue;
 
 class SAFEDRIVESDK_API SafeDriveSDK {
 public:
-    SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, std::string storage_directory);
+    SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, sd_optional<std::string> storage_directory);
     ~SafeDriveSDK();
     std::string channel();
     std::string version();

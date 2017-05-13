@@ -3,8 +3,14 @@
 
 #include "SafeDriveSDK.h"
 
-SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, std::string storage_directory) {
-    const char *s = storage_directory.c_str();
+SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, sd_optional<std::string> storage_directory) {
+    const char *s;
+    
+    if (storage_directory) {
+        s = (*storage_directory).c_str();
+    } else {
+        s = NULL;
+    }
     const char *cv = client_version.c_str();
     const char *os = operating_system.c_str();
     const char *l = locale.c_str();
