@@ -475,7 +475,13 @@ impl SDDKSyncCleaningSchedule {
 ///
 /// Parameters:
 ///
+///     Note: every parameter except `config` can be NULL, a sane default will be used in that case
+///
 ///     `local_storage_path`: a NULL-terminated string representing the location the app can store settings for a user
+///
+///     `operating_system`: a NULL-terminated string representing the current OS name
+///
+///     `language_code`: a NULL-terminated string representing the current language/locale
 ///
 ///     `unique_client_id`: a NULL-terminated string representing the current unique client id
 ///
@@ -543,7 +549,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
     let langc: String = match language_code.is_null() {
         true => {
-            "en_US".to_owned() //sane default if nothing was passed in, might want to check libc
+            "en_US".to_owned() //sane default if nothing was passed in, might want to check libc instead
         },
         false => {
             let c_language_code: &CStr = unsafe { CStr::from_ptr(language_code) };
