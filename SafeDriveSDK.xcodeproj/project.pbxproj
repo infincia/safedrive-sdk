@@ -16,6 +16,7 @@
 		AA97A1AD1E2C64C100CAAD19 /* SafeDriveSDKTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */; };
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFDD561DC4E91000B4EAC7 /* libz.tbd */; };
+		AAEB930D1EC6AC2A00B8685B /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,6 +56,7 @@
 		AAAD31321EB14C9E00221427 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = "<group>"; };
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -63,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAEB930D1EC6AC2A00B8685B /* libresolv.tbd in Frameworks */,
 				AA3808721EB7B4AB00BA5F3E /* libsddk.a in Frameworks */,
 				AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */,
 			);
@@ -118,6 +121,7 @@
 		AABFDD551DC4E91000B4EAC7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */,
 				AAAD31331EB14CB800221427 /* libsddk */,
 				AABFDD561DC4E91000B4EAC7 /* libz.tbd */,
 			);
