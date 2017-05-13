@@ -5,7 +5,7 @@
 #include "SafeDriveSDK.h"
 
 int main(int argc, char* argv[]) {
-    SafeDriveSDK sdk("1.0", "variable", "en_US", Configuration::Staging, NULL);
+    SafeDriveSDK sdk("1.0", "variable", "en_US", Configuration::Staging, std::experimental::nullopt);
 
     std::string channel = sdk.channel();
     std::string version = sdk.version();
