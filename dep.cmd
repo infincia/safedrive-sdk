@@ -130,7 +130,7 @@ del /q libsodium-!SODIUM_VER!
 copy /y "!BUILD_PREFIX!\lib\libsodium.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\sodium.!LIBSUFFIX!" || goto :error
 @echo !SODIUM_VER!> !SODIUM_VER_FILE!
 popd
-goto :EOF
+goto :checklibressl
 
 
 
