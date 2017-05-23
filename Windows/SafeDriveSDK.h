@@ -75,12 +75,6 @@ public:
     AccountDetails(SDDKAccountDetails* cdetails);
 };
 
-class SAFEDRIVESDK_API SafeDriveNotification {
-public:
-    std::string title;
-    std::string message;
-};
-
 enum SDKErrorType {
     SDKErrorTypeStateMissing = 0x0000,
     SDKErrorTypeInternal = 0x0001,
