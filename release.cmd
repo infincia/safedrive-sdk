@@ -121,6 +121,10 @@ msbuild /m /v:n /t:SafeDriveSDK /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuratio
 popd
 @echo copying "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" to "!BUILD_PREFIX!\SafeDriveSDK.!LIBSUFFIX!"
 copy /y "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" "!BUILD_PREFIX!\SafeDriveSDK.!LIBSUFFIX!" || goto :error
+
+ECHO copying "!CMAKE_PREFIX!\SafeDriveSDK.h" "!BUILD_PREFIX!\include\SafeDriveSDK.h"
+copy /y "!CMAKE_PREFIX!\SafeDriveSDK.h" "!BUILD_PREFIX!\include\SafeDriveSDK.h" || goto :error
+
 goto :EOF
 
 :error
