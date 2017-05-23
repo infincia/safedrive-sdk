@@ -30,7 +30,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     endif()
     set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
     set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
-    set(BUILD_DIR "${PARENT_DIR}/${PLATFORM}/${CONFIGURATION}/")
+    set(BUILD_DIR "${PARENT_DIR}/../${PLATFORM}/${CONFIGURATION}/")
     set(PLATFORM_SOURCES
             stdafx.h
             targetver.h)
