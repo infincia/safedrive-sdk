@@ -16,6 +16,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <codecvt>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -37,5 +38,21 @@ template<typename T> using sd_optional = std::optional<T>;
 template<typename T> using sd_optional = std::experimental::optional<T>;
 #endif
 #include <atomic>
+// convert UTF-8 string to wstring
+static std::wstring utf8_to_wstring(const std::string& str);
+
+// convert wstring to UTF-8 string
+static std::string wstring_to_utf8(const std::wstring& str);
 
 
+// convert UTF-8 string to wstring
+static std::wstring utf8_to_wstring(const std::string& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+    return myconv.from_bytes(str);
+}
+
+// convert wstring to UTF-8 string
+static std::string wstring_to_utf8(const std::wstring& str) {
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+    return myconv.to_bytes(str);
+}
