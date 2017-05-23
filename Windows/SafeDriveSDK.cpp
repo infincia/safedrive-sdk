@@ -3,17 +3,17 @@
 
 #include "SafeDriveSDK.h"
 
-SafeDriveSDK::SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, sd_optional<std::string> storage_directory) {
+SafeDriveSDK::SafeDriveSDK(std::wstring client_version, std::wstring operating_system, std::wstring locale, Configuration configuration, std::optional<std::wstring> storage_directory) {
     const char *s;
     
     if (storage_directory) {
-        s = (*storage_directory).c_str();
+        s = wstring_to_utf8((*storage_directory)).c_str();
     } else {
         s = NULL;
     }
-    const char *cv = client_version.c_str();
-    const char *os = operating_system.c_str();
-    const char *l = locale.c_str();
+    const char *cv = wstring_to_utf8(client_version).c_str();
+    const char *os = wstring_to_utf8(operating_system).c_str();
+    const char *l = wstring_to_utf8(locale).c_str();
 
     SDDKConfiguration c;
     switch (configuration) {
@@ -41,21 +41,21 @@ SafeDriveSDK::~SafeDriveSDK() {
     sddk_free_state(&state);
 }
 
-std::string SafeDriveSDK::channel() {
+std::wstring SafeDriveSDK::channel() {
     char* ch = sddk_get_channel();
-    std::string channel(ch);
+    std::wstring channel(utf8_to_wstring(ch));
     sddk_free_string(&ch);
     return channel;
 }
 
-std::string SafeDriveSDK::version() {
+std::wstring SafeDriveSDK::version() {
     char* ver = sddk_get_version();
-    std::string version(ver);
+    std::wstring version(utf8_to_wstring(ver));
     sddk_free_string(&ver);
     return version;
 }
 
-std::string SafeDriveSDK::app_directory(Configuration configuration) {
+std::wstring SafeDriveSDK::app_directory(Configuration configuration) {
     char* path = NULL;
     SDDKError* error = NULL;
     SDDKConfiguration c;
@@ -72,18 +72,18 @@ std::string SafeDriveSDK::app_directory(Configuration configuration) {
         SDKException e(error);
         throw e;
     }
-    std::string s = path;
+    std::wstring s = utf8_to_wstring(path);
     sddk_free_string(&path);
     return s;
 }
 
 
 
-void SafeDriveSDK::login(std::string username, std::string password, std::string unique_client_id, SDKAccountStatusSuccess success, SDKFailure failure) {
+void SafeDriveSDK::login(std::wstring username, std::wstring password, std::wstring unique_client_id, SDKAccountStatusSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError* error = NULL;
         SDDKAccountStatus* status = NULL;
-        int res = sddk_login(state, unique_client_id.c_str(), username.c_str(), password.c_str(), &status, &error);
+        int res = sddk_login(state, wstring_to_utf8(unique_client_id).c_str(), wstring_to_utf8(username).c_str(), wstring_to_utf8(password).c_str(), &status, &error);
         if (res == -1) {
             SDKException e(error);
             sddk_free_error(&error);
@@ -98,7 +98,7 @@ void SafeDriveSDK::login(std::string username, std::string password, std::string
     t1.detach();
 }
 
-void SafeDriveSDK::remove_client(std::string unique_client_id, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::remove_client(std::wstring unique_client_id, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError* error = NULL;
         if (0 != sddk_remove_client(state, &error)) {
@@ -120,9 +120,9 @@ void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phras
         void * c2 = static_cast<void*>(&issue);
 
         if (0 != sddk_load_keys(c, c2, state, &error, phrase, [](void* context, void* context2, char* new_phrase) {
-            (*static_cast<SaveRecoveryPhrase*>(context))(new_phrase);
+            (*static_cast<SaveRecoveryPhrase*>(context))(utf8_to_wstring(new_phrase));
         }, [](void* context, void* context2, char* message) {
-            (*static_cast<Issue*>(context))(message);
+            (*static_cast<Issue*>(context))(utf8_to_wstring(message));
 
         })) {
             _ready = false;
@@ -139,13 +139,13 @@ void SafeDriveSDK::load_keys(const char * phrase, SaveRecoveryPhrase store_phras
     t1.detach();
 }
 
-void SafeDriveSDK::get_clients(std::string username, std::string password, SDKGetClientsSuccess success, SDKFailure failure) {
+void SafeDriveSDK::get_clients(std::wstring username, std::wstring password, SDKGetClientsSuccess success, SDKFailure failure) {
 
     std::thread t1([&] {
 
         SDDKSoftwareClient* clients = NULL;
         SDDKError* error = NULL;
-        long long res = sddk_get_software_clients(username.c_str(), password.c_str(), &clients, &error);
+        long long res = sddk_get_software_clients(wstring_to_utf8(username).c_str(), wstring_to_utf8(password).c_str(), &clients, &error);
 
         if (res == -1) {
             SDKException e(error);
@@ -209,18 +209,18 @@ void SafeDriveSDK::get_account_details(SDKAccountDetailsSuccess success, SDKFail
     t1.detach();
 }
 
-std::string SafeDriveSDK::generate_unique_client_id() {
+std::wstring SafeDriveSDK::generate_unique_client_id() {
     char* unique_client_id = NULL;
     sddk_generate_unique_client_id(&unique_client_id);
-    std::string s = unique_client_id;
+    std::wstring s = utf8_to_wstring(unique_client_id);
     sddk_free_string(&unique_client_id);
     return s;
 }
 
-void SafeDriveSDK::add_folder(std::string name, std::string path, bool encrypted, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::add_folder(std::wstring name, std::wstring path, bool encrypted, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError * error = NULL;
-        if (0 != sddk_add_sync_folder(state, name.c_str(), path.c_str(), encrypted, &error)) {
+        if (0 != sddk_add_sync_folder(state, wstring_to_utf8(name).c_str(), wstring_to_utf8(path).c_str(), encrypted, &error)) {
             SDKException e(error);
             sddk_free_error(&error);
             failure(e);
@@ -233,7 +233,7 @@ void SafeDriveSDK::add_folder(std::string name, std::string path, bool encrypted
     t1.detach();
 }
 
-void SafeDriveSDK::update_folder(std::string name, std::string path, bool syncing, unsigned long long unique_id, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::update_folder(std::wstring name, std::wstring path, bool syncing, unsigned long long unique_id, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         unsigned char c_syncing = 0;
         if (syncing) {
@@ -241,7 +241,7 @@ void SafeDriveSDK::update_folder(std::string name, std::string path, bool syncin
         }
 
         SDDKError * error = NULL;
-        if (0 != sddk_update_sync_folder(state, name.c_str(), path.c_str(), c_syncing, unique_id, &error)) {
+        if (0 != sddk_update_sync_folder(state, wstring_to_utf8(name).c_str(), wstring_to_utf8(path).c_str(), c_syncing, unique_id, &error)) {
             SDKException e(error);
             sddk_free_error(&error);
             failure(e);
@@ -281,7 +281,7 @@ void SafeDriveSDK::get_folder(unsigned long long folderID, SDKSuccess success, S
             failure(e);
         }
         else {
-            Folder new_folder = Folder(cfolder);
+            SyncFolder new_folder = SyncFolder(cfolder);
             success();
             sddk_free_folder(&cfolder);
         }
@@ -302,10 +302,10 @@ void SafeDriveSDK::get_folders(SDKSuccess success, SDKFailure failure) {
         }
         else {
             SDDKFolder * head = cfolders;
-            std::vector<Folder> folders;
+            std::vector<SyncFolder> folders;
             for (int i = 0; i < res; i++, cfolders++) {
                 SDDKFolder* cfolder = cfolders;
-                Folder folder = Folder(cfolder);
+                SyncFolder folder = SyncFolder(cfolder);
                 folders.push_back(folder);
             }
             success();
@@ -359,10 +359,10 @@ void SafeDriveSDK::remove_session(unsigned long long session_id, SDKSuccess succ
     t1.detach();
 }
 
-void SafeDriveSDK::cancel_sync_task(std::string session_name, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::cancel_sync_task(std::wstring session_name, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError * error = NULL;
-        if (0 != sddk_cancel_sync_task(session_name.c_str(), &error)) {
+        if (0 != sddk_cancel_sync_task(wstring_to_utf8(session_name).c_str(), &error)) {
             SDKException e(error);
             sddk_free_error(&error);
             failure(e);
@@ -375,7 +375,7 @@ void SafeDriveSDK::cancel_sync_task(std::string session_name, SDKSuccess success
     t1.detach();
 }
 
-void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::string session_name, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::wstring session_name, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError * error = NULL;
         void * c_progress = static_cast<void*>(&progress);
@@ -385,13 +385,13 @@ void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::string session
             c_issue,
             state,
             &error,
-            session_name.c_str(),
+            wstring_to_utf8(session_name).c_str(),
             folder_id,
             [](void* context, void* context2, unsigned long long total, unsigned long long current, unsigned long long new_bytes, double percent, unsigned int  tick) {
                 (*static_cast<SyncSessionProgress*>(context))(total, current, new_bytes, percent);
             },
             [](void* context, void* context2, char const* message) {
-                (*static_cast<SyncSessionIssue*>(context2))(message);
+                (*static_cast<SyncSessionIssue*>(context2))(utf8_to_wstring(message));
             });
 
         if (0 != res) {
@@ -407,7 +407,7 @@ void SafeDriveSDK::sync_folder(unsigned long long folder_id, std::string session
     t1.detach();
 }
 
-void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string session_name, std::string destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::wstring session_name, std::wstring destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError * error = NULL;
         void * c_progress = static_cast<void*>(&progress);
@@ -417,15 +417,15 @@ void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string sess
             c_issue,
             state,
             &error,
-            session_name.c_str(),
+            wstring_to_utf8(session_name).c_str(),
             folder_id,
-            destination.c_str(),
+            wstring_to_utf8(destination).c_str(),
             session_size,
             [](void* context, void* context2, unsigned long long total, unsigned long long current, unsigned long long new_bytes, double percent, unsigned int  tick) {
                 (*static_cast<SyncSessionProgress*>(context))(total, current, new_bytes, percent);
             },
             [](void* context, void* context2, char const* message) {
-                (*static_cast<SyncSessionIssue*>(context2))(message);
+                (*static_cast<SyncSessionIssue*>(context2))(utf8_to_wstring(message));
             });
 
         if (0 != res) {
@@ -441,9 +441,9 @@ void SafeDriveSDK::restore_folder(unsigned long long folder_id, std::string sess
     t1.detach();
 }
 
-void SafeDriveSDK::Log(std::string message, LogLevel level) {
+void SafeDriveSDK::Log(std::wstring message, LogLevel level) {
     std::thread t1([message, level] {
-        const char *m = message.c_str();
+        const char *m = wstring_to_utf8(message).c_str();
 
         unsigned char l = 0;
         switch (level) {
@@ -471,24 +471,24 @@ void SafeDriveSDK::Log(std::string message, LogLevel level) {
 }
 
 
-void SafeDriveSDK::report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, sd_optional<std::string> operating_system, sd_optional<std::string> client_version, SDKSuccess success, SDKFailure failure) {
+void SafeDriveSDK::report_error(std::exception exc, std::wstring context, std::wstring description, std::wstring unique_client_id, std::optional<std::wstring> operating_system, std::optional<std::wstring> client_version, SDKSuccess success, SDKFailure failure) {
     std::thread t1([&] {
         SDDKError * error = NULL;
         const char* c_client_version = NULL;
         if (client_version) {
-            c_client_version = (*client_version).c_str();
+            c_client_version = wstring_to_utf8((*client_version)).c_str();
         }
         const char* c_operating_system = NULL;
         if (operating_system) {
-            c_operating_system = (*operating_system).c_str();
+            c_operating_system = wstring_to_utf8((*operating_system)).c_str();
         }
         if (0 != sddk_report_error(c_client_version, 
                                    c_operating_system, 
-                                   unique_client_id.c_str(), 
-                                   description.c_str(), 
-                                   context.c_str(),
+                                   wstring_to_utf8(unique_client_id).c_str(),
+                                   wstring_to_utf8(description).c_str(),
+                                   wstring_to_utf8(context).c_str(),
                                    &error)) {
-            std::cout << "Error reporting error: " << error->message << std::endl;
+            std::wcout << L"Error reporting error: " << utf8_to_wstring(error->message) << std::endl;
             SDKException e(error);
             sddk_free_error(&error);
             failure(e);
@@ -502,37 +502,180 @@ void SafeDriveSDK::report_error(std::exception exc, std::string context, std::st
 }
 
 
-std::string SafeDriveSDK::get_keychain_item(std::string username, std::string service) {
+std::wstring SafeDriveSDK::get_keychain_item(std::wstring username, std::wstring service) {
     char* secret = NULL;
     SDDKError* error = NULL;
     
-    if (0 != sddk_get_keychain_item(username.c_str(), service.c_str(), &secret, &error)) {
+    if (0 != sddk_get_keychain_item(wstring_to_utf8(username).c_str(), wstring_to_utf8(service).c_str(), &secret, &error)) {
         SDKException e(error);
         sddk_free_error(&error);
         throw e;
     }
 
-    std::string s = secret;
+    std::wstring s = utf8_to_wstring(secret);
     sddk_free_string(&secret);
     return s;
 }
 
-void SafeDriveSDK::delete_keychain_item(std::string username, std::string service) {
+void SafeDriveSDK::delete_keychain_item(std::wstring username, std::wstring service) {
     SDDKError* error = NULL;
-    if (0 != sddk_delete_keychain_item(username.c_str(), service.c_str(), &error)) {
+    if (0 != sddk_delete_keychain_item(wstring_to_utf8(username).c_str(), wstring_to_utf8(service).c_str(), &error)) {
         SDKException e(error);
         sddk_free_error(&error);
         throw e;
     }
 }
 
-void SafeDriveSDK::set_keychain_item(std::string username, std::string service, std::string secret) {
+void SafeDriveSDK::set_keychain_item(std::wstring username, std::wstring service, std::wstring secret) {
     SDDKError* error = NULL;
-    if (0 != sddk_set_keychain_item(username.c_str(), service.c_str(), secret.c_str(), &error)) {
+    if (0 != sddk_set_keychain_item(wstring_to_utf8(username).c_str(), wstring_to_utf8(service).c_str(), wstring_to_utf8(secret).c_str(), &error)) {
         SDKException e(error);
         sddk_free_error(&error);
         throw e;
     }
 }
+
+
+AccountDetails::AccountDetails(SDDKAccountDetails* details) {
+    assignedStorage = details->assigned_storage;
+    usedStorage = details->used_storage;
+    lowFreeStorageThreshold = details->low_free_space_threshold;
+    expirationDate = details->expiration_date;
+}
+
+AccountStatus::AccountStatus(SDDKAccountStatus* status) {
+    switch (status->state) {
+        case SDDKAccountStateUnknown: {
+            state = Unknown;
+            break;
+        }
+        case SDDKAccountStateActive: {
+            state = Active;
+            break;
+        }
+        case SDDKAccountStateTrial: {
+            state = Trial;
+            break;
+        }
+        case SDDKAccountStateTrialExpired: {
+            state = TrialExpired;
+            break;
+        }
+        case SDDKAccountStateExpired: {
+            state = Expired;
+            break;
+        }
+        case  SDDKAccountStateLocked: {
+            state = Locked;
+            break;
+        }
+        case SDDKAccountStateResetPassword: {
+            state = ResetPassword;
+            break;
+        }
+        case SDDKAccountStatePendingCreation: {
+            state = PendingCreation;
+            break;
+        }
+    }
+
+    if (status->time) {
+        time = *status->time;
+    }
+    host = utf8_to_wstring(status->host);
+    port = status->port;
+    user_name = utf8_to_wstring(status->user_name);
+}
+
+
+std::wostream & operator<<(std::wostream & os, const AccountStatus & status) {
+    os << status.user_name << L":" << status.host << L":" << status.port;
+    return os;
+}
+
+std::wostream& operator<<(std::wostream& os, const AccountState& state) {
+    switch (state) {
+        case Unknown: {
+            os << L"Unknown";
+            break;
+        }
+        case Active: {
+            os << L"Active";
+
+            break;
+        }
+        case Trial: {
+            os << L"Trial";
+
+            break;
+        }
+        case TrialExpired: {
+            os << L"TrialExpired";
+
+            break;
+        }
+        case Expired: {
+            os << L"Expired";
+
+            break;
+        }
+        case Locked: {
+            os << L"Locked";
+
+            break;
+        }
+        case ResetPassword: {
+            os << L"ResetPassword";
+
+            break;
+        }
+        case PendingCreation: {
+            os << L"PendingCreation";
+
+            break;
+        }
+    }
+    return os;
+}
+
+SDKException::SDKException(SDDKError* error) {
+    type = SDKErrorType(error->error_type);
+    message = utf8_to_wstring(error->message);
+    code = error->error_type;
+};
+
+SoftwareClient::SoftwareClient(SDDKSoftwareClient* cclient) {
+    unique_client_id = utf8_to_wstring(cclient->unique_client_id);
+    operating_system = utf8_to_wstring(cclient->operating_system);
+    language = utf8_to_wstring(cclient->language);
+};
+
+SyncFolder::SyncFolder() {
+    id = (long long)1;
+    name = L"";
+    path = L"D:\\";
+    date = (unsigned long long)0;
+    encrypted = true;
+    syncing = false;
+}
+
+
+SyncFolder::SyncFolder(SDDKFolder* cfolder) {
+    id = cfolder->id;
+    name = utf8_to_wstring(cfolder->name);
+    path = utf8_to_wstring(cfolder->path);
+    date = cfolder->date;
+    encrypted = cfolder->encrypted == 1 ? true : false;
+    syncing = cfolder->syncing == 1 ? true : false;
+}
+
+SyncSession::SyncSession(SDDKSyncSession* csyncsession) {
+    name = utf8_to_wstring(csyncsession->name);
+    size = csyncsession->size;
+    date = csyncsession->date;
+    folder_id = csyncsession->folder_id;
+    session_id = csyncsession->session_id;
+}
+
 
 

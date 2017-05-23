@@ -15,20 +15,21 @@ enum LogLevel {
     Trace,
 };
 
-class Folder {
+class SyncFolder {
 public:
     long long id;
-    std::string name;
-    std::string path;
+    std::wstring name;
+    std::wstring path;
     unsigned long long date;
     bool encrypted;
     bool syncing;
-    Folder(SDDKFolder* cfolder);
+    SyncFolder(SDDKFolder* cfolder);
+    SyncFolder();
 };
 
 class SyncSession {
 public:
-    std::string name;
+    std::wstring name;
     unsigned long long size;
     long long date;
     unsigned long long folder_id;
@@ -50,19 +51,19 @@ enum AccountState {
 class AccountStatus {
 public:
     AccountState state;
-    std::string host;
+    std::wstring host;
     unsigned short port;
-    std::string user_name;
-    sd_optional<long long> time;
+    std::wstring user_name;
+    std::optional<long long> time;
     AccountStatus(SDDKAccountStatus* cstatus);
     friend std::ostream& operator<<(std::ostream& os, const AccountStatus& status);
 };
 
 class SoftwareClient {
 public:
-    std::string unique_client_id;
-    std::string operating_system;
-    std::string language;
+    std::wstring unique_client_id;
+    std::wstring operating_system;
+    std::wstring language;
     SoftwareClient(SDDKSoftwareClient* cclient);
 };
 
@@ -107,7 +108,7 @@ class SDKException {
 public:
     SDKException(SDDKError* error);
     SDKErrorType type;
-    std::string message;
+    std::wstring message;
     int code;
 };
 
@@ -117,42 +118,40 @@ typedef std::function<void(AccountDetails details)> SDKAccountDetailsSuccess;
 typedef std::function<void(std::vector<SoftwareClient>)> SDKGetClientsSuccess;
 typedef std::function<void(SDKException error)> SDKFailure;
 typedef std::function<void(unsigned long long total, unsigned long long current, unsigned long long new_bytes, double percent)> SyncSessionProgress;
-typedef std::function<void(std::string message)> SyncSessionIssue;
-typedef std::function<void(std::string message)> SaveRecoveryPhrase;
-typedef std::function<void(std::string message)> Issue;
-
-
+typedef std::function<void(std::wstring message)> SyncSessionIssue;
+typedef std::function<void(std::wstring message)> SaveRecoveryPhrase;
+typedef std::function<void(std::wstring message)> Issue;
 
 class SafeDriveSDK {
 public:
-    SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, sd_optional<std::string> storage_directory);
+    SafeDriveSDK(std::wstring client_version, std::wstring operating_system, std::wstring locale, Configuration configuration, std::optional<std::wstring> storage_directory);
     ~SafeDriveSDK();
-    std::string channel();
-    std::string version();
-    void login(std::string username, std::string password, std::string unique_client_id, SDKAccountStatusSuccess success, SDKFailure failure);
-    void get_clients(std::string username, std::string password, SDKGetClientsSuccess success, SDKFailure failure);
-    void remove_client(std::string unique_client_id, SDKSuccess success, SDKFailure failure);
-    std::string app_directory(Configuration configuration);
+    std::wstring channel();
+    std::wstring version();
+    void login(std::wstring username, std::wstring password, std::wstring unique_client_id, SDKAccountStatusSuccess success, SDKFailure failure);
+    void get_clients(std::wstring username, std::wstring password, SDKGetClientsSuccess success, SDKFailure failure);
+    void remove_client(std::wstring unique_client_id, SDKSuccess success, SDKFailure failure);
+    std::wstring app_directory(Configuration configuration);
     void get_account_status(SDKAccountStatusSuccess success, SDKFailure failure);
     void get_account_details(SDKAccountDetailsSuccess success, SDKFailure failure);
-    std::string generate_unique_client_id();
+    std::wstring generate_unique_client_id();
     void load_keys(const char * phrase, SaveRecoveryPhrase store_phrase, Issue issue, SDKSuccess success, SDKFailure failure);
-    static void Log(std::string message, LogLevel level);
-    void add_folder(std::string name, std::string path, bool encrypted, SDKSuccess success, SDKFailure failure);
-    void update_folder(std::string name, std::string path, bool syncing, unsigned long long unique_id, SDKSuccess success, SDKFailure failure);
+    static void Log(std::wstring message, LogLevel level);
+    void add_folder(std::wstring name, std::wstring path, bool encrypted, SDKSuccess success, SDKFailure failure);
+    void update_folder(std::wstring name, std::wstring path, bool syncing, unsigned long long unique_id, SDKSuccess success, SDKFailure failure);
     void remove_folder(unsigned long long folderID, SDKSuccess success, SDKFailure failure);
     void get_folder(unsigned long long folderID, SDKSuccess success, SDKFailure failure);
     void get_folders(SDKSuccess success, SDKFailure failure);
     void get_sessions(SDKSuccess success, SDKFailure failure);
     void remove_session(unsigned long long session_id, SDKSuccess success, SDKFailure failure);
-    void cancel_sync_task(std::string session_name, SDKSuccess success, SDKFailure failure);
-    void sync_folder(unsigned long long folder_id, std::string session_name, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
-    void restore_folder(unsigned long long folder_id, std::string session_name, std::string destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
-    void report_error(std::exception exc, std::string context, std::string description, std::string unique_client_id, sd_optional<std::string> operating_system, sd_optional<std::string> client_version, SDKSuccess success, SDKFailure failure);
+    void cancel_sync_task(std::wstring session_name, SDKSuccess success, SDKFailure failure);
+    void sync_folder(unsigned long long folder_id, std::wstring session_name, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
+    void restore_folder(unsigned long long folder_id, std::wstring session_name, std::wstring destination, unsigned long long session_size, SyncSessionProgress progress, SyncSessionIssue issue, SDKSuccess success, SDKFailure failure);
+    void report_error(std::exception exc, std::wstring context, std::wstring description, std::wstring unique_client_id, std::optional<std::wstring> operating_system, std::optional<std::wstring> client_version, SDKSuccess success, SDKFailure failure);
     bool ready();
-    std::string get_keychain_item(std::string username, std::string service);
-    void delete_keychain_item(std::string username, std::string service);
-    void set_keychain_item(std::string username, std::string service, std::string secret);
+    std::wstring get_keychain_item(std::wstring username, std::wstring service);
+    void delete_keychain_item(std::wstring username, std::wstring service);
+    void set_keychain_item(std::wstring username, std::wstring service, std::wstring secret);
 
 
 private:

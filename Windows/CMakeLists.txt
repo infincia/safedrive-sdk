@@ -47,14 +47,8 @@ link_directories("${DEP_DIR}/lib")
 link_directories("${DIST_DIR}/lib")
 
 set(SOURCE_FILES
-        AccountDetails.cpp
-        AccountStatus.cpp
-        Folder.cpp
         SafeDriveSDK.cpp
         SafeDriveSDK.h
-        SDKException.cpp
-        SoftwareClient.cpp
-        SyncSession.cpp
         )
 
 
