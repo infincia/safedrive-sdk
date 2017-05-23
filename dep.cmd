@@ -161,6 +161,10 @@ copy /y "include\openssl"  "!BUILD_PREFIX!\include\openssl\" || goto :error
 copy /y "ssl\!CONFIGURATION!\ssl.!LIBSUFFIX!" "!BUILD_PREFIX!\ssl.!LIBSUFFIX!" || goto :error
 copy /y "tls\!CONFIGURATION!\tls.!LIBSUFFIX!" "!BUILD_PREFIX!\tls.!LIBSUFFIX!" || goto :error
 copy /y "crypto\!CONFIGURATION!\crypto.!LIBSUFFIX!" "!BUILD_PREFIX!\crypto.!LIBSUFFIX!" || goto :error
+
+copy /y "ssl\!CONFIGURATION!\ssl.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\libssl.!LIBSUFFIX!" || goto :error
+copy /y "tls\!CONFIGURATION!\tls.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\libtls.!LIBSUFFIX!" || goto :error
+copy /y "crypto\!CONFIGURATION!\crypto.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\libcrypto.!LIBSUFFIX!" || goto :error
 @echo !LIBRESSL_VER!> !LIBRESSL_VER_FILE!
 popd
 del /q libressl-!LIBRESSL_VER!
