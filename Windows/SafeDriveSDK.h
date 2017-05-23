@@ -1,22 +1,12 @@
-#ifdef _WIN32
-#ifdef SAFEDRIVESDK_EXPORTS
-#define SAFEDRIVESDK_API
-#else
-#define SAFEDRIVESDK_API
-#endif
-#else
-#define SAFEDRIVESDK_API
-#endif
-
 #include "stdafx.h"
 #include <sddk.h>
 
-enum SAFEDRIVESDK_API Configuration {
+enum Configuration {
     Production,
     Staging,
 };
 
-enum SAFEDRIVESDK_API LogLevel {
+enum LogLevel {
     Error,
     Warn,
     Info,
@@ -24,7 +14,7 @@ enum SAFEDRIVESDK_API LogLevel {
     Trace,
 };
 
-class SAFEDRIVESDK_API Folder {
+class Folder {
 public:
     long long id;
     std::string name;
@@ -35,7 +25,7 @@ public:
     Folder(SDDKFolder* cfolder);
 };
 
-class SAFEDRIVESDK_API SyncSession {
+class SyncSession {
 public:
     std::string name;
     unsigned long long size;
@@ -45,7 +35,7 @@ public:
     SyncSession(SDDKSyncSession* csyncsession);
 };
 
-enum SAFEDRIVESDK_API AccountState {
+enum AccountState {
     Unknown,
     Active,
     Trial,
@@ -56,7 +46,7 @@ enum SAFEDRIVESDK_API AccountState {
     PendingCreation,
 };
 
-class SAFEDRIVESDK_API AccountStatus {
+class AccountStatus {
 public:
     AccountState state;
     std::string host;
@@ -67,7 +57,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const AccountStatus& status);
 };
 
-class SAFEDRIVESDK_API SoftwareClient {
+class SoftwareClient {
 public:
     std::string unique_client_id;
     std::string operating_system;
@@ -75,7 +65,8 @@ public:
     SoftwareClient(SDDKSoftwareClient* cclient);
 };
 
-class SAFEDRIVESDK_API AccountDetails {
+
+class AccountDetails {
 public:
     unsigned long long assignedStorage;
     unsigned long long usedStorage;
@@ -90,7 +81,7 @@ public:
     std::string message;
 };
 
-enum SAFEDRIVESDK_API SDKErrorType {
+enum SDKErrorType {
     SDKErrorTypeStateMissing = 0x0000,
     SDKErrorTypeInternal = 0x0001,
     SDKErrorTypeRequestFailure = 0x0002,
@@ -117,7 +108,7 @@ enum SAFEDRIVESDK_API SDKErrorType {
     SDKErrorTypeKeyCorrupted = 0x0017,
 };
 
-class SAFEDRIVESDK_API SDKException {
+class SDKException {
 public:
     SDKException(SDDKError* error);
     SDKErrorType type;
@@ -137,7 +128,7 @@ typedef std::function<void(std::string message)> Issue;
 
 
 
-class SAFEDRIVESDK_API SafeDriveSDK {
+class SafeDriveSDK {
 public:
     SafeDriveSDK(std::string client_version, std::string operating_system, std::string locale, Configuration configuration, sd_optional<std::string> storage_directory);
     ~SafeDriveSDK();
