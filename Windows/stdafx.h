@@ -30,11 +30,13 @@
 #include <vector>
 #include <stdexcept>
 #include <thread>
-#ifdef _WIN32
-#include <optional>
+
+#ifdef USE_BOOST
+#include <boost/optional.hpp>
 #else
-#include <experimental/optional>
+#include <optional>
 #endif
+
 #include <atomic>
 // convert UTF-8 string to wstring
 static std::wstring utf8_to_wstring(const std::string& str);
