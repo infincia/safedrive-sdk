@@ -11,6 +11,8 @@ get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_definitions(-DUNICODE -D_UNICODE)
+    add_definitions(-DUSE_BOOST)
+
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++latest")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     if(${CONFIGURATION} MATCHES "ReleaseDLL")
