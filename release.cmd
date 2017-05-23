@@ -47,28 +47,28 @@ IF "!CONFIGURATION!"=="Release" (
     set RUNTIME_LIBRARY="MultiThreaded"
     set CMAKE_CXX_FLAGS_RELEASE="/MT"
     set CMAKE_C_FLAGS_RELEASE="/MT"
-    set RUSTFLAGS="-C target-feature=+crt-static"
+    set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
 IF "!CONFIGURATION!"=="ReleaseDLL" (
     set RUNTIME_LIBRARY="MultiThreadedDLL"
     set CMAKE_CXX_FLAGS_RELEASE="/MD"
     set CMAKE_C_FLAGS_RELEASE="/MD"
-    set RUSTFLAGS="-C target-feature=-crt-static"
+    set RUSTFLAGS=-Z unstable-options -C target-feature=-crt-static
 )
 
 IF "!CONFIGURATION!"=="Debug" (
     set RUNTIME_LIBRARY="MultiThreadedDebug"
     set CMAKE_CXX_FLAGS_DEBUG="/MTd"
     set CMAKE_C_FLAGS_DEBUG="/MTd"
-    set RUSTFLAGS="-C target-feature=+crt-static"
+    set RUSTFLAGS=-Z unstable-options -C target-feature=+crt-static
 )
 
 IF "!CONFIGURATION!"=="DebugDLL" (
     set RUNTIME_LIBRARY="MultiThreadedDebugDLL"
     set CMAKE_CXX_FLAGS_DEBUG="/MDd"
     set CMAKE_C_FLAGS_DEBUG="/MDd"
-    set RUSTFLAGS="-C target-feature=-crt-static"
+    set RUSTFLAGS=-Z unstable-options -C target-feature=-crt-static
 )
 
 IF "!TOOLSET!"=="v120_xp" (
