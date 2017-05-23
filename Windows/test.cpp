@@ -6,81 +6,80 @@
 
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
-    SafeDriveSDK sdk("1.0", "variable", "en_US", Configuration::Staging, std::nullopt);
+    SafeDriveSDK sdk(L"1.0", L"variable", L"en_US", Configuration::Staging, std::nullopt);
 
 #else
     SafeDriveSDK sdk("1.0", "variable", "en_US", Configuration::Staging, std::experimental::nullopt);
 
 #endif
 
-    std::string channel = sdk.channel();
-    std::string version = sdk.version();
-    std::string storage = sdk.app_directory(Configuration::Staging);
+    std::wstring channel = sdk.channel();
+    std::wstring version = sdk.version();
+    std::wstring storage = sdk.app_directory(Configuration::Staging);
 
-    std::stringstream is;
-    is << "SafeDriveSDK<" << channel << "> " << version;
+    std::wstringstream is;
+    is << L"SafeDriveSDK<" << channel << L"> " << version;
     SafeDriveSDK::Log(is.str(), Info);
 
 #ifdef USE_KEYCHAIN
-    std::string user = sdk.get_keychain_item("currentuser", "currentuser.safedrive.io");
+    std::wstring user = sdk.get_keychain_item(L"currentuser", L"currentuser.safedrive.io");
 #else
     #ifdef _WIN32
-    std::string user;
+    std::wstring user;
     user.resize(65535);
-    DWORD userSize = GetEnvironmentVariable("TEST_USER", &user[0], 65535);
+    DWORD userSize = GetEnvironmentVariable(L"TEST_USER", &user[0], 65535);
     user.resize(userSize);
     #else
-    std::string user = std::getenv("TEST_USER");
+    std::wstring user = std::getenv(L"TEST_USER");
     #endif
 #endif
 
 #ifdef USE_KEYCHAIN
-    std::string password = sdk.get_keychain_item(user, "safedrive.io");
-
+    std::wstring password = sdk.get_keychain_item(user, L"safedrive.io");
 #else
     #ifdef _WIN32
-    std::string password;
+    std::wstring password;
     password.resize(65535);
-    DWORD passwordSize = GetEnvironmentVariable("TEST_PASSWORD", &password[0], 65535);
+    DWORD passwordSize = GetEnvironmentVariable(L"TEST_PASSWORD", &password[0], 65535);
     password.resize(passwordSize);
     #else
-    std::string password = std::getenv("TEST_PASSWORD");
+    std::wstring password = std::getenv(L"TEST_PASSWORD");
     #endif
 #endif
     
-    std::stringstream us;
+    std::wstringstream us;
 
-    us << "login: " << user;
+    us << L"login: " << user;
     SafeDriveSDK::Log(us.str(), Info);
 
-    std::stringstream ps;
-    ps << "password: " << password;
+    std::wstringstream ps;
+    ps << L"password: " << password;
     SafeDriveSDK::Log(ps.str(), Info);
 
 #ifdef USE_KEYCHAIN
-    std::string ucid = sdk.get_keychain_item(user, "ucid.safedrive.io");
+    std::wstring ucid = sdk.get_keychain_item(user, L"ucid.safedrive.io");
 #else
     #ifdef _WIN32
-    std::string ucid;
+    std::wstring ucid;
     ucid.resize(65535);
-    DWORD ucidSize = GetEnvironmentVariable("TEST_UCID", &ucid[0], 65535);
+    DWORD ucidSize = GetEnvironmentVariable(L"TEST_UCID", &ucid[0], 65535);
     ucid.resize(ucidSize);
     #else
-    std::string ucid = std::getenv("TEST_UCID");
+    std::wstring ucid = std::getenv(L"TEST_UCID");
     #endif
 #endif
     
     sdk.login(user, password, ucid, [](AccountStatus status) {
-        SafeDriveSDK::Log("login succeeded", Info);
+        SafeDriveSDK::Log(L"login succeeded", Info);
 
-        std::stringstream ss;
-        ss << "account status: " << status;
+        std::wstringstream ss;
+        ss << L"account status: " << status;
         SafeDriveSDK::Log(ss.str(), Info);
     }, [](SDKException error) {
-        SafeDriveSDK::Log("login failed", Info);
+        SafeDriveSDK::Log(L"login failed", Info);
 
-        std::stringstream ss;
-        ss << "error: " << error.message;
+        std::wstringstream ss;
+        ss << L"error: " << error.message;
         SafeDriveSDK::Log(ss.str(), Error);
     });
 
