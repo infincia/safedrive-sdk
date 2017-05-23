@@ -15,30 +15,6 @@ IF [%CONFIGURATION%]==[Debug] set LIBSUFFIX=lib
 
 ECHO Building release for %TARGET% (%TOOLSET%-%CONFIGURATION%)
 
-set INTR_PREFIX=%cd%\build\%TARGET%\%TOOLSET%
-
-set BUILD_PREFIX=%cd%\dep\%TARGET%\%TOOLSET%\%CONFIGURATION%
-set DIST_PREFIX=%cd%\dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
-set CMAKE_PREFIX=%cd%\Windows
-
-del /q "%DIST_PREFIX%"
-
-del /q "%INTR_PREFIX%"
-
-mkdir "%DIST_PREFIX%" > NUL
-mkdir "%DIST_PREFIX%\lib" > NUL
-mkdir "%DIST_PREFIX%\include" > NUL
-mkdir "%DIST_PREFIX%\bin" > NUL
-
-mkdir "%INTR_PREFIX%" > NUL
-
-set OPENSSL_DIR=%BUILD_PREFIX%\lib
-set SODIUM_LIB_DIR=%BUILD_PREFIX%\lib
-set SODIUM_STATIC=""
-set CARGO_INCREMENTAL="1"
-set RUST_BACKTRACE="1"
-set RUST_FLAGS=""
-
 IF "!ARCH!"=="x64" (
     set PLATFORM=x64
     set CMAKE_GENERATOR_PLATFORM= Win64
@@ -48,6 +24,24 @@ IF "!ARCH!"=="x86" (
     set PLATFORM=Win32
     set CMAKE_GENERATOR_PLATFORM=
 )
+
+CALL :NORMALIZEPATH %cd%\..\!PLATFORM!\!CONFIGURATION!
+SET BUILD_PREFIX=%RETVAL%
+
+set INTR_PREFIX=%cd%\build\SafeDriveSDK
+
+set CMAKE_PREFIX=%cd%\Windows
+
+del /q "!INTR_PREFIX!"
+
+mkdir "!INTR_PREFIX!" > NUL
+
+set OPENSSL_DIR=!BUILD_PREFIX!
+set SODIUM_LIB_DIR=!BUILD_PREFIX!
+set SODIUM_STATIC=""
+set CARGO_INCREMENTAL="1"
+set RUST_BACKTRACE="1"
+set RUST_FLAGS=""
 
 IF "!CONFIGURATION!"=="Release" (
     set RUNTIME_LIBRARY="MultiThreaded"
@@ -119,28 +113,33 @@ cargo.exe build --release --verbose -p safedrived --target !TARGET! || goto :err
 
 ECHO Building SDDK headers for !TARGET! (!TOOLSET!-!CONFIGURATION!)
 
-cheddar -f "sddk\src\c_api.rs" "!DIST_PREFIX!\include\sddk.h" || goto :error
+cheddar -f "sddk\src\c_api.rs" "!BUILD_PREFIX!\include\sddk.h" || goto :error
 
 ECHO Copying build artifacts for !TARGET! (!TOOLSET!-!CONFIGURATION!)
 
-ECHO copying "target\!TARGET!\release\sddk.lib" "!DIST_PREFIX!\lib\"
-copy /y "target\!TARGET!\release\sddk.lib" "!DIST_PREFIX!\lib\" || goto :error
+ECHO copying "target\!TARGET!\release\sddk.lib" "!BUILD_PREFIX!\"
+copy /y "target\!TARGET!\release\sddk.lib" "!BUILD_PREFIX!\" || goto :error
 
-ECHO copying "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\bin\"
-copy /y "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\bin\" || goto :error
+ECHO copying "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe"
+copy /y "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe" || goto :error
 
-ECHO copying "target\!TARGET!\release\safedrived.exe" "!DIST_PREFIX!\bin\"
-copy /y "target\!TARGET!\release\safedrived.exe" "!DIST_PREFIX!\bin\" || goto :error
+ECHO copying "target\!TARGET!\release\safedrived.exe" "!BUILD_PREFIX!\"
+copy /y "target\!TARGET!\release\safedrived.exe" "!BUILD_PREFIX!\" || goto :error
 
 pushd "!INTR_PREFIX!"
 @echo building C++ SDK for "!VS!!CMAKE_GENERATOR_PLATFORM!"
 cmake "!CMAKE_PREFIX!" -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"TARGET=!TARGET!" -D"TOOLSET=!TOOLSET!" -D"CONFIGURATION=!CONFIGURATION!" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"CMAKE_C_FLAGS_RELEASE=!CMAKE_C_FLAGS_RELEASE!" -D"CMAKE_CXX_FLAGS_RELEASE=!CMAKE_CXX_FLAGS_RELEASE!" -D"CMAKE_C_FLAGS_DEBUG=!CMAKE_C_FLAGS_DEBUG!" -D"CMAKE_CXX_FLAGS_DEBUG=!CMAKE_CXX_FLAGS_DEBUG!" || goto :error
 msbuild /m /v:n /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! SafeDriveSDK.sln || goto :error
 popd
-@echo copying "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" to "!DIST_PREFIX!\lib\SafeDriveSDK.!LIBSUFFIX!"
-copy /y "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" "!DIST_PREFIX!\lib\SafeDriveSDK.!LIBSUFFIX!" || goto :error
+@echo copying "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" to "!BUILD_PREFIX!\SafeDriveSDK.!LIBSUFFIX!"
+copy /y "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" "!BUILD_PREFIX!\SafeDriveSDK.!LIBSUFFIX!" || goto :error
 goto :EOF
 
 :error
 echo Failed with error #!errorlevel!.
 exit /b !errorlevel!
+
+:NORMALIZEPATH
+  SET RETVAL=%~dpfn1
+  EXIT /B
+

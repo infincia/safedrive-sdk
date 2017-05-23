@@ -13,7 +13,19 @@ IF [%CONFIGURATION%]==[Release] set LIBSUFFIX=lib
 IF [%CONFIGURATION%]==[DebugDLL] set LIBSUFFIX=dll
 IF [%CONFIGURATION%]==[Debug] set LIBSUFFIX=lib
 
-set BUILD_PREFIX=%cd%\dep\!TARGET!\!TOOLSET!\!CONFIGURATION!
+IF "!ARCH!"=="x64" (
+    set PLATFORM=x64
+    set CMAKE_GENERATOR_PLATFORM= Win64
+)
+
+IF "!ARCH!"=="x86" (
+    set PLATFORM=Win32
+    set CMAKE_GENERATOR_PLATFORM=
+)
+
+CALL :NORMALIZEPATH %cd%\..\!PLATFORM!\!CONFIGURATION!
+SET BUILD_PREFIX=%RETVAL%
+
 set SRC_PREFIX=%cd%\src
 
 ECHO building dependencies for !TARGET! (!TOOLSET!-!CONFIGURATION!)
@@ -25,16 +37,6 @@ mkdir "!BUILD_PREFIX!\include\openssl" > NUL
 
 mkdir "!SRC_PREFIX!" > NUL
 mkdir build > NUL
-
-IF "!ARCH!"=="x64" (
-    set PLATFORM=x64
-    set CMAKE_GENERATOR_PLATFORM= Win64
-)
-
-IF "!ARCH!"=="x86" (
-    set PLATFORM=Win32
-    set CMAKE_GENERATOR_PLATFORM=
-)
 
 IF "!CONFIGURATION!"=="Release" (
     set RUNTIME_LIBRARY="MultiThreaded"
@@ -107,7 +109,8 @@ IF NOT EXIST "!SRC_PREFIX!\libressl-!LIBRESSL_VER!.tar.gz" goto :error
 
 :checksodium
 
-IF NOT EXIST "!BUILD_PREFIX!\lib\sodium.!LIBSUFFIX!" goto :buildsodium
+
+IF NOT EXIST "!BUILD_PREFIX!\sodium.!LIBSUFFIX!" goto :buildsodium
 
 findstr /c:"!SODIUM_VER!" !SODIUM_VER_FILE! > NUL || goto :buildsodium
 goto :EOF
@@ -123,11 +126,11 @@ del /q libsodium-!SODIUM_VER!
 7z x -y "libsodium-!SODIUM_VER!.tar" || goto :error
 pushd libsodium-!SODIUM_VER!
 @echo building libsodium
-msbuild /m /v:n /p:OutDir="!BUILD_PREFIX!\lib\\";WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libsodium.sln || goto :error
+msbuild /m /v:n /p:OutDir="!BUILD_PREFIX!\\";WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libsodium.sln || goto :error
 popd
 del /q libsodium-!SODIUM_VER!
-@echo copying "!BUILD_PREFIX!\lib\libsodium.!LIBSUFFIX!" to "!BUILD_PREFIX!\lib\sodium.!LIBSUFFIX!"
-copy /y "!BUILD_PREFIX!\lib\libsodium.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\sodium.!LIBSUFFIX!" || goto :error
+@echo copying "!BUILD_PREFIX!\libsodium.!LIBSUFFIX!" to "!BUILD_PREFIX!\sodium.!LIBSUFFIX!"
+copy /y "!BUILD_PREFIX!\libsodium.!LIBSUFFIX!" "!BUILD_PREFIX!\sodium.!LIBSUFFIX!" || goto :error
 @echo !SODIUM_VER!> !SODIUM_VER_FILE!
 popd
 goto :checklibressl
@@ -136,7 +139,7 @@ goto :checklibressl
 
 :checklibressl
 
-IF NOT EXIST "!BUILD_PREFIX!\lib\ssl.!LIBSUFFIX!" goto :buildlibressl
+IF NOT EXIST "!BUILD_PREFIX!\ssl.!LIBSUFFIX!" goto :buildlibressl
 
 findstr /c:"!LIBRESSL_VER!" !LIBRESSL_VER_FILE! > NUL || goto :buildlibressl
 goto :checkssh2
@@ -154,12 +157,9 @@ cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!"  -D"BUILD_SHARED_LIBS=0
 msbuild /m /v:n /p:WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libressl.sln || goto :error
 @echo copying "include\openssl" to "!BUILD_PREFIX!\include\"
 copy /y "include\openssl"  "!BUILD_PREFIX!\include\openssl\" || goto :error
-@echo copying "ssl\!CONFIGURATION!\ssl.!LIBSUFFIX!" to "!BUILD_PREFIX!\lib\ssl.!LIBSUFFIX!"
-copy /y "ssl\!CONFIGURATION!\ssl.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\ssl.!LIBSUFFIX!" || goto :error
-@echo copying "tls\!CONFIGURATION!\tls.!LIBSUFFIX!" to "!BUILD_PREFIX!\lib\tls.!LIBSUFFIX!"
-copy /y "tls\!CONFIGURATION!\tls.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\tls.!LIBSUFFIX!" || goto :error
-@echo copying "crypto\!CONFIGURATION!\crypto.!LIBSUFFIX!" to "!BUILD_PREFIX!\lib\crypto.!LIBSUFFIX!"
-copy /y "crypto\!CONFIGURATION!\crypto.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\crypto.!LIBSUFFIX!" || goto :error
+copy /y "ssl\!CONFIGURATION!\ssl.!LIBSUFFIX!" "!BUILD_PREFIX!\ssl.!LIBSUFFIX!" || goto :error
+copy /y "tls\!CONFIGURATION!\tls.!LIBSUFFIX!" "!BUILD_PREFIX!\tls.!LIBSUFFIX!" || goto :error
+copy /y "crypto\!CONFIGURATION!\crypto.!LIBSUFFIX!" "!BUILD_PREFIX!\crypto.!LIBSUFFIX!" || goto :error
 @echo !LIBRESSL_VER!> !LIBRESSL_VER_FILE!
 popd
 del /q libressl-!LIBRESSL_VER!
@@ -170,7 +170,7 @@ goto :checkssh2
 
 :checkssh2
 
-IF NOT EXIST "!BUILD_PREFIX!\lib\ssh2.!LIBSUFFIX!" goto :buildssh2
+IF NOT EXIST "!BUILD_PREFIX!\ssh2.!LIBSUFFIX!" goto :buildssh2
 
 findstr /c:"!LIBSSH2_VER!" !LIBSSH2_VER_FILE! > NUL || goto :buildssh2
 goto :EOF
@@ -185,15 +185,19 @@ del /q libssh2-!LIBSSH2_VER!
 pushd libssh2-!LIBSSH2_VER!
 @echo building libssh2 for "!VS!!CMAKE_GENERATOR_PLATFORM!"
 cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"OPENSSL_USE_STATIC_LIBS=TRUE" -D"CRYPTO_BACKEND=OpenSSL" -D"OPENSSL_ROOT_DIR="!BUILD_PREFIX!\\" -D"OPENSSL_INCLUDE_DIR="!BUILD_PREFIX!\include\\" -D"CMAKE_C_FLAGS_RELEASE=!CMAKE_C_FLAGS_RELEASE!" -D"CMAKE_CXX_FLAGS_RELEASE=!CMAKE_CXX_FLAGS_RELEASE!" -D"CMAKE_C_FLAGS_DEBUG=!CMAKE_C_FLAGS_DEBUG!" -D"CMAKE_CXX_FLAGS_DEBUG=!CMAKE_CXX_FLAGS_DEBUG!"
-msbuild /m /v:n /p:OutDir="!BUILD_PREFIX!\lib\\";WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libssh2.sln || goto :error
+msbuild /m /v:n /p:WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libssh2.sln || goto :error
+@echo copying "libssh2.!LIBSUFFIX!" to "!BUILD_PREFIX!\ssh2.!LIBSUFFIX!"
+copy /y "libssh2.!LIBSUFFIX!" "!BUILD_PREFIX!\ssh2.!LIBSUFFIX!" || goto :error
+@echo !LIBSSH2_VER!> !LIBSSH2_VER_FILE!
 popd
 del /q libssh2-!LIBSSH2_VER!
-@echo copying "!BUILD_PREFIX!\lib\libssh2.!LIBSUFFIX!" to "!BUILD_PREFIX!\lib\ssh2.!LIBSUFFIX!"
-copy /y "!BUILD_PREFIX!\lib\libssh2.!LIBSUFFIX!" "!BUILD_PREFIX!\lib\ssh2.!LIBSUFFIX!" || goto :error
-@echo !LIBSSH2_VER!> !LIBSSH2_VER_FILE!
 popd
 goto :EOF
 
 :error
 echo Failed with error #!errorlevel!.
 exit /b !errorlevel!
+
+:NORMALIZEPATH
+  SET RETVAL=%~dpfn1
+  EXIT /B
