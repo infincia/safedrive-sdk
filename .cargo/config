@@ -34,3 +34,13 @@ root = "dep/x86_64-unknown-linux-musl/lib"
 rustc-link-search = ["native=dep/wasm32-unknown-emscripten/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/wasm32-unknown-emscripten/lib"
+
+[target.x86_64-pc-windows-msvc.sodium]
+rustc-link-search = ["native=../x64/Release"]
+rustc-link-lib = ["static=sodium"]
+root = "../x64/Release"
+
+[target.i686-pc-windows-msvc.sodium]
+rustc-link-search = ["native=../Win32/Release"]
+rustc-link-lib = ["static=sodium"]
+root = "../Win32/Release"
