@@ -17,6 +17,8 @@ extern crate rocket;
 #[cfg(feature = "webui")]
 extern crate rocket_contrib;
 
+#[cfg(target_os = "windows")]
+extern crate winreg;
 
 extern crate semver;
 
@@ -66,6 +68,8 @@ mod sdlog;
 mod webui;
 #[cfg(target_os = "macos")]
 mod remotefs;
+#[cfg(target_os = "windows")]
+mod settings;
 
 /// public API
 ///

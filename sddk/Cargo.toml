@@ -56,6 +56,9 @@ objc-foundation = "*"
 ssh2 = "*"
 openssl-sys = "*"
 
+[target.'cfg(target_os = "windows")'.dependencies]
+winreg = "*"
+
 [lib]
 name = "sddk"
 crate-type = ["rlib", "staticlib"]
