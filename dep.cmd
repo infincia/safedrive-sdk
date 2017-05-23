@@ -78,7 +78,7 @@ set SODIUM_VER_FILE="!BUILD_PREFIX!\sodium_ver"
 set LIBSSH2_VER=1.8.0
 set LIBSSH2_VER_FILE="!BUILD_PREFIX!\ssh2_ver"
 
-set LIBRESSL_VER=2.5.3
+set LIBRESSL_VER=2.5.4
 set LIBRESSL_VER_FILE="!BUILD_PREFIX!\libressl_ver"
 
 pushd "!SRC_PREFIX!"

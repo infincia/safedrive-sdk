@@ -61,7 +61,7 @@ export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -
 export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0"
 
 
-export LIBRESSL_VER=2.5.3
+export LIBRESSL_VER=2.5.4
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
 export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no"
 
