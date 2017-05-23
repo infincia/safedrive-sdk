@@ -41,30 +41,34 @@ set SODIUM_LIB_DIR=!BUILD_PREFIX!
 set SODIUM_STATIC=""
 set CARGO_INCREMENTAL="1"
 set RUST_BACKTRACE="1"
-set RUST_FLAGS=""
+set RUSTFLAGS=""
 
 IF "!CONFIGURATION!"=="Release" (
     set RUNTIME_LIBRARY="MultiThreaded"
     set CMAKE_CXX_FLAGS_RELEASE="/MT"
     set CMAKE_C_FLAGS_RELEASE="/MT"
+    set RUSTFLAGS="-C target-feature=+crt-static"
 )
 
 IF "!CONFIGURATION!"=="ReleaseDLL" (
     set RUNTIME_LIBRARY="MultiThreadedDLL"
     set CMAKE_CXX_FLAGS_RELEASE="/MD"
     set CMAKE_C_FLAGS_RELEASE="/MD"
+    set RUSTFLAGS="-C target-feature=-crt-static"
 )
 
 IF "!CONFIGURATION!"=="Debug" (
     set RUNTIME_LIBRARY="MultiThreadedDebug"
     set CMAKE_CXX_FLAGS_DEBUG="/MTd"
     set CMAKE_C_FLAGS_DEBUG="/MTd"
+    set RUSTFLAGS="-C target-feature=+crt-static"
 )
 
 IF "!CONFIGURATION!"=="DebugDLL" (
     set RUNTIME_LIBRARY="MultiThreadedDebugDLL"
     set CMAKE_CXX_FLAGS_DEBUG="/MDd"
     set CMAKE_C_FLAGS_DEBUG="/MDd"
+    set RUSTFLAGS="-C target-feature=-crt-static"
 )
 
 IF "!TOOLSET!"=="v120_xp" (
@@ -77,22 +81,6 @@ IF "!TOOLSET!"=="v140_xp" (
 
 IF "!TOOLSET!"=="v141_xp" (
     set VS=Visual Studio 15 2017
-)
-
-if "!CONFIGURATION!"=="Release" (
-    set RUST_FLAGS="-C target-feature=+crt-static"
-)
-
-if "!CONFIGURATION!"=="ReleaseDLL" (
-    set RUST_FLAGS="-C target-feature=-crt-static"
-)
-
-if "!CONFIGURATION!"=="Debug" (
-    set RUST_FLAGS="-C target-feature=+crt-static"
-)
-
-if "!CONFIGURATION!"=="DebugDLL" (
-    set RUST_FLAGS="-C target-feature=-crt-static"
 )
 
 ECHO Building dependencies for !TARGET! (!TOOLSET!-!CONFIGURATION!)
