@@ -52,6 +52,11 @@ set(SOURCE_FILES
         SafeDriveSDK.h
         )
 
+set(HEADER_FILES
+    SafeDriveSDK.h
+    )
+
+
 
 add_library(SafeDriveSDK ${PLATFORM_SOURCES} ${SOURCE_FILES})
 
