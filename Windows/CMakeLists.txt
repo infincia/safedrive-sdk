@@ -30,7 +30,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     endif()
     set(DEP_DIR "${PARENT_DIR}/dep/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
     set(DIST_DIR "${PARENT_DIR}/dist/${TARGET}/${TOOLSET}/${CONFIGURATION}/")
-    set(BUILD_DIR "${PARENT_DIR}/build/${PLATFORM}/${CONFIGURATION}/${TOOLSET}/")
+    set(BUILD_DIR "${PARENT_DIR}/${PLATFORM}/${CONFIGURATION}/")
     set(PLATFORM_SOURCES
             stdafx.h
             targetver.h)
@@ -46,6 +46,7 @@ endif()
 
 include_directories("${DEP_DIR}/include")
 include_directories("${DIST_DIR}/include")
+include_directories("${BUILD_DIR}/include")
 include_directories(".")
 include_directories("${PARENT_DIR}/../packages/boost.1.64.0.0/lib/native/include")
 link_directories("${DEP_DIR}")
