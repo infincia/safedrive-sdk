@@ -45,6 +45,7 @@ endif()
 include_directories("${DEP_DIR}/include")
 include_directories("${DIST_DIR}/include")
 include_directories(".")
+include_directories("${PARENT_DIR}/../packages/boost.1.64.0.0/lib/native/include")
 link_directories("${DEP_DIR}")
 link_directories("${DIST_DIR}/lib")
 
