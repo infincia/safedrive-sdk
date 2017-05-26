@@ -273,7 +273,7 @@ impl WrappedBlock {
 
                             },
                             ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
-                                debug!("block padding removal failure node: {:?}, {}", kind, err);
+                                debug!("block padding removal failure node: {:?}, {:?}", kind, err);
 
                             },
                             ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
@@ -281,7 +281,7 @@ impl WrappedBlock {
 
                             },
                             ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
-                                debug!("block padding removal failure kind: {:?}: {:?}, {}", kind, position, err);
+                                debug!("block padding removal failure kind: {:?}: {:?}, {:?}", kind, position, err);
 
                             },
                         };
@@ -370,7 +370,7 @@ impl WrappedBlock {
 
                     },
                     ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
-                        debug!("block parse failure node: {:?}, {}", kind, err);
+                        debug!("block parse failure node: {:?}, {:?}", kind, err);
 
                     },
                     ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
@@ -378,7 +378,7 @@ impl WrappedBlock {
 
                     },
                     ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
-                        debug!("block parse failure kind: {:?}: {:?}, {}", kind, position, err);
+                        debug!("block parse failure kind: {:?}: {:?}, {:?}", kind, position, err);
 
                     },
                 };

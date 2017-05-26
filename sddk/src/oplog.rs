@@ -4,7 +4,7 @@
 
 use std;
 
-use nom::{IResult, rest, le_u8, le_u64};
+use nom::{rest, le_u8, le_u64};
 
 
 #[derive(Debug, PartialEq, Eq)]
@@ -52,21 +52,21 @@ impl<'a> std::fmt::Display for Op<'a> {
     }
 }
 
-pub fn op_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], Op<'a>> {
-    chain!(input,
-        magic: map_res!(tag!("sdop"), std::str::from_utf8)                           ~
-        sequence: le_u64                                                             ~
-        operation_type: le_u8                                                        ~
-        file_type: le_u8                                                             ~
-        file_id: le_u64                                                              ~
-        data_pointers: rest                                                          ,
-        || {
-        Op {
+named!(op_parse<&[u8], (Op)>,
+    do_parse!(
+        magic: map_res!(tag!("sdop"), std::str::from_utf8)                           >>
+        sequence: le_u64                                                             >>
+        operation_type: le_u8                                                        >>
+        file_type: le_u8                                                             >>
+        file_id: le_u64                                                              >>
+        data_pointers: rest                                                          >>
+
+        (Op {
             operation_type: operation_type,
             sequence: sequence,
             file_type: file_type,
             file_id: file_id,
             data_pointers: data_pointers,
-        }
-    })
-}
+        })
+    )
+);

@@ -31,18 +31,18 @@ impl<'a> std::fmt::Display for BinaryFormat<'a> {
     }
 }
 
-pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> {
-    chain!(input,
-    magic: map_res!(tag!("sd"), std::str::from_utf8)                             ~
-    file_type: map_res!(alt!(tag!("b") | tag!("s")), std::str::from_utf8)        ~
-    version: map_res!(take!(2), std::str::from_utf8)                             ~
-    flags: bits!(tuple!(take_bits!(u8, 3), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1) ))~
-    take!(2)                                                                     ~
-    wrapped_key: take!(SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE)                  ~
-    nonce: take!(SECRETBOX_NONCE_SIZE)                                           ~
-    wrapped_data: rest                                                           ,
-    || {
-    BinaryFormat {
+named!(pub binary_parse<&[u8], (BinaryFormat)>,
+    do_parse!(
+    magic: map_res!(tag!("sd"), std::str::from_utf8)                             >>
+    file_type: map_res!(alt!(tag!("b") | tag!("s")), std::str::from_utf8)        >>
+    version: map_res!(take!(2), std::str::from_utf8)                             >>
+    flags: bits!(tuple!(take_bits!(u8, 3), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1), take_bits!(u8, 1) ))>>
+    take!(2)                                                                     >>
+    wrapped_key: take!(SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE)                  >>
+    nonce: take!(SECRETBOX_NONCE_SIZE)                                           >>
+    wrapped_data: rest                                                           >>
+
+    (BinaryFormat {
         magic: magic,
         file_type: file_type,
         version: version,
@@ -62,19 +62,17 @@ pub fn binary_parse<'a>(input: &'a [u8]) -> IResult<&'a [u8], BinaryFormat<'a>> 
         wrapped_key: wrapped_key,
         nonce: nonce,
         wrapped_data: wrapped_data,
-      }
-    }
-  )
-}
-
-pub fn remove_padding<'a>(input: &'a [u8]) -> IResult<&'a [u8], &'a [u8]> {
-    chain!(input,
-        length: le_u32      ~
-        data: take!(length) ,
-    || {
-        (data)
     })
-}
+  )
+);
+
+named!(pub remove_padding<&[u8], (&[u8])>,
+    do_parse!(
+        length: le_u32      >>
+        data: take!(length) >>
+        (data)
+    )
+);
 
 named!(hmac_parse<&[u8], &[u8]>, do_parse!(
     hmac: take!(HMAC_SIZE) >>

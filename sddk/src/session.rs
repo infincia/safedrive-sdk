@@ -218,7 +218,7 @@ impl WrappedSyncSession {
 
                             },
                             ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
-                                debug!("session padding removal failure node: {:?}, {}", kind, err);
+                                debug!("session padding removal failure node: {:?}, {:?}", kind, err);
 
                             },
                             ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
@@ -226,7 +226,7 @@ impl WrappedSyncSession {
 
                             },
                             ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
-                                debug!("session padding removal failure kind: {:?}: {:?}, {}", kind, position, err);
+                                debug!("session padding removal failure kind: {:?}: {:?}, {:?}", kind, position, err);
 
                             },
                         };
@@ -297,7 +297,7 @@ impl WrappedSyncSession {
 
                     },
                     ::nom::verbose_errors::Err::Node(ref kind, ref err) => {
-                        debug!("session parsing failure node: {:?}, {}", kind, err);
+                        debug!("session parsing failure node: {:?}, {:?}", kind, err);
 
                     },
                     ::nom::verbose_errors::Err::Position(ref kind, ref position) => {
@@ -305,7 +305,7 @@ impl WrappedSyncSession {
 
                     },
                     ::nom::verbose_errors::Err::NodePosition(ref kind, ref position, ref err) => {
-                        debug!("session parsing failure kind: {:?}: {:?}, {}", kind, position, err);
+                        debug!("session parsing failure kind: {:?}: {:?}, {:?}", kind, position, err);
 
                     },
                 };
