@@ -31,11 +31,7 @@
 #include <stdexcept>
 #include <thread>
 
-#ifdef USE_BOOST
-#include <boost/optional.hpp>
-#else
 #include <optional>
-#endif
 
 #include <atomic>
 // convert UTF-8 string to wstring
