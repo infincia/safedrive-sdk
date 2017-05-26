@@ -61,7 +61,7 @@ winreg = "*"
 
 [lib]
 name = "sddk"
-crate-type = ["rlib", "staticlib"]
+crate-type = ["rlib", "staticlib", "cdylib"]
 doctest = false
 
 [features]
