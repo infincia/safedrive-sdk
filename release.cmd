@@ -108,6 +108,9 @@ ECHO Copying build artifacts for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 ECHO copying "target\!TARGET!\release\sddk.lib" "!BUILD_PREFIX!\"
 copy /y "target\!TARGET!\release\sddk.lib" "!BUILD_PREFIX!\" || goto :error
 
+ECHO copying "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\"
+copy /y "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\" || goto :error
+
 ECHO copying "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe"
 copy /y "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe" || goto :error
 
