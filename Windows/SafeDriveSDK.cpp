@@ -447,22 +447,22 @@ void SafeDriveSDK::Log(std::wstring message, LogLevel level) {
     std::thread t1([message, level] {
         const char *m = wstring_to_utf8(message).c_str();
 
-        unsigned char l = 0;
+        SDDKLogLevel l = SDDKLogLevelInfo;
         switch (level) {
         case Error:
-            l = 0;
+            l = SDDKLogLevelError;
             break;
         case Warn:
-            l = 1;
+            l = SDDKLogLevelWarn;
             break;
         case Info:
-            l = 2;
+            l = SDDKLogLevelInfo;
             break;
         case Debug:
-            l = 3;
+            l = SDDKLogLevelDebug;
             break;
         case Trace:
-            l = 4;
+            l = SDDKLogLevelTrace;
             break;
         }
 
