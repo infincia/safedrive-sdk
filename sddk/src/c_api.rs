@@ -640,9 +640,11 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 ///
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_channel() -> *mut std::os::raw::c_char {
-    let channel = ::core::get_channel();
-    CString::new(format!("{}", channel).as_str()).unwrap().into_raw()
+pub extern "C" fn sddk_get_channel(mut channel: *mut *mut std::os::raw::c_char) {
+    let c = ::core::get_channel();
+    unsafe {
+        *channel = CString::new(format!("{}", c).as_str()).unwrap().into_raw();
+    }
 }
 
 /// Get SDK version
@@ -659,9 +661,11 @@ pub extern "C" fn sddk_get_channel() -> *mut std::os::raw::c_char {
 ///
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_get_version() -> *mut std::os::raw::c_char {
-    let version = ::core::get_version();
-    CString::new(version.as_str()).unwrap().into_raw()
+pub extern "C" fn sddk_get_version(mut version: *mut *mut std::os::raw::c_char) {
+    let v = ::core::get_version();
+    unsafe {
+        *version = CString::new(v.as_str()).unwrap().into_raw();
+    }
 }
 
 /// Get local app storage directory
