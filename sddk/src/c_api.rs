@@ -75,6 +75,17 @@ pub enum SDDKConfiguration {
     SDDKConfigurationStaging,
 }
 
+
+#[derive(Debug)]
+#[repr(C)]
+pub enum SDDKLogLevel {
+    SDDKLogLevelError = 0,
+    SDDKLogLevelWarn = 1,
+    SDDKLogLevelInfo = 2,
+    SDDKLogLevelDebug = 3,
+    SDDKLogLevelTrace = 4,
+}
+
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKNotification {
@@ -2758,24 +2769,19 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 ///
 ///     `message`: a NULL terminated string for the log message
 ///
-///     `level`: unsigned 8-bit integer:
+///     `level`: an SDDKLogLevel
 ///
-///               0: error
-///               1: warn
-///               2: info
-///               3: debug
-///               4: trace
 ///
 ///
 /// # Examples
 ///
 /// ```c
-/// sddk_log("starting safedrive", 2);
+/// sddk_log("starting safedrive", SDDKLogLevelInfo);
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
-                           level: std::os::raw::c_uchar) {
+                           level: SDDKLogLevel) {
 
     let msg: String = unsafe {
         assert!(!message.is_null());
@@ -2791,11 +2797,11 @@ pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
     };
 
     let log_level = match level {
-        0 => ::log::LogLevelFilter::Error,
-        1 => ::log::LogLevelFilter::Warn,
-        2 => ::log::LogLevelFilter::Info,
-        3  => ::log::LogLevelFilter::Debug,
-        4 | _=> ::log::LogLevelFilter::Trace,
+        SDDKLogLevelError => ::log::LogLevelFilter::Error,
+        SDDKLogLevelWarn => ::log::LogLevelFilter::Warn,
+        SDDKLogLevelInfo => ::log::LogLevelFilter::Info,
+        SDDKLogLevelDebug => ::log::LogLevelFilter::Debug,
+        SDDKLogLevelTrace => ::log::LogLevelFilter::Trace,
     };
 
     log(&msg, log_level);
