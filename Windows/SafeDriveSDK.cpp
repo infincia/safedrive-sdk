@@ -42,14 +42,16 @@ SafeDriveSDK::~SafeDriveSDK() {
 }
 
 std::wstring SafeDriveSDK::channel() {
-    char* ch = sddk_get_channel();
+    char* ch = NULL;
+    sddk_get_channel(&ch);
     std::wstring channel(utf8_to_wstring(ch));
     sddk_free_string(&ch);
     return channel;
 }
 
 std::wstring SafeDriveSDK::version() {
-    char* ver = sddk_get_version();
+    char* ver = NULL;
+    sddk_get_version(&ver);
     std::wstring version(utf8_to_wstring(ver));
     sddk_free_string(&ver);
     return version;
