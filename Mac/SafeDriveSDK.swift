@@ -176,7 +176,7 @@ public class SafeDriveSDK: NSObject {
         }
     }
     
-    public func getClients(withUser username: String, password: String, completionQueue queue: DispatchQueue, success: @escaping (_ folders: [SoftwareClient]) -> Void, failure: @escaping SDKFailure) {
+    public func getClients(withUser username: String, password: String, completionQueue queue: DispatchQueue, success: @escaping (_ clients: [SoftwareClient]) -> Void, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
 
