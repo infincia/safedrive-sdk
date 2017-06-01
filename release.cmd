@@ -68,12 +68,11 @@ cheddar -f "sddk\src\c_api.rs" "!BUILD_PREFIX!\include\sddk.h" || goto :error
 
 ECHO Copying build artifacts for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
-ECHO copying "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\"
-copy /y "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\" || goto :error
+ECHO copying "target\!TARGET!\!CONFIGURATION!\sddk.dll" "!BUILD_PREFIX!\"
+copy /y "target\!TARGET!\!CONFIGURATION!\sddk.dll" "!BUILD_PREFIX!\" || goto :error
 
-ECHO copying "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe"
-copy /y "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe" || goto :error
-
+ECHO copying "target\!TARGET!\!CONFIGURATION!\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe"
+copy /y "target\!TARGET!\!CONFIGURATION!\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe" || goto :error
 
 goto :EOF
 
