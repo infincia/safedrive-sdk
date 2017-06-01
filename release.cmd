@@ -6,9 +6,6 @@ set PLATFORM=%1
 set CONFIGURATION=%2
 set TOOLSET=%3
 
-
-ECHO Building release for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
-
 IF "!PLATFORM!"=="x64" (
     set TARGET=x86_64-pc-windows-msvc
 )
@@ -16,6 +13,8 @@ IF "!PLATFORM!"=="x64" (
 IF "!PLATFORM!"=="Win32" (
     set TARGET=i686-pc-windows-msvc
 )
+
+ECHO Building for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
 CALL :NORMALIZEPATH %cd%\..\!PLATFORM!\!CONFIGURATION!
 SET BUILD_PREFIX=%RETVAL%
