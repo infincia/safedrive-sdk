@@ -49,7 +49,7 @@ test_script:
   - unit.cmd
 
 build_script:
-  - release.cmd
+  - release.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
 
 before_deploy:
   - cd dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
