@@ -2,22 +2,19 @@
 
 setlocal enabledelayedexpansion
 
-IF [%ARCH%]==[] set ARCH=x64
-IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
-IF [%TOOLSET%]==[] set TOOLSET=v141_xp
-IF [%CONFIGURATION%]==[] set CONFIGURATION=Debug
+set PLATFORM=%1
+set CONFIGURATION=%2
+set TOOLSET=%3
 
 
 ECHO Building release for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
-IF "!ARCH!"=="x64" (
-    set PLATFORM=x64
-    set CMAKE_GENERATOR_PLATFORM= Win64
+IF "!PLATFORM!"=="x64" (
+    set TARGET=x86_64-pc-windows-msvc
 )
 
-IF "!ARCH!"=="x86" (
-    set PLATFORM=Win32
-    set CMAKE_GENERATOR_PLATFORM=
+IF "!PLATFORM!"=="Win32" (
+    set TARGET=i686-pc-windows-msvc
 )
 
 CALL :NORMALIZEPATH %cd%\..\!PLATFORM!\!CONFIGURATION!
@@ -55,7 +52,7 @@ IF "!TOOLSET!"=="v141_xp" (
 
 ECHO Building dependencies for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
-call dep.cmd || goto :error
+call dep.cmd !PLATFORM! !CONFIGURATION! !TOOLSET! || goto :error
 
 call rustver.bat
 
