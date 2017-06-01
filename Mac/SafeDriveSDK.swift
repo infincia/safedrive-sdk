@@ -35,7 +35,9 @@ public class SafeDriveSDK: NSObject {
     }
     
     public static var sddk_channel: String {
-        var ch = sddk_get_channel()
+        var ch: UnsafeMutablePointer<CChar>? = nil
+        
+        sddk_get_channel(&ch)
         defer {
             sddk_free_string(&ch)
         }
@@ -43,7 +45,9 @@ public class SafeDriveSDK: NSObject {
     }
     
     public static var sddk_version: String {
-        var ver = sddk_get_version()
+        var ver: UnsafeMutablePointer<CChar>? = nil
+
+        sddk_get_version(&ver)
         defer {
             sddk_free_string(&ver)
         }
