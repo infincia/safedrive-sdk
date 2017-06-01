@@ -29,7 +29,6 @@ mkdir "!BUILD_PREFIX!\include" > NUL
 mkdir "!BUILD_PREFIX!\include\openssl" > NUL
 
 mkdir "!SRC_PREFIX!" > NUL
-mkdir build > NUL
 
 IF "!CONFIGURATION!"=="Release" (
     set RUNTIME_LIBRARY="MultiThreadedDLL"
@@ -101,7 +100,7 @@ goto :checklibressl
 
 :buildsodium
 
-pushd build
+pushd !BUILD_PREFIX!
 @echo unpacking libsodium source
 del /q libsodium-!SODIUM_VER!
 7z x -y "!SRC_PREFIX!\libsodium-!SODIUM_VER!.tar.gz" || goto :error
@@ -128,7 +127,7 @@ goto :checkssh2
 
 :buildlibressl
 
-pushd build
+pushd !BUILD_PREFIX!
 @echo unpacking libressl source
 del /q libressl-!LIBRESSL_VER!
 7z x -y "!SRC_PREFIX!\libressl-!LIBRESSL_VER!.tar.gz" || goto :error
@@ -163,7 +162,7 @@ goto :EOF
 
 :buildssh2
 
-pushd build
+pushd !BUILD_PREFIX!
 @echo unpacking libssh2 source
 del /q libssh2-!LIBSSH2_VER!
 7z x -y "!SRC_PREFIX!\libssh2-!LIBSSH2_VER!.tar.gz" || goto :error
