@@ -49,8 +49,6 @@ IF "!TOOLSET!"=="v141_xp" (
     set VS=Visual Studio 15 2017
 )
 
-ECHO Building dependencies for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
-
 call dep.cmd !PLATFORM! !CONFIGURATION! !TOOLSET! || goto :error
 
 call rustver.bat
