@@ -60,9 +60,6 @@ ECHO Building safedrive CLI for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
 cargo.exe build --release --verbose -p safedrive --target !TARGET! || goto :error
 
-ECHO Building safedrive daemon for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
-
-cargo.exe build --release --verbose -p safedrived --target !TARGET! || goto :error
 
 ECHO Building SDDK headers for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
