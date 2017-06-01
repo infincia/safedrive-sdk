@@ -46,7 +46,7 @@ cache:
 build: false
 
 test_script:
-  - unit.cmd
+  - unit.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
 
 build_script:
   - release.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
