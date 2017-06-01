@@ -23,13 +23,8 @@ IF "!ARCH!"=="x86" (
 CALL :NORMALIZEPATH %cd%\..\!PLATFORM!\!CONFIGURATION!
 SET BUILD_PREFIX=%RETVAL%
 
-set INTR_PREFIX=%cd%\build\SafeDriveSDK
 
-set CMAKE_PREFIX=%cd%\Windows
 
-del /q "!INTR_PREFIX!"
-
-mkdir "!INTR_PREFIX!" > NUL
 
 set OPENSSL_DIR=!BUILD_PREFIX!
 set SODIUM_LIB_DIR=!BUILD_PREFIX!
@@ -92,16 +87,7 @@ copy /y "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe
 ECHO copying "target\!TARGET!\release\safedrived.exe" "!BUILD_PREFIX!\"
 copy /y "target\!TARGET!\release\safedrived.exe" "!BUILD_PREFIX!\" || goto :error
 
-pushd "!INTR_PREFIX!"
-@echo building C++ SDK for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
-cmake "!CMAKE_PREFIX!" -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"PLATFORM=!PLATFORM!" -D"TARGET=!TARGET!" -D"TOOLSET=!TOOLSET!" -D"CONFIGURATION=!CONFIGURATION!" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"CMAKE_C_FLAGS_RELEASE=!CMAKE_C_FLAGS_RELEASE!" -D"CMAKE_CXX_FLAGS_RELEASE=!CMAKE_CXX_FLAGS_RELEASE!" -D"CMAKE_C_FLAGS_DEBUG=!CMAKE_C_FLAGS_DEBUG!" -D"CMAKE_CXX_FLAGS_DEBUG=!CMAKE_CXX_FLAGS_DEBUG!" || goto :error
-msbuild /m /v:n /t:SafeDriveSDK /p:RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! SafeDriveSDK.sln || goto :error
-popd
-@echo copying "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" to "!BUILD_PREFIX!\SafeDriveSDK.!LIBSUFFIX!"
-copy /y "!INTR_PREFIX!\!CONFIGURATION!\SafeDriveSDK.!LIBSUFFIX!" "!BUILD_PREFIX!\SafeDriveSDK.!LIBSUFFIX!" || goto :error
 
-ECHO copying "!CMAKE_PREFIX!\SafeDriveSDK.h" "!BUILD_PREFIX!\include\SafeDriveSDK.h"
-copy /y "!CMAKE_PREFIX!\SafeDriveSDK.h" "!BUILD_PREFIX!\include\SafeDriveSDK.h" || goto :error
 
 goto :EOF
 
