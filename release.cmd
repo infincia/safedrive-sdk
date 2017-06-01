@@ -32,10 +32,12 @@ set RUST_BACKTRACE=1
 
 IF "!CONFIGURATION!"=="Release" (
     set RUNTIME_LIBRARY="MultiThreadedDLL"
+    set BUILDOPTS=--release
 )
 
 IF "!CONFIGURATION!"=="Debug" (
     set RUNTIME_LIBRARY="MultiThreadedDebugDLL"
+    set BUILDOPTS=
 )
 
 IF "!TOOLSET!"=="v120_xp" (
@@ -58,7 +60,7 @@ rustup override set !RUST_VER!
 
 ECHO Building safedrive CLI for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
-cargo.exe build --release --verbose -p safedrive --target !TARGET! || goto :error
+cargo build !BUILDOPTS! --verbose -p safedrive --target !TARGET! || goto :error
 
 
 ECHO Building SDDK headers for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
