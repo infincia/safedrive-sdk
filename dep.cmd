@@ -137,7 +137,6 @@ pushd libressl-!LIBRESSL_VER!
 @echo building libressl for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!"  -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"CMAKE_C_FLAGS_RELEASE=!CMAKE_C_FLAGS_RELEASE!" -D"CMAKE_CXX_FLAGS_RELEASE=!CMAKE_CXX_FLAGS_RELEASE!" -D"CMAKE_C_FLAGS_DEBUG=!CMAKE_C_FLAGS_DEBUG!" -D"CMAKE_CXX_FLAGS_DEBUG=!CMAKE_CXX_FLAGS_DEBUG!"
 msbuild /m /v:n /p:WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libressl.sln || goto :error
-@echo copying "include\openssl" to "!BUILD_PREFIX!\include\"
 
 copy /y "include\openssl" "!BUILD_PREFIX!\include\openssl\" || goto :error
 copy /y "ssl\!CONFIGURATION!\ssl.lib" "!BUILD_PREFIX!\ssl.lib" || goto :error
