@@ -31,3 +31,5 @@ x64
 cmake-build-debug
 CMakeFiles
 .DS_Store
+/Win32
+/x64
