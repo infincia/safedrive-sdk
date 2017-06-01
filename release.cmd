@@ -74,8 +74,6 @@ copy /y "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\" || goto :error
 ECHO copying "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe"
 copy /y "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe" || goto :error
 
-ECHO copying "target\!TARGET!\release\safedrived.exe" "!DIST_PREFIX!\safedrived-!PLATFORM!.exe"
-copy /y "target\!TARGET!\release\safedrived.exe" "!DIST_PREFIX!\safedrived-!PLATFORM!.exe" || goto :error
 
 goto :EOF
 
