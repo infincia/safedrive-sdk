@@ -2,33 +2,43 @@
 
 setlocal enabledelayedexpansion
 
-IF [%ARCH%]==[] set ARCH=x64
-IF [%TARGET%]==[] set TARGET=x86_64-pc-windows-msvc
-IF [%TOOLSET%]==[] set TOOLSET=v141_xp
-IF [%CONFIGURATION%]==[] set CONFIGURATION=Release
+set PLATFORM=%1
+set CONFIGURATION=Debug
+set TOOLSET=%3
 
-ECHO Testing release for !TARGET! (!TOOLSET!-!CONFIGURATION!)
+IF "!PLATFORM!"=="x64" (
+    set TARGET=x86_64-pc-windows-msvc
+)
 
-set NATIVE_BUILD_PREFIX=!cd!\dep\!TARGET!\!TOOLSET!\!CONFIGURATION!
+IF "!PLATFORM!"=="Win32" (
+    set TARGET=i686-pc-windows-msvc
+)
 
-set OPENSSL_DIR=!NATIVE_BUILD_PREFIX!\lib
-set SODIUM_LIB_DIR=!NATIVE_BUILD_PREFIX!\lib
+CALL :NORMALIZEPATH %cd%\!PLATFORM!\!CONFIGURATION!
+SET BUILD_PREFIX=!RETVAL!
+
+set OPENSSL_DIR=!BUILD_PREFIX!
+set SODIUM_LIB_DIR=!BUILD_PREFIX!
 set SODIUM_STATIC=""
-set CARGO_INCREMENTAL="1"
-set RUST_BACKTRACE="1"
-set RUST_FLAGS=""
+set RUST_BACKTRACE=1
 
-ECHO Building test dependencies for !TARGET! (!TOOLSET!-!CONFIGURATION!)
+IF "!CONFIGURATION!"=="Release" (
+    set BUILDOPTS=--release
+)
 
-call dep.cmd || goto :error
+IF "!CONFIGURATION!"=="Debug" (
+    set BUILDOPTS=
+)
+
+call dep.cmd !PLATFORM! !CONFIGURATION! !TOOLSET! || goto :error
 
 call rustver.bat
 
 rustup override set !RUST_VER!
 
-ECHO Testing sddk for !TARGET! (!TOOLSET!-!CONFIGURATION!)
+ECHO Testing sddk for !PLATFORM! (!TOOLSET!)
 
-cargo.exe test --release -p sddk --target !TARGET! || goto :error
+cargo.exe test !BUILDOPTS! -p sddk --target !TARGET! || goto :error
 goto :EOF
 
 :error
