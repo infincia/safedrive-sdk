@@ -69,9 +69,6 @@ cheddar -f "sddk\src\c_api.rs" "!BUILD_PREFIX!\include\sddk.h" || goto :error
 
 ECHO Copying build artifacts for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 
-ECHO copying "target\!TARGET!\release\sddk.lib" "!BUILD_PREFIX!\"
-copy /y "target\!TARGET!\release\sddk.lib" "!BUILD_PREFIX!\" || goto :error
-
 ECHO copying "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\"
 copy /y "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\" || goto :error
 
