@@ -595,7 +595,7 @@ public class SafeDriveSDK: NSObject {
     
     public func log(_ message: String, _ level: SDKLogLevel) {
         DispatchQueue.global(priority: .default).async {
-            sddk_log(message, level.rawValue)
+            sddk_log(message, SDDKLogLevel(rawValue: UInt32(level.rawValue)))
         }
     }
     
