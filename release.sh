@@ -133,23 +133,3 @@ case ${TARGET} in
     *)
         ;;
 esac
-
-echo "Building C++ SDK for ${TARGET}"
-
-pushd "${INTR_PREFIX}"
-
-case ${TARGET} in
-    x86_64-apple-darwin)
-        cmake "${CMAKE_PREFIX}" -G Xcode -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
-        xcodebuild -configuration ${CONFIGURATION}
-
-        echo copying ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a to ${DIST_PREFIX}/lib/
-        cp -a ${INTR_PREFIX}/${CONFIGURATION}/libSafeDriveSDK.a ${DIST_PREFIX}/lib/
-        ;;
-    *)
-        #cmake "${CMAKE_PREFIX}" -G"Unix Makefiles" -D"TARGET=${TARGET}" -D"CONFIGURATION=${CONFIGURATION}"
-        #make
-        ;;
-esac
-
-popd
