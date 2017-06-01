@@ -20,6 +20,8 @@ CALL :NORMALIZEPATH %cd%\..\!PLATFORM!\!CONFIGURATION!
 SET BUILD_PREFIX=%RETVAL%
 
 
+CALL :NORMALIZEPATH %cd%\..\!CONFIGURATION!
+SET DIST_PREFIX=%RETVAL%
 
 
 set OPENSSL_DIR=!BUILD_PREFIX!
@@ -72,13 +74,11 @@ ECHO Copying build artifacts for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
 ECHO copying "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\"
 copy /y "target\!TARGET!\release\sddk.dll" "!BUILD_PREFIX!\" || goto :error
 
-ECHO copying "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe"
-copy /y "target\!TARGET!\release\safedrive.exe" "!BUILD_PREFIX!\safedrivecli.exe" || goto :error
+ECHO copying "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe"
+copy /y "target\!TARGET!\release\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe" || goto :error
 
-ECHO copying "target\!TARGET!\release\safedrived.exe" "!BUILD_PREFIX!\"
-copy /y "target\!TARGET!\release\safedrived.exe" "!BUILD_PREFIX!\" || goto :error
-
-
+ECHO copying "target\!TARGET!\release\safedrived.exe" "!DIST_PREFIX!\safedrived-!PLATFORM!.exe"
+copy /y "target\!TARGET!\release\safedrived.exe" "!DIST_PREFIX!\safedrived-!PLATFORM!.exe" || goto :error
 
 goto :EOF
 
