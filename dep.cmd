@@ -111,7 +111,6 @@ pushd libsodium-!SODIUM_VER!
 @echo building libsodium for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 msbuild /m /v:n /p:OutDir="!BUILD_PREFIX!\\";WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libsodium.sln || goto :error
 popd
-del /q libsodium-!SODIUM_VER!
 @echo copying "!BUILD_PREFIX!\libsodium.lib" to "!BUILD_PREFIX!\sodium.lib"
 copy /y "!BUILD_PREFIX!\libsodium.lib" "!BUILD_PREFIX!\sodium.lib" || goto :error
 @echo !SODIUM_VER!> !SODIUM_VER_FILE!
@@ -149,7 +148,6 @@ copy /y "tls\!CONFIGURATION!\tls.lib" "!BUILD_PREFIX!\lib\libtls.lib" || goto :e
 copy /y "crypto\!CONFIGURATION!\crypto.lib" "!BUILD_PREFIX!\lib\libcrypto.lib" || goto :error
 @echo !LIBRESSL_VER!> !LIBRESSL_VER_FILE!
 popd
-del /q libressl-!LIBRESSL_VER!
 popd
 goto :checkssh2
 
@@ -178,7 +176,6 @@ copy /y "include\*.h"  "!BUILD_PREFIX!\include\" || goto :error
 copy /y "src\!CONFIGURATION!\libssh2.lib" "!BUILD_PREFIX!\ssh2.lib" || goto :error
 @echo !LIBSSH2_VER!> !LIBSSH2_VER_FILE!
 popd
-del /q libssh2-!LIBSSH2_VER!
 popd
 goto :done
 
