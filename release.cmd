@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 setlocal enabledelayedexpansion
 
@@ -74,7 +75,9 @@ copy /y "target\!TARGET!\!CONFIGURATION!\sddk.dll" "!BUILD_PREFIX!\" || goto :er
 ECHO copying "target\!TARGET!\!CONFIGURATION!\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe"
 copy /y "target\!TARGET!\!CONFIGURATION!\safedrive.exe" "!DIST_PREFIX!\safedrivecli-!PLATFORM!.exe" || goto :error
 
-goto :EOF
+endlocal
+
+goto :done
 
 :error
 echo Failed with error #!errorlevel!.
@@ -84,3 +87,5 @@ exit /b !errorlevel!
   SET RETVAL=%~dpfn1
   EXIT /B
 
+:done
+endlocal

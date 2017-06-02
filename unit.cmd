@@ -1,4 +1,5 @@
 @echo off
+setlocal
 
 setlocal enabledelayedexpansion
 
@@ -39,8 +40,11 @@ rustup override set !RUST_VER!
 ECHO Testing sddk for !PLATFORM! (!TOOLSET!)
 
 cargo.exe test !BUILDOPTS! -p sddk --target !TARGET! || goto :error
-goto :EOF
+goto :done
 
 :error
 echo Failed with error #!errorlevel!.
 exit /b !errorlevel!
+
+:done
+endlocal

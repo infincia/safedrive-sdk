@@ -1,5 +1,7 @@
 @echo off
 
+setlocal
+
 setlocal enabledelayedexpansion
 
 set PLATFORM=%1
@@ -158,7 +160,7 @@ goto :checkssh2
 IF NOT EXIST "!BUILD_PREFIX!\ssh2.lib" goto :buildssh2
 
 findstr /c:"!LIBSSH2_VER!" !LIBSSH2_VER_FILE! > NUL || goto :buildssh2
-goto :EOF
+goto :done
 
 :buildssh2
 
@@ -178,7 +180,7 @@ copy /y "src\!CONFIGURATION!\libssh2.lib" "!BUILD_PREFIX!\ssh2.lib" || goto :err
 popd
 del /q libssh2-!LIBSSH2_VER!
 popd
-goto :EOF
+goto :done
 
 :error
 echo Failed with error #!errorlevel!.
@@ -187,3 +189,7 @@ exit /b !errorlevel!
 :NORMALIZEPATH
   SET RETVAL=%~dpfn1
   EXIT /B
+
+:done
+@echo dependency build finished for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
+endlocal
