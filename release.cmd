@@ -16,7 +16,7 @@ IF "!PLATFORM!"=="Win32" (
     rustup target add !TARGET!
 )
 
-ECHO Building for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+ECHO Building for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 
 CALL :NORMALIZEPATH %cd%\!PLATFORM!\!CONFIGURATION!
 SET BUILD_PREFIX=!RETVAL!
@@ -45,16 +45,16 @@ call rustver.bat
 
 rustup override set !RUST_VER!
 
-ECHO Building safedrive CLI for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+ECHO Building safedrive CLI for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 
 cargo build !BUILDOPTS! --verbose -p safedrive --target !TARGET! || goto :error
 
 
-ECHO Building SDDK headers for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+ECHO Building SDDK headers for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 
 cheddar -f "sddk\src\c_api.rs" "!BUILD_PREFIX!\include\sddk.h" || goto :error
 
-ECHO Copying build artifacts for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+ECHO Copying build artifacts for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 
 ECHO copying "target\!TARGET!\!CONFIGURATION!\sddk.dll" "!BUILD_PREFIX!\"
 copy /y "target\!TARGET!\!CONFIGURATION!\sddk.dll" "!BUILD_PREFIX!\" || goto :error

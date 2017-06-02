@@ -37,7 +37,7 @@ call rustver.bat
 
 rustup override set !RUST_VER!
 
-ECHO Testing sddk for !PLATFORM! (!TOOLSET!)
+ECHO Testing sddk for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 
 cargo.exe test !BUILDOPTS! -p sddk --target !TARGET! || goto :error
 goto :done

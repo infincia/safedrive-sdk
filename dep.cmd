@@ -23,7 +23,7 @@ SET BUILD_PREFIX=!RETVAL!
 
 set SRC_PREFIX=%cd%\src
 
-ECHO building dependencies for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+ECHO building dependencies for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 
 mkdir "!BUILD_PREFIX!" > NUL
 mkdir "!BUILD_PREFIX!\lib" > NUL
@@ -108,7 +108,7 @@ del /q libsodium-!SODIUM_VER!
 7z x -y "!SRC_PREFIX!\libsodium-!SODIUM_VER!.tar.gz" || goto :error
 7z x -y "libsodium-!SODIUM_VER!.tar" || goto :error
 pushd libsodium-!SODIUM_VER!
-@echo building libsodium for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+@echo building libsodium for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 msbuild /m /v:n /p:OutDir="!BUILD_PREFIX!\\";WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libsodium.sln || goto :error
 popd
 del /q libsodium-!SODIUM_VER!
@@ -135,7 +135,7 @@ del /q libressl-!LIBRESSL_VER!
 7z x -y "!SRC_PREFIX!\libressl-!LIBRESSL_VER!.tar.gz" || goto :error
 7z x -y "libressl-!LIBRESSL_VER!.tar" || goto :error
 pushd libressl-!LIBRESSL_VER!
-@echo building libressl for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+@echo building libressl for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!"  -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"CMAKE_C_FLAGS_RELEASE=!CMAKE_C_FLAGS_RELEASE!" -D"CMAKE_CXX_FLAGS_RELEASE=!CMAKE_CXX_FLAGS_RELEASE!" -D"CMAKE_C_FLAGS_DEBUG=!CMAKE_C_FLAGS_DEBUG!" -D"CMAKE_CXX_FLAGS_DEBUG=!CMAKE_CXX_FLAGS_DEBUG!"
 msbuild /m /v:n /p:WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libressl.sln || goto :error
 
@@ -170,7 +170,7 @@ del /q libssh2-!LIBSSH2_VER!
 7z x -y "!SRC_PREFIX!\libssh2-!LIBSSH2_VER!.tar.gz" || goto :error
 7z x -y "libssh2-!LIBSSH2_VER!.tar" || goto :error
 pushd libssh2-!LIBSSH2_VER!
-@echo building libssh2 for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
+@echo building libssh2 for !TARGET! (!PLATFORM!-!CONFIGURATION!-!TOOLSET!)
 cmake . -G"!VS!!CMAKE_GENERATOR_PLATFORM!" -T"!TOOLSET!" -D"BUILD_SHARED_LIBS=0" -D"BUILD_EXAMPLES=0" -D"BUILD_TESTING=0" -D"CMAKE_BUILD_TYPE=!CONFIGURATION!" -D"OPENSSL_USE_STATIC_LIBS=TRUE" -D"CRYPTO_BACKEND=OpenSSL" -D"OPENSSL_ROOT_DIR=!BUILD_PREFIX!\\" -D"OPENSSL_INCLUDE_DIR=!BUILD_PREFIX!\include\\" -D"CMAKE_C_FLAGS_RELEASE=!CMAKE_C_FLAGS_RELEASE!" -D"CMAKE_CXX_FLAGS_RELEASE=!CMAKE_CXX_FLAGS_RELEASE!" -D"CMAKE_C_FLAGS_DEBUG=!CMAKE_C_FLAGS_DEBUG!" -D"CMAKE_CXX_FLAGS_DEBUG=!CMAKE_CXX_FLAGS_DEBUG!"
 msbuild /m /v:n /p:WholeProgramOptimization=false;RuntimeLibrary=!RUNTIME_LIBRARY!;Configuration=!CONFIGURATION!;Platform=!PLATFORM!;PlatformToolset=!TOOLSET! libssh2.sln || goto :error
 copy /y "include\*.h"  "!BUILD_PREFIX!\include\" || goto :error
