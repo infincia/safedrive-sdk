@@ -32,25 +32,11 @@ set SODIUM_STATIC=""
 set RUST_BACKTRACE=1
 
 IF "!CONFIGURATION!"=="Release" (
-    set RUNTIME_LIBRARY="MultiThreadedDLL"
     set BUILDOPTS=--release
 )
 
 IF "!CONFIGURATION!"=="Debug" (
-    set RUNTIME_LIBRARY="MultiThreadedDebugDLL"
     set BUILDOPTS=
-)
-
-IF "!TOOLSET!"=="v120_xp" (
-    set VS=Visual Studio 12 2013
-)
-
-IF "!TOOLSET!"=="v140_xp" (
-    set VS=Visual Studio 14 2015
-)
-
-IF "!TOOLSET!"=="v141_xp" (
-    set VS=Visual Studio 15 2017
 )
 
 call dep.cmd !PLATFORM! !CONFIGURATION! !TOOLSET! || goto :error
