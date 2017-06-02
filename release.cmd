@@ -13,6 +13,7 @@ IF "!PLATFORM!"=="x64" (
 
 IF "!PLATFORM!"=="Win32" (
     set TARGET=i686-pc-windows-msvc
+    rustup target add !TARGET!
 )
 
 ECHO Building for !PLATFORM! (!CONFIGURATION!-!TOOLSET!)
