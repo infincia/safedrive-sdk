@@ -8,6 +8,7 @@ environment:
   matrix:
     - TARGET: i686-pc-windows-msvc
       PLATFORM: Win32
+      ARCH: x86
       VS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: v141_xp
@@ -15,6 +16,7 @@ environment:
       CONFIGURATION: Release
     - TARGET: x86_64-pc-windows-msvc
       PLATFORM: x64
+      ARCH: x64
       VS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: v141_xp
@@ -24,7 +26,7 @@ environment:
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
 install:
-  - if defined VS call "%VS%" %PLATFORM%
+  - if defined VS call "%VS%" %ARCH%
   - if defined ESCRIPT call "%ESCRIPT%"
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
   - rustup-init.exe --default-host %TARGET% -y
