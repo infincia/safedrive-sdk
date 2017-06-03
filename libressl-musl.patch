@@ -1,12 +1,15 @@
 --- crypto/compat/getentropy_linux.c.old	2015-08-24 00:58:18.000000000 -0400
 +++ crypto/compat/getentropy_linux.c	2017-04-30 13:10:15.000000000 -0400
-@@ -27,9 +27,6 @@
+@@ -27,9 +27,9 @@
  #include <sys/ioctl.h>
  #include <sys/resource.h>
  #include <sys/syscall.h>
 -#ifdef SYS__sysctl
 -#include <linux/sysctl.h>
 -#endif
++//#ifdef SYS__sysctl
++//#include <linux/sysctl.h>
++//#endif
  #include <sys/statvfs.h>
  #include <sys/socket.h>
  #include <sys/mount.h>
