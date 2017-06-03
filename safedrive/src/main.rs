@@ -1450,11 +1450,10 @@ pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
         }
     }
 
-    #[cfg(target_os = "windows")]
-    unsafe {
-        let p: &str = &binary_path.to_str().expect("failed to get path");
+    #[cfg(target_os = "windows")] {
+        //let p: &str = &binary_path.to_str().expect("failed to get path");
 
-        let s: CString = CString::new(p).expect("failed to get path");
+        //let s: CString = CString::new(p).expect("failed to get path");
 
         Ok(())
     }
