@@ -114,6 +114,16 @@ fn main() {
 
     info!("Building in {} for {} {} {}", current_dir.display(), platform.name(), toolset.name(), configuration.name());
 
+
+    match add_rust_target(platform) {
+        Ok(()) => {
+
+        },
+        Err(err) => {
+            warn!("{}", err);
+        }
+    }
+
     match set_rust_version(&current_dir) {
         Ok(()) => {
 
@@ -235,8 +245,13 @@ fn set_rust_version(current_dir: &Path) -> Result<(), BuildError> {
     }
 }
 
+fn add_rust_target(platform: Platform) -> Result<(), BuildError> {
+    info!("adding rust target: {}", platform.target());
 
+    Exec::shell(format!("rustup target add {}", platform.target())).join()?;
 
+    Ok(())
+}
 
 
 
