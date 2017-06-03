@@ -1,0 +1,17 @@
+[package]
+name = "builder"
+version = "0.1.0"
+authors = ["Stephen Oliver <steve@infincia.com>"]
+build = "build.rs"
+workspace = ".."
+
+[dependencies]
+clap = "*"
+log = "*"
+simplelog = "*"
+subprocess = "*"
+walkdir = "*"
+fs_extra = "*"
+
+[[bin]]
+name = "builder"

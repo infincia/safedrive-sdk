@@ -35,23 +35,3 @@ rustc-link-search = ["native=dep/wasm32-unknown-emscripten/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/wasm32-unknown-emscripten/lib"
 
-[target.'cfg(debug_assertions)'.x86_64-pc-windows-msvc.sodium]
-rustc-link-search = ["native=../x64/Debug"]
-rustc-link-lib = ["static=sodium"]
-root = "../x64/Debug"
-
-[target.'cfg(debug_assertions)'.i686-pc-windows-msvc.sodium]
-rustc-link-search = ["native=../Win32/Debug"]
-rustc-link-lib = ["static=sodium"]
-root = "../Win32/Debug"
-
-[target.'cfg(not(debug_assertions))'.x86_64-pc-windows-msvc.sodium]
-rustc-link-search = ["native=../x64/Release"]
-rustc-link-lib = ["static=sodium"]
-root = "../x64/Release"
-
-[target.'cfg(not(debug_assertions))'.i686-pc-windows-msvc.sodium]
-rustc-link-search = ["native=../Win32/Release"]
-rustc-link-lib = ["static=sodium"]
-root = "../Win32/Release"
-
