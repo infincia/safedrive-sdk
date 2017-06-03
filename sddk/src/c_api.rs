@@ -2801,11 +2801,11 @@ pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
     };
 
     let log_level = match level {
-        SDDKLogLevelError => ::log::LogLevelFilter::Error,
-        SDDKLogLevelWarn => ::log::LogLevelFilter::Warn,
-        SDDKLogLevelInfo => ::log::LogLevelFilter::Info,
-        SDDKLogLevelDebug => ::log::LogLevelFilter::Debug,
-        SDDKLogLevelTrace => ::log::LogLevelFilter::Trace,
+        SDDKLogLevel::SDDKLogLevelError => ::log::LogLevelFilter::Error,
+        SDDKLogLevel::SDDKLogLevelWarn => ::log::LogLevelFilter::Warn,
+        SDDKLogLevel::SDDKLogLevelInfo => ::log::LogLevelFilter::Info,
+        SDDKLogLevel::SDDKLogLevelDebug => ::log::LogLevelFilter::Debug,
+        SDDKLogLevel::SDDKLogLevelTrace => ::log::LogLevelFilter::Trace,
     };
 
     log(&msg, log_level);
