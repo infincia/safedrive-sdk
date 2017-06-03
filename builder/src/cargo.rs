@@ -56,9 +56,13 @@ impl Cargo {
             }
         }
 
+        let mut crate_root = PathBuf::from(&self.build_prefix);
+        crate_root.pop();
+        crate_root.pop();
+
         let exit = Exec::cmd("cheddar")
             .arg("-f")
-            .arg("sddk/src/c_api.rs")
+            .arg(format!("{}/sddk/src/c_api.rs", &crate_root.display()))
             .arg(format!("{}/include/sddk.h", &self.build_prefix.display()))
             .join()?;
 
