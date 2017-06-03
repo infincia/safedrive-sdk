@@ -149,8 +149,8 @@ case ${TARGET} in
         export BUILD_LIBSSH2=true
         ;;
     x86_64-unknown-linux-musl)
-        export CFLAGS="${CFLAGS} -I/usr/src/linux/include"
-        export CPPFLAGS="${CPPFLAGS} -I/usr/src/linux/include"
+        export CFLAGS="${CFLAGS} -I/usr/include"
+        export CPPFLAGS="${CPPFLAGS} -I/usr/include"
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
         export BUILD_EXPAT=true
@@ -159,8 +159,8 @@ case ${TARGET} in
         export BUILD_LIBSSH2=true
         ;;
     i686-unknown-linux-musl)
-        export CFLAGS="${CFLAGS} -m32 -I/usr/src/linux/include"
-        export CPPFLAGS="${CPPFLAGS} -m32 -I/usr/src/linux/include"
+        export CFLAGS="${CFLAGS} -m32 -I/usr/include"
+        export CPPFLAGS="${CPPFLAGS} -m32 -I/usr/include"
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
         export PKG_CONFIG_ALLOW_CROSS=1
