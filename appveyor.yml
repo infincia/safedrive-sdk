@@ -35,9 +35,7 @@ install:
   - if not exist "%USERPROFILE%\.cargo\bin\cheddar.exe" cargo install rusty-cheddar
 
 cache:
-  - dep -> dep.cmd
   - src
-  - target -> dep.cmd
   - '%USERPROFILE%\.cargo'
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
