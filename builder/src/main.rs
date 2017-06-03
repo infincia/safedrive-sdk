@@ -134,7 +134,7 @@ fn main() {
         }
     }
 
-    match create_dirs(&build_prefix) {
+    match create_dirs(&build_prefix, &source_prefix) {
         Ok(()) => {
 
         },

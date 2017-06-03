@@ -3,7 +3,7 @@ use error::BuildError;
 use std::fs;
 use std::env;
 
-pub fn create_dirs(build_prefix: &Path) -> Result<(), BuildError> {
+pub fn create_dirs(build_prefix: &Path, source_prefix: &Path) -> Result<(), BuildError> {
     let build_dirs = vec!["lib", "include", "include/openssl"];
 
     for dir in build_dirs {
@@ -14,9 +14,7 @@ pub fn create_dirs(build_prefix: &Path) -> Result<(), BuildError> {
         }
     }
 
-    let p = build_prefix.join("src");
-
-    if let Err(err) = fs::create_dir_all(p) {
+    if let Err(err) = fs::create_dir_all(source_prefix) {
         return Err(BuildError::Error(Box::new(err)));
     }
 
