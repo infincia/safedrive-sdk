@@ -60,7 +60,7 @@ echo "Building test dependencies for ${TARGET}"
 
 bash dep.sh
 
-source ./rustver.sh
+RUST_VER=$(<${rustver.conf})
 
 rustup override set ${RUST_VER}
 

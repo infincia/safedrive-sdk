@@ -1,7 +1,9 @@
 #![allow(non_camel_case_types)]
 
-use std::path::{PathBuf};
+use std::path::{PathBuf, Path};
 use std::env;
+use std::fs::OpenOptions;
+use std::io::Read;
 
 #[macro_use]
 extern crate log;
@@ -41,8 +43,6 @@ use library::Library;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const NAME: &str = env!("CARGO_PKG_NAME");
 const COPYRIGHT: &str = "(C) 2013-2017 SafeData Net S.R.L.";
-
-const RUST_VER: &str = "nightly-2017-06-01";
 
 fn main() {
     let matches = App::new(NAME)
@@ -114,7 +114,7 @@ fn main() {
 
     info!("Building in {} for {} {} {}", current_dir.display(), platform.name(), toolset.name(), configuration.name());
 
-    match set_rust_version(RUST_VER) {
+    match set_rust_version(&current_dir) {
         Ok(()) => {
 
         },
@@ -214,8 +214,16 @@ fn main() {
     }
 }
 
-fn set_rust_version(ver: &str) -> Result<(), BuildError> {
+fn set_rust_version(current_dir: &Path) -> Result<(), BuildError> {
+
+    let mut full_path: PathBuf = PathBuf::from(current_dir);
+    full_path.push("rustver.conf");
+
+    let mut file = OpenOptions::new().read(true).write(false).truncate(false).open(&full_path)?;
+    let mut ver = String::new();
+    file.read_to_string(&mut ver)?;
     info!("setting rust version to: {}", ver);
+
     let exit = Exec::shell(format!("rustup override set {}", ver)).join()?;
     match exit {
         ExitStatus::Exited(0) => {

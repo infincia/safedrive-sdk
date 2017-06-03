@@ -5,7 +5,8 @@
 set -ex
 
 . $(dirname $0)/utils.sh
-. $(dirname $0)/../rustver.sh
+
+RUST_VER_FILE=$(dirname $0)/../rustver.conf
 
 install_fuse() {
     case "${TRAVIS_OS_NAME}" in
@@ -18,6 +19,8 @@ install_fuse() {
 }
 
 install_rustup() {
+    RUST_VER=$(<${RUST_VER_FILE})
+
     echo "Using Rust ${RUST_VER}"
     curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=${RUST_VER}
     rustup target add ${TARGET} || true

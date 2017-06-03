@@ -26,9 +26,8 @@ environment:
 install:
   - if defined VS call "%VS%" %PLATFORM%
   - if defined ESCRIPT call "%ESCRIPT%"
-  - call rustver.bat
   - curl -sSf -o rustup-init.exe https://win.rustup.rs
-  - rustup-init.exe --default-host %TARGET% --default-toolchain %RUST_VER% -y
+  - rustup-init.exe --default-host %TARGET% -y
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
   - rustc -Vv
   - cargo -V
