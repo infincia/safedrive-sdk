@@ -26,9 +26,12 @@ impl Cargo {
     pub fn build(&self) -> Result<(), BuildError> {
         info!("building sddk");
 
+        let mut lib_dir = PathBuf::from(&self.build_prefix);
+        lib_dir.push("lib");
+
         let mut exec = Exec::cmd("cargo")
-            .env("OPENSSL_DIR", self.build_prefix.as_os_str())
-            .env("SODIUM_LIB_DIR", self.build_prefix.as_os_str())
+            .env("OPENSSL_DIR", (&self.build_prefix).as_os_str())
+            .env("SODIUM_LIB_DIR", (&self.build_prefix).as_os_str())
             .env("SODIUM_STATIC", "1")
             .env("RUST_BACKTRACE", "1")
 
@@ -81,9 +84,12 @@ impl Cargo {
     pub fn test(&self) -> Result<(), BuildError> {
         info!("testing sddk");
 
+        let mut lib_dir = PathBuf::from(&self.build_prefix);
+        lib_dir.push("lib");
+
         let mut exec = Exec::cmd("cargo")
-            .env("OPENSSL_DIR", self.build_prefix.as_os_str())
-            .env("SODIUM_LIB_DIR", self.build_prefix.as_os_str())
+            .env("OPENSSL_DIR", (&self.build_prefix).as_os_str())
+            .env("SODIUM_LIB_DIR", (&self.build_prefix).as_os_str())
             .env("SODIUM_STATIC", "1")
             .env("RUST_BACKTRACE", "1")
 

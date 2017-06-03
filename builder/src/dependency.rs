@@ -57,6 +57,7 @@ impl Dependency {
 
         for product_name in self.library.products() {
             let mut product_dest: PathBuf = PathBuf::from(&self.build_prefix);
+            product_dest.push("lib");
             product_dest.push(product_name);
 
             if !product_dest.exists() {
@@ -257,6 +258,7 @@ impl Dependency {
             }
 
             let mut product_dest: PathBuf = PathBuf::from(&self.build_prefix);
+            product_dest.push("lib");
             product_dest.push(product);
 
             for item in WalkDir::new(&product_location).into_iter().filter_map(|e| e.ok()) {
