@@ -132,6 +132,7 @@ impl State {
 
     }
 
+    #[allow(dead_code)]
     pub fn get_master_key(&self) -> &Key {
         let key = match self.master_key {
             Some(ref key) => key,
