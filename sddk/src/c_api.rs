@@ -52,13 +52,9 @@ use core::get_software_clients;
 
 use core::send_error_report;
 
-#[cfg(target_os = "macos")]
 use core::remote_mkdir;
-#[cfg(target_os = "macos")]
 use core::remote_mv;
-#[cfg(target_os = "macos")]
 use core::remote_rmdir;
-#[cfg(target_os = "macos")]
 use core::remote_rm;
 
 use error::SDError;
@@ -3084,7 +3080,6 @@ pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetail
 /// }
 /// ```
 ///
-#[cfg(target_os = "macos")]
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
@@ -3148,7 +3143,6 @@ pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut 
 ///
 /// }
 /// ```
-#[cfg(target_os = "macos")]
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
@@ -3214,7 +3208,6 @@ pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut 
 ///
 /// }
 /// ```
-#[cfg(target_os = "macos")]
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_remote_rm(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char, recursive: std::os::raw::c_uchar) -> std::os::raw::c_int {
@@ -3282,7 +3275,6 @@ pub extern "C" fn sddk_remote_rm(state: *mut SDDKState, mut error: *mut *mut SDD
 ///
 /// }
 /// ```
-#[cfg(target_os = "macos")]
 #[no_mangle]
 #[allow(dead_code)]
 pub extern "C" fn sddk_remote_mv(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char, new_path: *const std::os::raw::c_char) -> std::os::raw::c_int {

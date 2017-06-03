@@ -66,7 +66,6 @@ mod sessionfs;
 mod sdlog;
 #[cfg(feature = "webui")]
 mod webui;
-#[cfg(target_os = "macos")]
 mod remotefs;
 #[cfg(target_os = "windows")]
 mod settings;
@@ -86,7 +85,6 @@ pub use keychain::KeychainService;
 #[cfg(feature = "sessionfs")]
 pub use sessionfs::*;
 
-#[cfg(target_os = "macos")]
 pub use remotefs::RemoteFS;
 
 
@@ -115,7 +113,6 @@ extern crate time;
 
 extern crate keyring;
 
-#[cfg(target_os = "macos")]
 extern crate ssh2;
 
 #[cfg(feature = "sessionfs")]
@@ -140,7 +137,6 @@ extern crate nom;
 #[macro_use]
 extern crate lazy_static;
 
-#[cfg(target_os = "macos")]
 extern crate openssl_sys;
 
 #[cfg(feature = "locking")]
