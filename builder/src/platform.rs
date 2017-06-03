@@ -11,6 +11,9 @@ impl From<String> for Platform {
         match r {
             "win32" => Platform::i686,
             "x64" => Platform::x86_64,
+            "x86" => Platform::i686,
+            "x86_64" => Platform::x86_64,
+            "amd64" => Platform::x86_64,
             _ => {
                 panic!("invalid platform")
             }
