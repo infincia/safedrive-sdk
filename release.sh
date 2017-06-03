@@ -78,7 +78,9 @@ echo "Building dependencies for ${TARGET}"
 
 bash dep.sh
 
-RUST_VER=$(<${rustver.conf})
+RUST_VER_FILE=$(dirname $0)/rustver.conf
+
+RUST_VER=$(<${RUST_VER_FILE})
 
 rustup override set ${RUST_VER}
 
