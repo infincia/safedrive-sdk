@@ -31,7 +31,7 @@ impl Cargo {
 
         let mut exec = Exec::cmd("cargo")
             .env("OPENSSL_DIR", (&self.build_prefix).as_os_str())
-            .env("SODIUM_LIB_DIR", (&self.build_prefix).as_os_str())
+            .env("SODIUM_LIB_DIR", (&lib_dir).as_os_str())
             .env("SODIUM_STATIC", "1")
             .env("RUST_BACKTRACE", "1")
 
@@ -89,7 +89,7 @@ impl Cargo {
 
         let mut exec = Exec::cmd("cargo")
             .env("OPENSSL_DIR", (&self.build_prefix).as_os_str())
-            .env("SODIUM_LIB_DIR", (&self.build_prefix).as_os_str())
+            .env("SODIUM_LIB_DIR", (&lib_dir).as_os_str())
             .env("SODIUM_STATIC", "1")
             .env("RUST_BACKTRACE", "1")
 
