@@ -155,6 +155,8 @@ case ${TARGET} in
         export CC=musl-gcc
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
+        export BUILD_LIBRESSL=true
+        export BUILD_LIBSSH2=true
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -m32"
@@ -164,6 +166,8 @@ case ${TARGET} in
         export PKG_CONFIG_ALLOW_CROSS=1
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
+        export BUILD_LIBRESSL=true
+        export BUILD_LIBSSH2=true
         ;;
     wasm32-unknown-emscripten)
         export SODIUM_ARGS="${SODIUM_ARGS}"
