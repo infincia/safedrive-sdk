@@ -1,5 +1,5 @@
-use std::path::Path;
-use std::io;
+#![allow(dead_code)]
+
 use winreg::RegKey;
 use winreg::enums::*;
 
