@@ -214,7 +214,7 @@ impl Dependency {
 
         let options = fs_extra::dir::CopyOptions::new();
         let handle = |process_info: fs_extra::TransitProcess| {
-            fs_extra::dir::TransitProcessResult::ContinueOrAbort
+            fs_extra::dir::TransitProcessResult::OverwriteAll
         };
 
         let header_names = self.library.headers();
