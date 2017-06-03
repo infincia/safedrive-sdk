@@ -90,7 +90,7 @@ impl Cargo {
             .arg("test")
             .arg("--verbose")
             .arg("--package")
-            .arg("libsddk")
+            .arg("sddk")
             .arg("--target")
             .arg(self.platform.target());
 
