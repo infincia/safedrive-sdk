@@ -332,6 +332,7 @@ if [ ${BUILD_EXPAT} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! $(<${EXPAT_VER_FILE}) = ${EXPAT_VER} ]; then
 
         echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        rm -rf expat*
         clear_man
         tar xf ../src/expat-${EXPAT_VER}.tar.bz2 > /dev/null
         pushd expat-${EXPAT_VER}
@@ -351,7 +352,7 @@ fi
 if [ ${BUILD_DBUS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf dbus*
         clear_man
         tar xf ../src/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         pushd dbus-${LIBDBUS_VER}
@@ -372,7 +373,7 @@ if [ ${BUILD_LIBSODIUM} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libsodium.a ] || [ ! -f ${SODIUM_VER_FILE} ] || [ ! $(<${SODIUM_VER_FILE}) = ${SODIUM_VER} ]; then
 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf libsodium*
         clear_man
         tar xf ../src/libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
@@ -402,7 +403,7 @@ fi
 if [ ${BUILD_ICONV} = true ]; then
     if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ ! $(<${ICONV_VER_FILE}) = ${ICONV_VER} ]; then
         echo "Building iconv ${ICONV_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf libiconv*
         clear_man
         tar xf ../src/libiconv-${ICONV_VER}.tar.gz > /dev/null
         pushd libiconv-${ICONV_VER}
@@ -422,7 +423,7 @@ fi
 if [ ${BUILD_GETTEXT} = true ]; then
     if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ ! $(<${GETTEXT_VER_FILE}) = ${GETTEXT_VER} ]; then
         echo "Building gettext ${GETTEXT_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf gettext*
         clear_man
         tar xf ../src/gettext-${GETTEXT_VER}.tar.gz > /dev/null
         pushd gettext-${GETTEXT_VER}
@@ -442,7 +443,7 @@ fi
 if [ ${BUILD_FFI} = true ]; then
     if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
         echo "Building libffi ${FFI_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf libffi*
         clear_man
         tar xf ../src/libffi-${FFI_VER}.tar.gz > /dev/null
         pushd libffi-${FFI_VER}
@@ -462,7 +463,7 @@ fi
 if [ ${BUILD_GLIB} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ ! $(<${GLIB_VER_FILE}) = ${GLIB_VER} ]; then
         echo "Building glib ${GLIB_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf glib*
         clear_man
         tar xf ../src/glib-${GLIB_VER}.tar.xz > /dev/null
         pushd glib-${GLIB_VER}
@@ -523,7 +524,7 @@ fi
 if [ ${BUILD_SSHFS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
         echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
-
+        rm -rf sshfs*
         clear_man
         tar xf ../src/sshfs-${SSHFS_VER}.tar.gz > /dev/null
         pushd sshfs-${SSHFS_VER}
