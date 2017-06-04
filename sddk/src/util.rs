@@ -1,3 +1,5 @@
+#![allow(unused_mut)]
+
 use std::path::PathBuf;
 use std::fs::{self, File};
 
@@ -69,7 +71,6 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 #[cfg(not(target_os = "macos"))]
 pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
-    #[allow(unused_mut)]
     let mut evar: &str;
 
     if cfg!(target_os="windows") {
@@ -107,7 +108,6 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
 
 pub fn get_current_os() -> &'static str {
 
-    #[allow(unused_mut)]
     let mut os: &str;
 
     if cfg!(target_os="windows") {
