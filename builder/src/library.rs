@@ -3,7 +3,13 @@
 pub enum Library {
     Libsodium,
     Libressl,
-    Libssh2
+    Libssh2,
+    Libiconv,
+    Libglib,
+    Libdbus,
+    Libexpat,
+    Libgettext,
+    Libffi,
 }
 
 impl AsRef<str> for Library {
@@ -17,6 +23,24 @@ impl AsRef<str> for Library {
             },
             Library::Libssh2 => {
                 "libssh2"
+            },
+            Library::Libexpat => {
+                "libexpat"
+            },
+            Library::Libiconv => {
+                "libiconv"
+            },
+            Library::Libglib => {
+                "libglib"
+            },
+            Library::Libdbus => {
+                "libdbus"
+            },
+            Library::Libgettext => {
+                "libgettext"
+            },
+            Library::Libffi => {
+                "libffi"
             }
         }
     }
@@ -37,6 +61,24 @@ impl Library {
             },
             Library::Libssh2 => {
                 "1.8.0"
+            },
+            Library::Libexpat => {
+                "2.2.0"
+            },
+            Library::Libiconv => {
+                "1.15"
+            },
+            Library::Libglib => {
+                "2.52.1"
+            },
+            Library::Libdbus => {
+                "1.10.18"
+            },
+            Library::Libgettext => {
+                "0.19.8.1"
+            },
+            Library::Libffi => {
+                "3.2.1"
             }
         }
     }
@@ -51,6 +93,24 @@ impl Library {
             },
             Library::Libssh2 => {
                 "ssh2_ver"
+            },
+            Library::Libexpat => {
+                "expat_ver"
+            },
+            Library::Libiconv => {
+                "iconv_ver"
+            },
+            Library::Libglib => {
+                "glib_ver"
+            },
+            Library::Libdbus => {
+                "dbus_ver"
+            },
+            Library::Libgettext => {
+                "gettext_ver"
+            },
+            Library::Libffi => {
+                "ffi_ver"
             }
         }
     }
@@ -65,6 +125,24 @@ impl Library {
             },
             Library::Libssh2 => {
                 true
+            },
+            Library::Libexpat => {
+                false
+            },
+            Library::Libiconv => {
+                false
+            },
+            Library::Libglib => {
+                false
+            },
+            Library::Libdbus => {
+                false
+            },
+            Library::Libgettext => {
+                false
+            },
+            Library::Libffi => {
+                false
             }
         }
     }
@@ -79,6 +157,24 @@ impl Library {
             },
             Library::Libssh2 => {
                 true
+            },
+            Library::Libexpat => {
+                false
+            },
+            Library::Libiconv => {
+                false
+            },
+            Library::Libglib => {
+                false
+            },
+            Library::Libdbus => {
+                false
+            },
+            Library::Libgettext => {
+                false
+            },
+            Library::Libffi => {
+                false
             }
         }
     }
@@ -100,6 +196,36 @@ impl Library {
                 let u = format!("https://www.libssh2.org/download/libssh2-{}.tar.gz", version);
 
                 u
+            },
+            Library::Libexpat => {
+                let u = format!("https://downloads.sourceforge.net/project/expat/expat/{0}/expat-{0}.tar.bz2", version);
+
+                u
+            },
+            Library::Libiconv => {
+                let u = format!("https://ftp.gnu.org/pub/gnu/libiconv/libiconv-{}.tar.gz", version);
+
+                u
+            },
+            Library::Libglib => {
+                let u = format!("http://ftp.gnome.org/pub/GNOME/sources/glib/2.52/glib-{}.tar.xz", version);
+
+                u
+            },
+            Library::Libdbus => {
+                let u = format!("https://dbus.freedesktop.org/releases/dbus/dbus-{}.tar.gz", version);
+
+                u
+            },
+            Library::Libgettext => {
+                let u = format!("http://ftp.gnu.org/pub/gnu/gettext/gettext-{}.tar.gz", version);
+
+                u
+            },
+            Library::Libffi => {
+                let u = format!("ftp://sourceware.org/pub/libffi/libffi-{}.tar.gz", version);
+
+                u
             }
         }
     }
@@ -114,6 +240,24 @@ impl Library {
             },
             Library::Libssh2 => {
                 vec!["libssh2.lib"]
+            },
+            Library::Libexpat => {
+                vec!["libexpat.lib"]
+            },
+            Library::Libiconv => {
+                vec!["libiconv.lib"]
+            },
+            Library::Libglib => {
+                vec!["libglib-2.0.lib"]
+            },
+            Library::Libdbus => {
+                vec!["libdbus-1.lib"]
+            },
+            Library::Libgettext => {
+                vec!["libgettext.lib"]
+            },
+            Library::Libffi => {
+                vec!["libffi.lib"]
             }
         }
     }
@@ -128,6 +272,24 @@ impl Library {
             },
             Library::Libssh2 => {
                 vec!["libssh2.h", "libssh2_sftp.h", "libssh2_publickey.h"]
+            },
+            Library::Libexpat => {
+                vec![]
+            },
+            Library::Libiconv => {
+                vec![]
+            },
+            Library::Libglib => {
+                vec![]
+            },
+            Library::Libdbus => {
+                vec![]
+            },
+            Library::Libgettext => {
+                vec![]
+            },
+            Library::Libffi => {
+                vec![]
             }
         }
     }
