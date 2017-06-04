@@ -251,7 +251,7 @@ fn add_rust_target(platform: Platform) -> Result<(), BuildError> {
         return Ok(());
     }
 
-    Exec::shell(format!("rustup target add {}", platform.target())).join()?;
+    Exec::shell(format!("rustup target add {} || true", platform.target())).join()?;
 
     Ok(())
 }
