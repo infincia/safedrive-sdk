@@ -278,6 +278,12 @@ impl Dependency {
 
                         fs::copy(item_path, &product_dest)?;
 
+                    } else {
+                        product_dest.pop();
+                        product_dest.push(format!("lib{}", product));
+                        info!("copying {} -> {}", item_path.display(), (&product_dest).display());
+
+                        fs::copy(item_path, &product_dest)?;
                     }
 
                     found = true;
