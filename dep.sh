@@ -21,6 +21,13 @@ mkdir -p ${DIST_PREFIX}/bin
 mkdir -p src
 mkdir -p build
 
+clear_man() {
+    # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
+    pushd ${BUILD_PREFIX}/share
+    rm -rf man
+    popd
+}
+
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
 export SODIUM_VER=1.0.12
@@ -280,6 +287,7 @@ if [ ${BUILD_LIBRESSL} = true ]; then
 
         echo "Building LibreSSL ${LIBRESSL_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf libressl*
+        clear_man
         tar xf ../src/libressl-${LIBRESSL_VER}.tar.gz > /dev/null
         pushd libressl-${LIBRESSL_VER} > /dev/null
             case ${TARGET} in
@@ -305,6 +313,7 @@ if [ ${BUILD_LIBSSH2} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libssh2.a ] || [ ! -f ${LIBSSH2_VER_FILE} ] || [ ! $(<${LIBSSH2_VER_FILE}) = ${LIBSSH2_VER} ]; then
         echo "Building libssh2 ${LIBSSH2_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf libssh2-*
+        clear_man
         tar xf ../src/libssh2-${LIBSSH2_VER}.tar.gz > /dev/null
         pushd libssh2-${LIBSSH2_VER} > /dev/null
         ./configure --prefix=${BUILD_PREFIX} ${LIBSSH2_ARGS} > /dev/null
@@ -323,6 +332,7 @@ if [ ${BUILD_EXPAT} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libexpat.a ] || [ ! -f ${EXPAT_VER_FILE} ] || [ ! $(<${EXPAT_VER_FILE}) = ${EXPAT_VER} ]; then
 
         echo "Building libexpat ${EXPAT_VER} for ${TARGET} in ${BUILD_PREFIX}"
+        clear_man
         tar xf ../src/expat-${EXPAT_VER}.tar.bz2 > /dev/null
         pushd expat-${EXPAT_VER}
         ./configure --prefix=${BUILD_PREFIX} ${EXPAT_ARGS} > /dev/null
@@ -342,6 +352,7 @@ if [ ${BUILD_DBUS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libdbus-1.a ] || [ ! -f ${LIBDBUS_VER_FILE} ] || [ ! $(<${LIBDBUS_VER_FILE}) = ${LIBDBUS_VER} ]; then
         echo "Building libdbus ${LIBDBUS_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/dbus-${LIBDBUS_VER}.tar.gz > /dev/null
         pushd dbus-${LIBDBUS_VER}
         ./configure --prefix=${BUILD_PREFIX} ${LIBDBUS_ARGS} > /dev/null
@@ -362,6 +373,7 @@ if [ ${BUILD_LIBSODIUM} = true ]; then
 
         echo "Building libsodium ${SODIUM_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/libsodium-${SODIUM_VER}.tar.gz > /dev/null
         pushd libsodium-${SODIUM_VER}
         ${CONFIGURE_PREFIX} ./configure --prefix=${BUILD_PREFIX} ${SODIUM_ARGS} > /dev/null
@@ -391,6 +403,7 @@ if [ ${BUILD_ICONV} = true ]; then
     if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ ! $(<${ICONV_VER_FILE}) = ${ICONV_VER} ]; then
         echo "Building iconv ${ICONV_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/libiconv-${ICONV_VER}.tar.gz > /dev/null
         pushd libiconv-${ICONV_VER}
             ./configure --prefix=${BUILD_PREFIX} ${ICONV_ARGS} > /dev/null
@@ -410,6 +423,7 @@ if [ ${BUILD_GETTEXT} = true ]; then
     if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ ! $(<${GETTEXT_VER_FILE}) = ${GETTEXT_VER} ]; then
         echo "Building gettext ${GETTEXT_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/gettext-${GETTEXT_VER}.tar.gz > /dev/null
         pushd gettext-${GETTEXT_VER}
             ./configure --prefix=${BUILD_PREFIX} ${GETTEXT_ARGS} > /dev/null
@@ -429,6 +443,7 @@ if [ ${BUILD_FFI} = true ]; then
     if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
         echo "Building libffi ${FFI_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/libffi-${FFI_VER}.tar.gz > /dev/null
         pushd libffi-${FFI_VER}
             ./configure --prefix=${BUILD_PREFIX} ${FFI_ARGS} > /dev/null
@@ -448,6 +463,7 @@ if [ ${BUILD_GLIB} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ ! $(<${GLIB_VER_FILE}) = ${GLIB_VER} ]; then
         echo "Building glib ${GLIB_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/glib-${GLIB_VER}.tar.xz > /dev/null
         pushd glib-${GLIB_VER}
             PATH=${BUILD_PREFIX}/bin:${PATH} ./configure --prefix=${BUILD_PREFIX} ${GLIB_ARGS} > /dev/null
@@ -467,6 +483,7 @@ if [ ${BUILD_OPENSSH} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${OPENSSH_VER_FILE} ] || [ ! $(<${OPENSSH_VER_FILE}) = ${OPENSSH_VER} ]; then
         echo "Building OpenSSH ${OPENSSH_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf openssh-*
+        clear_man
         tar xf ../src/openssh-${OPENSSH_VER}.tar.gz > /dev/null
         pushd openssh-${OPENSSH_VER} > /dev/null
             patch < ../../always-askpass.patch
@@ -488,6 +505,7 @@ if [ ${BUILD_RSYNC} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ] || [ ! -f ${RSYNC_VER_FILE} ] || [ ! $(<${RSYNC_VER_FILE}) = ${RSYNC_VER} ]; then
         echo "Building Rsync ${RSYNC_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf rsync-*
+        clear_man
         tar xf ../src/rsync-${RSYNC_VER}.tar.gz > /dev/null
         pushd rsync-${RSYNC_VER} > /dev/null
             ./configure --prefix=${BUILD_PREFIX} ${RSYNC_ARGS} > /dev/null
@@ -506,6 +524,7 @@ if [ ${BUILD_SSHFS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
         echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
 
+        clear_man
         tar xf ../src/sshfs-${SSHFS_VER}.tar.gz > /dev/null
         pushd sshfs-${SSHFS_VER}
             ./configure --prefix=${BUILD_PREFIX} ${SSHFS_ARGS} > /dev/null
