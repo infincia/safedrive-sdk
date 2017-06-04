@@ -251,7 +251,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
     }
@@ -273,7 +272,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
     }
@@ -297,7 +295,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
     }
@@ -323,7 +320,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
     }
@@ -345,7 +341,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
 
@@ -358,7 +353,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
     }
@@ -380,7 +374,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
 
@@ -390,7 +383,6 @@ mod remote_fs_test {
             },
             Err(err) => {
                 panic!("{}", err);
-                return;
             },
         };
     }
