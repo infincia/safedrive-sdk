@@ -47,7 +47,7 @@ impl CMake {
             //.arg(format!("-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}", &self.build_prefix.display()))
             //.arg(format!("-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={}", &self.build_prefix.display()))
             .arg(format!("-DOPENSSL_USE_STATIC_LIBS=TRUE"))
-            .arg(format!("-DCRYPTO_BACKEND=WinCNG"))
+            .arg(format!("-DCRYPTO_BACKEND=OpenSSL"))
             .arg(format!("-DOPENSSL_ROOT_DIR={}", &self.build_prefix.display()))
             .arg(format!("-DOPENSSL_INCLUDE_DIR={}\\include", &self.build_prefix.display()))
             .arg(format!("-DCMAKE_BUILD_TYPE={}", self.configuration.name()))
