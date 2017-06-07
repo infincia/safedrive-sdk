@@ -247,9 +247,6 @@ fn set_rust_version(current_dir: &Path) -> Result<(), BuildError> {
 
 fn add_rust_target(platform: Platform) -> Result<(), BuildError> {
     info!("adding rust target: {}", platform.target());
-    if platform == Platform::x86_64 {
-        return Ok(());
-    }
 
     Exec::shell(format!("rustup target add {} || true", platform.target())).join()?;
 
