@@ -60,6 +60,9 @@ objc-foundation = "*"
 [target.'cfg(target_os = "windows")'.dependencies]
 winreg = "*"
 
+[build-dependencies]
+moz-cheddar = "*"
+
 [lib]
 name = "sddk"
 crate-type = ["rlib", "staticlib", "cdylib"]
