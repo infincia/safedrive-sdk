@@ -33,3 +33,4 @@ CMakeFiles
 .DS_Store
 /Win32
 /x64
+/include
