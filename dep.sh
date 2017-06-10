@@ -13,6 +13,8 @@ export DIST_PREFIX=${PWD}/dist/${TARGET}
 mkdir -p ${BUILD_PREFIX}/lib
 mkdir -p ${BUILD_PREFIX}/include
 mkdir -p ${BUILD_PREFIX}/bin
+mkdir -p ${BUILD_PREFIX}/share
+
 
 mkdir -p ${DIST_PREFIX}/lib
 mkdir -p ${DIST_PREFIX}/include
