@@ -248,7 +248,7 @@ fn set_rust_version(current_dir: &Path) -> Result<(), BuildError> {
 fn add_rust_target(platform: Platform) -> Result<(), BuildError> {
     info!("adding rust target: {}", platform.target());
 
-    Exec::shell(format!("rustup target add {} || true", platform.target())).join()?;
+    let _ = Exec::shell(format!("rustup target add {} > NUL 2>&1", platform.target())).capture()?;
 
     Ok(())
 }

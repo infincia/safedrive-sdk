@@ -12,8 +12,9 @@ IF "!PLATFORM!"=="x64" (
 
 IF "!PLATFORM!"=="Win32" (
     set TARGET=i686-pc-windows-msvc
-    rustup target add !TARGET! || true
 )
+
+rustup target add !TARGET! > NUL 2>&1
 
 cargo run -p builder --target !TARGET! -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! build || goto :error
 
