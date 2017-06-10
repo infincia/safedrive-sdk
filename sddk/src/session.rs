@@ -1,4 +1,3 @@
-use std::io::{Read, Write};
 
 use error::{CryptoError, SDError};
 use binformat::BinaryFormat;
@@ -50,11 +49,7 @@ impl SyncSession {
                 (false, data, None)
             },
             SyncVersion::Version2 => {
-                let buf = Vec::new();
-                let mut encoder = ::lz4::EncoderBuilder::new().level(16).build(buf).unwrap();
-                encoder.write(data.as_slice()).unwrap();
-                let (mut compressed_data, result) = encoder.finish();
-                result.unwrap();
+                let mut compressed_data: Vec<u8> = ::lz4_compress::compress(data.as_slice());
 
                 compressed_data.shrink_to_fit();
 
@@ -251,9 +246,7 @@ impl WrappedSyncSession {
             SyncVersion::Version2 => {
                 match self.compressed {
                     true => {
-                        let mut uncompressed_data = Vec::new();
-                        let mut decoder = ::lz4::Decoder::new(unpadded_data.as_slice()).unwrap();
-                        let _ = decoder.read_to_end(&mut uncompressed_data);
+                        let uncompressed_data = ::lz4_compress::decompress(unpadded_data.as_slice()).unwrap();
 
                         let compressed_size = unpadded_data.len();
 
