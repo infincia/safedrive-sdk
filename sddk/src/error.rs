@@ -302,7 +302,7 @@ impl std::fmt::Display for SDError {
                        "{}",
                        localized_str!("SafeDrive authentication token expired", ""))
             },
-            SDError::CryptoError(ref err) => write!(f, "{}: {}", localized_str!("Crypto error", ""), err),
+            SDError::CryptoError(ref err) => write!(f, "{}", err),
             SDError::SyncAlreadyInProgress => write!(f, "{}", localized_str!("Sync already in progress", "")),
             SDError::RestoreAlreadyInProgress => write!(f, "{}", localized_str!("Restore already in progress", "")),
             SDError::ExceededRetries(retries) => {
