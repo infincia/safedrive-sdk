@@ -23,7 +23,4 @@
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <None Include="target\i686-pc-windows-msvc\debug\sddk.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="target\i686-pc-windows-msvc\debug\sddk.dll" />
-  </ItemGroup>
 </Project>
