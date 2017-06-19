@@ -10,7 +10,7 @@ pub enum Library {
     Libexpat,
     Libgettext,
     Libffi,
-    Libz,
+    Zlib,
 }
 
 impl AsRef<str> for Library {
@@ -43,8 +43,8 @@ impl AsRef<str> for Library {
             Library::Libffi => {
                 "libffi"
             },
-            Library::Libz => {
-                "libz"
+            Library::Zlib => {
+                "zlib"
             }
         }
     }
@@ -84,7 +84,7 @@ impl Library {
             Library::Libffi => {
                 "3.2.1"
             },
-            Library::Libz => {
+            Library::Zlib => {
                 "1.2.11"
             }
         }
@@ -119,7 +119,7 @@ impl Library {
             Library::Libffi => {
                 "ffi_ver"
             },
-            Library::Libz => {
+            Library::Zlib => {
                 "z_ver"
             }
         }
@@ -154,7 +154,7 @@ impl Library {
             Library::Libffi => {
                 false
             },
-            Library::Libz => {
+            Library::Zlib => {
                 true
             }
         }
@@ -189,8 +189,8 @@ impl Library {
             Library::Libffi => {
                 false
             },
-            Library::Libz => {
-                false
+            Library::Zlib => {
+                true
             }
         }
     }
@@ -243,7 +243,7 @@ impl Library {
 
                 u
             },
-            Library::Libz => {
+            Library::Zlib => {
                 let u = format!("https://zlib.net/zlib-{}.tar.gz", version);
 
                 u
@@ -280,8 +280,8 @@ impl Library {
             Library::Libffi => {
                 vec!["libffi.lib"]
             },
-            Library::Libz => {
-                vec!["libz.lib"]
+            Library::Zlib => {
+                vec!["zlib.lib"]
             }
         }
     }
@@ -315,7 +315,7 @@ impl Library {
             Library::Libffi => {
                 vec![]
             },
-            Library::Libz => {
+            Library::Zlib => {
                 vec![]
             }
         }
