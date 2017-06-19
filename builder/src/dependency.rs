@@ -93,6 +93,8 @@ impl Dependency {
 
             popd()?;
 
+            self.clean_source()?;
+
             self.set_success()?;
         }
 
@@ -166,17 +168,10 @@ impl Dependency {
     }
 
     pub fn refresh_source(&self, src_tarball: &Path) -> Result<PathBuf, BuildError> {
-        info!("removing old source for: {}", self.library.name());
-
-        let source_dir_name = format!("{}-{}", self.library.name(), self.library.version());
-
-        let mut source_dir = PathBuf::from(&self.build_prefix);
-        source_dir.push(&source_dir_name);
-
-        info!("removing directory: {}", &source_dir.display());
-
-        match fs::remove_dir_all(&source_dir) {
-            _ => {}
+        match self.clean_source() {
+            _ => {
+                // doesn't matter, might not exist
+            }
         }
 
         let zc = format!("7z x -y {}", src_tarball.display());
@@ -205,6 +200,8 @@ impl Dependency {
                 return Err(BuildError::CommandFailed("failed to unpack source".to_string()));
             }
         }
+
+        let source_dir = self.source_dir();
 
         Ok(source_dir)
     }
@@ -298,5 +295,27 @@ impl Dependency {
         }
 
         Ok(())
+    }
+
+    pub fn clean_source(&self) -> Result<(), BuildError> {
+        info!("removing old source for: {}", self.library.name());
+
+        let source_dir = self.source_dir();
+
+        info!("removing directory: {}", &source_dir.display());
+
+        fs::remove_dir_all(&source_dir)?;
+
+        Ok(())
+    }
+
+    fn source_dir(&self) -> PathBuf {
+
+        let source_dir_name = format!("{}-{}", self.library.name(), self.library.version());
+
+        let mut source_dir = PathBuf::from(&self.build_prefix);
+        source_dir.push(&source_dir_name);
+
+        source_dir
     }
 }
