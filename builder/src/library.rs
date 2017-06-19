@@ -10,6 +10,7 @@ pub enum Library {
     Libexpat,
     Libgettext,
     Libffi,
+    Libz,
 }
 
 impl AsRef<str> for Library {
@@ -41,6 +42,9 @@ impl AsRef<str> for Library {
             },
             Library::Libffi => {
                 "libffi"
+            },
+            Library::Libz => {
+                "libz"
             }
         }
     }
@@ -79,6 +83,9 @@ impl Library {
             },
             Library::Libffi => {
                 "3.2.1"
+            },
+            Library::Libz => {
+                "1.2.11"
             }
         }
     }
@@ -111,6 +118,9 @@ impl Library {
             },
             Library::Libffi => {
                 "ffi_ver"
+            },
+            Library::Libz => {
+                "z_ver"
             }
         }
     }
@@ -143,6 +153,9 @@ impl Library {
             },
             Library::Libffi => {
                 false
+            },
+            Library::Libz => {
+                true
             }
         }
     }
@@ -174,6 +187,9 @@ impl Library {
                 false
             },
             Library::Libffi => {
+                false
+            },
+            Library::Libz => {
                 false
             }
         }
@@ -226,6 +242,11 @@ impl Library {
                 let u = format!("ftp://sourceware.org/pub/libffi/libffi-{}.tar.gz", version);
 
                 u
+            },
+            Library::Libz => {
+                let u = format!("https://zlib.net/zlib-{}.tar.gz", version);
+
+                u
             }
         }
     }
@@ -258,6 +279,9 @@ impl Library {
             },
             Library::Libffi => {
                 vec!["libffi.lib"]
+            },
+            Library::Libz => {
+                vec!["libz.lib"]
             }
         }
     }
@@ -289,6 +313,9 @@ impl Library {
                 vec![]
             },
             Library::Libffi => {
+                vec![]
+            },
+            Library::Libz => {
                 vec![]
             }
         }
