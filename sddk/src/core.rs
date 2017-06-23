@@ -838,18 +838,21 @@ pub fn sync(token: &Token,
 
                 header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); /// hmac list size
                 header.set_cksum();
-                ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append session entry header");
+                
+                ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append session entry header");
 
             } else {
                 header.set_size(0); /// hmac list size is zero when file has no actual data
                 header.set_cksum();
-                ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append zero length archive header");
+
+                ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append zero length archive header");
             }
         } else if is_dir {
             /// folder
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
-            ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append folder to archive header");
+
+            ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append folder to archive header");
         } else if is_symlink {
             /// symlink
 
@@ -872,7 +875,8 @@ pub fn sync(token: &Token,
 
             header.set_size(0); /// hmac list size is zero when file has no actual data
             header.set_cksum();
-            ar.append_long_name(&relative_path, &mut header, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
+
+            ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
         }
     }
 
