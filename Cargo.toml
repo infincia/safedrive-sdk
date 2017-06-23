@@ -5,3 +5,4 @@ members = ["builder", "sddk", "safedrive", "safedrived"]
 "security-framework:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "security-framework-sys:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "rustls:0.9.0" = { git = "https://github.com/infincia/rustls.git", branch = "infincia" }
+"lz4:1.21.0" = { git = "https://github.com/infincia/lz4-rs.git", branch = "infincia" }
