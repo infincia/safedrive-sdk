@@ -25,7 +25,7 @@ extern crate semver;
 #[macro_use]
 extern crate bitflags;
 
-extern crate lz4_compress;
+extern crate lz4;
 
 #[macro_use]
 extern crate log;
