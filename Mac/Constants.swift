@@ -8,9 +8,9 @@
 
 import Foundation
 
-public let SDErrorDomainNotReported = "io.safedrive.notreported"
-public let SDErrorDomainReported = "io.safedrive.reported"
-public let SDErrorDomainInternal = "io.safedrive.internal"
+public let SDKErrorDomainNotReported = "io.safedrive.notreported"
+public let SDKErrorDomainReported = "io.safedrive.reported"
+public let SDKErrorDomainInternal = "io.safedrive.internal"
 
 public enum SDKLogLevel: UInt8 {
     case error = 0
@@ -23,7 +23,7 @@ public enum SDKLogLevel: UInt8 {
 
 // MARK: RemoteFS operations
 
-public enum RemoteFSOperation {
+public enum SDKRemoteFSOperation {
     case createFolder
     case deleteFolder
     case deletePath(recursive: Bool)

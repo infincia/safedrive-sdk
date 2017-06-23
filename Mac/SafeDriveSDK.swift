@@ -81,7 +81,7 @@ public class SafeDriveSDK: NSObject {
         case 0:
             self.state = state
         default:
-            throw SDKErrorFromSDDKError(sdkError: error!.pointee)
+            throw SDKError(sdkError: error!.pointee)
         }
         
     }
@@ -90,7 +90,7 @@ public class SafeDriveSDK: NSObject {
         sddk_free_state(&state)
     }
     
-    public func login(_ username: String, password: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
+    public func login(_ username: String, password: String, unique_client_id: String, completionQueue queue: DispatchQueue, success: @escaping (_ status: SDKAccountStatus) -> Void, failure: @escaping SDKFailure) {
 
         DispatchQueue.global(priority: .default).async {
             var error: UnsafeMutablePointer<SDDKError>? = nil
@@ -106,10 +106,10 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                let s = SDDKAccountStatusToAccountStatus(account_status: status!.pointee)
+                let s = SDKAccountStatus(account_status: status!.pointee)
                 queue.async { success(s) }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -131,13 +131,13 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
     }
 
-    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SaveRecoveryPhrase, issue: @escaping Issue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func loadKeys(_ recoveryPhrase: String?, completionQueue queue: DispatchQueue, storePhrase: @escaping SDKSaveRecoveryPhrase, issue: @escaping SDKIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
     
         DispatchQueue.global(priority: .default).async {
             
@@ -150,14 +150,14 @@ public class SafeDriveSDK: NSObject {
                                      recoveryPhrase,
                                      { (context, context2, phrase) in
                 // call back to Swift to save the phrase somewhere
-                let b = unsafeBitCast(context, to: SaveRecoveryPhrase.self)
+                let b = unsafeBitCast(context, to: SDKSaveRecoveryPhrase.self)
                 let p = String(cString: phrase!)
                 var m = phrase
                 b(p)
                 sddk_free_string(&m)
             }, { (context, context2, message) in
                 // call back to Swift to report the issue
-                let b = unsafeBitCast(context2, to: Issue.self)
+                let b = unsafeBitCast(context2, to: SDKIssue.self)
                 let p = String(cString: message!)
                 var m = message
                 b(p)
@@ -174,13 +174,13 @@ public class SafeDriveSDK: NSObject {
                 queue.async { success() }
             default:
                 self.ready = false
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
     }
     
-    public func getClients(withUser username: String, password: String, completionQueue queue: DispatchQueue, success: @escaping (_ clients: [SoftwareClient]) -> Void, failure: @escaping SDKFailure) {
+    public func getClients(withUser username: String, password: String, completionQueue queue: DispatchQueue, success: @escaping (_ clients: [SDKSoftwareClient]) -> Void, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
 
@@ -198,17 +198,17 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case -1:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             default:
                 let buffer = UnsafeBufferPointer<SDDKSoftwareClient>(start: UnsafePointer(clients_ptr), count: Int(res))
                 let a = Array(buffer)
-                var new_array = [SoftwareClient]()
+                var new_array = [SDKSoftwareClient]()
                 for c_client in a {
                     let uniqueClientId = String(cString: c_client.unique_client_id)
                     let language = String(cString: c_client.language)
                     let operatingSystem = String(cString: c_client.operating_system)
-                    let client = SoftwareClient(uniqueClientID: uniqueClientId, operatingSystem: operatingSystem, language: language)
+                    let client = SDKSoftwareClient(uniqueClientID: uniqueClientId, operatingSystem: operatingSystem, language: language)
                     new_array.append(client)
                 }
                 
@@ -219,7 +219,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func getAccountStatus(completionQueue queue: DispatchQueue, success: @escaping (_ status: AccountStatus) -> Void, failure: @escaping SDKFailure) {
+    public func getAccountStatus(completionQueue queue: DispatchQueue, success: @escaping (_ status: SDKAccountStatus) -> Void, failure: @escaping SDKFailure) {
 
         DispatchQueue.global(priority: .default).async {
         
@@ -237,16 +237,16 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                let s = SDDKAccountStatusToAccountStatus(account_status: account_status_ptr!.pointee)
+                let s = SDKAccountStatus(account_status: account_status_ptr!.pointee)
                 queue.async { success(s) }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
     }
     
-    public func getAccountDetails(completionQueue queue: DispatchQueue, success: @escaping (_ details: AccountDetails) -> Void, failure: @escaping SDKFailure) {
+    public func getAccountDetails(completionQueue queue: DispatchQueue, success: @escaping (_ details: SDKAccountDetails) -> Void, failure: @escaping SDKFailure) {
 
         DispatchQueue.global(priority: .default).async {
         
@@ -264,10 +264,10 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                let d = SDDKAccountDetailsToAccountDetails(account_details: account_details_ptr!.pointee)
+                let d = SDKAccountDetails(account_details: account_details_ptr!.pointee)
                 queue.async { success(d) }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -303,7 +303,7 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case -1:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             default:
                 queue.async { success(UInt64(res)) }
@@ -330,7 +330,7 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case -1:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             default:
                 queue.async { success() }
@@ -355,13 +355,13 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
     }
     
-    public func getFolder(folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping (_ folder: Folder) -> Void, failure: @escaping SDKFailure)  {
+    public func getFolder(folderId: UInt64, completionQueue queue: DispatchQueue, success: @escaping (_ folder: SDKSyncFolder) -> Void, failure: @escaping SDKFailure)  {
 
         DispatchQueue.global(priority: .default).async {
             
@@ -379,20 +379,17 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case 0:
-                let name = String(cString: folder_ptr!.pointee.name)
-                let path = String(cString: folder_ptr!.pointee.path)
-                let id = folder_ptr!.pointee.id
-                let new_folder = Folder(id: id, name: name, path: path, date: folder_ptr!.pointee.date, encrypted: folder_ptr!.pointee.encrypted == 1 ? true : false, syncing: folder_ptr!.pointee.syncing == 1 ? true : false)
+                let sync_folder = SDKSyncFolder(folder: folder_ptr!.pointee)
                 
-                queue.async { success(new_folder) }
+                queue.async { success(sync_folder) }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
     }
 
-    public func getFolders(completionQueue queue: DispatchQueue, success: @escaping (_ folders: [Folder]) -> Void, failure: @escaping SDKFailure) {
+    public func getFolders(completionQueue queue: DispatchQueue, success: @escaping (_ folders: [SDKSyncFolder]) -> Void, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
 
@@ -410,28 +407,26 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case -1:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             default:
                 let buffer = UnsafeBufferPointer<SDDKFolder>(start: UnsafePointer(folder_ptr), count: Int(res))
                 let a = Array(buffer)
-                var new_array = [Folder]()
+                var sync_folders = [SDKSyncFolder]()
                 for folder in a {
-                    let name = String(cString: folder.name)
-                    let path = String(cString: folder.path)
-                    let id = folder.id
-                    let new_folder = Folder(id: id, name: name, path: path, date: folder.date, encrypted: folder.encrypted == 1 ? true : false, syncing: folder.syncing == 1 ? true : false)
-                    new_array.append(new_folder)
+                    let sync_folder = SDKSyncFolder(folder: folder)
+
+                    sync_folders.append(sync_folder)
                 }
                 
-                queue.async { success(new_array) }
+                queue.async { success(sync_folders) }
 
             }
         }
 
     }
     
-    public func getSessions(completionQueue queue: DispatchQueue, success: @escaping (_ sessions: [SDSyncSession]) -> Void, failure: @escaping SDKFailure) {
+    public func getSessions(completionQueue queue: DispatchQueue, success: @escaping (_ sessions: [SDKSyncSession]) -> Void, failure: @escaping SDKFailure) {
     
         DispatchQueue.global(priority: .default).async {
 
@@ -449,24 +444,19 @@ public class SafeDriveSDK: NSObject {
             }
             switch res {
             case -1:
-               let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+               let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             default:
                 let buffer = UnsafeBufferPointer<SDDKSyncSession>(start: UnsafePointer(sessions_ptr), count: Int(res))
                 let a = Array(buffer)
-                var new_array = [SDSyncSession]()
+                var sync_sessions = [SDKSyncSession]()
                 for session in a {
-                    let name = String(cString: session.name)
-                    let size = session.size
-                    let ti = (session.date / UInt64(1000))
-                    let date: Date = Date(timeIntervalSince1970: TimeInterval(ti))
-                    let id = session.folder_id
-                    let session_id = session.session_id
-                    let new_session = SDSyncSession(name: name, size: size, date: date, folder_id: id, session_id: session_id)
-                    new_array.append(new_session)
+                    let sync_session = SDKSyncSession(session: session)
+
+                    sync_sessions.append(sync_session)
                 }
 
-                queue.async { success(new_array) }
+                queue.async { success(sync_sessions) }
             }
         }
 
@@ -489,7 +479,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -510,13 +500,13 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
     }
     
-    public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, issue: @escaping SyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func syncFolder(folderID: UInt64, sessionName: String, completionQueue queue: DispatchQueue, progress: @escaping SDKSyncSessionProgress, issue: @escaping SDKSyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
             var error: UnsafeMutablePointer<SDDKError>? = nil
@@ -529,12 +519,12 @@ public class SafeDriveSDK: NSObject {
                                 folderID,
                                 { (context, context2, total, current, new, percent, tick) in
                 // call back to Swift to report progress
-                let b = unsafeBitCast(context, to: SyncSessionProgress.self)
+                let b = unsafeBitCast(context, to: SDKSyncSessionProgress.self)
                 b(total, current, new, percent)
             }, { (context, context2, message) in
                 let m = String(cString: message!)
 
-                let b = unsafeBitCast(context2, to: SyncSessionIssue.self)
+                let b = unsafeBitCast(context2, to: SDKSyncSessionIssue.self)
                 b(m)
             })
             defer {
@@ -546,14 +536,14 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
 
     }
     
-    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, sessionSize: UInt64, completionQueue queue: DispatchQueue, progress: @escaping SyncSessionProgress, issue: @escaping SyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
+    public func restoreFolder(folderID: UInt64, sessionName: String, destination: URL, sessionSize: UInt64, completionQueue queue: DispatchQueue, progress: @escaping SDKSyncSessionProgress, issue: @escaping SDKSyncSessionIssue, success: @escaping SDKSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
         
@@ -569,12 +559,12 @@ public class SafeDriveSDK: NSObject {
                                    sessionSize,
                                    { (context, context2, total, current, new, percent, tick) in
                 // call back to Swift to report progress
-                let b = unsafeBitCast(context, to: SyncSessionProgress.self)
+                let b = unsafeBitCast(context, to: SDKSyncSessionProgress.self)
                 b(total, current, new, percent)
             }, { (context, context2, message) in
                 let m = String(cString: message!)
 
-                let b = unsafeBitCast(context2, to: SyncSessionIssue.self)
+                let b = unsafeBitCast(context2, to: SDKSyncSessionIssue.self)
                 b(m)
             })
             defer {
@@ -586,7 +576,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -618,7 +608,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: s_error!.pointee)
+                let e = SDKError(sdkError: s_error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -643,7 +633,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -666,7 +656,7 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case -1:
-            let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+            let e = SDKError(sdkError: error!.pointee)
             throw e
         default:
             let secret = String(cString: secret_ptr!)
@@ -686,7 +676,7 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case -1:
-            let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+            let e = SDKError(sdkError: error!.pointee)
             throw e
         default:
             return
@@ -707,7 +697,7 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case -1:
-            let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+            let e = SDKError(sdkError: error!.pointee)
             throw e
         default:
             return
@@ -731,7 +721,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -752,7 +742,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -778,7 +768,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }
@@ -799,7 +789,7 @@ public class SafeDriveSDK: NSObject {
             case 0:
                 queue.async { success() }
             default:
-                let e = SDKErrorFromSDDKError(sdkError: error!.pointee)
+                let e = SDKError(sdkError: error!.pointee)
                 queue.async { failure(e) }
             }
         }

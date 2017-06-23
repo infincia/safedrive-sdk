@@ -50,6 +50,15 @@ public struct SDKError {
         self.message = message
         self.kind = kind
     }
+    
+    public init(sdkError: SDDKError) {
+        self.message = String(cString: sdkError.message!)
+        guard let type = SDKErrorType(rawValue: Int(sdkError.error_type.rawValue)) else {
+            fatalError("no error type for \(sdkError.error_type)")
+        }
+        
+        self.kind = type
+    }
 }
 
 extension SDKError: LocalizedError {
@@ -64,69 +73,57 @@ extension SDKError:  CustomNSError {
     var errorDomain: String {
         switch self.kind {
         case .StateMissing:
-            return SDErrorDomainInternal
+            return SDKErrorDomainInternal
         case .Internal:
-            return SDErrorDomainInternal
+            return SDKErrorDomainInternal
         case .RequestFailure:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .NetworkFailure:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .Conflict:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .BlockMissing:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .SessionMissing:
-            return SDErrorDomainInternal
+            return SDKErrorDomainInternal
         case .RecoveryPhraseIncorrect:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .InsufficientFreeSpace:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .Authentication:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .UnicodeError:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .TokenExpired:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .CryptoError:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .IO:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .SyncAlreadyInProgress:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .RestoreAlreadyInProgress:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .ExceededRetries:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .KeychainError:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .BlockUnreadable:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .SessionUnreadable:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .ServiceUnavailable:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         case .Cancelled:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .FolderMissing:
-            return SDErrorDomainNotReported
+            return SDKErrorDomainNotReported
         case .KeyCorrupted:
-            return SDErrorDomainReported
+            return SDKErrorDomainReported
         }
     }
     
     public var errorCode: Int {
         return self.kind.rawValue
     }
-}
-
-
-
-
-func SDKErrorFromSDDKError(sdkError: SDDKError) -> SDKError {
-    let s = String(cString: sdkError.message!)
-    guard let type = SDKErrorType(rawValue: Int(sdkError.error_type.rawValue)) else {
-        fatalError("no error type for \(sdkError.error_type)")
-    }
-    
-    return SDKError(message: s, kind: type)
 }
