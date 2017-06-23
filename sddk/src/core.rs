@@ -178,7 +178,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
             let stream_length = md.len();
             let is_file = md.file_type().is_file();
             if is_file && stream_length > 10_000_000 {
-                let now = ::chrono::UTC::now();
+                let now = ::chrono::Utc::now();
                 let log_backup_name = format!("safedrive-{}-{}.log", app_type, now);
 
                 match ::std::fs::rename(&log_name, &log_backup_name) {
@@ -457,9 +457,9 @@ pub fn remove_sync_session(token: &Token,
 }
 
 pub fn clean_sync_sessions(token: &Token, schedule: SyncCleaningSchedule) -> Result<(), SDError> {
-    use ::chrono::{Local, UTC, Timelike};
+    use ::chrono::{Local, Utc, Timelike};
 
-    let utc_time = UTC::now();
+    let utc_time = Utc::now();
     let local_time = utc_time.with_timezone(&Local);
     let midnight = local_time.with_hour(0).unwrap().with_minute(0).unwrap().with_second(0).unwrap().with_nanosecond(0).unwrap();
 
