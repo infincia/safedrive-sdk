@@ -1225,7 +1225,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                               folder_id: folder_id,
                           });
             },
-            &::reqwest::StatusCode::NotFound => return Err(SDAPIError::SessionMissing),
+            &::reqwest::StatusCode::NotFound | &::reqwest::StatusCode::NoContent => return Err(SDAPIError::SessionMissing),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let mut response = String::new();
@@ -1412,7 +1412,7 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 
         match result.status() {
             &::reqwest::StatusCode::Ok => return Ok(true),
-            &::reqwest::StatusCode::NotFound => return Ok(false),
+            &::reqwest::StatusCode::NotFound | &::reqwest::StatusCode::NoContent => return Ok(false),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
@@ -1544,7 +1544,7 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
 
                 return Ok(buffer);
             },
-            &::reqwest::StatusCode::NotFound => return Err(SDAPIError::BlockMissing),
+            &::reqwest::StatusCode::NotFound | &::reqwest::StatusCode::NoContent => return Err(SDAPIError::BlockMissing),
             &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
             &::reqwest::StatusCode::BadRequest => {
                 let mut response = String::new();
