@@ -1,5 +1,5 @@
 [workspace]
-members = ["builder", "sddk", "safedrive", "safedrived"]
+members = ["builder", "sddk", "safedrive", "safedrived", "askpass"]
 
 [replace]
 "security-framework:0.1.14" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
