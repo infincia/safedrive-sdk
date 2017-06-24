@@ -16,6 +16,8 @@ use error::SDAPIError;
 
 use binformat::BinaryWriter;
 
+use sync_state::is_sync_task_cancelled;
+
 pub struct WriteCacheMessage {
     pub item: Option<WrappedBlock>,
     pub stop: bool,
@@ -199,7 +201,7 @@ impl WriteCache {
 
                             debug!("write cache trying send of {} blocks", block_batch.len());
 
-                            if ::core::is_sync_task_cancelled(local_session_name.to_owned()) {
+                            if is_sync_task_cancelled(local_session_name.to_owned()) {
                                 match status_send.send(Err(SDError::Cancelled)) {
                                     Ok(()) => {
                                         debug!("write thread cancelled");

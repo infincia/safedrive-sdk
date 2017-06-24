@@ -46,6 +46,9 @@ mod localized;
 
 mod c_api;
 mod core;
+mod sync_state;
+mod sync;
+mod restore;
 mod constants;
 mod models;
 mod error;
@@ -74,6 +77,9 @@ mod settings;
 ///
 pub use c_api::*;
 pub use core::*;
+pub use sync::sync;
+pub use restore::restore;
+pub use sync_state::*;
 pub use constants::*;
 pub use error::SDError;
 pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder, AccountStatus, AccountDetails, SoftwareClient};

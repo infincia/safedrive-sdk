@@ -24,11 +24,11 @@ use core::log;
 use core::get_sync_sessions;
 use core::remove_sync_session;
 use core::clean_sync_sessions;
-use core::sync;
-use core::restore;
+use sync::sync;
+use restore::restore;
 use core::load_keys;
 use core::login;
-use core::cancel_sync_task;
+use sync_state::cancel_sync_task;
 
 use constants::Configuration;
 
