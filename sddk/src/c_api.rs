@@ -18,6 +18,7 @@ use core::update_sync_folder;
 use core::remove_sync_folder;
 use core::get_sync_folder;
 use core::get_sync_folders;
+use core::has_conflicting_folder;
 
 use core::log;
 
@@ -2053,6 +2054,88 @@ pub extern "C" fn sddk_get_sync_folders(state: *mut SDDKState,
     }
 
     len as i64
+}
+
+/// Check a folder path for conflicts with existing registered sync folders
+///
+/// The caller does not own the memory pointed to by `error` after this function returns,
+/// they must be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///
+///     `folder_path`: a NULL terminated string representing the folder path to check
+///
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
+///
+///              must be freed by the caller using `sddk_free_error()`
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///     0: no conflicts
+///
+///     1: conflict found
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+///
+/// int res = sddk_has_conflicting_folder(&state, "/path/to/folder", &error)
+///
+/// if (res == 0) {
+///     printf("No conflicts");
+/// }
+/// else if (res == 1) {
+///     printf("Conflict found");
+/// } else {
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_has_conflicting_folder(state: *mut SDDKState,
+                                              folder_path: *const std::os::raw::c_char,
+                                              mut error: *mut *mut SDDKError) -> i8 {
+    let c = unsafe{ assert!(!state.is_null()); &mut * state };
+
+    let c_name: &CStr = unsafe { CStr::from_ptr(folder_path) };
+    let p: PathBuf = match c_name.to_str() {
+        Ok(s) => PathBuf::from(s),
+        Err(err) => panic!("string is not valid UTF-8: {}", err),
+    };
+
+
+    match has_conflicting_folder(c.0.get_api_token(), &p) {
+        Ok(conflict_found) => {
+            if conflict_found {
+                1
+            } else {
+                0
+            }
+        },
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let boxed_error = Box::new(c_err);
+            let ptr = Box::into_raw(boxed_error);
+
+            unsafe {
+                *error = ptr;
+            }
+            -1
+        },
+    }
 }
 
 

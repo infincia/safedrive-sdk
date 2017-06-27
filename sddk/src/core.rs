@@ -368,6 +368,36 @@ pub fn get_sync_folder(token: &Token,
     Err(SDError::Internal(format!("unexpected failure to find folder_id {}", folder_id)))
 }
 
+#[allow(unused_variables)]
+pub fn has_conflicting_folder(token: &Token,
+                              folder_path: &Path) -> Result<bool, SDError> {
+    let folders = match read_folders(token) {
+        Ok(folders) => folders,
+        Err(e) => return Err(SDError::from(e)),
+    };
+    if let Some(test_path) = folder_path.to_str() {
+        let test_lower: String = test_path.to_lowercase();
+
+
+        for folder in folders {
+            // let options: NSString.CompareOptions = [.anchored, .caseInsensitive]
+
+            // check if folder_path is a parent or subdirectory of an existing folder
+            let folder_lower: String = folder.folderPath.as_str().to_lowercase();
+
+            if test_lower.as_str().contains(folder_lower.as_str()) {
+                return Ok(true);
+
+            }
+            if folder_lower.as_str().contains(test_lower.as_str()) {
+                return Ok(true);
+
+            }
+        }
+    }
+    return Ok(false);
+}
+
 pub fn add_sync_folder(token: &Token,
                        name: &str,
                        path: &str,
