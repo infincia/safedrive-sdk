@@ -166,10 +166,6 @@ case ${TARGET} in
         export BUILD_DBUS=true
         export BUILD_LIBRESSL=true
         export BUILD_LIBSSH2=true
-        pushd musl-cross-make
-        make
-        make install
-        popd
         ;;
     i686-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -m32 -I/usr/include"
