@@ -22,8 +22,8 @@ addons:
 
 matrix:
   include:
-    - os: linux
-      env: TARGET=x86_64-unknown-linux-musl
+    #- os: linux
+    #  env: TARGET=x86_64-unknown-linux-musl
     - os: linux
       env: TARGET=x86_64-unknown-linux-gnu
     - os: osx
