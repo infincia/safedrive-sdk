@@ -377,19 +377,21 @@ pub fn has_conflicting_folder(token: &Token,
     };
     if let Some(test_path) = folder_path.to_str() {
         let test_lower: String = test_path.to_lowercase();
-
+        let test: &Path = Path::new(&test_lower);
 
         for folder in folders {
             // let options: NSString.CompareOptions = [.anchored, .caseInsensitive]
 
             // check if folder_path is a parent or subdirectory of an existing folder
             let folder_lower: String = folder.folderPath.as_str().to_lowercase();
+            let folder_f: &Path = Path::new(&folder_lower);
+            let t: &Path = &test;
 
-            if test_lower.as_str().contains(folder_lower.as_str()) {
+            if t.starts_with(folder_f) {
                 return Ok(true);
 
             }
-            if folder_lower.as_str().contains(test_lower.as_str()) {
+            if folder_f.starts_with(t) {
                 return Ok(true);
 
             }
