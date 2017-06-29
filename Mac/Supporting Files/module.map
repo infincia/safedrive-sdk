@@ -1,5 +1,5 @@
 module SDDK {
-    umbrella header "../../dist/x86_64-apple-darwin/include/sddk.h"
+    umbrella header "../../include/sddk.h"
     module * { export * }
     export *
 }
