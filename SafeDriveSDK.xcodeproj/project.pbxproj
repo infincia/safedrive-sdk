@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA0135B71F043AF100ABE8F5 /* io.safedrive.SafeDrive.askpass in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AB1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.askpass */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AA0135B81F043AF100ABE8F5 /* io.safedrive.SafeDrive.cli in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AC1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.cli */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AA0135B91F043AF100ABE8F5 /* io.safedrive.SafeDrive.daemon in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AD1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.daemon */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AA0135BA1F043AF100ABE8F5 /* io.safedrive.SafeDrive.rsync in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AE1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.rsync */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AA0135BB1F043AF100ABE8F5 /* io.safedrive.SafeDrive.ssh in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AF1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.ssh */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		AA0135BC1F043AF100ABE8F5 /* io.safedrive.SafeDrive.sshfs in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135B01F043AEA00ABE8F5 /* io.safedrive.SafeDrive.sshfs */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA3808721EB7B4AB00BA5F3E /* libsddk.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA3808701EB7B47400BA5F3E /* libsddk.a */; };
 		AA686A1E1E81C0AA00C9F33B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA686A1D1E81C0AA00C9F33B /* Constants.swift */; };
 		AA789B161EB81C7000883240 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA789B151EB81C7000883240 /* Models.swift */; };
@@ -18,7 +24,32 @@
 		AAEB930D1EC6AC2A00B8685B /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		AA0135C31F043C2D00ABE8F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAE34C791CF8EAAA0067B401 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA5DCF651D6CFFDA00FEDAFB;
+			remoteInfo = SafeDriveSDK;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		AA0135AA1F043ABB00ABE8F5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				AA0135B71F043AF100ABE8F5 /* io.safedrive.SafeDrive.askpass in CopyFiles */,
+				AA0135B81F043AF100ABE8F5 /* io.safedrive.SafeDrive.cli in CopyFiles */,
+				AA0135B91F043AF100ABE8F5 /* io.safedrive.SafeDrive.daemon in CopyFiles */,
+				AA0135BA1F043AF100ABE8F5 /* io.safedrive.SafeDrive.rsync in CopyFiles */,
+				AA0135BB1F043AF100ABE8F5 /* io.safedrive.SafeDrive.ssh in CopyFiles */,
+				AA0135BC1F043AF100ABE8F5 /* io.safedrive.SafeDrive.sshfs in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA8CCDCE1E2948030002B1FF /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -40,6 +71,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AA0135A41F043AA500ABE8F5 /* Components.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Components.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0135A61F043AA500ABE8F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0135AB1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.askpass */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.askpass; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.askpass"; sourceTree = SOURCE_ROOT; };
+		AA0135AC1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = SOURCE_ROOT; };
+		AA0135AD1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.daemon */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.daemon; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.daemon"; sourceTree = SOURCE_ROOT; };
+		AA0135AE1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.rsync */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.rsync; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.rsync"; sourceTree = SOURCE_ROOT; };
+		AA0135AF1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.ssh */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.ssh; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.ssh"; sourceTree = SOURCE_ROOT; };
+		AA0135B01F043AEA00ABE8F5 /* io.safedrive.SafeDrive.sshfs */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.sshfs; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.sshfs"; sourceTree = SOURCE_ROOT; };
 		AA3808701EB7B47400BA5F3E /* libsddk.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsddk.a; path = "dist/x86_64-apple-darwin/lib/libsddk.a"; sourceTree = "<group>"; };
 		AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SafeDriveSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Mac/Constants.swift; sourceTree = "<group>"; };
@@ -55,10 +94,16 @@
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AA0135A11F043AA500ABE8F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA5DCF6F1D6CFFDA00FEDAFB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -79,6 +124,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA0135A51F043AA500ABE8F5 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				AA0135AB1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.askpass */,
+				AA0135AC1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.cli */,
+				AA0135AD1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.daemon */,
+				AA0135AE1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.rsync */,
+				AA0135AF1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.ssh */,
+				AA0135B01F043AEA00ABE8F5 /* io.safedrive.SafeDrive.sshfs */,
+				AA0135A61F043AA500ABE8F5 /* Info.plist */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		AA97A1A81E2C645C00CAAD19 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -110,7 +169,6 @@
 			isa = PBXGroup;
 			children = (
 				AA3808701EB7B47400BA5F3E /* libsddk.a */,
-				AAFBBA1D1E7ED27D001A3688 /* io.safedrive.SafeDrive.cli */,
 				AA8CCDC81E2947B90002B1FF /* sddk.h */,
 			);
 			name = libsddk;
@@ -132,6 +190,7 @@
 				AA789B171EB81D2900883240 /* Errors.swift */,
 				AA789B151EB81C7000883240 /* Models.swift */,
 				AA686A1D1E81C0AA00C9F33B /* Constants.swift */,
+				AA0135A51F043AA500ABE8F5 /* Components */,
 				AABFDD551DC4E91000B4EAC7 /* Frameworks */,
 				AAAD312F1EB14B3E00221427 /* Supporting Files */,
 				AAE34C831CF8EAAA0067B401 /* Products */,
@@ -146,6 +205,7 @@
 			children = (
 				AA5DCFBE1D6CFFDA00FEDAFB /* SafeDriveSDK.framework */,
 				AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */,
+				AA0135A41F043AA500ABE8F5 /* Components.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,6 +223,25 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		AA0135A31F043AA500ABE8F5 /* Components */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0135A91F043AA500ABE8F5 /* Build configuration list for PBXNativeTarget "Components" */;
+			buildPhases = (
+				AA0135A01F043AA500ABE8F5 /* Sources */,
+				AA0135A11F043AA500ABE8F5 /* Frameworks */,
+				AA0135A21F043AA500ABE8F5 /* Resources */,
+				AA0135AA1F043ABB00ABE8F5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA0135C41F043C2D00ABE8F5 /* PBXTargetDependency */,
+			);
+			name = Components;
+			productName = Components;
+			productReference = AA0135A41F043AA500ABE8F5 /* Components.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		AA5DCF651D6CFFDA00FEDAFB /* SafeDriveSDK */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA5DCFBB1D6CFFDA00FEDAFB /* Build configuration list for PBXNativeTarget "SafeDriveSDK" */;
@@ -211,6 +290,11 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = SafeDrive;
 				TargetAttributes = {
+					AA0135A31F043AA500ABE8F5 = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = G738Z89QKM;
+						ProvisioningStyle = Automatic;
+					};
 					AA5DCF651D6CFFDA00FEDAFB = {
 						DevelopmentTeam = G738Z89QKM;
 						LastSwiftMigration = 0830;
@@ -237,11 +321,19 @@
 			targets = (
 				AA5DCF651D6CFFDA00FEDAFB /* SafeDriveSDK */,
 				AA9D8AD91D6E9A300011DE1F /* SafeDriveSDKTests */,
+				AA0135A31F043AA500ABE8F5 /* Components */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AA0135A21F043AA500ABE8F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA9D8AE31D6E9A300011DE1F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -283,6 +375,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AA0135A01F043AA500ABE8F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA5DCF671D6CFFDA00FEDAFB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -305,7 +404,53 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		AA0135C41F043C2D00ABE8F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA5DCF651D6CFFDA00FEDAFB /* SafeDriveSDK */;
+			targetProxy = AA0135C31F043C2D00ABE8F5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		AA0135A71F043AA500ABE8F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = Components/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.Components;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		AA0135A81F043AA500ABE8F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				INFOPLIST_FILE = Components/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = io.safedrive.Components;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
 		AA5DCFBC1D6CFFDA00FEDAFB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -525,6 +670,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AA0135A91F043AA500ABE8F5 /* Build configuration list for PBXNativeTarget "Components" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0135A71F043AA500ABE8F5 /* Debug */,
+				AA0135A81F043AA500ABE8F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		AA5DCFBB1D6CFFDA00FEDAFB /* Build configuration list for PBXNativeTarget "SafeDriveSDK" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
