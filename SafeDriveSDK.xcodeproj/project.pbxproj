@@ -22,6 +22,7 @@
 		AA9D8AD81D6E97690011DE1F /* SafeDriveSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */; };
 		AABFDD571DC4E91000B4EAC7 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AABFDD561DC4E91000B4EAC7 /* libz.tbd */; };
 		AAEB930D1EC6AC2A00B8685B /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */; };
+		AAEF28B11F059DD6006A8DD6 /* sddk.h in Headers */ = {isa = PBXBuildFile; fileRef = AAEF28B01F059DD6006A8DD6 /* sddk.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,7 +85,6 @@
 		AA686A1D1E81C0AA00C9F33B /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = Mac/Constants.swift; sourceTree = "<group>"; };
 		AA789B151EB81C7000883240 /* Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Models.swift; path = Mac/Models.swift; sourceTree = "<group>"; };
 		AA789B171EB81D2900883240 /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Mac/Errors.swift; sourceTree = "<group>"; };
-		AA8CCDC81E2947B90002B1FF /* sddk.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = "dist/x86_64-apple-darwin/include/sddk.h"; sourceTree = "<group>"; };
 		AA97A1AA1E2C645C00CAAD19 /* SafeDriveSDKTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeDriveSDKTests.swift; sourceTree = "<group>"; };
 		AA9D8AD51D6E97620011DE1F /* SafeDriveSDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SafeDriveSDK.swift; path = Mac/SafeDriveSDK.swift; sourceTree = "<group>"; };
 		AA9D8AE91D6E9A300011DE1F /* SafeDriveSDKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SafeDriveSDKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +94,7 @@
 		AABF37281E36E19C003DC6C2 /* update-version.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "update-version.sh"; sourceTree = "<group>"; };
 		AABFDD561DC4E91000B4EAC7 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		AAEB930C1EC6AC2A00B8685B /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		AAEF28B01F059DD6006A8DD6 /* sddk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sddk.h; path = include/sddk.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,8 +169,8 @@
 		AAAD31331EB14CB800221427 /* libsddk */ = {
 			isa = PBXGroup;
 			children = (
+				AAEF28B01F059DD6006A8DD6 /* sddk.h */,
 				AA3808701EB7B47400BA5F3E /* libsddk.a */,
-				AA8CCDC81E2947B90002B1FF /* sddk.h */,
 			);
 			name = libsddk;
 			sourceTree = "<group>";
@@ -217,6 +218,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAEF28B11F059DD6006A8DD6 /* sddk.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
