@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>v0.7.0-dirty</string>
+	<string>v0.7.1</string>
 	<key>CFBundleVersion</key>
-	<string>2068</string>
+	<string>2080</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2017 SafeDrive. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
