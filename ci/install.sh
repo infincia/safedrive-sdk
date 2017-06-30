@@ -27,7 +27,7 @@ install_rustup() {
     rustc -V
     cargo -V
     if [ ! -f ${HOME}/.cargo/bin/cheddar ]; then
-        cargo install rusty-cheddar
+        cargo install moz-cheddar
     else
         echo "cheddar already installed, skipping"
     fi
