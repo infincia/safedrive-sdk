@@ -106,10 +106,6 @@ case ${TARGET} in
         ;;
 esac
 
-echo "Building SDDK headers for ${TARGET}"
-
-cheddar -f sddk/src/c_api.rs ${DIST_PREFIX}/include/sddk.h
-
 echo "Copying build artifacts for ${TARGET}"
 
 case ${TARGET} in
