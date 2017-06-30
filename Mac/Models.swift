@@ -100,19 +100,19 @@ public enum SDKAccountState {
     
     public init(_ state: SDDKAccountState) {
         switch state {
-        case SDDKAccountStateUnknown:
+        case SDDKAccountState_Unknown:
             self = .unknown
-        case SDDKAccountStateActive:
+        case SDDKAccountState_Active:
             self = .active
-        case SDDKAccountStateTrial:
+        case SDDKAccountState_Trial:
             self = .trial
-        case SDDKAccountStateTrialExpired:
+        case SDDKAccountState_TrialExpired:
             self = .trialExpired
-        case SDDKAccountStateLocked:
+        case SDDKAccountState_Locked:
             self = .locked
-        case SDDKAccountStateResetPassword:
+        case SDDKAccountState_ResetPassword:
             self = .resetPassword
-        case SDDKAccountStatePendingCreation:
+        case SDDKAccountState_PendingCreation:
             self = .pendingCreation
         default:
             self = .unknown

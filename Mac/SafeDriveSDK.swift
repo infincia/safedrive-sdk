@@ -64,9 +64,9 @@ public class SafeDriveSDK: NSObject {
         var sddk_config: SDDKConfiguration
         switch config {
         case .Production:
-            sddk_config = SDDKConfigurationProduction
+            sddk_config = SDDKConfiguration_Production
         case .Staging:
-            sddk_config = SDDKConfigurationStaging
+            sddk_config = SDDKConfiguration_Staging
         }
         var error: UnsafeMutablePointer<SDDKError>? = nil
         var state: OpaquePointer? = nil
