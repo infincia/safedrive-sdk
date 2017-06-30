@@ -68,19 +68,19 @@ pub struct SDDKState(State);
 #[derive(Debug)]
 #[repr(C)]
 pub enum SDDKConfiguration {
-    SDDKConfigurationProduction,
-    SDDKConfigurationStaging,
+    Production,
+    Staging,
 }
 
 
 #[derive(Debug)]
 #[repr(C)]
 pub enum SDDKLogLevel {
-    SDDKLogLevelError = 0,
-    SDDKLogLevelWarn = 1,
-    SDDKLogLevelInfo = 2,
-    SDDKLogLevelDebug = 3,
-    SDDKLogLevelTrace = 4,
+    Error = 0,
+    Warn = 1,
+    Info = 2,
+    Debug = 3,
+    Trace = 4,
 }
 
 #[derive(Debug)]
@@ -102,27 +102,27 @@ impl From<Notification> for SDDKNotification {
 #[derive(Debug)]
 #[repr(C)]
 pub enum SDDKAccountState {
-    SDDKAccountStateUnknown,
-    SDDKAccountStateActive,
-    SDDKAccountStateTrial,
-    SDDKAccountStateTrialExpired,
-    SDDKAccountStateExpired,
-    SDDKAccountStateLocked,
-    SDDKAccountStateResetPassword,
-    SDDKAccountStatePendingCreation,
+    Unknown,
+    Active,
+    Trial,
+    TrialExpired,
+    Expired,
+    Locked,
+    ResetPassword,
+    PendingCreation,
 }
 
 impl From<AccountState> for SDDKAccountState {
     fn from(e: AccountState) -> SDDKAccountState {
         match e {
-            AccountState::Unknown => SDDKAccountState::SDDKAccountStateUnknown,
-            AccountState::Active => SDDKAccountState::SDDKAccountStateActive,
-            AccountState::Trial => SDDKAccountState::SDDKAccountStateTrial,
-            AccountState::TrialExpired => SDDKAccountState::SDDKAccountStateTrialExpired,
-            AccountState::Expired => SDDKAccountState::SDDKAccountStateExpired,
-            AccountState::Locked => SDDKAccountState::SDDKAccountStateLocked,
-            AccountState::ResetPassword => SDDKAccountState::SDDKAccountStateResetPassword,
-            AccountState::PendingCreation => SDDKAccountState::SDDKAccountStatePendingCreation,
+            AccountState::Unknown => SDDKAccountState::Unknown,
+            AccountState::Active => SDDKAccountState::Active,
+            AccountState::Trial => SDDKAccountState::Trial,
+            AccountState::TrialExpired => SDDKAccountState::TrialExpired,
+            AccountState::Expired => SDDKAccountState::Expired,
+            AccountState::Locked => SDDKAccountState::Locked,
+            AccountState::ResetPassword => SDDKAccountState::ResetPassword,
+            AccountState::PendingCreation => SDDKAccountState::PendingCreation,
         }
     }
 }
@@ -144,7 +144,7 @@ impl From<AccountStatus> for SDDKAccountStatus {
                 if let Some(state) = status.state {
                     SDDKAccountState::from(state)
                 } else {
-                    SDDKAccountState::SDDKAccountStateUnknown
+                    SDDKAccountState::Unknown
                 }
             },
             host: CString::new(status.host.as_str()).unwrap().into_raw(),
@@ -426,49 +426,49 @@ pub enum SDDKSyncCleaningSchedule {
     ///
     ///
     ///
-    SDDKSyncCleaningScheduleAuto,
+    Auto,
 
     /// Clean all sessions older than an exact date
     ///
-    SDDKSyncCleaningScheduleExactDateRFC3339,
-    SDDKSyncCleaningScheduleExactDateRFC2822,
+    ExactDateRFC3339,
+    ExactDateRFC2822,
 
     /// The remaining schedules will clean all sync sessions older than a specific time period
     ///
-    SDDKSyncCleaningScheduleAll,             // current time, should delete all of them
-    SDDKSyncCleaningScheduleBeforeToday,     // today at 00:00
-    SDDKSyncCleaningScheduleBeforeThisWeek,  // the first day of this week at 00:00
-    SDDKSyncCleaningScheduleBeforeThisMonth, // the first day of this month at 00:00
-    SDDKSyncCleaningScheduleBeforeThisYear,  // the first day of this year at 00:00
-    SDDKSyncCleaningScheduleOneDay,          // 24 hours
-    SDDKSyncCleaningScheduleOneWeek,         // 7 days
-    SDDKSyncCleaningScheduleOneMonth,        // 30 days
-    SDDKSyncCleaningScheduleOneYear,         // 365 days
+    All,             // current time, should delete all of them
+    BeforeToday,     // today at 00:00
+    BeforeThisWeek,  // the first day of this week at 00:00
+    BeforeThisMonth, // the first day of this month at 00:00
+    BeforeThisYear,  // the first day of this year at 00:00
+    OneDay,          // 24 hours
+    OneWeek,         // 7 days
+    OneMonth,        // 30 days
+    OneYear,         // 365 days
 }
 
 impl SDDKSyncCleaningSchedule {
     fn to_schedule(&self, date: Option<String>) -> SyncCleaningSchedule {
         match *self {
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAuto => SyncCleaningSchedule::Auto,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleExactDateRFC3339 => {
+            SDDKSyncCleaningSchedule::Auto => SyncCleaningSchedule::Auto,
+            SDDKSyncCleaningSchedule::ExactDateRFC3339 => {
                 SyncCleaningSchedule::ExactDateRFC3339 {
                     date: date.unwrap(),
                 }
             },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleExactDateRFC2822 => {
+            SDDKSyncCleaningSchedule::ExactDateRFC2822 => {
                 SyncCleaningSchedule::ExactDateRFC2822 {
                     date: date.unwrap(),
                 }
             },
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleAll => SyncCleaningSchedule::All,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeToday => SyncCleaningSchedule::BeforeToday,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisWeek => SyncCleaningSchedule::BeforeThisWeek,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisMonth => SyncCleaningSchedule::BeforeThisMonth,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleBeforeThisYear => SyncCleaningSchedule::BeforeThisYear,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneDay => SyncCleaningSchedule::OneDay,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneWeek => SyncCleaningSchedule::OneWeek,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneMonth => SyncCleaningSchedule::OneMonth,
-            SDDKSyncCleaningSchedule::SDDKSyncCleaningScheduleOneYear => SyncCleaningSchedule::OneYear,
+            SDDKSyncCleaningSchedule::All => SyncCleaningSchedule::All,
+            SDDKSyncCleaningSchedule::BeforeToday => SyncCleaningSchedule::BeforeToday,
+            SDDKSyncCleaningSchedule::BeforeThisWeek => SyncCleaningSchedule::BeforeThisWeek,
+            SDDKSyncCleaningSchedule::BeforeThisMonth => SyncCleaningSchedule::BeforeThisMonth,
+            SDDKSyncCleaningSchedule::BeforeThisYear => SyncCleaningSchedule::BeforeThisYear,
+            SDDKSyncCleaningSchedule::OneDay => SyncCleaningSchedule::OneDay,
+            SDDKSyncCleaningSchedule::OneWeek => SyncCleaningSchedule::OneWeek,
+            SDDKSyncCleaningSchedule::OneMonth => SyncCleaningSchedule::OneMonth,
+            SDDKSyncCleaningSchedule::OneYear => SyncCleaningSchedule::OneYear,
         }
     }
 }
@@ -570,8 +570,8 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
     };
 
     let c = match config {
-        SDDKConfiguration::SDDKConfigurationProduction => Configuration::Production,
-        SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
+        SDDKConfiguration::Production => Configuration::Production,
+        SDDKConfiguration::Staging => Configuration::Staging,
     };
 
     let storage_path: PathBuf = match local_storage_path.is_null() {
@@ -703,8 +703,8 @@ pub extern "C" fn sddk_get_version(mut version: *mut *mut std::os::raw::c_char) 
 pub extern "C" fn sddk_get_app_directory(config: SDDKConfiguration, mut storage_path: *mut *mut std::os::raw::c_char, mut error: *mut *mut SDDKError) -> std::os::raw::c_char {
 
     let c = match config {
-        SDDKConfiguration::SDDKConfigurationProduction => Configuration::Production,
-        SDDKConfiguration::SDDKConfigurationStaging => Configuration::Staging,
+        SDDKConfiguration::Production => Configuration::Production,
+        SDDKConfiguration::Staging => Configuration::Staging,
     };
 
     let directory: PathBuf = match ::core::get_app_directory(&c) {
@@ -2880,11 +2880,11 @@ pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
     };
 
     let log_level = match level {
-        SDDKLogLevel::SDDKLogLevelError => ::log::LogLevelFilter::Error,
-        SDDKLogLevel::SDDKLogLevelWarn => ::log::LogLevelFilter::Warn,
-        SDDKLogLevel::SDDKLogLevelInfo => ::log::LogLevelFilter::Info,
-        SDDKLogLevel::SDDKLogLevelDebug => ::log::LogLevelFilter::Debug,
-        SDDKLogLevel::SDDKLogLevelTrace => ::log::LogLevelFilter::Trace,
+        SDDKLogLevel::Error => ::log::LogLevelFilter::Error,
+        SDDKLogLevel::Warn => ::log::LogLevelFilter::Warn,
+        SDDKLogLevel::Info => ::log::LogLevelFilter::Info,
+        SDDKLogLevel::Debug => ::log::LogLevelFilter::Debug,
+        SDDKLogLevel::Trace => ::log::LogLevelFilter::Trace,
     };
 
     log(&msg, log_level);
