@@ -154,14 +154,12 @@ public class SafeDriveSDK: NSObject {
                 let p = String(cString: phrase!)
                 var m = phrase
                 b(p)
-                sddk_free_string(&m)
             }, { (context, context2, message) in
                 // call back to Swift to report the issue
                 let b = unsafeBitCast(context2, to: SDKIssue.self)
                 let p = String(cString: message!)
                 var m = message
                 b(p)
-                sddk_free_string(&m)
             })
             defer {
                 if res == -1 {
