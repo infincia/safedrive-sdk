@@ -5,6 +5,9 @@ authors = ["Stephen Oliver <steve@infincia.com>"]
 build = "build.rs"
 workspace = ".."
 
+[profile.release]
+debug = true
+
 [dependencies]
 sodiumoxide = "*"
 libsodium-sys = "*"
