@@ -28,39 +28,277 @@ public enum SDKConfiguration {
     case Staging
 }
 
-public class SDKSyncFolder {
+public enum SDKSyncDirection {
+    case forward
+    case reverse
+}
+
+public enum SDKSyncType {
+    case encrypted
+    case unencrypted
+}
+
+public struct SDKSyncFolder: Equatable {
     public var id: UInt64
     public var name: String
     public var path: String
     public var date: Date
     public var encrypted: Bool
-    public var syncing: Bool
+    public var type: SDKSyncType
     
-    required public init(folder: SDDKFolder) {
+    // whether the folder should be allowed to sync, is it disabled/missing etc
+    public var active: Bool = true
+    
+    public var syncFrequency: String = "daily"
+    
+    public var syncTime: Date
+    
+    public var url: URL? {
+        return URL(fileURLWithPath: path, isDirectory: true)
+    }
+    
+    public func exists() -> Bool {
+        var isDirectory: ObjCBool = false
+        
+        if FileManager.default.fileExists(atPath: path, isDirectory:&isDirectory) {
+            if isDirectory.boolValue {
+                return true
+            }
+        }
+        return false
+    }
+    
+    public static func == (left: SDKSyncFolder, right: SDKSyncFolder) -> Bool {
+        return (left.id == right.id)
+    }
+    
+    public init(folder: SDDKFolder) {
         self.id = folder.id
         self.name = String(cString: folder.name)
         self.path = String(cString: folder.path)
         self.date = Date(timeIntervalSince1970: Double(folder.date) / 1000)
         self.encrypted = folder.encrypted == 1 ? true : false
-        self.syncing = folder.syncing == 1 ? true : false
+        self.active = folder.syncing == 1 ? true : false
+        self.type = self.encrypted ? .encrypted : .unencrypted
+        
+        // TODO: get this from SDDKFolder once it has that property
+        var components = DateComponents()
+        components.hour = 0
+        components.minute = 0
+        let calendar = Calendar.current
+        self.syncTime = calendar.date(from: components)!
     }
-    
 }
 
-public class SDKSyncSession {
+public class SDKSyncTask: Equatable {
+    
+    fileprivate let modificationQueue = DispatchQueue(label: "io.safedrive.SafeDriveSDK.SDKSyncTask.modificationQueue")
+    
+    public var folderID: UInt64 {
+        get {
+            var r: UInt64 = 0
+            modificationQueue.sync {
+                r = self._folderID
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._folderID = newValue
+            })
+        }
+    }
+    
+    fileprivate var _folderID: UInt64
+    
+    public var name: String {
+        get {
+            var r: String = ""
+            modificationQueue.sync {
+                r = self._name
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._name = newValue
+            })
+        }
+    }
+    
+    fileprivate var _name: String
+    
+    // start of sync
+    public var syncDate: Date? {
+        get {
+            var r: Date?
+            modificationQueue.sync {
+                r = self._syncDate
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._syncDate = newValue
+            })
+        }
+    }
+    
+    fileprivate var _syncDate: Date?
+    
+    // set to true only if sync finishes without error
+    public var success: Bool {
+        get {
+            var r: Bool = false
+            modificationQueue.sync {
+                r = self._success
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._success = newValue
+            })
+        }
+    }
+    
+    fileprivate var _success: Bool = false
+    
+    public var syncing: Bool {
+        get {
+            var r: Bool = false
+            modificationQueue.sync {
+                r = self._syncing
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._syncing = newValue
+            })
+        }
+    }
+    
+    fileprivate var _syncing: Bool = false
+    
+    public var restoring: Bool {
+        get {
+            var r: Bool = false
+            modificationQueue.sync {
+                r = self._restoring
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._restoring = newValue
+            })
+        }
+    }
+    
+    fileprivate var _restoring: Bool = false
+    
+    // will be NSDate() - syncDate, calculated at time of success or failure
+    
+    public var duration: TimeInterval {
+        get {
+            var r: TimeInterval = 0
+            modificationQueue.sync {
+                r = self._duration
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._duration = newValue
+            })
+        }
+    }
+    
+    fileprivate var _duration: TimeInterval = 0
+    
+    // use for error messages if sync fails
+    public var message: String {
+        get {
+            var r: String = ""
+            modificationQueue.sync {
+                r = self._message
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._message = newValue
+            })
+        }
+    }
+    
+    fileprivate var _message: String = ""
+    
+    // sync progress in percentage
+    public var progress: Double {
+        get {
+            var r: Double = 0.0
+            modificationQueue.sync {
+                r = self._progress
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._progress = newValue
+            })
+        }
+    }
+    
+    fileprivate var _progress: Double = 0.0
+    
+    // sync bandwidth
+    public var bandwidth: String {
+        get {
+            var r: String = ""
+            modificationQueue.sync {
+                r = self._bandwidth
+            }
+            return r
+        }
+        set (newValue) {
+            modificationQueue.sync(flags: .barrier, execute: {
+                self._bandwidth = newValue
+            })
+        }
+    }
+    
+    fileprivate var _bandwidth: String = "0.00kB/s"
+    
+    required public init(folderID: UInt64, syncDate: Date, name: String) {
+        _folderID = folderID
+        _syncDate = syncDate
+        _name = name
+    }
+    
+    public static func == (left: SDKSyncTask, right: SDKSyncTask) -> Bool {
+        return (left.folderID == right.folderID)
+    }
+}
+
+public struct SDKSyncSession: Equatable {
     public var name: String
     public var size: UInt64
     public var date: Date
     public var folder_id: UInt64
     public var session_id: UInt64
-    
-    
-    required public init(session: SDDKSyncSession) {
+        
+    public init(session: SDDKSyncSession) {
         self.name = String(cString: session.name)
         self.size = session.size
         self.date = Date(timeIntervalSince1970: TimeInterval(session.date / UInt64(1000)))
         self.folder_id = session.folder_id
         self.session_id = session.session_id
+    }
+    
+    public static func == (left: SDKSyncSession, right: SDKSyncSession) -> Bool {
+        return (left.session_id == right.session_id) && (left.folder_id == right.folder_id)
     }
 }
 
