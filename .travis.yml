@@ -36,7 +36,6 @@ cache:
     - dep
     - target
     - $HOME/.cargo
-    - musl-cross-make/output
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
