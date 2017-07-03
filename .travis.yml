@@ -42,6 +42,7 @@ before_install:
 
 install:
   - bash ci/install.sh
+  - find '*fuse*' /usr/local
 
 script:
   - travis_wait 90 bash dep.sh
