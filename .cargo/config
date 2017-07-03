@@ -20,15 +20,28 @@ rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/i686-unknown-linux-gnu/lib"
 
-[target.x86_64-unknown-linux-musl.sodium]
-rustc-link-search = ["native=dep/x86_64-unknown-linux-musl/lib"]
-rustc-link-lib = ["static=sodium"]
-root = "dep/x86_64-unknown-linux-musl/lib"
 
-[target.x86_64-unknown-linux-musl.dbus-1]
-rustc-link-search = ["native=dep/x86_64-unknown-linux-musl/lib"]
+[target.i686-unknown-linux-gnu.ssh2]
+rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
+rustc-link-lib = ["static=ssh2"]
+root = "dep/i686-unknown-linux-gnu/lib"
+
+
+[target.x86_64-unknown-linux-gnu.ssh2]
+rustc-link-search = ["native=dep/x86_64-unknown-linux-gnu/lib"]
+rustc-link-lib = ["static=ssh2"]
+root = "dep/x86_64-unknown-linux-gnu/lib"
+
+
+[target.i686-unknown-linux-gnu.dbus-1]
+rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
 rustc-link-lib = ["static=dbus-1"]
-root = "dep/x86_64-unknown-linux-musl/lib"
+root = "dep/i686-unknown-linux-gnu/lib"
+
+[target.x86_64-unknown-linux-gnu.dbus-1]
+rustc-link-search = ["native=dep/x86_64-unknown-linux-gnu/lib"]
+rustc-link-lib = ["static=dbus-1"]
+root = "dep/x86_64-unknown-linux-gnu/lib"
 
 [target.wasm32-unknown-emscripten.sodium]
 rustc-link-search = ["native=dep/wasm32-unknown-emscripten/lib"]
