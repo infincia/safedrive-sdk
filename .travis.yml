@@ -30,12 +30,12 @@ matrix:
       env: TARGET=x86_64-apple-darwin
 
 
-#cache:
-#  directories:
-#    - src
-#    - dep
-#    - target
-#    - $HOME/.cargo
+cache:
+  directories:
+    - src
+    - dep
+    - target
+    - $HOME/.cargo
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
