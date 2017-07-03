@@ -48,3 +48,7 @@ rustc-link-search = ["native=dep/wasm32-unknown-emscripten/lib"]
 rustc-link-lib = ["static=sodium"]
 root = "dep/wasm32-unknown-emscripten/lib"
 
+[target.i686-pc-windows-msvc.ssh2]
+
+[target.x86_64-pc-windows-msvc.ssh2]
+

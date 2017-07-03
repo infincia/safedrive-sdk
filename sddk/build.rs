@@ -1,10 +1,25 @@
 extern crate cheddar;
 
 fn main() {
+    let target = std::env::var("TARGET").unwrap();
+
+
     if cfg!(target_os = "macos") {
         println!("cargo:rustc-link-args=-mmacosx-version-min=10.9");
     }
     println!("cargo:rustc-link-lib=static=sodium");
+
+    if target.contains("msvc") {
+        let build_prefix = std::env::var("BUILD_PREFIX").unwrap();
+
+        println!("cargo:rustc-link-lib=static=libssh2");
+        println!("cargo:rustc-link-search=native={}/lib", build_prefix);
+        println!("cargo:include={}/include", build_prefix);
+
+        println!("cargo:rustc-link-lib=bcrypt");
+        println!("cargo:rustc-link-lib=crypt32");
+        println!("cargo:rustc-link-lib=user32");
+    }
 
     println!("cargo:rerun-if-changed=src/lib.rs");
     println!("cargo:rerun-if-changed=src/c_api.rs");
