@@ -254,7 +254,7 @@ impl Library {
     pub fn products(&self) -> Vec<&str> {
         match *self {
             Library::Libsodium => {
-                vec!["libsodium.lib"]
+                vec!["libsodium.lib", "libsodium.pdb"]
             },
             Library::Libressl => {
                 vec!["ssl.lib", "tls.lib", "crypto.lib"]
