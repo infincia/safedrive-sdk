@@ -39,15 +39,6 @@ matrix:
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
-  - >
-      case "${TRAVIS_OS_NAME:-linux}" in
-          linux)
-          ;;
-          osx)
-          brew install cmake || true
-          brew upgrade cmake || true
-          ;;
-      esac;
 
 install:
   - bash ci/install.sh

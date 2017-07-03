@@ -18,6 +18,17 @@ install_fuse() {
     esac
 }
 
+install_cmake() {
+    case "${TRAVIS_OS_NAME}" in
+        linux)
+            ;;
+        osx)
+            brew install cmake || true
+            brew upgrade cmake || true
+            ;;
+    esac
+}
+
 install_rustup() {
     RUST_VER=$(<${RUST_VER_FILE})
 
@@ -34,6 +45,7 @@ install_rustup() {
 }
 
 main() {
+    install_cmake
     install_fuse
     install_rustup
 }
