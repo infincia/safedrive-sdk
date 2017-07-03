@@ -44,7 +44,7 @@ install:
   - bash ci/install.sh
 
 script:
-  - travis_wait 30 bash dep.sh
+  - travis_wait 60 bash dep.sh
   - travis_wait 30 bash unit.sh
   - travis_wait 30 bash release.sh
 
