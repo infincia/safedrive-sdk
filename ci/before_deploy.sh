@@ -8,7 +8,8 @@ set -ex
 
 mk_tarball() {
     # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
-    pushd dist/$TARGET/
+    cp include/sddk.h dist/${TARGET}/
+    pushd dist/${TARGET}/
     tar -zcf ../${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz *
     popd
 }
@@ -28,7 +29,7 @@ mk_deb() {
             ;;
         *)
             dolib dist/${TARGET}/lib/libsddk.a
-            doinclude dist/${TARGET}/include/sddk.h
+            doinclude include/sddk.h
             ;;
     esac
 
