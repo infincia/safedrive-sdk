@@ -304,7 +304,11 @@ impl Dependency {
 
         info!("removing directory: {}", &source_dir.display());
 
-        fs::remove_dir_all(&source_dir)?;
+        // best effort, not an actual failure if we can't
+        match fs::remove_dir_all(&source_dir) {
+            Ok(()) => {},
+            Err(_) => {},
+        }
 
         Ok(())
     }
