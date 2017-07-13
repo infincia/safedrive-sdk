@@ -3,6 +3,7 @@ use platform::Platform;
 use error::BuildError;
 use configuration::Configuration;
 use std::path::{Path, PathBuf};
+use std::fs;
 
 pub struct Cargo {
     configuration: Configuration,
@@ -59,6 +60,44 @@ impl Cargo {
                 return Err(BuildError::CommandFailed("failed to build sddk".to_string()));
             }
         }
+
+        let mut crate_dir: PathBuf = PathBuf::from(&self.build_prefix);
+        // top level dep directory
+        crate_dir.pop();
+        // top level crate root directory
+        crate_dir.pop();
+
+        let mut out_path: PathBuf = PathBuf::from(&crate_dir);
+        // solution dir
+        out_path.pop();
+        // configuration dir
+        out_path.push(self.configuration.name());
+        // platform dir
+        out_path.push(self.platform.name());
+
+        info!("creating output directory {}", out_path.display());
+
+
+        if let Err(err) = fs::create_dir_all(&out_path) {
+            return Err(BuildError::CommandFailed("failed to create destination dir".to_string()));
+        }
+
+        let mut target_path: PathBuf = PathBuf::from(&crate_dir);
+        // target directory
+        target_path.push("target");
+        // triple dir
+        target_path.push(self.platform.target());
+        // configuration dir
+        target_path.push(self.configuration.name());
+        // product name
+        target_path.push("sddk.dll");
+
+        // set output path file name
+        out_path.push("sddk.dll");
+
+        info!("copying {} -> {}", target_path.display(), out_path.display());
+
+        fs::copy(target_path, out_path)?;
 
         Ok(())
     }
