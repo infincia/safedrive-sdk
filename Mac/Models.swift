@@ -280,6 +280,12 @@ public class SDKSyncTask: Equatable {
     public static func == (left: SDKSyncTask, right: SDKSyncTask) -> Bool {
         return (left.folderID == right.folderID)
     }
+    
+    public func log(message: String) {
+        modificationQueue.sync(flags: .barrier, execute: {
+            self._message += message
+        })
+    }
 }
 
 public struct SDKSyncSession: Equatable {
