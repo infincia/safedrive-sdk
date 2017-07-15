@@ -97,7 +97,25 @@ impl Cargo {
 
         info!("copying {} -> {}", target_path.display(), out_path.display());
 
-        fs::copy(target_path, out_path)?;
+        fs::copy(&target_path, &out_path)?;
+
+        // switch source and target to cli app
+        target_path.pop();
+        target_path.push("safedrive.exe");
+
+        // remove sddk.dll from target path so we can add the cli name
+        out_path.pop();
+        // back out to top level output directory, without architecture specific component
+        // since the binary is going to be renamed instead
+        out_path.pop();
+
+        let cliname = format!("safedrivecli{}.exe", self.platform.arch_width());
+        out_path.push(&cliname);
+
+
+        info!("copying {} -> {}", target_path.display(), out_path.display());
+
+        fs::copy(&target_path, &out_path)?;
 
         Ok(())
     }
