@@ -6,6 +6,10 @@ use std::collections::HashMap;
 
 /// external crate imports
 
+use reqwest::{ClientBuilder};
+use reqwest::header::UserAgent;
+use reqwest::header::ContentLength;
+use reqwest::header::ContentType;
 use rustc_serialize::hex::ToHex;
 use rand::distributions::{IndependentSample, Range};
 use std::{thread, time};
@@ -20,11 +24,7 @@ use constants::*;
 use USER_AGENT;
 use binformat::BinaryWriter;
 
-
-header! { (UserAgent, "User-Agent") => [String] }
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
-header! { (ContentType, "Content-Type") => [String] }
-header! { (ContentLength, "Content-Length") => [usize] }
 
 #[allow(dead_code)]
 struct ProgressReader<F> {
@@ -301,16 +301,22 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     };
 
     let user_agent = &**USER_AGENT.read();
-    let client = ::reqwest::Client::new().unwrap();
+    let agent = UserAgent::new(user_agent.to_owned());
+
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(agent);
+    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .json(&endpoint);
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -323,7 +329,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -332,12 +338,12 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -363,16 +369,21 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
     };
 
     let user_agent = &**USER_AGENT.read();
-    let client = ::reqwest::Client::new().unwrap();
+    let agent = UserAgent::new(user_agent.to_owned());
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(agent);
+    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .json(&endpoint);
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -385,7 +396,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -394,16 +405,16 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let token: Token = ::serde_json::from_str(&response)?;
                 return Ok(token);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -423,16 +434,21 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::UnregisterClient;
 
     let user_agent = &**USER_AGENT.read();
-    let client = ::reqwest::Client::new().unwrap();
+    let agent = UserAgent::new(user_agent.to_owned());
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(agent);
+    r.header(SDAuthToken(token.token.to_owned()));
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -445,7 +461,7 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -454,13 +470,13 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -483,16 +499,23 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
     };
 
     let user_agent = &**USER_AGENT.read();
-    let client = ::reqwest::Client::new().unwrap();
+    let agent = UserAgent::new(user_agent.to_owned());
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(agent);
+    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .json(&endpoint);
+        let request = r.build();
+
+
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -505,7 +528,7 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -514,13 +537,13 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let clients: Vec<SoftwareClient> = ::serde_json::from_str(&response)?;
                 return Ok(clients);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -539,17 +562,21 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let endpoint = APIEndpoint::AccountStatus;
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -562,7 +589,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -571,16 +598,16 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let account_status: AccountStatus = ::serde_json::from_str(&response)?;
                 return Ok(account_status);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -600,17 +627,22 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails;
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -623,7 +655,7 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -632,16 +664,16 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let account_details: AccountDetails = ::serde_json::from_str(&response)?;
                 return Ok(account_details);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -667,18 +699,23 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
+    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .json(&endpoint)
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -691,7 +728,7 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -700,16 +737,16 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let wrapped_keyset_b: WrappedKeysetBody = ::serde_json::from_str(&response)?;
                 return Ok(WrappedKeyset::from(wrapped_keyset_b));
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -731,17 +768,23 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     let endpoint = APIEndpoint::ReadFolders;
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
+
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -754,7 +797,7 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -763,16 +806,16 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let folders: Vec<RegisteredFolder> = ::serde_json::from_str(&response)?;
                 return Ok(folders);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -794,18 +837,23 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
+    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .json(&endpoint)
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -818,7 +866,7 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -827,16 +875,16 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let folder_response: CreateFolderResponse = ::serde_json::from_str(&response)?;
                 return Ok(folder_response.id);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -863,18 +911,23 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
+    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .json(&endpoint)
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -887,7 +940,7 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -896,13 +949,13 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -925,17 +978,22 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -948,7 +1006,7 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -957,13 +1015,13 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -988,17 +1046,22 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1011,7 +1074,7 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1020,16 +1083,16 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let sessions: HashMap<String, HashMap<u64, Vec<SyncSession>>> = ::serde_json::from_str(&response)?;
                 return Ok(sessions);
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1055,17 +1118,22 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1078,7 +1146,7 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1087,14 +1155,14 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Created => {},
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Created => {},
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1120,23 +1188,32 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
+
+    let (multipart_body, content_length, real_size) = multipart_for_binary(session, "file");
+
+    let t = format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned());
+
+    let m: ::reqwest::mime::Mime = t.parse().unwrap();
+
+    r.header(ContentType(m));
+    r.header(ContentLength(content_length as u64));
+    r.body(multipart_body);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-
-        let (multipart_body, content_length, real_size) = multipart_for_binary(session, "file");
-        
-        let request = client.request(endpoint.method(), endpoint.url())
-            .body(multipart_body)
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()))
-            .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
-            .header(ContentLength(content_length));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1149,21 +1226,21 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
         result.read_to_string(&mut response)?;
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Created => return Ok(()),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Created => return Ok(()),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1185,17 +1262,23 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
+
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1208,11 +1291,11 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let mut buffer = Vec::new();
 
                 trace!("reading data");
@@ -1225,9 +1308,9 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                               folder_id: folder_id,
                           });
             },
-            &::reqwest::StatusCode::NotFound | &::reqwest::StatusCode::NoContent => return Err(SDAPIError::SessionMissing),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::NotFound | ::reqwest::StatusCode::NoContent => return Err(SDAPIError::SessionMissing),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let mut response = String::new();
 
                 result.read_to_string(&mut response)?;
@@ -1235,7 +1318,7 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1254,17 +1337,22 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1277,7 +1365,7 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1286,14 +1374,14 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::NotFound => {},
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::NotFound => {},
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1315,17 +1403,22 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1338,7 +1431,7 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1347,14 +1440,14 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(()),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::NotFound => {},
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(()),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::NotFound => {},
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1379,17 +1472,22 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1402,7 +1500,7 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1411,14 +1509,14 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => return Ok(true),
-            &::reqwest::StatusCode::NotFound | &::reqwest::StatusCode::NoContent => return Ok(false),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::Ok => return Ok(true),
+            ::reqwest::StatusCode::NotFound | ::reqwest::StatusCode::NoContent => return Ok(false),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1441,22 +1539,32 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
+
+    let (multipart_body, content_length, real_size) = multipart_for_binary(blocks, "files");
+
+    let t = format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned());
+
+    let m: ::reqwest::mime::Mime = t.parse().unwrap();
+
+    r.header(ContentType(m));
+    r.header(ContentLength(content_length as u64));
+    r.body(multipart_body);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let (multipart_body, content_length, real_size) = multipart_for_binary(blocks, "files");
-        
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()))
-            .header(ContentType(format!("multipart/form-data; boundary={}", MULTIPART_BOUNDARY.to_owned())))
-            .header(ContentLength(content_length))
-            .body(multipart_body);
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1469,7 +1577,7 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1478,16 +1586,16 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
         trace!("response: {}", response);
 
         match result.status() {
-            &::reqwest::StatusCode::Ok | &::reqwest::StatusCode::Created => {
+            ::reqwest::StatusCode::Ok | ::reqwest::StatusCode::Created => {
                 let missing: Vec<String> = ::serde_json::from_str(&response)?;
                 return Ok(missing);
             },
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::BadRequest => {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
@@ -1509,17 +1617,22 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
     };
 
     let user_agent = &**USER_AGENT.read();
+    let agent = UserAgent::new(user_agent.to_owned());
 
-    let client = ::reqwest::Client::new().unwrap();
+    let mut c = ClientBuilder::new().unwrap();
+    let client = c.build().unwrap();
+
+    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+    r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
+    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
-        let request = client.request(endpoint.method(), endpoint.url())
-            .header(::reqwest::header::Connection::close())
-            .header(UserAgent(user_agent.to_string()))
-            .header(SDAuthToken(token.token.to_owned()));
+        let request = r.build();
 
         let failed_count = retries - retries_left;
         let mut rng = ::rand::thread_rng();
@@ -1532,11 +1645,11 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = request.send()?;
+        let mut result = client.execute(request)?;
         trace!("response received");
 
         match result.status() {
-            &::reqwest::StatusCode::Ok => {
+            ::reqwest::StatusCode::Ok => {
                 let mut buffer = Vec::new();
                 trace!("reading data");
                 result.read_to_end(&mut buffer)?;
@@ -1544,9 +1657,9 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
 
                 return Ok(buffer);
             },
-            &::reqwest::StatusCode::NotFound | &::reqwest::StatusCode::NoContent => return Err(SDAPIError::BlockMissing),
-            &::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            &::reqwest::StatusCode::BadRequest => {
+            ::reqwest::StatusCode::NotFound | ::reqwest::StatusCode::NoContent => return Err(SDAPIError::BlockMissing),
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
                 let mut response = String::new();
 
                 result.read_to_string(&mut response)?;
@@ -1554,7 +1667,7 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
                 let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
                 return Err(SDAPIError::Internal(error.message));
             },
-            &::reqwest::StatusCode::ServiceUnavailable => {
+            ::reqwest::StatusCode::ServiceUnavailable => {
                 retries_left = retries_left - 1;
                 if retries_left <= 0 {
                     return Err(SDAPIError::ServiceUnavailable);
