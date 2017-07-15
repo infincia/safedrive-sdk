@@ -15,7 +15,7 @@ tar = "*"
 rustc-serialize = "*"
 reqwest = "*"
 #reqwest = { version = "*", git = "https://github.com/infincia/reqwest.git", branch = "infincia"  }
-hyper = { version = "0.10" , default-features = false }
+hyper = { version = "0.11" , default-features = false }
 serde = "^1.0"
 serde_json = "^1.0"
 serde_derive = "^1.0"
