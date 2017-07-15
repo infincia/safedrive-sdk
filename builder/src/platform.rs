@@ -26,6 +26,17 @@ impl Platform {
         self.as_ref()
     }
 
+    pub fn arch_width(&self) -> &str {
+        match *self {
+            Platform::i686 => {
+                "32"
+            },
+            Platform::x86_64 => {
+                "64"
+            }
+        }
+    }
+
     pub fn target(&self) -> &str {
         match *self {
             Platform::i686 => {
