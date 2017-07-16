@@ -651,7 +651,7 @@ dependencies = [
 [[package]]
 name = "keyring"
 version = "0.5.0"
-source = "git+https://github.com/infincia/keyring-rs.git?branch=infincia#5afda6fb31d98afa6b849e2319ec5b4999754993"
+source = "git+https://github.com/infincia/keyring-rs.git?branch=infincia#f43dd39f77a8eb017590dc2c2e7a22a7175ff03a"
 dependencies = [
  "advapi32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
