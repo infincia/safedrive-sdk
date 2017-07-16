@@ -16,7 +16,7 @@ IF "!PLATFORM!"=="Win32" (
 
 rustup target add !TARGET! > NUL 2>&1
 
-cargo run -p builder --target !TARGET! -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! build || goto :error
+cargo run -p builder -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! build || goto :error
 
 goto :done
 
