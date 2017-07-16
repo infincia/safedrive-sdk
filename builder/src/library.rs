@@ -58,16 +58,16 @@ impl Library {
     pub fn version(&self) -> &str {
         match *self {
             Library::Libsodium => {
-                "1.0.12"
+                "1.0.13"
             },
             Library::Libressl => {
-                "2.5.4"
+                "2.5.5"
             },
             Library::Libssh2 => {
                 "1.8.0"
             },
             Library::Libexpat => {
-                "2.2.0"
+                "2.2.2"
             },
             Library::Libiconv => {
                 "1.15"
@@ -76,7 +76,7 @@ impl Library {
                 "2.52.1"
             },
             Library::Libdbus => {
-                "1.10.18"
+                "1.10.20"
             },
             Library::Libgettext => {
                 "0.19.8.1"
