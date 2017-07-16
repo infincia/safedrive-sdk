@@ -58,7 +58,7 @@ impl Library {
     pub fn version(&self) -> &str {
         match *self {
             Library::Libsodium => {
-                "1.0.13"
+                "1.0.12"
             },
             Library::Libressl => {
                 "2.5.4"
