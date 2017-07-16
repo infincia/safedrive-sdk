@@ -73,6 +73,7 @@ impl From<KeyringError> for KeychainError {
     fn from(e: KeyringError) -> KeychainError {
         match e {
             KeyringError::Parse(err) => KeychainError::KeychainEncoding(format!("{}", err)),
+            KeyringError::Unicode(err) => KeychainError::KeychainEncoding(format!("{}", err)),
             #[cfg(target_os = "macos")]
             KeyringError::MacOsKeychainError(err) => KeychainError::KeychainError(format!("{}", err)),
             KeyringError::NoBackendFound => KeychainError::KeychainUnavailable(format!("no backend found")),
@@ -80,7 +81,7 @@ impl From<KeyringError> for KeychainError {
             #[cfg(target_os = "linux")]
             KeyringError::SecretServiceError(err) => KeychainError::KeychainError(format!("{}", err)),
             #[cfg(target_os = "windows")]
-            KeyringError::WindowsVaultError => KeychainError::KeychainError(format!("{}", e)),
+            KeyringError::WindowsVaultError(ref err) => KeychainError::KeychainError(format!("{}", err)),
         }
     }
 }
