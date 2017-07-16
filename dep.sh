@@ -32,15 +32,15 @@ clear_man() {
 
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
-export SODIUM_VER=1.0.12
+export SODIUM_VER=1.0.13
 export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
 export SODIUM_ARGS="--enable-shared=no"
 
-export LIBDBUS_VER=1.10.18
+export LIBDBUS_VER=1.10.20
 export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
 export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
-export EXPAT_VER=2.2.0
+export EXPAT_VER=2.2.2
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
@@ -63,14 +63,14 @@ export OPENSSH_VER=7.5p1
 export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
 export OPENSSH_ARGS="--without-openssl --without-ssl-engine --with-sandbox=darwin"
 
-export SSHFS_VER=2.9
+export SSHFS_VER=3.0.0
 export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
 export SSHFS_ARGS="--disable-dependency-tracking"
 export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I/usr/local/include/osxfuse -I/usr/local/include/osxfuse/fuse"
 export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0 -L/usr/local/lib"
 
 
-export LIBRESSL_VER=2.5.4
+export LIBRESSL_VER=2.5.5
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
 export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no"
 
