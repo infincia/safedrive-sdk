@@ -1,3 +1,5 @@
+#![cfg(feature = "registry")]
+
 #![allow(dead_code)]
 
 use winreg::RegKey;

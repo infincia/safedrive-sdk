@@ -57,10 +57,6 @@ pulldown-cmark = { version = "0.0.8", optional = true }
 objc = { version = "*", features = ["exception"] }
 objc-foundation = "*"
 
-
-[target.'cfg(target_os = "windows")'.dependencies]
-winreg = "*"
-
 [build-dependencies]
 moz-cheddar = "*"
 
