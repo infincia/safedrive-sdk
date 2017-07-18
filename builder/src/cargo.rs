@@ -36,7 +36,7 @@ impl Cargo {
             .env("SODIUM_LIB_DIR", (&lib_dir).as_os_str())
             .env("SODIUM_STATIC", "1")
             .env("RUST_BACKTRACE", "1")
-
+            .env("CARGO_INCREMENTAL", "1")
             .arg("build")
             .arg("--verbose")
             .arg("--package")
@@ -132,7 +132,7 @@ impl Cargo {
             .env("SODIUM_LIB_DIR", (&lib_dir).as_os_str())
             .env("SODIUM_STATIC", "1")
             .env("RUST_BACKTRACE", "1")
-
+            .env("CARGO_INCREMENTAL", "1")
             .arg("test")
             .arg("--verbose")
             .arg("--package")
