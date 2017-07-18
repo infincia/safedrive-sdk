@@ -1,5 +1,5 @@
 [workspace]
-members = ["builder", "sddk", "safedrive", "safedrived", "askpass"]
+members = ["builder", "sddk", "safedrive", "askpass"]
 
 [profile.release]
 debug = true
