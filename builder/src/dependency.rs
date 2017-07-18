@@ -134,7 +134,7 @@ impl Dependency {
                     Ok(false)
                 }
             },
-            Err(err) => {
+            Err(_) => {
                 Ok(false)
             }
         }
@@ -211,7 +211,7 @@ impl Dependency {
         info!("copying headers for: {}", self.library.name());
 
         let options = fs_extra::dir::CopyOptions::new();
-        let handle = |process_info: fs_extra::TransitProcess| {
+        let handle = |_| {
             fs_extra::dir::TransitProcessResult::OverwriteAll
         };
 

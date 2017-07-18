@@ -78,7 +78,7 @@ impl Cargo {
         info!("creating output directory {}", out_path.display());
 
 
-        if let Err(err) = fs::create_dir_all(&out_path) {
+        if let Err(_) = fs::create_dir_all(&out_path) {
             return Err(BuildError::CommandFailed("failed to create destination dir".to_string()));
         }
 

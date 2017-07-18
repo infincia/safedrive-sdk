@@ -191,7 +191,7 @@ fn main() {
     }
 
 
-    if let Some(m) = matches.subcommand_matches("build") {
+    if let Some(_) = matches.subcommand_matches("build") {
 
         let sddk = Cargo::new(configuration,
                               platform,
@@ -207,7 +207,7 @@ fn main() {
         }
     }
 
-    if let Some(m) = matches.subcommand_matches("test") {
+    if let Some(_) = matches.subcommand_matches("test") {
 
         let sddk = Cargo::new(configuration,
                               platform,
