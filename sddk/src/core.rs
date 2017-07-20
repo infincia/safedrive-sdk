@@ -97,7 +97,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     }
 
     let openssl_version = unsafe {
-        let c_openssl_version = ::openssl_sys::SSLeay_version(::openssl_sys::SSLEAY_VERSION);
+        let c_openssl_version = ::openssl_sys::OpenSSL_version(::openssl_sys::OPENSSL_VERSION);
 
         CStr::from_ptr(c_openssl_version).to_str().unwrap()
     };
