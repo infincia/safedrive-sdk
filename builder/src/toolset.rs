@@ -32,6 +32,17 @@ impl Toolset {
             },
         }
     }
+
+    pub fn sdk_version(&self) -> &str {
+        match *self {
+            Toolset::v141 => {
+                "10.0"
+            },
+            Toolset::v141_xp => {
+                "7.0"
+            }
+        }
+    }
 }
 
 impl From<String> for Toolset {

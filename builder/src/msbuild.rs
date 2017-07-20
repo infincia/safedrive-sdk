@@ -38,6 +38,7 @@ impl MSBuild {
 
             .arg(format!("/p:Platform={}", self.platform.as_ref()))
 
+            .arg(format!("/p:WindowsTargetPlatformVersion={}", self.configuration.toolset().sdk_version()))
             .arg(format!("/p:PlatformToolset={}", self.configuration.toolset().name()))
             .arg(format!("{}.sln", &self.solution))
             .join()?;

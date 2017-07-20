@@ -51,6 +51,8 @@ impl CMake {
             .arg(format!("-DOPENSSL_ROOT_DIR={}", &self.build_prefix.display()))
             .arg(format!("-DOPENSSL_INCLUDE_DIR={}\\include", &self.build_prefix.display()))
             .arg(format!("-DCMAKE_BUILD_TYPE={}", self.configuration.name()))
+            .arg(format!("-DVS_WINDOWS_TARGET_PLATFORM_VERSION={}", self.configuration.toolset().sdk_version()))
+            .arg(format!("-DCMAKE_SYSTEM_VERSION={}", self.configuration.toolset().sdk_version()))
             .arg(format!("-DCMAKE_C_FLAGS_RELEASE={}", self.configuration.runtime_library().c_flags_release()))
             .arg(format!("-DCMAKE_CXX_FLAGS_RELEASE={}", self.configuration.runtime_library().cxx_flags_release()))
             .arg(format!("-DCMAKE_C_FLAGS_DEBUG={}", self.configuration.runtime_library().c_flags_debug()))
