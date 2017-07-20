@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		AA0135B71F043AF100ABE8F5 /* io.safedrive.SafeDrive.askpass in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AB1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.askpass */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA0135B81F043AF100ABE8F5 /* io.safedrive.SafeDrive.cli in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AC1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.cli */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		AA0135B91F043AF100ABE8F5 /* io.safedrive.SafeDrive.daemon in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AD1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.daemon */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA0135BA1F043AF100ABE8F5 /* io.safedrive.SafeDrive.rsync in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AE1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.rsync */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA0135BB1F043AF100ABE8F5 /* io.safedrive.SafeDrive.ssh in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135AF1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.ssh */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA0135BC1F043AF100ABE8F5 /* io.safedrive.SafeDrive.sshfs in CopyFiles */ = {isa = PBXBuildFile; fileRef = AA0135B01F043AEA00ABE8F5 /* io.safedrive.SafeDrive.sshfs */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -45,7 +44,6 @@
 			files = (
 				AA0135B71F043AF100ABE8F5 /* io.safedrive.SafeDrive.askpass in CopyFiles */,
 				AA0135B81F043AF100ABE8F5 /* io.safedrive.SafeDrive.cli in CopyFiles */,
-				AA0135B91F043AF100ABE8F5 /* io.safedrive.SafeDrive.daemon in CopyFiles */,
 				AA0135BA1F043AF100ABE8F5 /* io.safedrive.SafeDrive.rsync in CopyFiles */,
 				AA0135BB1F043AF100ABE8F5 /* io.safedrive.SafeDrive.ssh in CopyFiles */,
 				AA0135BC1F043AF100ABE8F5 /* io.safedrive.SafeDrive.sshfs in CopyFiles */,
@@ -78,7 +76,6 @@
 		AA0135A61F043AA500ABE8F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA0135AB1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.askpass */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.askpass; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.askpass"; sourceTree = SOURCE_ROOT; };
 		AA0135AC1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.cli */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.cli; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.cli"; sourceTree = SOURCE_ROOT; };
-		AA0135AD1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.daemon */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.daemon; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.daemon"; sourceTree = SOURCE_ROOT; };
 		AA0135AE1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.rsync */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.rsync; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.rsync"; sourceTree = SOURCE_ROOT; };
 		AA0135AF1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.ssh */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.ssh; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.ssh"; sourceTree = SOURCE_ROOT; };
 		AA0135B01F043AEA00ABE8F5 /* io.safedrive.SafeDrive.sshfs */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; name = io.safedrive.SafeDrive.sshfs; path = "dist/x86_64-apple-darwin/bin/io.safedrive.SafeDrive.sshfs"; sourceTree = SOURCE_ROOT; };
@@ -132,7 +129,6 @@
 			children = (
 				AA0135AB1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.askpass */,
 				AA0135AC1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.cli */,
-				AA0135AD1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.daemon */,
 				AA0135AE1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.rsync */,
 				AA0135AF1F043AEA00ABE8F5 /* io.safedrive.SafeDrive.ssh */,
 				AA0135B01F043AEA00ABE8F5 /* io.safedrive.SafeDrive.sshfs */,
