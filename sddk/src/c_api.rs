@@ -796,24 +796,68 @@ pub extern "C" fn sddk_get_keychain_item(user: *const std::os::raw::c_char,
                                          mut secret: *mut *mut std::os::raw::c_char,
                                          mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
+    if user.is_null() {
+
+        let c_err = SDDKError::from(SDError::Internal(format!("user was null")));
+
+        let b = Box::new(c_err);
+        let ptr = Box::into_raw(b);
+
+        unsafe {
+            *error = ptr;
+        }
+        return -1;
+    }
+
+    if service.is_null() {
+
+        let c_err = SDDKError::from(SDError::Internal(format!("service was null")));
+
+        let b = Box::new(c_err);
+        let ptr = Box::into_raw(b);
+
+        unsafe {
+            *error = ptr;
+        }
+        return -1;
+    }
+
     let luser: &CStr = unsafe {
-        assert!(!user.is_null());
         CStr::from_ptr(user)
     };
 
     let u: String = match luser.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let lservice: &CStr = unsafe {
-        assert!(!service.is_null());
         CStr::from_ptr(service)
     };
 
     let s: String = match lservice.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let service = KeychainService::from(s);
