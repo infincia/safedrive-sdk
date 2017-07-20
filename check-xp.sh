@@ -10,5 +10,4 @@
 #	echo Done checking $api
 #done <xp.api
 
-rg -f xp.api -F -g '*.rlib' $api
-
+rg -f vista.api --no-ignore -F -a -c
