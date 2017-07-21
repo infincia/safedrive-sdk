@@ -278,7 +278,7 @@ popd > /dev/null
 
 
 
-pushd build > /dev/null
+pushd ${BUILD_PREFIX} > /dev/null
 
 if [ ${BUILD_LIBRESSL} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/lib/libssl.a ] || [ ! -f ${LIBRESSL_VER_FILE} ] || [ ! $(<${LIBRESSL_VER_FILE}) = ${LIBRESSL_VER} ]; then
