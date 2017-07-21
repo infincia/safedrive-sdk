@@ -6,8 +6,8 @@ if [ -z "${TARGET}" ]; then
     export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
 fi
 
-export BUILD_PREFIX=${PWD}/dep/${TARGET}
-export DIST_PREFIX=${PWD}/dist/${TARGET}
+export DIST_PREFIX=${PWD}/target/${TARGET}/release
+export BUILD_PREFIX=${DIST_PREFIX}/deps
 
 
 mkdir -p ${BUILD_PREFIX}/lib

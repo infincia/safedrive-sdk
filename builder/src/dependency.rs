@@ -254,8 +254,11 @@ impl Dependency {
                 return Err(BuildError::SourceMissing(product.to_string()));
             }
 
+            let mut product_dest_lib: PathBuf = PathBuf::from(&self.build_prefix);
+            product_dest_lib.push("lib");
+            product_dest_lib.push(product);
+
             let mut product_dest: PathBuf = PathBuf::from(&self.build_prefix);
-            product_dest.push("lib");
             product_dest.push(product);
 
             for item in WalkDir::new(&product_location).into_iter().filter_map(|e| e.ok()) {
@@ -265,22 +268,39 @@ impl Dependency {
                     info!("copying {} -> {}", item_path.display(), (&product_dest).display());
 
                     fs::copy(item_path, &product_dest)?;
+                    fs::copy(item_path, &product_dest_lib)?;
 
                     if product.starts_with("lib") {
                         product_dest.pop();
+                        product_dest_lib.pop();
+
                         let (_, libname) = product.split_at(3);
 
                         product_dest.push(format!("{}", libname));
+                        product_dest_lib.push(format!("{}", libname));
+
                         info!("copying {} -> {}", item_path.display(), (&product_dest).display());
 
                         fs::copy(item_path, &product_dest)?;
+
+                        info!("copying {} -> {}", item_path.display(), (&product_dest_lib).display());
+
+                        fs::copy(item_path, &product_dest_lib)?;
 
                     } else {
                         product_dest.pop();
+                        product_dest_lib.pop();
+
                         product_dest.push(format!("lib{}", product));
+                        product_dest_lib.push(format!("lib{}", product));
+
                         info!("copying {} -> {}", item_path.display(), (&product_dest).display());
 
                         fs::copy(item_path, &product_dest)?;
+
+                        info!("copying {} -> {}", item_path.display(), (&product_dest_lib).display());
+
+                        fs::copy(item_path, &product_dest_lib)?;
                     }
 
                     found = true;

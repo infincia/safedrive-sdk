@@ -106,8 +106,11 @@ fn main() {
 
 
     let mut build_prefix: PathBuf = PathBuf::from(current_dir.clone());
-    build_prefix.push(platform.name());
+    build_prefix.push("target");
+    build_prefix.push(platform.target());
     build_prefix.push(configuration.name());
+    build_prefix.push("deps");
+
 
     let mut source_prefix: PathBuf = PathBuf::from(current_dir.clone());
     source_prefix.push("src");

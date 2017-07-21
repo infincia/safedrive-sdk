@@ -60,7 +60,11 @@ impl Cargo {
         }
 
         let mut crate_dir: PathBuf = PathBuf::from(&self.build_prefix);
-        // top level dep directory
+        // config directory
+        crate_dir.pop();
+        // platform target directory
+        crate_dir.pop();
+        // target directory
         crate_dir.pop();
         // top level crate root directory
         crate_dir.pop();
@@ -87,33 +91,63 @@ impl Cargo {
         target_path.push(self.platform.target());
         // configuration dir
         target_path.push(self.configuration.name());
-        // product name
-        target_path.push("sddk.dll");
-
-        // set output path file name
-        out_path.push("sddk.dll");
-
-        info!("copying {} -> {}", target_path.display(), out_path.display());
-
-        fs::copy(&target_path, &out_path)?;
-
-        // switch source and target to cli app
-        target_path.pop();
-        target_path.push("safedrive.exe");
-
-        // remove sddk.dll from target path so we can add the cli name
-        out_path.pop();
-        // back out to top level output directory, without architecture specific component
-        // since the binary is going to be renamed instead
-        out_path.pop();
-
-        let cliname = format!("safedrivecli{}.exe", self.platform.arch_width());
-        out_path.push(&cliname);
 
 
-        info!("copying {} -> {}", target_path.display(), out_path.display());
+        {
+            // copy sddk
+            let mut sddk_source_path: PathBuf = PathBuf::from(&target_path);
+            sddk_source_path.push("sddk.dll");
 
-        fs::copy(&target_path, &out_path)?;
+            let mut sddk_destination_path: PathBuf = PathBuf::from(&out_path);
+            sddk_destination_path.push("sddk.dll");
+
+            info!("copying {} -> {}", sddk_source_path.display(), sddk_destination_path.display());
+            fs::copy(&sddk_source_path, &sddk_destination_path)?;
+        }
+
+        {
+            // copy import lib
+            let mut import_lib_source_path: PathBuf = PathBuf::from(&target_path);
+            import_lib_source_path.push("deps");
+            import_lib_source_path.push("sddk.dll.lib");
+
+            let mut import_lib_destination_path: PathBuf = PathBuf::from(&out_path);
+            import_lib_destination_path.push("sddk.dll.lib");
+
+            info!("copying {} -> {}", import_lib_source_path.display(), import_lib_destination_path.display());
+            fs::copy(&import_lib_source_path, &import_lib_destination_path)?;
+        }
+
+        {
+            // copy debug symbols
+            let mut debug_symbols_source_path: PathBuf = PathBuf::from(&target_path);
+            debug_symbols_source_path.push("deps");
+            debug_symbols_source_path.push("sddk.pdb");
+
+            let mut debug_symbols_destination_path: PathBuf = PathBuf::from(&out_path);
+            debug_symbols_destination_path.push("sddk.pdb");
+
+            info!("copying {} -> {}", debug_symbols_source_path.display(), debug_symbols_destination_path.display());
+            fs::copy(&debug_symbols_source_path, &debug_symbols_destination_path)?;
+        }
+
+        {
+            // copy cli
+            let mut cli_source_path: PathBuf = PathBuf::from(&target_path);
+
+            cli_source_path.push("safedrive.exe");
+
+            let mut cli_destination_path: PathBuf = PathBuf::from(&out_path);
+            // back out to top level output directory, without architecture specific component
+            // since the binary is going to be renamed instead
+            cli_destination_path.pop();
+
+            let cliname = format!("safedrivecli{}.exe", self.platform.arch_width());
+            cli_destination_path.push(&cliname);
+
+            info!("copying {} -> {}", cli_source_path.display(), cli_destination_path.display());
+            fs::copy(&cli_source_path, &cli_destination_path)?;
+        }
 
         Ok(())
     }

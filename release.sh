@@ -8,10 +8,10 @@ fi
 
 echo "Building release for ${TARGET}"
 
-export BUILD_PREFIX=$PWD/dep/${TARGET}
-export DIST_PREFIX=$PWD/dist/${TARGET}
-export INTR_PREFIX=$PWD/build/${TARGET}
-export CMAKE_PREFIX=$PWD/Windows
+
+export DIST_PREFIX=${PWD}/target/${TARGET}/release
+export BUILD_PREFIX=${DIST_PREFIX}/deps
+
 
 export RUSTFLAGS=""
 export CARGO_INCREMENTAL=1
@@ -65,14 +65,9 @@ case ${TARGET} in
         ;;
 esac
 
-rm -rf ${DIST_PREFIX}
 mkdir -p ${DIST_PREFIX}/lib
 mkdir -p ${DIST_PREFIX}/include
 mkdir -p ${DIST_PREFIX}/bin
-mkdir -p ${INTR_PREFIX}
-mkdir -p ${INTR_PREFIX}/Release
-mkdir -p ${INTR_PREFIX}/Debug
-
 
 echo "Building dependencies for ${TARGET}"
 
