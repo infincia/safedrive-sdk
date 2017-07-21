@@ -1,7 +1,6 @@
 use std::str;
 use std::path::{Path, PathBuf};
 use std::fs;
-use std::ffi::CStr;
 
 /// external crate imports
 use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
@@ -95,13 +94,6 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     if !::sodiumoxide::init() {
         panic!("sodium initialization failed, cannot continue");
     }
-
-    let openssl_version = unsafe {
-        let c_openssl_version = ::openssl_sys::OpenSSL_version(::openssl_sys::OPENSSL_VERSION);
-
-        CStr::from_ptr(c_openssl_version).to_str().unwrap()
-    };
-
 
     let sodium_version = ::sodiumoxide::version::version_string();
     let sdk_version = get_version();
@@ -212,9 +204,6 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 
 
     info!("libsodium {}", sodium_version);
-
-
-    info!("{}", openssl_version);
 
     info!("sddk ready");
 
