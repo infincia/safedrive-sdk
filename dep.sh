@@ -25,7 +25,6 @@ mkdir -p src
 mkdir -p build
 
 clear_man() {
-    # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
     pushd ${BUILD_PREFIX}/share
     rm -rf man
     popd
