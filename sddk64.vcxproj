@@ -58,12 +58,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <BuildLog>
-      <Path>$(ProjectDir)$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>$(SolutionDir)$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <BuildLog>
-      <Path>$(ProjectDir)$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>$(SolutionDir)$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
