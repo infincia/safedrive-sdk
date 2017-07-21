@@ -6,13 +6,15 @@ use LOG;
 pub struct SDLogger {
     level: LogLevelFilter,
     config: Config,
+    //callback: FnMut(&str),
 }
 
 impl SDLogger {
-    pub fn new(log_level: LogLevelFilter, config: Config) -> Box<SDLogger> {
+    pub fn new(log_level: LogLevelFilter, config: Config, /*callback: FnMut(&str)*/) -> Box<SDLogger> {
         Box::new(SDLogger {
                      level: log_level,
                      config: config,
+                     //callback: callback,
                  })
     }
 }
@@ -31,6 +33,8 @@ impl Log for SDLogger {
                     let line = format!("{}", record.args());
 
                     (*log).push(line);
+
+                    //(self.callback)(&line);
                 },
             }
         }
