@@ -19,6 +19,7 @@ export CFLAGS=""
 export CPPFLAGS=""
 export LDFLAGS=""
 export OPENSSL_DIR=${BUILD_PREFIX}
+export DEP_OPENSSL_LIBRESSL=1
 
 export OSX_VERSION_MIN="10.9"
 export OSX_CPU_ARCH="core2"

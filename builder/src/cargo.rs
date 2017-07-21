@@ -32,6 +32,7 @@ impl Cargo {
 
         let mut exec = Exec::cmd("cargo")
             .env("OPENSSL_DIR", (&self.build_prefix).as_os_str())
+            .env("DEP_OPENSSL_LIBRESSL", "1")
             .env("BUILD_PREFIX", (&self.build_prefix).as_os_str())
             .env("RUST_BACKTRACE", "1")
             .env("CARGO_INCREMENTAL", "1")
@@ -160,6 +161,7 @@ impl Cargo {
 
         let mut exec = Exec::cmd("cargo")
             .env("OPENSSL_DIR", (&self.build_prefix).as_os_str())
+            .env("DEP_OPENSSL_LIBRESSL", "1")
             .env("BUILD_PREFIX", (&self.build_prefix).as_os_str())
             .env("RUST_BACKTRACE", "1")
             .env("CARGO_INCREMENTAL", "1")
