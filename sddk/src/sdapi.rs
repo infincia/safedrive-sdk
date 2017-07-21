@@ -570,6 +570,7 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
 
     r.header(::reqwest::header::Connection::close());
+    r.header(SDAuthToken(token.token.to_owned()));
     r.header(agent);
 
     let retries: u8 = 3;
