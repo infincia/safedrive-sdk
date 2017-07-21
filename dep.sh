@@ -7,6 +7,8 @@ if [ -z "${TARGET}" ]; then
 fi
 
 export SRC_PREFIX=${PWD}/src
+export PATCH_PREFIX=${PWD}
+
 export DIST_PREFIX=${PWD}/target/${TARGET}/release
 export BUILD_PREFIX=${DIST_PREFIX}/deps
 
@@ -290,7 +292,7 @@ if [ ${BUILD_LIBRESSL} = true ]; then
         pushd libressl-${LIBRESSL_VER} > /dev/null
             case ${TARGET} in
                 i686-unknown-linux-musl|x86_64-unknown-linux-musl)
-                    patch -p0 < ../../libressl-musl.patch
+                    patch -p0 < ${PATCH_PREFIX}/libressl-musl.patch
                     ;;
                 *)
                     ;;
@@ -485,7 +487,7 @@ if [ ${BUILD_OPENSSH} = true ]; then
         clear_man
         tar xf ${SRC_PREFIX}/openssh-${OPENSSH_VER}.tar.gz > /dev/null
         pushd openssh-${OPENSSH_VER} > /dev/null
-            patch < ../../always-askpass.patch
+            patch < ${PATCH_PREFIX}/always-askpass.patch
             ./configure --prefix=${BUILD_PREFIX} ${OPENSSH_ARGS} > /dev/null
             make install OPENSSL=no > /dev/null
 
