@@ -1,54 +1,30 @@
 [target.x86_64-apple-darwin.sodium]
-rustc-link-search = ["native=dep/x86_64-apple-darwin/lib"]
-rustc-link-lib = ["static=sodium"]
-root = "dep/x86_64-apple-darwin/lib"
-
 [target.x86_64-apple-darwin.ssh2]
-rustc-link-search = ["native=dep/x86_64-apple-darwin/lib"]
-rustc-link-lib = ["static=ssh2"]
-root = "dep/x86_64-apple-darwin/lib"
+
 
 
 [target.x86_64-unknown-linux-gnu.sodium]
-rustc-link-search = ["native=dep/x86_64-unknown-linux-gnu/lib"]
-rustc-link-lib = ["static=sodium"]
-root = "dep/x86_64-unknown-linux-gnu/lib"
+[target.x86_64-unknown-linux-gnu.ssh2]
+[target.x86_64-unknown-linux-gnu.dbus-1]
+
 
 
 [target.i686-unknown-linux-gnu.sodium]
-rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
-rustc-link-lib = ["static=sodium"]
-root = "dep/i686-unknown-linux-gnu/lib"
-
-
 [target.i686-unknown-linux-gnu.ssh2]
-rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
-rustc-link-lib = ["static=ssh2"]
-root = "dep/i686-unknown-linux-gnu/lib"
-
-
-[target.x86_64-unknown-linux-gnu.ssh2]
-rustc-link-search = ["native=dep/x86_64-unknown-linux-gnu/lib"]
-rustc-link-lib = ["static=ssh2"]
-root = "dep/x86_64-unknown-linux-gnu/lib"
-
-
 [target.i686-unknown-linux-gnu.dbus-1]
-rustc-link-search = ["native=dep/i686-unknown-linux-gnu/lib"]
-rustc-link-lib = ["static=dbus-1"]
-root = "dep/i686-unknown-linux-gnu/lib"
 
-[target.x86_64-unknown-linux-gnu.dbus-1]
-rustc-link-search = ["native=dep/x86_64-unknown-linux-gnu/lib"]
-rustc-link-lib = ["static=dbus-1"]
-root = "dep/x86_64-unknown-linux-gnu/lib"
+
 
 [target.wasm32-unknown-emscripten.sodium]
-rustc-link-search = ["native=dep/wasm32-unknown-emscripten/lib"]
-rustc-link-lib = ["static=sodium"]
-root = "dep/wasm32-unknown-emscripten/lib"
+
+
 
 [target.i686-pc-windows-msvc.ssh2]
+[target.i686-pc-windows-msvc.openssl]
+[target.i686-pc-windows-msvc.sodium]
+
+
 
 [target.x86_64-pc-windows-msvc.ssh2]
-
+[target.x86_64-pc-windows-msvc.openssl]
+[target.x86_64-pc-windows-msvc.sodium]

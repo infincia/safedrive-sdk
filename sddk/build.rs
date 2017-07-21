@@ -7,14 +7,20 @@ fn main() {
     if cfg!(target_os = "macos") {
         println!("cargo:rustc-link-args=-mmacosx-version-min=10.9");
     }
+
+    let build_prefix = std::env::var("BUILD_PREFIX").unwrap();
+
+    println!("cargo:rustc-link-search=native={}/lib", build_prefix);
+    println!("cargo:include={}/include", build_prefix);
+
+    println!("cargo:rustc-link-lib=static=ssh2");
+
     println!("cargo:rustc-link-lib=static=sodium");
 
     if target.contains("msvc") {
-        let build_prefix = std::env::var("BUILD_PREFIX").unwrap();
-
-        println!("cargo:rustc-link-lib=static=libssh2");
-        println!("cargo:rustc-link-search=native={}/lib", build_prefix);
-        println!("cargo:include={}/include", build_prefix);
+        println!("cargo:rustc-link-lib=static=crypto");
+        println!("cargo:rustc-link-lib=static=ssl");
+        println!("cargo:rustc-link-lib=static=tls");
 
         println!("cargo:rustc-link-lib=bcrypt");
         println!("cargo:rustc-link-lib=crypt32");
