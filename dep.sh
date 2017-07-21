@@ -496,7 +496,7 @@ if [ ${BUILD_OPENSSH} = true ]; then
         rm -rf openssh*
         echo ${OPENSSH_VER} > ${OPENSSH_VER_FILE}
     fi
-    cp ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.ssh
+    cp ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ${DIST_PREFIX}/io.safedrive.SafeDrive.ssh
 else
     echo "Not set to build OpenSSH"
 fi
@@ -516,7 +516,7 @@ if [ ${BUILD_RSYNC} = true ]; then
         rm -rf rsync*
         echo ${RSYNC_VER} > ${RSYNC_VER_FILE}
     fi
-    cp ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.rsync
+    cp ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ${DIST_PREFIX}/io.safedrive.SafeDrive.rsync
 else
     echo "Not set to build Rsync"
 fi
@@ -536,7 +536,7 @@ if [ ${BUILD_SSHFS} = true ]; then
         rm -rf sshfs*
         echo ${SSHFS_VER} > ${SSHFS_VER_FILE}
     fi
-    cp ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.sshfs
+    cp ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs
 else
     echo "Not set to build sshfs"
 fi

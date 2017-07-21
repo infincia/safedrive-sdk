@@ -102,25 +102,17 @@ echo "Copying build artifacts for ${TARGET}"
 
 case ${TARGET} in
     x86_64-apple-darwin)
-        cp -a target/${TARGET}/release/libsddk.dylib ${DIST_PREFIX}/lib/libsddk.dylib
-        install_name_tool -id "@rpath/libsddk.dylib" ${DIST_PREFIX}/lib/libsddk.dylib
-        #cp -a target/${TARGET}/release/libsddk.a ${DIST_PREFIX}/lib/libsddk.a
-        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.cli
-        cp -a target/${TARGET}/release/askpass ${DIST_PREFIX}/bin/io.safedrive.SafeDrive.askpass
+        install_name_tool -id "@rpath/libsddk.dylib" ${DIST_PREFIX}/libsddk.dylib
+        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/io.safedrive.SafeDrive.cli
+        cp -a target/${TARGET}/release/askpass ${DIST_PREFIX}/io.safedrive.SafeDrive.askpass
         ;;
     i686-unknown-linux-musl|x86_64-unknown-linux-musl)
-        #cp -a target/${TARGET}/release/libsddk.a ${DIST_PREFIX}/lib/libsddk.a
-        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
+        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/
         ;;
     i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
-        #cp -a target/${TARGET}/release/libsddk.a ${DIST_PREFIX}/lib/libsddk.a
-        #cp -a target/${TARGET}/release/libsddk.so ${DIST_PREFIX}/lib/libsddk.so
-        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/bin/
+        cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/
         ;;
     wasm32-unknown-emscripten)
-        cp -a target/${TARGET}/release/libsddk.wasm ${DIST_PREFIX}/lib/libsddk.wasm
-        cp -a target/${TARGET}/release/libsddk.js ${DIST_PREFIX}/lib/libsddk.js
-        cp -a target/${TARGET}/release/libsddk.html ${DIST_PREFIX}/lib/libsddk.html
         ;;
     *)
         ;;
