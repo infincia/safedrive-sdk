@@ -140,8 +140,6 @@ extern crate nom;
 #[macro_use]
 extern crate lazy_static;
 
-extern crate openssl_sys;
-
 #[cfg(feature = "locking")]
 #[macro_use(defer)]
 extern crate scopeguard;
