@@ -1,6 +1,6 @@
 [root]
 name = "sddk"
-version = "0.7.6"
+version = "0.7.7"
 dependencies = [
  "bip39 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitflags 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -90,10 +90,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "askpass"
-version = "0.7.6"
+version = "0.7.7"
 dependencies = [
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "sddk 0.7.6",
+ "sddk 0.7.7",
 ]
 
 [[package]]
@@ -1123,7 +1123,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "safedrive"
-version = "0.7.6"
+version = "0.7.7"
 dependencies = [
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 2.25.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1132,7 +1132,7 @@ dependencies = [
  "pbr 1.0.0 (git+https://github.com/infincia/pb.git?branch=infincia)",
  "prettytable-rs 0.6.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sddk 0.7.6",
+ "sddk 0.7.7",
  "serde 1.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",

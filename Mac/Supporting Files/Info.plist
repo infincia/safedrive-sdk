@@ -15,11 +15,11 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>v0.7.6</string>
+	<string>v0.7.7</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>2100</string>
+	<string>2181</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2016 SafeDrive. All rights reserved.</string>
 	<key>NSPrincipalClass</key>
