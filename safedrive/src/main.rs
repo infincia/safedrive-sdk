@@ -42,7 +42,7 @@ extern crate uuid;
 use uuid::Uuid;
 
 extern crate chrono;
-use chrono::{Local, UTC, TimeZone};
+use chrono::{Local, Utc, TimeZone};
 
 extern crate libc;
 
@@ -994,7 +994,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
     };
 
     let t = session.time.unwrap();
-    let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+    let utc_time = Utc.timestamp(t as i64 / 1000, t as u32 % 1000);
     let local_time = utc_time.with_timezone(&Local);
 
     //TODO: this is not portable to windows, must be fixed before use there
@@ -1105,7 +1105,7 @@ pub fn list_sessions(token: Token) {
 
         let session_time = format!("{}", {
             let t = session.time.unwrap();
-            let utc_time = UTC.timestamp(t as i64 / 1000, t as u32 % 1000);
+            let utc_time = Utc.timestamp(t as i64 / 1000, t as u32 % 1000);
             let local_time = utc_time.with_timezone(&Local);
 
             local_time
