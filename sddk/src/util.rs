@@ -250,7 +250,12 @@ pub fn pad_and_prefix_length(input: &[u8]) -> Vec<u8> {
     let padding_needed = nearest - input_length;
 
     /// pad the end of the data with zeros if needed
-    buf.resize(size_buf.len() + input_length + padding_needed, 0u8);
+    // buf.resize(size_buf.len() + input_length + padding_needed, 0u8);
+
+    // pad the end of the data with random data if needed
+    let padding_data = ::sodiumoxide::randombytes::randombytes(padding_needed);
+    buf.extend_from_slice(padding_data.as_ref());
+
 
     buf
 }
