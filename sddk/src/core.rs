@@ -203,9 +203,7 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
     };
 
 
-    info!("libsodium {}", sodium_version);
-
-    info!("sddk ready");
+    info!("{}", &*ua);
 
     Ok(())
 }
