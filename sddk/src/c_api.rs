@@ -529,6 +529,7 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
                                   language_code: *const std::os::raw::c_char,
                                   config: SDDKConfiguration,
                                   local_storage_path: *const std::os::raw::c_char,
+                                  log_level: SDDKLogLevel,
                                   mut state: *mut *mut SDDKState,
                                   mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
     let cv: String = match client_version.is_null() {
@@ -594,8 +595,16 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
         },
     };
 
+    let level = match log_level {
+        SDDKLogLevel::Error => ::log::LogLevelFilter::Error,
+        SDDKLogLevel::Warn => ::log::LogLevelFilter::Warn,
+        SDDKLogLevel::Info => ::log::LogLevelFilter::Info,
+        SDDKLogLevel::Debug => ::log::LogLevelFilter::Debug,
+        SDDKLogLevel::Trace => ::log::LogLevelFilter::Trace,
+    };
 
-    match initialize(&cv, true, &os, &langc, c, ::log::LogLevelFilter::Info, &storage_path) {
+
+    match initialize(&cv, true, &os, &langc, c, level, &storage_path) {
         Ok(()) => {
 
             let sstate = State::new();
