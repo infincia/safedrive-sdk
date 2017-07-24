@@ -424,7 +424,7 @@ public class SafeDriveSDK: NSObject {
 
     }
     
-    public func hasConflictingFolder(folderPath: String) throws -> Bool {
+    public func hasConflictingFolder(folderPath: String, completionQueue queue: DispatchQueue, success: @escaping (_ conflict: Bool) -> Void, failure: @escaping SDKFailure) {
         
         var error: UnsafeMutablePointer<SDDKError>? = nil
         let res = sddk_has_conflicting_folder(self.state!, folderPath, &error)
@@ -435,12 +435,12 @@ public class SafeDriveSDK: NSObject {
         }
         switch res {
         case 0:
-            return false
+            queue.async { success(false) }
         case 1:
-            return true
+            queue.async { success(true) }
         default:
             let e = SDKError(sdkError: error!.pointee)
-            throw e
+            queue.async { failure(e) }
         }
     }
     
