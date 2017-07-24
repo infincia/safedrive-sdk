@@ -23,7 +23,7 @@ export DEP_OPENSSL_LIBRESSL=1
 
 export OSX_VERSION_MIN="10.9"
 export OSX_CPU_ARCH="core2"
-export MAC_ARGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH}"
+export MAC_ARGS="-arch x86_64 -mmacosx-version-min=${OSX_VERSION_MIN} -march=${OSX_CPU_ARCH} -fapplication-extension"
 
 case ${TARGET} in
     x86_64-apple-darwin)
