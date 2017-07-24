@@ -30,7 +30,7 @@ case ${TARGET} in
         export CFLAGS="${CFLAGS} ${MAC_ARGS}"
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
-        export RUSTFLAGS="${RUSTFLAGS} -C link-args=-mmacosx-version-min=${OSX_VERSION_MIN}"
+        export RUSTFLAGS="${RUSTFLAGS} -C link-arg=-fapplication-extension -C link-arg=-mmacosx-version-min=${OSX_VERSION_MIN}"
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="${CFLAGS}"
