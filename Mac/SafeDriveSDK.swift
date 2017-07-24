@@ -284,7 +284,7 @@ public class SafeDriveSDK: NSObject {
         return String(cString: unique_client_id!)
     }
     
-    public func addFolder(_ name: String, path: String, encrypted: Bool, completionQueue queue: DispatchQueue, success: @escaping (_ folderId: UInt64) -> Void, failure: @escaping SDKFailure) {
+    public func addFolder(_ name: String, path: String, encrypted: Bool, completionQueue queue: DispatchQueue, success: @escaping SDKAddSyncFolderSuccess, failure: @escaping SDKFailure) {
         
         DispatchQueue.global(priority: .default).async {
             
