@@ -28,6 +28,7 @@ use std::path::PathBuf;
 
 use std::collections::HashMap;
 
+extern crate parking_lot;
 extern crate clap;
 use clap::{Arg, App, SubCommand};
 
@@ -836,7 +837,7 @@ pub fn sync_all(token: Token, keyset: Keyset) {
         let local_tweak = keyset.tweak.clone();
         let local_folder_name = folder.folderName.clone();
 
-        let pbt = ::std::sync::Mutex::new(pb);
+        let pbt = ::parking_lot::Mutex::new(pb);
 
         let _ = thread::spawn(move || {
             match sync(&local_token,
@@ -846,7 +847,7 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                        &local_tweak,
                        folder.id,
                        &mut |total, _, new, _, tick| {
-                           let mut pb = pbt.lock().unwrap();
+                           let mut pb = pbt.lock();
 
                            if tick {
                                pb.tick();
@@ -856,20 +857,20 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                            }
                        },
                        &mut |message| {
-                           let mut pb = pbt.lock().unwrap();
+                           let mut pb = pbt.lock();
 
                            let message = format!("{}: {}", local_folder_name, message);
                            pb.log(&message);
                        }
             ) {
                 Ok(_) => {
-                    let mut pb = pbt.lock().unwrap();
+                    let mut pb = pbt.lock();
 
                     let message = format!("{}: finished", local_folder_name);
                     pb.finish_print(&message);
                 },
                 Err(e) => {
-                    let mut pb = pbt.lock().unwrap();
+                    let mut pb = pbt.lock();
 
                     let message = format!("{}: sync failed: {}", local_folder_name, e);
                     pb.finish_print(&message);
@@ -903,7 +904,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
     pb.message(&message);
 
     let sync_uuid = Uuid::new_v4().hyphenated().to_string();
-    let pbt = ::std::sync::Mutex::new(pb);
+    let pbt = ::parking_lot::Mutex::new(pb);
 
     match sync(&token,
                &sync_uuid,
@@ -912,7 +913,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                &keyset.tweak,
                folder.id,
                &mut |total, _, new, _, tick| {
-                   let mut pb = pbt.lock().unwrap();
+                   let mut pb = pbt.lock();
 
                    if tick {
                        pb.tick();
@@ -922,7 +923,7 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                    }
                },
                &mut |message| {
-                   let mut pb = pbt.lock().unwrap();
+                   let mut pb = pbt.lock();
 
                    let message = format!("{}: {}", &folder.folderName, message);
 
@@ -931,13 +932,13 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                }
     ) {
         Ok(_) => {
-            let mut pb = pbt.lock().unwrap();
+            let mut pb = pbt.lock();
 
             let message = format!("{}: finished", &folder.folderName);
             pb.finish_print(&message);
         },
         Err(e) => {
-            let mut pb = pbt.lock().unwrap();
+            let mut pb = pbt.lock();
 
             let message = format!("{}: sync failed: {}", &folder.folderName, e);
             pb.finish_print(&message);
@@ -1006,7 +1007,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
     let message = format!("{}: ", &folder.folderName);
     pb.message(&message);
 
-    let pbt = ::std::sync::Mutex::new(pb);
+    let pbt = ::parking_lot::Mutex::new(pb);
 
     match restore(&token,
                   &session.name,
@@ -1015,7 +1016,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   path,
                   session.size.unwrap(),
                   &mut |total, _, new, _, tick| {
-                      let mut pb = pbt.lock().unwrap();
+                      let mut pb = pbt.lock();
 
                       if tick {
                           pb.tick();
@@ -1025,7 +1026,7 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                       }
                   },
                   &mut |message| {
-                      let mut pb = pbt.lock().unwrap();
+                      let mut pb = pbt.lock();
 
                       let message = format!("{}: {}", &folder.folderName, message);
 
@@ -1034,13 +1035,13 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   }
     ) {
         Ok(_) => {
-            let mut pb = pbt.lock().unwrap();
+            let mut pb = pbt.lock();
 
             let message = format!("{}: finished", &folder.folderName);
             pb.finish_print(&message);
         },
         Err(e) => {
-            let mut pb = pbt.lock().unwrap();
+            let mut pb = pbt.lock();
 
             let message = format!("{}: restore failed: {}", &folder.folderName, e);
             pb.finish_print(&message);

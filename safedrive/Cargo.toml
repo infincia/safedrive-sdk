@@ -17,6 +17,7 @@ log = "*"
 prettytable-rs = "*"
 chrono = "^0.4"
 libc = "*"
+parking_lot = "^0.4"
 
 [dependencies.sddk]
 path = "../sddk"
