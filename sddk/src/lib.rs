@@ -37,6 +37,8 @@ extern crate number_prefix;
 
 extern crate reed_solomon;
 
+extern crate parking_lot_mpsc;
+
 #[macro_use]
 mod localized;
 

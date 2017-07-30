@@ -142,10 +142,10 @@ impl WriteCache {
         self.data_waiting >= self.data_limit || self.items_waiting() >= self.item_limit
     }
 
-    pub fn upload_thread(self, token: &Token, session_name: &str) -> (::std::sync::mpsc::SyncSender<::cache::WriteCacheMessage>, ::std::sync::mpsc::Receiver<Result<bool, SDError>>) {
+    pub fn upload_thread(self, token: &Token, session_name: &str) -> (::parking_lot_mpsc::SyncSender<::cache::WriteCacheMessage>, ::parking_lot_mpsc::Receiver<Result<bool, SDError>>) {
 
-        let (block_send, block_receive) = ::std::sync::mpsc::sync_channel::<::cache::WriteCacheMessage>(0);
-        let (status_send, status_receive) = ::std::sync::mpsc::channel::<Result<bool, SDError>>();
+        let (block_send, block_receive) = ::parking_lot_mpsc::sync_channel::<::cache::WriteCacheMessage>(0);
+        let (status_send, status_receive) = ::parking_lot_mpsc::channel::<Result<bool, SDError>>();
 
         let local_token = token.clone();
 
@@ -296,13 +296,13 @@ impl WriteCache {
                         },
                         Err(e) => {
                             match e {
-                                ::std::sync::mpsc::TryRecvError::Empty => {
+                                ::parking_lot_mpsc::TryRecvError::Empty => {
                                     let delay = time::Duration::from_millis(10);
 
                                     thread::sleep(delay);
                                     continue;
                                 },
-                                ::std::sync::mpsc::TryRecvError::Disconnected => {
+                                ::parking_lot_mpsc::TryRecvError::Disconnected => {
                                     debug!("write cache: no more messages, end of channel {}", e);
                                     break;
                                 },

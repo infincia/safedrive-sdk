@@ -200,8 +200,8 @@ pub fn sync(token: &Token,
                         },
                         Err(e) => {
                             match e {
-                                ::std::sync::mpsc::TryRecvError::Empty => {},
-                                ::std::sync::mpsc::TryRecvError::Disconnected => {
+                                ::parking_lot_mpsc::TryRecvError::Empty => {},
+                                ::parking_lot_mpsc::TryRecvError::Disconnected => {
                                     debug!("Result<(), SDError>: end of channel {}", e);
                                     return Err(SDError::Internal(format!("end of channel: {}", e)));
                                 },
@@ -373,8 +373,8 @@ pub fn sync(token: &Token,
             },
             Err(e) => {
                 match e {
-                    ::std::sync::mpsc::TryRecvError::Empty => {},
-                    ::std::sync::mpsc::TryRecvError::Disconnected => {
+                    ::parking_lot_mpsc::TryRecvError::Empty => {},
+                    ::parking_lot_mpsc::TryRecvError::Disconnected => {
                         debug!("write thread has disconnected, continuing");
 
                         break;
