@@ -29,7 +29,7 @@ uuid = { version = "*", features = ["v4"] }
 regex = "^0.2"
 scopeguard = { version = "*", optional = true }
 parking_lot = "^0.4"
-parking_lot_mpsc = "^0.1"
+parking_lot_mpsc = "^0.1.5-alpha.1"
 byteorder = "*"
 blake2-rfc = { version = "*" }
 #blake2-rfc = { version = "*", features = ["simd", "simd_opt", "simd_asm"] }
