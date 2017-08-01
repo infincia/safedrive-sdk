@@ -1,7 +1,6 @@
 use std::str;
 use std::path::{Path, PathBuf};
 use std::fs;
-use std::{thread, time};
 
 /// external crate imports
 use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
