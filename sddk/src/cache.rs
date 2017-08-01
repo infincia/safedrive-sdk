@@ -289,9 +289,16 @@ impl WriteCache {
                                 },
                             }
 
+                            // reset bandwidth display
+                            let status_message = ::models::SyncStatus::Bandwidth(0);
+                            match sync_status_send.send(status_message) {
+                                Ok(()) => {
 
+                                },
+                                Err(_) => {
 
-
+                                },
+                            }
                         }
                     },
                     None => {},
