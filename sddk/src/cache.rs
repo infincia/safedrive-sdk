@@ -142,7 +142,7 @@ impl WriteCache {
         self.data_waiting >= self.data_limit || self.items_waiting() >= self.item_limit
     }
 
-    pub fn upload_thread(self, token: &Token, session_name: &str) -> (::parking_lot_mpsc::SyncSender<::cache::WriteCacheMessage>, ::parking_lot_mpsc::Receiver<Result<bool, SDError>>) {
+    pub fn upload_thread(self, token: &Token, session_name: &str, sync_status_send: ::parking_lot_mpsc::SyncSender<::models::SyncStatus>) -> (::parking_lot_mpsc::SyncSender<::cache::WriteCacheMessage>, ::parking_lot_mpsc::Receiver<Result<bool, SDError>>) {
 
         let (block_send, block_receive) = ::parking_lot_mpsc::sync_channel::<::cache::WriteCacheMessage>(0);
         let (status_send, status_receive) = ::parking_lot_mpsc::channel::<Result<bool, SDError>>();
@@ -214,10 +214,22 @@ impl WriteCache {
                                     },
                                 }
                             }
+                            let l_sync_status_send = sync_status_send.clone();
 
-                            match ::sdapi::write_blocks(&local_token, &local_session_name, &block_batch, |total, current, new| {
-                                debug!("block upload progress: {}/{}, {} new", current, total, new);
-                            }) {
+                            match ::sdapi::write_blocks(&local_token, &local_session_name, &block_batch, Box::new(move |speed| {
+                                debug!("block upload speed: {}", speed);
+
+                                let status_message = ::models::SyncStatus::Bandwidth(speed);
+                                match l_sync_status_send.send(status_message) {
+                                    Ok(()) => {
+
+                                    },
+                                    Err(_) => {
+
+                                    },
+                                }
+
+                            })) {
                                 Ok(missing) => {
                                     debug!("sending group took {} seconds", block_write_start_time.elapsed().as_secs());
 

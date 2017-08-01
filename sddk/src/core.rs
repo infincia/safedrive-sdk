@@ -1,6 +1,7 @@
 use std::str;
 use std::path::{Path, PathBuf};
 use std::fs;
+use std::{thread, time};
 
 /// external crate imports
 use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
@@ -640,3 +641,108 @@ pub fn remote_mv(host: &str, port: u16, remote_path: &Path, new_path: &Path, use
 }
 
 
+
+pub fn sync<B, I, P>(token: &Token,
+                     session_name: &str,
+                     main_key: &Key,
+                     hmac_key: &Key,
+                     tweak_key: &Key,
+                     folder_id: u64,
+                     progress: &mut P,
+                     bandwidth: &mut B,
+                     issue: &mut I) -> Result<(), SDError>
+    where P: FnMut(u64, u64, u64), B: FnMut(u64), I: FnMut(&str) {
+
+    let sync_status_receive = ::sync::sync(token, session_name, main_key, hmac_key, tweak_key, folder_id);
+
+    loop {
+        match sync_status_receive.try_recv() {
+            Ok(msg) => {
+                match msg {
+                    SyncStatus::Progress(total, current, new) => {
+                        //if finished {
+                        //    debug!("sync thread says it's finished, continuing");
+                        //    break;
+                        //}
+                        progress(total, current, new);
+                    },
+                    SyncStatus::Issue(message) => {
+                        issue(&message);
+                    },
+                    SyncStatus::Bandwidth(speed) => {
+                        bandwidth(speed);
+                    },
+                    SyncStatus::Err(err) => return Err(err),
+                };
+            },
+            Err(e) => {
+                match e {
+                    ::parking_lot_mpsc::TryRecvError::Empty => {},
+                    ::parking_lot_mpsc::TryRecvError::Disconnected => {
+                        debug!("sync thread has disconnected, continuing");
+
+                        break;
+                    },
+                }
+            },
+        };
+        let delay = time::Duration::from_millis(500);
+
+        thread::sleep(delay);
+    }
+
+    Ok(())
+}
+
+
+pub fn restore<B, I, P>(token: &Token,
+                        session_name: &str,
+                        main_key: &Key,
+                        folder_id: u64,
+                        destination: PathBuf,
+                        session_size: u64,
+                        progress: &mut P,
+                        bandwidth: &mut B,
+                        issue: &mut I) -> Result<(), SDError>
+    where P: FnMut(u64, u64, u64), B: FnMut(u64), I: FnMut(&str) {
+
+    let sync_status_receive = ::restore::restore(token, session_name, main_key, folder_id, destination, session_size);
+
+    loop {
+        match sync_status_receive.try_recv() {
+            Ok(msg) => {
+                match msg {
+                    SyncStatus::Progress(total, current, new) => {
+                        //if finished {
+                        //    debug!("sync thread says it's finished, continuing");
+                        //    break;
+                        //}
+                        progress(total, current, new);
+                    },
+                    SyncStatus::Issue(message) => {
+                        issue(&message);
+                    },
+                    SyncStatus::Bandwidth(speed) => {
+                        bandwidth(speed);
+                    },
+                    SyncStatus::Err(err) => return Err(err),
+                };
+            },
+            Err(e) => {
+                match e {
+                    ::parking_lot_mpsc::TryRecvError::Empty => {},
+                    ::parking_lot_mpsc::TryRecvError::Disconnected => {
+                        debug!("sync thread has disconnected, continuing");
+
+                        break;
+                    },
+                }
+            },
+        };
+        let delay = time::Duration::from_millis(500);
+
+        thread::sleep(delay);
+    }
+
+    Ok(())
+}

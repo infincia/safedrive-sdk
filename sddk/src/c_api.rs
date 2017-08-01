@@ -25,8 +25,8 @@ use core::log;
 use core::get_sync_sessions;
 use core::remove_sync_session;
 use core::clean_sync_sessions;
-use sync::sync;
-use restore::restore;
+use core::sync;
+use core::restore;
 use core::load_keys;
 use core::login;
 use sync_state::cancel_sync_task;
@@ -2575,9 +2575,9 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                             progress: extern fn(progress_context: *mut std::os::raw::c_void,
                                                 total: std::os::raw::c_ulonglong,
                                                 current: std::os::raw::c_ulonglong,
-                                                new_bytes: std::os::raw::c_ulonglong,
-                                                percent: std::os::raw::c_double,
-                                                tick: std::os::raw::c_uint),
+                                                new_bytes: std::os::raw::c_ulonglong),
+                            bandwidth: extern fn(bandwidth_context: *mut std::os::raw::c_void,
+                                                 speed: std::os::raw::c_ulonglong),
                             issue: extern fn(issue_context: *mut std::os::raw::c_void,
                                              message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
@@ -2600,13 +2600,14 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
                hmac_key,
                tweak_key,
                id,
-               &mut |total, current, new_bytes, progress_percent, tick| {
+               &mut |total, current, new_bytes| {
                    let c_total: std::os::raw::c_ulonglong = total;
                    let c_current: std::os::raw::c_ulonglong = current;
                    let c_new_bytes: std::os::raw::c_ulonglong = new_bytes;
-                   let c_percent: std::os::raw::c_double = progress_percent;
-                   let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                   progress(context, c_total, c_current, c_new_bytes, c_percent, c_tick);
+                   progress(context, c_total, c_current, c_new_bytes);
+               },&mut |speed| {
+                   let c_speed: std::os::raw::c_ulonglong = speed;
+                   bandwidth(context2, c_speed);
                },
                &mut |message| {
                    let c_message = CString::new(message).expect("failed to get sync message");
@@ -2687,9 +2688,9 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                                progress: extern fn(progress_context: *mut std::os::raw::c_void,
                                                    total: std::os::raw::c_ulonglong,
                                                    current: std::os::raw::c_ulonglong,
-                                                   new_bytes: std::os::raw::c_ulonglong,
-                                                   percent: std::os::raw::c_double,
-                                                   tick: std::os::raw::c_uint),
+                                                   new_bytes: std::os::raw::c_ulonglong),
+                               bandwidth: extern fn(bandwidth_context: *mut std::os::raw::c_void,
+                                                    speed: std::os::raw::c_ulonglong),
                                issue: extern fn(issue_context: *mut std::os::raw::c_void,
                                                 message: *const std::os::raw::c_char)) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
@@ -2721,13 +2722,15 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
                   id,
                   p,
                   ses_size,
-                  &mut |total, current, new_bytes, progress_percent, tick| {
+                  &mut |total, current, new_bytes| {
                       let c_total: std::os::raw::c_ulonglong = total;
                       let c_current: std::os::raw::c_ulonglong = current;
-                      let c_percent: std::os::raw::c_double = progress_percent;
                       let c_new_bytes: std::os::raw::c_ulonglong = new_bytes;
-                      let c_tick: std::os::raw::c_uint =  if tick { 1 } else { 0 };
-                      progress(context, c_total, c_current, c_new_bytes, c_percent, c_tick);
+                      progress(context, c_total, c_current, c_new_bytes);
+                  },
+                  &mut |speed| {
+                      let c_speed: std::os::raw::c_ulonglong = speed;
+                      bandwidth(context2, c_speed);
                   },
                   &mut |message| {
                       let c_message = CString::new(message).expect("failed to get sync message");

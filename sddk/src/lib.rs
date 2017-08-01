@@ -76,8 +76,6 @@ mod settings;
 ///
 pub use c_api::*;
 pub use core::*;
-pub use sync::sync;
-pub use restore::restore;
 pub use sync_state::*;
 pub use constants::*;
 pub use error::SDError;

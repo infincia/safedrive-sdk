@@ -3,6 +3,7 @@
 
 use std::io::Read;
 use std::collections::HashMap;
+use std::time::Duration;
 
 /// external crate imports
 
@@ -13,6 +14,7 @@ use reqwest::header::ContentType;
 use rustc_serialize::hex::ToHex;
 use rand::distributions::{IndependentSample, Range};
 use std::{thread, time};
+use time::SteadyTime;
 
 /// internal imports
 
@@ -26,19 +28,22 @@ use binformat::BinaryWriter;
 
 header! { (SDAuthToken, "SD-Auth-Token") => [String] }
 
+type BandwidthCallback = Box<FnMut(u64) + Send + Sync + 'static>;
+
 #[allow(dead_code)]
-struct ProgressReader<F> {
+struct ProgressReader {
     inner: ::std::io::Cursor<Vec<u8>>,
-    callback: F,
+    callback: BandwidthCallback,
     content_length: u64,
     real_size: u64,
     current: u64,
     real_current: u64,
+    start_time: SteadyTime,
 }
 
-impl<F> ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+impl ProgressReader {
     #[allow(dead_code)]
-    pub fn new(reader: Vec<u8>, callback: F, content_length: u64, real_size: u64) -> ProgressReader<F> {
+    pub fn new(reader: Vec<u8>, callback: BandwidthCallback, content_length: u64, real_size: u64) -> ProgressReader {
         ProgressReader {
             inner: ::std::io::Cursor::new(reader),
             callback: callback,
@@ -46,6 +51,7 @@ impl<F> ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static 
             real_size: real_size,
             current: 0,
             real_current: 0,
+            start_time: SteadyTime::now(),
         }
     }
 
@@ -56,7 +62,14 @@ impl<F> ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static 
     }
 }
 
-impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+impl Into<::reqwest::Body> for ProgressReader {
+    fn into(self) -> ::reqwest::Body {
+        let content_length = self.content_length;
+        ::reqwest::Body::sized(self, content_length as u64)
+    }
+}
+
+impl Read for ProgressReader {
     fn read(&mut self, buf: &mut [u8]) -> ::std::io::Result<usize> {
         let r = self.inner.read(buf);
 
@@ -76,7 +89,19 @@ impl<F> Read for ProgressReader<F> where F: FnMut(u64, u64, u64) + Send + Sync +
 
                 self.real_current = real_updated as u64;
 
-                (self.callback)(self.real_size, self.real_current, real_new as u64);
+                let now = SteadyTime::now();
+
+                let dur = now - self.start_time;
+
+                let secs = dur.num_seconds();
+                let nsecs = (dur - ::time::Duration::seconds(secs)).num_nanoseconds().unwrap();
+                let time_elapsed = Duration::new(secs as u64, nsecs as u32);
+
+                let speed = self.real_current as f64 / (time_elapsed.as_secs() as f64 + time_elapsed.subsec_nanos() as f64 / 1_000_000_000.0);
+
+                (self.callback)(speed as u64);
+
+                //(self.callback)(self.real_size, self.real_current, real_new as u64, speed as u64);
             },
             Err(e) => {
                 debug!("error reading: {}", e);
@@ -1179,7 +1204,7 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
 
 }
 
-pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool, session: &[WrappedSyncSession], size: usize, progress: F) -> Result<(), SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static {
+pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, session: &[WrappedSyncSession], size: usize, progress: BandwidthCallback) -> Result<(), SDAPIError> {
 
     let endpoint = APIEndpoint::FinishSyncSession {
         folder_id: folder_id,
@@ -1208,7 +1233,10 @@ pub fn finish_sync_session<'a, F>(token: &Token, folder_id: u64, encrypted: bool
 
     r.header(ContentType(m));
     r.header(ContentLength(content_length as u64));
-    r.body(multipart_body);
+
+    let progress = ProgressReader::new(multipart_body.clone(), progress, content_length as u64, real_size as u64);
+
+    r.body(progress);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
@@ -1533,7 +1561,7 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
 }
 
 #[allow(dead_code)]
-pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: F) -> Result<Vec<String>, SDAPIError> where F: FnMut(u64, u64, u64) + Send + Sync + 'static, T: ::binformat::BinaryWriter {
+pub fn write_blocks<T>(token: &Token, session: &str, blocks: &[T], progress: BandwidthCallback) -> Result<Vec<String>, SDAPIError> where T: ::binformat::BinaryWriter {
 
     let endpoint = APIEndpoint::WriteBlocks {
         session: session,
@@ -1559,7 +1587,10 @@ pub fn write_blocks<F, T>(token: &Token, session: &str, blocks: &[T], progress: 
 
     r.header(ContentType(m));
     r.header(ContentLength(content_length as u64));
-    r.body(multipart_body);
+
+    let progress = ProgressReader::new(multipart_body.clone(), progress, content_length as u64, real_size as u64);
+
+    r.body(progress);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
