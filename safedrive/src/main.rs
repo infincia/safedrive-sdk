@@ -822,14 +822,16 @@ pub fn sync_all(token: Token, keyset: Keyset) {
 
     for (index, folder) in encrypted_folders.into_iter().enumerate() {
         let mut pb = mb.create_bar(index as u64);
+        pb.show_speed = false;
 
-        let message = format!("{}: ", folder.folderName);
+        let message = format!("{}<checking data>: ", folder.folderName);
         pb.message(&message);
+        pb.tick();
 
         pb.format("╢▌▌░╟");
         pb.set_units(Units::Bytes);
-        let message = format!("{}: ", &folder.folderName);
-        pb.message(&message);
+
+
         let sync_uuid = Uuid::new_v4().hyphenated().to_string();
         let local_token = token.clone();
         let local_main = keyset.main.clone();
@@ -853,6 +855,17 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                            pb.add(new as u64);
                        },
                        &mut |speed| {
+                           let mut pb = pbt.lock();
+                           if speed > 0 {
+                               let speed_bytes = pretty_bytes(speed as f64);
+
+                               let message = format!("{}<uploading@{}/s>: ", &folder.folderName, speed_bytes);
+                               pb.message(&message);
+                           } else {
+                               let message = format!("{}<checking data>: ", &folder.folderName);
+                               pb.message(&message);
+                           }
+                           pb.tick();
 
                        },
                        &mut |message| {
@@ -897,10 +910,13 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
     println!("Syncing folder \"{}\"", &folder.folderName);
 
     let mut pb = ProgressBar::new(0);
+    pb.show_speed = false;
+
     pb.format("╢▌▌░╟");
     pb.set_units(Units::Bytes);
-    let message = format!("{}: ", &folder.folderName);
+    let message = format!("{}<checking data>: ", folder.folderName);
     pb.message(&message);
+    pb.tick();
 
     let sync_uuid = Uuid::new_v4().hyphenated().to_string();
     let pbt = ::parking_lot::Mutex::new(pb);
@@ -918,6 +934,18 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                    pb.add(new as u64);
                },
                &mut |speed| {
+                   let mut pb = pbt.lock();
+
+                   if speed > 0 {
+                       let speed_bytes = pretty_bytes(speed as f64);
+
+                       let message = format!("{}<uploading@{}/s>: ", &folder.folderName, speed_bytes);
+                       pb.message(&message);
+                   } else {
+                       let message = format!("{}<checking data>: ", &folder.folderName);
+                       pb.message(&message);
+                   }
+                   pb.tick();
 
                },
                &mut |message| {
@@ -999,11 +1027,14 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
     //TODO: this is not portable to windows, must be fixed before use there
     println!("Restoring sync folder \"{}\" ({}) to {}", &folder.folderName, &local_time, &path.to_str().unwrap());
 
-    let mut pb = ProgressBar::new(0);
+    let mut pb: ProgressBar<::std::io::Stdout> = ProgressBar::new(0);
+    pb.show_speed = false;
+
     pb.format("╢▌▌░╟");
     pb.set_units(Units::Bytes);
-    let message = format!("{}: ", &folder.folderName);
+    let message = format!("{}<processing>: ", folder.folderName);
     pb.message(&message);
+
 
     let pbt = ::parking_lot::Mutex::new(pb);
 
@@ -1020,7 +1051,18 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                       pb.add(new as u64);
                   },
                   &mut |speed| {
+                      let mut pb = pbt.lock();
 
+                      if speed > 0 {
+                          let speed_bytes = pretty_bytes(speed as f64);
+
+                          let message = format!("{}<downloading@{}/s>: ", &folder.folderName, speed_bytes);
+                          pb.message(&message);
+                      } else {
+                          let message = format!("{}<processing>: ", &folder.folderName);
+                          pb.message(&message);
+                      }
+                      pb.tick();
                   },
                   &mut |message| {
                       let mut pb = pbt.lock();
