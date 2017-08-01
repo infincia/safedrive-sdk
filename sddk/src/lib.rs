@@ -79,7 +79,7 @@ pub use core::*;
 pub use sync_state::*;
 pub use constants::*;
 pub use error::SDError;
-pub use models::{SyncCleaningSchedule, SyncVersion, Token, RegisteredFolder, AccountStatus, AccountDetails, SoftwareClient};
+pub use models::{SyncCleaningSchedule, SyncStatus, SyncVersion, Token, RegisteredFolder, AccountStatus, AccountDetails, SoftwareClient};
 pub use keys::{Key, Keyset, KeyType};
 pub use session::SyncSession;
 pub use chunk::{ChunkGenerator, BlockGenerator, BlockGeneratorStats};
