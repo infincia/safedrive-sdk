@@ -656,7 +656,7 @@ pub fn sync<B, I, P>(token: &Token,
     let sync_status_receive = ::sync::sync(token, session_name, main_key, hmac_key, tweak_key, folder_id);
 
     loop {
-        match sync_status_receive.try_recv() {
+        match sync_status_receive.recv() {
             Ok(msg) => {
                 match msg {
                     SyncStatus::Progress(total, current, new) => {
@@ -676,19 +676,11 @@ pub fn sync<B, I, P>(token: &Token,
                 };
             },
             Err(e) => {
-                match e {
-                    ::parking_lot_mpsc::TryRecvError::Empty => {},
-                    ::parking_lot_mpsc::TryRecvError::Disconnected => {
-                        debug!("sync thread has disconnected, continuing");
+                debug!("sync thread has disconnected, continuing");
 
-                        break;
-                    },
-                }
+                break;
             },
         };
-        let delay = time::Duration::from_millis(500);
-
-        thread::sleep(delay);
     }
 
     Ok(())
@@ -709,7 +701,7 @@ pub fn restore<B, I, P>(token: &Token,
     let sync_status_receive = ::restore::restore(token, session_name, main_key, folder_id, destination, session_size);
 
     loop {
-        match sync_status_receive.try_recv() {
+        match sync_status_receive.recv() {
             Ok(msg) => {
                 match msg {
                     SyncStatus::Progress(total, current, new) => {
@@ -729,19 +721,11 @@ pub fn restore<B, I, P>(token: &Token,
                 };
             },
             Err(e) => {
-                match e {
-                    ::parking_lot_mpsc::TryRecvError::Empty => {},
-                    ::parking_lot_mpsc::TryRecvError::Disconnected => {
-                        debug!("sync thread has disconnected, continuing");
+                debug!("restore thread has disconnected, continuing");
 
-                        break;
-                    },
-                }
+                break;
             },
         };
-        let delay = time::Duration::from_millis(500);
-
-        thread::sleep(delay);
     }
 
     Ok(())
