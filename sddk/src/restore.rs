@@ -37,7 +37,7 @@ pub fn restore(token: &Token,
                folder_id: u64,
                destination: PathBuf,
                session_size: u64) -> ::parking_lot_mpsc::Receiver<SyncStatus> {
-    let (sync_status_send, sync_status_receive) = ::parking_lot_mpsc::sync_channel::<SyncStatus>(0);
+    let (sync_status_send, sync_status_receive) = ::parking_lot_mpsc::sync_channel::<SyncStatus>(1000);
 
     let token_local = token.to_owned();
     let session_name_local = session_name.to_owned();
