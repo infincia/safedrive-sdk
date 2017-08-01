@@ -846,15 +846,14 @@ pub fn sync_all(token: Token, keyset: Keyset) {
                        &local_hmac,
                        &local_tweak,
                        folder.id,
-                       &mut |total, _, new, _, tick| {
+                       &mut |total, _, new| {
                            let mut pb = pbt.lock();
 
-                           if tick {
-                               pb.tick();
-                           } else {
-                               pb.total = total as u64;
-                               pb.add(new as u64);
-                           }
+                           pb.total = total as u64;
+                           pb.add(new as u64);
+                       },
+                       &mut |speed| {
+
                        },
                        &mut |message| {
                            let mut pb = pbt.lock();
@@ -912,15 +911,14 @@ pub fn sync_one(token: Token, keyset: Keyset, id: u64) {
                &keyset.hmac,
                &keyset.tweak,
                folder.id,
-               &mut |total, _, new, _, tick| {
+               &mut |total, _, new| {
                    let mut pb = pbt.lock();
 
-                   if tick {
-                       pb.tick();
-                   } else {
-                       pb.total = total as u64;
-                       pb.add(new as u64);
-                   }
+                   pb.total = total as u64;
+                   pb.add(new as u64);
+               },
+               &mut |speed| {
+
                },
                &mut |message| {
                    let mut pb = pbt.lock();
@@ -1015,15 +1013,14 @@ pub fn restore_one(token: Token, keyset: Keyset, id: u64, destination: &str, ses
                   folder.id,
                   path,
                   session.size.unwrap(),
-                  &mut |total, _, new, _, tick| {
+                  &mut |total, _, new| {
                       let mut pb = pbt.lock();
 
-                      if tick {
-                          pb.tick();
-                      } else {
-                          pb.total = total as u64;
-                          pb.add(new as u64);
-                      }
+                      pb.total = total as u64;
+                      pb.add(new as u64);
+                  },
+                  &mut |speed| {
+
                   },
                   &mut |message| {
                       let mut pb = pbt.lock();
