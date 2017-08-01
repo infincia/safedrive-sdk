@@ -1334,10 +1334,8 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
                                  mut error: *mut *mut SDDKError,
                                  recovery_phrase: *const std::os::raw::c_char,
                                  store_recovery_key: extern fn(context: *mut std::os::raw::c_void,
-                                                               context2: *mut std::os::raw::c_void,
                                                                new_phrase: *mut std::os::raw::c_char),
-                                 issue: extern fn(context: *mut std::os::raw::c_void,
-                                                  context2: *mut std::os::raw::c_void,
+                                 issue: extern fn(context2: *mut std::os::raw::c_void,
                                                   message: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
@@ -1357,11 +1355,11 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
     let keyset = match load_keys(c.0.get_api_token(), phrase, &|new_phrase| {
         /// call back to C to store phrase
         let mut c_new_phrase = CString::new(new_phrase).unwrap();
-        store_recovery_key(context, context2, c_new_phrase.into_raw());
+        store_recovery_key(context, c_new_phrase.into_raw());
     }, &|message| {
         /// call back to C to report non-fatal issue with keys
         let mut c_message = CString::new(message).unwrap();
-        issue(context, context2, c_message.into_raw());
+        issue(context2, c_message.into_raw());
     }) {
         Ok(ks) => ks,
         Err(err) => {
