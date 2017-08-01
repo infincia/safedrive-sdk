@@ -3,6 +3,8 @@
 
 use std;
 
+use error::SDError;
+
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[allow(dead_code)]
@@ -343,4 +345,14 @@ pub struct RegisteredFolder {
     pub addedDate: u64,
     pub encrypted: bool,
     pub syncing: bool,
+}
+
+// sync progress
+
+#[derive(Debug)]
+pub enum SyncStatus {
+    Progress(u64, u64, u64),
+    Bandwidth(u64),
+    Issue(String),
+    Err(SDError),
 }
