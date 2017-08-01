@@ -1333,9 +1333,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
                                  state: *mut SDDKState,
                                  mut error: *mut *mut SDDKError,
                                  recovery_phrase: *const std::os::raw::c_char,
-                                 store_recovery_key: extern fn(context: *mut std::os::raw::c_void,
+                                 store_recovery_key: extern fn(store_context: *mut std::os::raw::c_void,
                                                                new_phrase: *mut std::os::raw::c_char),
-                                 issue: extern fn(context2: *mut std::os::raw::c_void,
+                                 issue: extern fn(issue_context: *mut std::os::raw::c_void,
                                                   message: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
