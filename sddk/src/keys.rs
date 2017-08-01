@@ -326,6 +326,13 @@ impl Key {
         }
     }
 
+    pub fn to_owned(&self) -> Key {
+        Key {
+            bytes: self.bytes.clone(),
+            key_type: self.key_type,
+        }
+    }
+
     fn from(recovery_phrase: Bip39) -> Key {
         let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(recovery_phrase.seed.as_ref());
         Key {
