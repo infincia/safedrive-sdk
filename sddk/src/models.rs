@@ -233,6 +233,14 @@ pub struct Token {
     pub token: String,
 }
 
+impl Token {
+    pub fn to_owned(&self) -> Token {
+        Token {
+            token: self.token.clone(),
+        }
+    }
+}
+
 impl Default for Token {
     fn default() -> Token {
         Token {
