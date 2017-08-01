@@ -24,7 +24,7 @@ dependencies = [
  "objc 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "objc-foundation 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "parking_lot_mpsc 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parking_lot_mpsc 0.1.5-alpha.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "pulldown-cmark 0.0.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "reed-solomon 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -924,7 +924,7 @@ dependencies = [
 
 [[package]]
 name = "parking_lot_mpsc"
-version = "0.1.2"
+version = "0.1.5-alpha.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "parking_lot 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1846,7 +1846,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum owning_ref 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "cdf84f41639e037b484f93433aa3897863b561ed65c6e59c7073d7c561710f37"
 "checksum parking_lot 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)" = "37f364e2ce5efa24c7d0b6646d5bb61145551a0112f107ffd7499f1a3e322fbd"
 "checksum parking_lot_core 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "0ad2c4d148942b3560034785bf19df586ebba53351e8c78f84984147d5795eef"
-"checksum parking_lot_mpsc 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "ab040f32d4281d021acccd9cab2c290921284951912260883d6ba7eabefc0c08"
+"checksum parking_lot_mpsc 0.1.5-alpha.1 (registry+https://github.com/rust-lang/crates.io-index)" = "bdea187c5464edb3cbd0c5bc7675d90528e5ac4808d8a5d0df6e788b721a0b82"
 "checksum pbr 1.0.0 (git+https://github.com/infincia/pb.git?branch=infincia)" = "<none>"
 "checksum pear 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)" = "87dd0e084e2c18b047658e40f89b856dfc23104011fd43f9369e873d03b7f15b"
 "checksum pear_codegen 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)" = "0455b67d07b3aa40a552256059f11eb8db3a848cbec81bae3e3cb366e6e74e24"
