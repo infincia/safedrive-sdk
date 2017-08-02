@@ -133,7 +133,7 @@ case ${TARGET} in
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export BUILD_OPENSSH=true
         export BUILD_RSYNC=true
-        export BUILD_SSHFS=true
+        export BUILD_SSHFS=false
         export BUILD_LIBRESSL=true
         export BUILD_LIBSSH2=true
         if [ ${BUILD_SSHFS} = true ]; then
