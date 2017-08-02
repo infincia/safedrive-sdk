@@ -8,6 +8,7 @@ fi
 
 export SRC_PREFIX=${PWD}/src
 export PATCH_PREFIX=${PWD}
+export STATIC_DEP_PREFIX=${PWD}/dep-static
 
 export DIST_PREFIX=${PWD}/target/${TARGET}/release
 export BUILD_PREFIX=${DIST_PREFIX}/deps
@@ -70,7 +71,7 @@ export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
 export SSHFS_ARGS="--disable-dependency-tracking"
 export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I/usr/local/include/osxfuse -I/usr/local/include/osxfuse/fuse"
 export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0 -L/usr/local/lib"
-
+export SSHFS_STATIC=true
 
 export LIBRESSL_VER=2.5.5
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -521,7 +522,9 @@ else
     echo "Not set to build Rsync"
 fi
 
-if [ ${BUILD_SSHFS} = true ]; then
+if [ ${STATIC_SSHFS} = true ]; then
+    cp -a ${STATIC_DEP_PREFIX}/${TARGET}/io.safedrive.SafeDrive.sshfs ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs
+elif [ ${BUILD_SSHFS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
         echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
         rm -rf sshfs*
