@@ -131,15 +131,17 @@ case ${TARGET} in
         export CFLAGS="${CFLAGS} ${MAC_ARGS}"
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
-        export BUILD_ICONV=true
-        export BUILD_GETTEXT=true
-        export BUILD_GLIB=true
         export BUILD_OPENSSH=true
         export BUILD_RSYNC=true
         export BUILD_SSHFS=true
         export BUILD_LIBRESSL=true
-        export BUILD_FFI=true
         export BUILD_LIBSSH2=true
+        if [ ${BUILD_SSHFS} = true ]; then
+            export BUILD_ICONV=true
+            export BUILD_GETTEXT=true
+            export BUILD_GLIB=true
+            export BUILD_FFI=true
+        fi
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="${CFLAGS}"
