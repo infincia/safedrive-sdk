@@ -19,7 +19,7 @@ hyper = { version = "^0.10" , default-features = false }
 serde = "^1.0"
 serde_json = "^1.0"
 serde_derive = "^1.0"
-bip39 = "*"
+bip39 = "^0.3.0-alpha.2"
 rand = "*"
 log = "*"
 simplelog = "*"
