@@ -91,7 +91,7 @@ impl From<KeyringError> for KeychainError {
 pub enum CryptoError {
     KeyInvalid,
     KeyCorrupted,
-    RecoveryPhraseInvalid(Box<std::error::Error + Send + Sync>),
+    RecoveryPhraseInvalid(Box<std::error::Error + Send>),
     RecoveryPhraseIncorrect,
     KeyGenerationFailed,
     KeyWrapFailed,
@@ -188,12 +188,12 @@ impl From<Bip39Error> for CryptoError {
 #[derive(Debug)]
 pub enum SDError {
     Internal(String),
-    IO(Box<std::error::Error + Send + Sync>),
-    KeychainError(Box<std::error::Error + Send + Sync>),
-    RequestFailure(Box<std::error::Error + Send + Sync>),
-    NetworkFailure(Box<std::error::Error + Send + Sync>),
+    IO(Box<std::error::Error + Send>),
+    KeychainError(Box<std::error::Error + Send>),
+    RequestFailure(Box<std::error::Error + Send>),
+    NetworkFailure(Box<std::error::Error + Send>),
     ServiceUnavailable,
-    Conflict(Box<std::error::Error + Send + Sync>),
+    Conflict(Box<std::error::Error + Send>),
     BlockMissing,
     SessionMissing,
     BlockUnreadable,
@@ -204,7 +204,7 @@ pub enum SDError {
     Authentication,
     UnicodeError,
     TokenExpired,
-    CryptoError(Box<std::error::Error + Send + Sync>),
+    CryptoError(Box<std::error::Error + Send>),
     SyncAlreadyInProgress,
     RestoreAlreadyInProgress,
     ExceededRetries(u64),
@@ -383,8 +383,8 @@ impl From<::serde_json::Error> for SDError {
 #[derive(Debug)]
 pub enum SDAPIError {
     Internal(String),
-    IO(Box<std::error::Error + Send + Sync>),
-    RequestFailed(Box<std::error::Error + Send + Sync>),
+    IO(Box<std::error::Error + Send>),
+    RequestFailed(Box<std::error::Error + Send>),
     NetworkFailure,
     ServiceUnavailable,
     Authentication,
