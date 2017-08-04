@@ -2,7 +2,6 @@ use std;
 
 /// external crate imports
 
-use bip39::Bip39Error;
 use rustc_serialize::hex::FromHexError;
 
 use keyring::KeyringError;
@@ -172,15 +171,16 @@ impl From<DecoderError> for CryptoError {
     }
 }
 
-impl From<Bip39Error> for CryptoError {
-    fn from(e: Bip39Error) -> CryptoError {
-        match e {
-            Bip39Error::InvalidChecksum => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
-            Bip39Error::EntropyUnavailable(_) => CryptoError::KeyGenerationFailed,
-            Bip39Error::InvalidKeysize => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
-            Bip39Error::InvalidWordLength => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
-            Bip39Error::InvalidWord => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
-            Bip39Error::LanguageUnavailable => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+impl From<::bip39::Error> for CryptoError {
+    fn from(e: ::bip39::Error) -> CryptoError {
+        match *e.kind() {
+            ::bip39::ErrorKind::Msg(_) => CryptoError::KeyInvalid,
+            ::bip39::ErrorKind::InvalidChecksum => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            ::bip39::ErrorKind::EntropyUnavailable(_) => CryptoError::KeyGenerationFailed,
+            ::bip39::ErrorKind::InvalidKeysize => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            ::bip39::ErrorKind::InvalidWordLength => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            ::bip39::ErrorKind::InvalidWord => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            ::bip39::ErrorKind::LanguageUnavailable => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
         }
     }
 }

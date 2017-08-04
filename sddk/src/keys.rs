@@ -1,7 +1,7 @@
 
 /// external crate imports
 
-use bip39::{Bip39, Language};
+use bip39::{Mnemonic, Language};
 use rustc_serialize::hex::{ToHex, FromHex};
 use reed_solomon::Encoder as RSEncoder;
 use reed_solomon::Decoder as RSDecoder;
@@ -76,9 +76,9 @@ pub struct WrappedKeyset {
 impl WrappedKeyset {
     pub fn new() -> Result<WrappedKeyset, CryptoError> {
         /// generate a recovery phrase that will be used to encrypt the master key
-        let mnemonic_keytype = ::bip39::KeyType::Key128;
-        let mnemonic = Bip39::new(&mnemonic_keytype, Language::English, "")?;
-        let recovery_phrase = { mnemonic.mnemonic.clone() };
+        let mnemonic_type = ::bip39::MnemonicType::Type12Words;
+        let mnemonic = Mnemonic::new(mnemonic_type, Language::English, "")?;
+        let recovery_phrase = mnemonic.get_string();
         let recovery_key = Key::from(mnemonic);
 
         /// generate a master key and encrypt it with the recovery phrase and static nonce
@@ -119,7 +119,7 @@ impl WrappedKeyset {
     }
 
     pub fn to_keyset(&self, phrase: &str) -> Result<Keyset, CryptoError> {
-        let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string())?;
+        let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string())?;
         let recovery_key = Key::from(mnemonic);
         let master_key = self.master.to_key(&recovery_key, None)?;
         let main_key = self.main.to_key(&master_key, None)?;
@@ -333,8 +333,10 @@ impl Key {
         }
     }
 
-    fn from(recovery_phrase: Bip39) -> Key {
-        let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(recovery_phrase.seed.as_ref());
+    fn from(recovery_phrase: Mnemonic) -> Key {
+        let seed = recovery_phrase.as_seed();
+
+        let recovery_key = ::sodiumoxide::crypto::hash::sha256::hash(seed.as_ref());
         Key {
             bytes: recovery_key.as_ref().to_vec(),
             key_type: KeyType::Recovery,
