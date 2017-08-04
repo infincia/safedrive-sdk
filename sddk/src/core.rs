@@ -674,7 +674,7 @@ pub fn sync<B, I, P>(token: &Token,
                     SyncStatus::Err(err) => return Err(err),
                 };
             },
-            Err(e) => {
+            Err(_) => {
                 debug!("sync thread has disconnected, continuing");
 
                 break;
@@ -719,7 +719,7 @@ pub fn restore<B, I, P>(token: &Token,
                     SyncStatus::Err(err) => return Err(err),
                 };
             },
-            Err(e) => {
+            Err(_) => {
                 debug!("restore thread has disconnected, continuing");
 
                 break;
