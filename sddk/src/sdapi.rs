@@ -326,21 +326,23 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
 
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(agent);
-    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(agent);
+        r.json(&endpoint)?;
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -394,20 +396,21 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(agent);
-    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(agent);
+        r.json(&endpoint)?;
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -459,20 +462,21 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
     let endpoint = APIEndpoint::UnregisterClient;
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(agent);
-    r.header(SDAuthToken(token.token.to_owned()));
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(agent);
+        r.header(SDAuthToken(token.token.to_owned()));
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -524,20 +528,21 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(agent);
-    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(agent);
+        r.json(&endpoint)?;
+
         let request = r.build();
 
 
@@ -587,21 +592,22 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
     let endpoint = APIEndpoint::AccountStatus;
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -653,21 +659,22 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
     let endpoint = APIEndpoint::AccountDetails;
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -725,22 +732,23 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
-    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+        r.json(&endpoint)?;
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -794,21 +802,22 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
     let endpoint = APIEndpoint::ReadFolders;
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
 
@@ -863,22 +872,23 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
-    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+        r.json(&endpoint)?;
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -937,22 +947,23 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
-    r.json(&endpoint)?;
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+        r.json(&endpoint)?;
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1004,21 +1015,22 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1072,21 +1084,22 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1144,21 +1157,22 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1291,22 +1305,23 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1366,21 +1381,22 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1432,21 +1448,22 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1501,21 +1518,22 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
@@ -1649,21 +1667,22 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
     };
 
     let user_agent = &**USER_AGENT.read();
-    let agent = UserAgent(user_agent.to_owned());
-
-    let mut c = ClientBuilder::new().unwrap();
-    let client = c.build().unwrap();
-
-    let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
-
-    r.header(::reqwest::header::Connection::close());
-    r.header(SDAuthToken(token.token.to_owned()));
-    r.header(agent);
 
     let retries: u8 = 3;
     let mut retries_left: u8 = retries;
 
     loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(SDAuthToken(token.token.to_owned()));
+        r.header(agent);
+
         let request = r.build();
 
         let failed_count = retries - retries_left;
