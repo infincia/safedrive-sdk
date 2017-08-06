@@ -1252,49 +1252,31 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, s
 
     r.body(progress);
 
-    let retries: u8 = 3;
-    let mut retries_left: u8 = retries;
+    let request = r.build();
 
-    loop {
-        let request = r.build();
+    trace!("sending request");
+    let mut result = client.execute(request)?;
+    trace!("response received");
+    let mut response = String::new();
+    trace!("reading response");
+    result.read_to_string(&mut response)?;
 
-        let failed_count = retries - retries_left;
-        let mut rng = ::rand::thread_rng();
-        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
-
-        if failed_count >= 1 {
-            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
-            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
-            thread::sleep(delay);
-        }
-
-        trace!("sending request");
-        let mut result = client.execute(request)?;
-        trace!("response received");
-        let mut response = String::new();
-        trace!("reading response");
-        result.read_to_string(&mut response)?;
-
-        match result.status() {
-            ::reqwest::StatusCode::Ok => return Ok(()),
-            ::reqwest::StatusCode::Created => return Ok(()),
-            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            ::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message));
-            },
-            ::reqwest::StatusCode::ServiceUnavailable => {
-                retries_left = retries_left - 1;
-                if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable);
-                }
-            },
-            _ => {
-                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
-                                                        result.status(),
-                                                        &response)))
-            },
-        }
+    match result.status() {
+        ::reqwest::StatusCode::Ok => return Ok(()),
+        ::reqwest::StatusCode::Created => return Ok(()),
+        ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        ::reqwest::StatusCode::BadRequest => {
+            let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
+            return Err(SDAPIError::Internal(error.message));
+        },
+        ::reqwest::StatusCode::ServiceUnavailable => {
+            return Err(SDAPIError::ServiceUnavailable);
+        },
+        _ => {
+            return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                    result.status(),
+                                                    &response)))
+        },
     }
 }
 
@@ -1610,53 +1592,35 @@ pub fn write_blocks<T>(token: &Token, session: &str, blocks: &[T], progress: Ban
 
     r.body(progress);
 
-    let retries: u8 = 3;
-    let mut retries_left: u8 = retries;
+    let request = r.build();
 
-    loop {
-        let request = r.build();
+    trace!("sending request");
+    let mut result = client.execute(request)?;
+    trace!("response received");
+    let mut response = String::new();
+    trace!("reading response");
+    result.read_to_string(&mut response)?;
 
-        let failed_count = retries - retries_left;
-        let mut rng = ::rand::thread_rng();
-        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+    trace!("response: {}", response);
 
-        if failed_count >= 1 {
-            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
-            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
-            thread::sleep(delay);
-        }
-
-        trace!("sending request");
-        let mut result = client.execute(request)?;
-        trace!("response received");
-        let mut response = String::new();
-        trace!("reading response");
-        result.read_to_string(&mut response)?;
-
-        trace!("response: {}", response);
-
-        match result.status() {
-            ::reqwest::StatusCode::Ok | ::reqwest::StatusCode::Created => {
-                let missing: Vec<String> = ::serde_json::from_str(&response)?;
-                return Ok(missing);
-            },
-            ::reqwest::StatusCode::BadRequest => {
-                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
-                return Err(SDAPIError::Internal(error.message));
-            },
-            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
-            ::reqwest::StatusCode::ServiceUnavailable => {
-                retries_left = retries_left - 1;
-                if retries_left <= 0 {
-                    return Err(SDAPIError::ServiceUnavailable);
-                }
-            },
-            _ => {
-                return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
-                                                        result.status(),
-                                                        &response)))
-            },
-        }
+    match result.status() {
+        ::reqwest::StatusCode::Ok | ::reqwest::StatusCode::Created => {
+            let missing: Vec<String> = ::serde_json::from_str(&response)?;
+            return Ok(missing);
+        },
+        ::reqwest::StatusCode::BadRequest => {
+            let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
+            return Err(SDAPIError::Internal(error.message));
+        },
+        ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+        ::reqwest::StatusCode::ServiceUnavailable => {
+            return Err(SDAPIError::ServiceUnavailable);
+        },
+        _ => {
+            return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}",
+                                                    result.status(),
+                                                    &response)))
+        },
     }
 }
 
