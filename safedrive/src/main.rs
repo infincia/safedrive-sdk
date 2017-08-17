@@ -24,7 +24,7 @@ use std::thread;
 #[cfg(target_os = "linux")]
 use std::env;
 
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 use std::collections::HashMap;
 
@@ -405,7 +405,7 @@ fn main() {
             .parse()
             .expect("Expected a number");
 
-        match doctor(uid, gid) {
+        match doctor(uid, gid, &app_directory) {
             Ok(()) => {},
             Err(err) => {
                 error!("{}", err);
@@ -1441,7 +1441,59 @@ pub fn find_unique_client_id(username: &str) -> Option<String> {
     unique_client_id
 }
 
-pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
+pub fn doctor(uid: u32, gid: u32, storage_dir: &Path) -> Result<(), SDError> {
+    // check app dir and fix permissions if needed
+
+    match std::fs::create_dir_all(storage_dir) {
+        Ok(()) => {},
+        Err(err) => {
+            return Err(SDError::Internal(format!("failed to create directory '{}': {}", storage_dir.display(), err)))
+        },
+    }
+
+    #[cfg(target_os = "macos")]
+    unsafe {
+        let p: &str = storage_dir.to_str().expect("failed to get path");
+
+        let s: CString = CString::new(p).expect("failed to get path");
+
+        match ::libc::chown(s.into_raw(), uid, gid) {
+            0 => {},
+            _ => {
+                return Err(SDError::Internal(format!("failed to set permissions on directory '{}'", storage_dir.display())))
+            }
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    unsafe {
+        let p: &str = storage_dir.to_str().expect("failed to get path");
+
+        let s: CString = CString::new(p).expect("failed to get path");
+
+        match ::libc::chown(s.into_raw(), uid, gid) {
+            0 => {},
+            _ => {
+                return Err(SDError::Internal(format!("failed to set permissions on directory '{}'", storage_dir.display())))
+            }
+        }
+    }
+
+    #[cfg(target_os = "windows")] {
+        //let p: &str = storage_dir.to_str().expect("failed to get path");
+
+        //let s: CString = CString::new(p).expect("failed to get path");
+
+        Ok(())
+    }
+
+
+
+
+
+
+    // check binary path and fix permissions if needed
+
     let binary_path: PathBuf;
 
     if cfg!(target_os="windows") {
@@ -1465,11 +1517,9 @@ pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
         let s: CString = CString::new(p).expect("failed to get path");
 
         match ::libc::chown(s.into_raw(), uid, gid) {
-            0 => {
-                Ok(())
-            },
+            0 => {},
             _ => {
-                Err(SDError::Internal(format!("failed to set permissions on directory '{}'", binary_path.display())))
+                return Err(SDError::Internal(format!("failed to set permissions on directory '{}'", binary_path.display())))
             }
         }
     }
@@ -1481,11 +1531,9 @@ pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
         let s: CString = CString::new(p).expect("failed to get path");
 
         match ::libc::chown(s.into_raw(), uid, gid) {
-            0 => {
-                Ok(())
-            },
+            0 => {},
             _ => {
-                Err(SDError::Internal(format!("failed to set permissions on directory '{}'", binary_path.display())))
+                return Err(SDError::Internal(format!("failed to set permissions on directory '{}'", binary_path.display())))
             }
         }
     }
@@ -1497,4 +1545,7 @@ pub fn doctor(uid: u32, gid: u32) -> Result<(), SDError> {
 
         Ok(())
     }
+
+    Ok(())
+
 }
