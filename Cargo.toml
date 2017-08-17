@@ -5,5 +5,5 @@ members = ["builder", "sddk", "safedrive", "askpass"]
 debug = true
 
 [replace]
-"security-framework:0.1.15" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
-"security-framework-sys:0.1.15" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
+"security-framework:0.1.16" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
+"security-framework-sys:0.1.16" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
