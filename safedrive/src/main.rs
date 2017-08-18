@@ -1484,7 +1484,6 @@ pub fn doctor(uid: u32, gid: u32, storage_dir: &Path) -> Result<(), SDError> {
 
         //let s: CString = CString::new(p).expect("failed to get path");
 
-        Ok(())
     }
 
 
@@ -1542,8 +1541,6 @@ pub fn doctor(uid: u32, gid: u32, storage_dir: &Path) -> Result<(), SDError> {
         //let p: &str = &binary_path.to_str().expect("failed to get path");
 
         //let s: CString = CString::new(p).expect("failed to get path");
-
-        Ok(())
     }
 
     Ok(())
