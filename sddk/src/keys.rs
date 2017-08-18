@@ -573,7 +573,7 @@ fn key_unwrap_test() {
 fn key_unwrap_lowercase_master_generated_by_sdk_00318_test() {
     let phrase = "plastic quote hotel coyote exercise stairs runway protect visit lion arch truth";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let wrapped_master_hex = "f4814a238215f659585052a6d21cba789e60c3fdcb7ae095641366857aae59f4a374b564e24d41a1619ec13118873621";
@@ -592,7 +592,7 @@ fn key_unwrap_lowercase_master_generated_by_sdk_00318_test() {
 fn key_unwrap_uppercase_master_generated_by_sdk_00318_test() {
     let phrase = "plastic quote hotel coyote exercise stairs runway protect visit lion arch truth";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let wrapped_master_hex = "F4814A238215F659585052A6D21CBA789E60C3FDCB7AE095641366857AAE59F4A374B564E24D41A1619EC13118873621";
@@ -611,7 +611,7 @@ fn key_unwrap_uppercase_master_generated_by_sdk_00318_test() {
 fn key_unwrap_uppercase_master_generated_by_sdk_00600_test() {
     let phrase = "special cheap live sing proud ethics public you apology outside empty person";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let wrapped_master_hex = "CAEC81365F37D055C53545E74C34A35C8031D6E6810BFEEBBC119C7C34892176BBF19AE24C322EF6F9B385B1C5B01640C0CFFAA2AA4827DF9E054E12E73251C2F7D7713C778A2D14BACAF587B01EF2BD51D3A883D4CBA0C6DC0E6E702DB7568F";
@@ -634,7 +634,7 @@ fn key_unwrap_uppercase_master_generated_by_sdk_00600_test() {
 fn key_unwrap_lowercase_master_generated_by_sdk_00600_test() {
     let phrase = "special cheap live sing proud ethics public you apology outside empty person";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let wrapped_master_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
@@ -657,7 +657,7 @@ fn key_unwrap_lowercase_master_generated_by_sdk_00600_test() {
 fn key_unwrap_lowercase_keyset_generated_by_sdk_00600_test() {
     let phrase = "special cheap live sing proud ethics public you apology outside empty person";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let wrapped_master_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
@@ -732,7 +732,7 @@ fn key_unwrap_lowercase_keyset_generated_by_sdk_00600_test() {
 fn key_unwrap_corrupt_hex_generated_by_sdk_00600_test() {
     let phrase = "special cheap live sing proud ethics public you apology outside empty person";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let original_master_wrapped_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
@@ -771,7 +771,7 @@ fn key_unwrap_corrupt_hex_generated_by_sdk_00600_test() {
 fn key_unwrap_corrupt_ecc_generated_by_sdk_00600_test() {
     let phrase = "special cheap live sing proud ethics public you apology outside empty person";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let original_master_wrapped_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
@@ -811,7 +811,7 @@ fn key_unwrap_corrupt_ecc_generated_by_sdk_00600_test() {
 fn key_unwrap_corrupt_ecc_too_damaged_generated_by_sdk_00600_test() {
     let phrase = "special cheap live sing proud ethics public you apology outside empty person";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let original_master_wrapped_hex = "caec81365f37d055c53545e74c34a35c8031d6e6810bfeebbc119c7c34892176bbf19ae24c322ef6f9b385b1c5b01640c0cffaa2aa4827df9e054e12e73251c2f7d7713c778a2d14bacaf587b01ef2bd51d3a883d4cba0c6dc0e6e702db7568f";
@@ -851,7 +851,7 @@ fn key_unwrap_corrupt_ecc_too_damaged_generated_by_sdk_00600_test() {
 fn key_unwrap_failing_master_test() {
     let phrase = "hockey increase universe rib stone nothing someone sentence click game fresh vessel";
 
-    let mnemonic = Bip39::from_mnemonic(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
+    let mnemonic = Mnemonic::from_string(phrase.to_string(), Language::English, "".to_string()).expect("failed to parse bip39 phrase");
     let recovery_key = Key::from(mnemonic);
 
     let wrapped_master_hex = "9e1215400656d9c56cfe62b03d0b949fed1200bad51fc23477fb10623a2f6b767deb3553e68de9dd0141bf14e58fa890";
