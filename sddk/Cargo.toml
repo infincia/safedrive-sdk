@@ -68,6 +68,7 @@ doctest = false
 [features]
 default = []
 
+network_tests = []
 locking = ["scopeguard"]
 sessionfs = ["fuse_mt"]
 lint = ["clippy"]

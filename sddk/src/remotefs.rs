@@ -230,6 +230,7 @@ impl<'a> RemoteFS<'a> {
 }
 
 #[cfg(test)]
+#[cfg(feature = "network_tests")]
 mod remote_fs_test {
     use super::*;
     use rand;
