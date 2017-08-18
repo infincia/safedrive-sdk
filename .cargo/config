@@ -4,14 +4,10 @@
 
 
 [target.x86_64-unknown-linux-gnu.sodium]
-[target.x86_64-unknown-linux-gnu.ssh2]
-[target.x86_64-unknown-linux-gnu.dbus-1]
 
 
 
 [target.i686-unknown-linux-gnu.sodium]
-[target.i686-unknown-linux-gnu.ssh2]
-[target.i686-unknown-linux-gnu.dbus-1]
 
 
 
