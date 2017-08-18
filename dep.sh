@@ -524,7 +524,7 @@ else
     echo "Not set to build Rsync"
 fi
 
-if [ ${STATIC_SSHFS} = true ]; then
+if [ ${SSHFS_STATIC} = true ]; then
     cp -a ${STATIC_DEP_PREFIX}/${TARGET}/io.safedrive.SafeDrive.sshfs ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs
 elif [ ${BUILD_SSHFS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
