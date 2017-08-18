@@ -10,6 +10,11 @@ fn main() {
 
     let build_prefix = std::env::var("BUILD_PREFIX").unwrap();
 
+    if target.contains("gnu") {
+        println!("cargo:rustc-link-search=native=/usr/lib");
+        println!("cargo:include=/usr/include");
+    }
+
     println!("cargo:rustc-link-search=native={}/lib", build_prefix);
     println!("cargo:include={}/include", build_prefix);
 
