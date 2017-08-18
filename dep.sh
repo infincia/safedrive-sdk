@@ -147,20 +147,20 @@ case ${TARGET} in
         export CFLAGS="${CFLAGS}"
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
-        export BUILD_EXPAT=true
-        export BUILD_DBUS=true
-        export BUILD_LIBRESSL=true
-        export BUILD_LIBSSH2=true
+        export BUILD_EXPAT=false
+        export BUILD_DBUS=false
+        export BUILD_LIBRESSL=false
+        export BUILD_LIBSSH2=false
         ;;
     i686-unknown-linux-gnu)
         export CFLAGS="${CFLAGS} -m32"
         export CPPFLAGS="${CPPFLAGS} -m32"
         export LDFLAGS="${LDFLAGS}"
         export PKG_CONFIG_ALLOW_CROSS=1
-        export BUILD_EXPAT=true
-        export BUILD_DBUS=true
-        export BUILD_LIBRESSL=true
-        export BUILD_LIBSSH2=true
+        export BUILD_EXPAT=false
+        export BUILD_DBUS=false
+        export BUILD_LIBRESSL=false
+        export BUILD_LIBSSH2=false
         ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -I/usr/include"
