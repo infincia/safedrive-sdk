@@ -19,6 +19,10 @@ addons:
       - musl-tools
       - musl-dev
       - linux-headers-generic
+      - libssh2-1-dev
+      - libdbus-1-dev
+      - libssl-dev
+
 
 matrix:
   include:
