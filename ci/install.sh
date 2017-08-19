@@ -4,6 +4,8 @@
 
 set -ex
 
+export PATH=${HOME}/.cargo/bin:${PATH}
+
 . $(dirname $0)/utils.sh
 
 RUST_VER_FILE=$(dirname $0)/../rustver.conf
