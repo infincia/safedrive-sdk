@@ -525,7 +525,7 @@ else
 fi
 
 if [ ${SSHFS_STATIC} = true ]; then
-    cp -a ${STATIC_DEP_PREFIX}/${TARGET}/io.safedrive.SafeDrive.sshfs ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs
+    cp -a ${STATIC_DEP_PREFIX}/${TARGET}/io.safedrive.SafeDrive.sshfs ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs || true
 elif [ ${BUILD_SSHFS} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
         echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
