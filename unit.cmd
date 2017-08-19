@@ -6,6 +6,7 @@ set PATH="C:\Users\%USER%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\G
 
 
 set PLATFORM=%1
+set CARGO_INCREMENTAL=1
 
 IF "!PLATFORM!"=="x64" (
     set TARGET=x86_64-pc-windows-msvc
