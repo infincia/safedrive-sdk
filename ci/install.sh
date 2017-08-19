@@ -36,6 +36,9 @@ install_rustup() {
 
     echo "Using Rust ${RUST_VER}"
     curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=${RUST_VER}
+    if [ -z "${TARGET}" ]; then
+        export TARGET=`rustup show | awk 'match($0, /Default host: ([0-9a-zA-Z\_]).+/) { ver = substr($3, RSTART, RLENGTH); print ver;}'`
+    fi
     rustup target add ${TARGET} || true
     rustc -V
     cargo -V
