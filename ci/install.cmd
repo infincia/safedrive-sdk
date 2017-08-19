@@ -2,6 +2,9 @@
 
 setlocal enabledelayedexpansion
 
+set PATH="C:\Users\%USER%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\7-Zip;C:\Program Files\WinAnt;%PATH%;"
+
+
 set PLATFORM=%1
 set CONFIGURATION=%2
 set TOOLSET=%3
@@ -26,7 +29,6 @@ if defined VS call %VS% %ARCH%
 if defined ESCRIPT call %ESCRIPT%
 curl -sSf -o rustup-init.exe https://win.rustup.rs
 rustup-init.exe --default-host %TARGET% -y
-set PATH=C:\Users\%USER%\.cargo\bin;%PATH%;
 rustc -Vv
 cargo -V
 if not exist "C:\Users\%USER%\.cargo\bin\cheddar.exe" cargo install moz-cheddar
