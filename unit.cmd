@@ -29,6 +29,8 @@ IF "!PLATFORM!"=="Win32" (
 if defined VS call %VS% %ARCH%
 if defined ESCRIPT call %ESCRIPT%
 
+rustup target add !TARGET! > NUL 2>&1
+
 cargo run -p builder -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! test || goto :error
 
 goto :done
