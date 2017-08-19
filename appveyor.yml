@@ -6,34 +6,17 @@ environment:
     TEST_PASSWORD:
       secure: 0KxiBlc00CJbHhy1jkz4Yg==
   matrix:
-    - TARGET: i686-pc-windows-msvc
-      PLATFORM: Win32
-      ARCH: x86
-      VS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    - PLATFORM: Win32
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: v141_xp
-      ESCRIPT: v141_xp.bat
-      CONFIGURATION: Release
-    - TARGET: x86_64-pc-windows-msvc
-      PLATFORM: x64
-      ARCH: x64
-      VS: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat
+    - PLATFORM: x64
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: v141_xp
-      ESCRIPT: v141_xp64.bat
-      CONFIGURATION: Release
 
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
 install:
-  - if defined VS call "%VS%" %ARCH%
-  - if defined ESCRIPT call "%ESCRIPT%"
-  - curl -sSf -o rustup-init.exe https://win.rustup.rs
-  - rustup-init.exe --default-host %TARGET% -y
-  - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin;
-  - rustc -Vv
-  - cargo -V
-  - if not exist "%homepath%\.cargo\bin\cheddar.exe" cargo install moz-cheddar
+  - pushd ci
+  - install.cmd %PLATFORM%
+  - popd
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
@@ -41,10 +24,10 @@ install:
 build: false
 
 test_script:
-  - unit.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
+  - unit.cmd %PLATFORM%
 
 build_script:
-  - release.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
+  - release.cmd %PLATFORM%
 
 before_deploy:
   - cd dist\%TARGET%\%TOOLSET%\%CONFIGURATION%

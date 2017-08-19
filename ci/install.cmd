@@ -6,8 +6,6 @@ set PATH="C:\Users\%USER%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\G
 
 
 set PLATFORM=%1
-set CONFIGURATION=%2
-set TOOLSET=%3
 
 IF "!PLATFORM!"=="x64" (
     set TARGET=x86_64-pc-windows-msvc
@@ -15,6 +13,7 @@ IF "!PLATFORM!"=="x64" (
     set VS="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
     set TOOLSET=v141_xp
     set ESCRIPT=v141_xp64.bat
+    set CONFIGURATION=Release
 )
 
 IF "!PLATFORM!"=="Win32" (
@@ -23,6 +22,7 @@ IF "!PLATFORM!"=="Win32" (
     set VS="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"
     set TOOLSET=v141_xp
     set ESCRIPT=v141_xp.bat
+    set CONFIGURATION=Release
 )
 
 if defined VS call %VS% %ARCH%
