@@ -20,8 +20,7 @@ export CARGO_INCREMENTAL=1
 export CFLAGS=""
 export CPPFLAGS=""
 export LDFLAGS=""
-export OPENSSL_DIR=${BUILD_PREFIX}
-export DEP_OPENSSL_LIBRESSL=1
+
 
 export OSX_VERSION_MIN="10.9"
 export OSX_CPU_ARCH="core2"
@@ -33,6 +32,8 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS} ${MAC_ARGS}"
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export RUSTFLAGS="${RUSTFLAGS} -C link-arg=-fapplication-extension -C link-arg=-mmacosx-version-min=${OSX_VERSION_MIN}"
+        export OPENSSL_DIR=${BUILD_PREFIX}
+        export DEP_OPENSSL_LIBRESSL=1
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="${CFLAGS}"
