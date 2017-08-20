@@ -12,9 +12,7 @@ export DIST_PREFIX=${PWD}/target/${TARGET}/release
 mk_tarball() {
     # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
     TAG=$(git describe)
-    pushd ${DIST_PREFIX}
-    tar -zcf safedrive-cli-${TAG}-${TARGET}.tar.gz safedrive
-    popd
+    tar -zcf safedrive-cli-${TAG}-${TARGET}.tar.gz ${DIST_PREFIX}/safedrive
 }
 
 # Package your artifacts in a .deb file
