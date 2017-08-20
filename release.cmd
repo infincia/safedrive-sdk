@@ -2,7 +2,7 @@
 
 setlocal enabledelayedexpansion
 
-set PATH="C:\Users\%USER%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\7-Zip;C:\Program Files\WinAnt;%PATH%;"
+set PATH=%USERPROFILE%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\7-Zip;C:\Program Files\WinAnt;%PATH%
 
 
 set PLATFORM=%1
