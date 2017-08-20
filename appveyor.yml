@@ -15,6 +15,7 @@ environment:
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
 install:
   - pushd ci
+  - env.cmd %PLATFORM%
   - install.cmd %PLATFORM%
   - popd
 
