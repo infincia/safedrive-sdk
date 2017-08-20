@@ -26,9 +26,6 @@ IF "!PLATFORM!"=="Win32" (
     set CONFIGURATION=Release
 )
 
-if defined VS call %VS% %ARCH%
-if defined ESCRIPT call %ESCRIPT%
-
 rustup target add !TARGET! > NUL 2>&1
 
 cargo run -p builder -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! build || goto :error
