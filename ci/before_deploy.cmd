@@ -2,4 +2,4 @@
 set /p TAG=<__query.tmp
 del __query.tmp
 
-7z a safedrive-sdk-%%TAG%%-%TARGET%.zip target\%TARGET%\safedrive
+"C:\Program Files\7-Zip\7z" a safedrive-cli-%%TAG%%-%TARGET%.zip target\%TARGET%\safedrive
