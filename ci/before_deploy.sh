@@ -6,11 +6,14 @@ set -ex
 
 . $(dirname $0)/utils.sh
 
+
+export DIST_PREFIX=${PWD}/target/${TARGET}/release
+
 mk_tarball() {
     # release tarball will look like 'rust-everywhere-v1.2.3-x86_64-unknown-linux-gnu.tar.gz'
-    cp include/sddk.h dist/${TARGET}/
-    pushd dist/${TARGET}/
-    tar -zcf ../${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz *
+    TAG=$(git describe)
+    pushd ${DIST_PREFIX}/io.safedrive.SafeDrive.cli
+    tar -zcf ${PROJECT_NAME}-${TAG}-${TARGET}.tar.gz ${DIST_PREFIX}/io.safedrive.SafeDrive.cli
     popd
 }
 
@@ -22,8 +25,7 @@ mk_tarball() {
 # fully conform to Debian packaging guideliens (`lintian` raises a few warnings/errors)
 mk_deb() {
     # TODO update this part to package the artifacts that make sense for your project
-    dobin dist/${TARGET}/bin/safedrive
-    dobin dist/${TARGET}/bin/safedrived
+    dobin ${DIST_PREFIX}/io.safedrive.SafeDrive.cli
     case ${TARGET} in
         i686-unknown-linux-musl|x86_64-unknown-linux-musl)
             ;;
@@ -47,17 +49,20 @@ main() {
 
             mk_deb
 
+            TAG=$(git describe)
+
+
             mkdir -p $dtd/debian/DEBIAN
             cat >$dtd/debian/DEBIAN/control <<EOF
 Package: ${PROJECT_NAME}
-Version: ${TRAVIS_TAG#v}
+Version: ${TAG#v}
 Architecture: $(architecture ${TARGET})
 Maintainer: ${DEB_MAINTAINER}
 Description: ${DEB_DESCRIPTION}
 EOF
 
             fakeroot dpkg-deb --build $dtd/debian
-            mv $dtd/debian.deb ${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.deb
+            mv $dtd/debian.deb ${PROJECT_NAME}-${TAG}-${TARGET}.deb
             rm -r $dtd
         fi
     fi
