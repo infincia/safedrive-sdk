@@ -31,7 +31,7 @@ rustup target add !TARGET! > NUL 2>&1
 if defined VS call %VS% %ARCH%
 if defined ESCRIPT call %ESCRIPT%
 
-cargo run -p builder -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! test || goto :error
+cargo run -p builder --target !TARGET! -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! test || goto :error
 
 goto :done
 
