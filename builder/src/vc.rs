@@ -37,10 +37,10 @@ impl VC {
     }
 
     pub fn load_env(&self) -> Result<(), BuildError>  {
-        info!("running vcvars for: {}", &self.platform.name());
+        info!("running vcvars for: {}", &self.platform.arch());
 
         let exit = Exec::cmd(r#"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat"#)
-            .arg(&self.platform.name())
+            .arg(&self.platform.arch())
             .join()?;
 
 
