@@ -14,10 +14,8 @@ environment:
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
 install:
-  - pushd ci
-  - env.cmd %PLATFORM%
-  - install.cmd %PLATFORM%
-  - popd
+  - ci\env.cmd %PLATFORM%
+  - ci\install.cmd %PLATFORM%
 
 # 'cargo test' takes care of building for us, so disable Appveyor's build stage. This prevents
 # the "directory does not contain a project or solution file" error.
