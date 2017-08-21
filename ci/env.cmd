@@ -25,4 +25,4 @@ IF "!PLATFORM!"=="Win32" (
 )
 
 if defined VS call %VS% %ARCH%
-if defined ESCRIPT call "%ESCRIPT%"
+if defined ESCRIPT call %ESCRIPT%
