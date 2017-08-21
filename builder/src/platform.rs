@@ -47,6 +47,17 @@ impl Platform {
             }
         }
     }
+
+    pub fn escript(&self) -> &str {
+        match *self {
+            Platform::i686 => {
+                "v141_xp.bat"
+            },
+            Platform::x86_64 => {
+                "v141_xp64.bat"
+            }
+        }
+    }
 }
 
 impl AsRef<str> for Platform {

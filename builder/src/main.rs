@@ -29,6 +29,7 @@ mod msbuild;
 mod cmake;
 mod dir;
 mod library;
+mod vc;
 
 use error::BuildError;
 use platform::Platform;
@@ -143,6 +144,24 @@ fn main() {
         },
         Err(err) => {
             error!("{}", err);
+            std::process::exit(1);
+        }
+    }
+
+    let vc = ::vc::VC::new(platform);
+
+    match vc.load_env() {
+        Ok(()) => {},
+        Err(err) => {
+            error!("vcvars failed: {}", err);
+            std::process::exit(1);
+        }
+    }
+
+    match vc.load_escript() {
+        Ok(()) => {},
+        Err(err) => {
+            error!("escript failed: {}", err);
             std::process::exit(1);
         }
     }
