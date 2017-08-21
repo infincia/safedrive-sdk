@@ -37,6 +37,17 @@ impl Platform {
         }
     }
 
+    pub fn arch(&self) -> &str {
+        match *self {
+            Platform::i686 => {
+                "x86"
+            },
+            Platform::x86_64 => {
+                "x64"
+            }
+        }
+    }
+
     pub fn target(&self) -> &str {
         match *self {
             Platform::i686 => {
