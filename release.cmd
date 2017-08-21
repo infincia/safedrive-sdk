@@ -28,6 +28,9 @@ IF "!PLATFORM!"=="Win32" (
 
 rustup target add !TARGET! > NUL 2>&1
 
+if defined VS call %VS% %ARCH%
+if defined ESCRIPT call %ESCRIPT%
+
 cargo run -p builder -- --toolset !TOOLSET! --platform !PLATFORM! --configuration !CONFIGURATION! build || goto :error
 
 goto :done
