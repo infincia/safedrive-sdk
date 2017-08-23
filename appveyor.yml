@@ -28,10 +28,10 @@ install:
 build: false
 
 test_script:
-  - unit.cmd %PLATFORM% %TOOLSET% %CONFIGURATION%
+  - unit.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
 
 build_script:
-  - release.cmd %PLATFORM% %TOOLSET% %CONFIGURATION%
+  - release.cmd %PLATFORM% %CONFIGURATION% %TOOLSET%
 
 before_deploy:
   - 7z a %PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%PLATFORM%.zip target\%TARGET%\%CONFIGURATION%\safedrive.exe

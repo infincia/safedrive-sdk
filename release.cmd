@@ -6,8 +6,8 @@ set PATH=%USERPROFILE%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\Git\
 
 
 set PLATFORM=%1
-set TOOLSET=%2
-set CONFIGURATION=%3
+set CONFIGURATION=%2
+set TOOLSET=%3
 set CARGO_INCREMENTAL=1
 
 IF "!PLATFORM!"=="x64" (
