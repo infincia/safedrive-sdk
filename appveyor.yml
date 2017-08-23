@@ -1,6 +1,6 @@
 environment:
   global:
-    PROJECT_NAME: safedrive-sdk
+    PROJECT_NAME: safedrive-cli
     TEST_USER:
       secure: l9NGI3oeUceB/UpM5Bnz1GZmXu+Ffqn8VpY1QrY5vKMayVSMKLbu3dDd+JGRYpcd
     TEST_PASSWORD:
@@ -34,13 +34,11 @@ build_script:
   - release.cmd %PLATFORM% %TOOLSET% %CONFIGURATION%
 
 before_deploy:
-  - cd dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
-    # release zipfile will look like 'rust-everywhere-v1.2.3-x86_64-pc-windows-msvc'
-  - 7z a ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%-%TOOLSET%-%CONFIGURATION%.zip *
-  - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%TARGET%-%TOOLSET%-%CONFIGURATION%.zip
+  - 7z a %PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%PLATFORM%.zip target\%TARGET%\%CONFIGURATION%\safedrive.exe
+  - appveyor PushArtifact ../%PROJECT_NAME%-%APPVEYOR_REPO_TAG_NAME%-%PLATFORM%.zip
 
 deploy:
-  description: 'SafeDrive SDK'
+  description: 'SafeDrive CLI'
   # All the zipped artifacts will be deployed
   artifact: /.*\.zip/
   # TODO Regenerate this auth_token for your project, this one won't work for you. Here's how:
