@@ -7,9 +7,15 @@ environment:
       secure: 0KxiBlc00CJbHhy1jkz4Yg==
   matrix:
     - PLATFORM: Win32
+      TARGET: i686-pc-windows-msvc
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CONFIGURATION: Release
+      TOOLSET: v141_xp
     - PLATFORM: x64
+      TARGET: x86_64-pc-windows-msvc
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      CONFIGURATION: Release
+      TOOLSET: v141_xp
 
 # Install Rust and Cargo
 # (Based on from https://github.com/rust-lang/libc/blob/master/appveyor.yml)
@@ -22,10 +28,10 @@ install:
 build: false
 
 test_script:
-  - unit.cmd %PLATFORM%
+  - unit.cmd %PLATFORM% %TOOLSET% %CONFIGURATION%
 
 build_script:
-  - release.cmd %PLATFORM%
+  - release.cmd %PLATFORM% %TOOLSET% %CONFIGURATION%
 
 before_deploy:
   - cd dist\%TARGET%\%TOOLSET%\%CONFIGURATION%
