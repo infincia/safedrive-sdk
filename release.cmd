@@ -6,18 +6,16 @@ set PATH=%USERPROFILE%\.cargo\bin;C:\Program Files\Git\bin;C:\Program Files\Git\
 
 
 set PLATFORM=%1
+set TOOLSET=%2
+set CONFIGURATION=%3
 set CARGO_INCREMENTAL=1
 
 IF "!PLATFORM!"=="x64" (
     set TARGET=x86_64-pc-windows-msvc
-    set TOOLSET=v141_xp
-    set CONFIGURATION=Release
 )
 
 IF "!PLATFORM!"=="Win32" (
     set TARGET=i686-pc-windows-msvc
-    set TOOLSET=v141_xp
-    set CONFIGURATION=Release
 )
 
 rustup target add !TARGET! > NUL 2>&1
