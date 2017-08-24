@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use std::fs;
 
 /// external crate imports
-use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SharedLogger};
+use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SimpleLogger, SharedLogger};
 use log::LogLevelFilter;
 
 /// internal imports
@@ -189,7 +189,12 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
         Some(logger) => {
             logs.push(logger);
         },
-        None => {},
+        None => {
+            println!("WARNING: failed to initialize term logger");
+
+            let logger = SimpleLogger::new(log_level, LogConfig::default());
+            logs.push(logger);
+        },
     }
 
     let sdl = ::sdlog::SDLogger::new(log_level, LogConfig::default());
