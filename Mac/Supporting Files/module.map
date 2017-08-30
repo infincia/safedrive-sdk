@@ -1,5 +1,0 @@
-module SDDK {
-    umbrella header "../../include/sddk.h"
-    module * { export * }
-    export *
-}
