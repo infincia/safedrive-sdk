@@ -44,7 +44,7 @@
     <NMakeCleanCommandLine>cargo clean</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)$(Platform)\$(Configuration)\;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -53,17 +53,17 @@
     <NMakeCleanCommandLine>cargo clean</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>$(ProjectDir)$(Platform)\$(Configuration)\;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <BuildLog>
-      <Path>$(SolutionDir)$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>$(ProjectDir)..\$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <BuildLog>
-      <Path>$(SolutionDir)$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
+      <Path>$(ProjectDir)..\$(Platform)\$(Configuration)\$(MSBuildProjectName).log</Path>
     </BuildLog>
   </ItemDefinitionGroup>
   <ItemGroup>
