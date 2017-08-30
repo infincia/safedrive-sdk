@@ -71,7 +71,6 @@ export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
 export SSHFS_ARGS="--disable-dependency-tracking"
 export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I/usr/local/include/osxfuse -I/usr/local/include/osxfuse/fuse"
 export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0 -L/usr/local/lib"
-export SSHFS_STATIC=true
 
 export LIBRESSL_VER=2.5.5
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -113,6 +112,7 @@ export BUILD_GLIB=false
 export BUILD_OPENSSH=false
 export BUILD_RSYNC=false
 export BUILD_SSHFS=false
+export SSHFS_STATIC=false
 export BUILD_LIBRESSL=false
 export BUILD_FFI=false
 export BUILD_LIBSSH2=false
@@ -136,6 +136,7 @@ case ${TARGET} in
         export BUILD_SSHFS=false
         export BUILD_LIBRESSL=true
         export BUILD_LIBSSH2=true
+        export SSHFS_STATIC=true
         if [ ${BUILD_SSHFS} = true ]; then
             export BUILD_ICONV=true
             export BUILD_GETTEXT=true
