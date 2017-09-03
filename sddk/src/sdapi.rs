@@ -356,7 +356,16 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -424,7 +433,16 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -490,7 +508,16 @@ pub fn unregister_client<'a>(token: &Token) -> Result<(), SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -558,7 +585,16 @@ pub fn list_clients(email: &str, password: &str) -> Result<Vec<SoftwareClient>, 
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -621,7 +657,16 @@ pub fn account_status(token: &Token) -> Result<AccountStatus, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -688,7 +733,16 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -762,7 +816,16 @@ pub fn account_key(token: &Token, new_wrapped_keyset: &WrappedKeyset) -> Result<
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -832,7 +895,16 @@ pub fn read_folders(token: &Token) -> Result<Vec<RegisteredFolder>, SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -902,7 +974,16 @@ pub fn create_folder(token: &Token, path: &str, name: &str, encrypted: bool) -> 
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -977,7 +1058,16 @@ pub fn update_folder(token: &Token, path: &str, name: &str, syncing: bool, uniqu
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1044,7 +1134,16 @@ pub fn delete_folder(token: &Token, folder_id: u64) -> Result<(), SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1113,7 +1212,16 @@ pub fn read_sessions(token: &Token) -> Result<HashMap<String, HashMap<u64, Vec<S
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1186,7 +1294,16 @@ pub fn register_sync_session(token: &Token, folder_id: u64, name: &str, encrypte
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1255,7 +1372,12 @@ pub fn finish_sync_session<'a>(token: &Token, folder_id: u64, encrypted: bool, s
     let request = r.build();
 
     trace!("sending request");
-    let mut result = client.execute(request)?;
+    let mut result = match client.execute(request) {
+        Ok(result) => result,
+        Err(err) => {
+            return Err(SDAPIError::NetworkFailure);
+        }
+    };
     trace!("response received");
     let mut response = String::new();
     trace!("reading response");
@@ -1317,7 +1439,16 @@ pub fn read_session<'a>(token: &Token, folder_id: u64, name: &'a str, encrypted:
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
 
         match result.status() {
@@ -1392,7 +1523,16 @@ pub fn delete_session(token: &Token, session_id: u64) -> Result<(), SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1459,7 +1599,16 @@ pub fn delete_sessions(token: &Token, timestamp: i64) -> Result<(), SDAPIError> 
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1529,7 +1678,16 @@ pub fn check_block(token: &Token, name: &str) -> Result<bool, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
         let mut response = String::new();
         trace!("reading response");
@@ -1595,7 +1753,12 @@ pub fn write_blocks<T>(token: &Token, session: &str, blocks: &[T], progress: Ban
     let request = r.build();
 
     trace!("sending request");
-    let mut result = client.execute(request)?;
+    let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                return Err(SDAPIError::NetworkFailure);
+            }
+    };
     trace!("response received");
     let mut response = String::new();
     trace!("reading response");
@@ -1660,7 +1823,16 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
         }
 
         trace!("sending request");
-        let mut result = client.execute(request)?;
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
         trace!("response received");
 
         match result.status() {
