@@ -69,8 +69,8 @@ export OPENSSH_ARGS="--without-openssl --without-ssl-engine --with-sandbox=darwi
 export SSHFS_VER=2.9
 export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
 export SSHFS_ARGS="--disable-dependency-tracking"
-export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I/usr/local/include/osxfuse -I/usr/local/include/osxfuse/fuse"
-export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -losxfuse -L${BUILD_PREFIX}/lib/glib-2.0 -L/usr/local/lib"
+export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I${BUILD_PREFIX}/../../../../../sdfs/fuse/include/"
+export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -lsdfs.2 -L${BUILD_PREFIX}/lib/glib-2.0 -L${BUILD_PREFIX}/../../../../../dist -Xlinker -rpath -Xlinker @executable_path/../Frameworks -Xlinker -rpath -Xlinker @loader_path/Frameworks"
 
 export LIBRESSL_VER=2.5.5
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -221,8 +221,8 @@ fi
 
 if [ ! -f libffi-${FFI_VER}.tar.gz ]; then
     echo "Downloading libffi-${FFI_VER}.tar.gz"
-    echo "From ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
-    curl -L ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
+    echo "From https://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
+    curl -L https://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
 fi
 
 if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
@@ -234,7 +234,7 @@ fi
 if [ ! -f gettext-${GETTEXT_VER}.tar.gz ]; then
     echo "Downloading gettext-${GETTEXT_VER}.tar.gz"
     echo "From http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz"
-    curl -L http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
+    curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
 fi
 
 if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
@@ -246,7 +246,7 @@ fi
 if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
     echo "Downloading glib-${GLIB_VER}.tar.xz"
     echo "From http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz"
-    curl -L http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
+    curl -L https://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
 fi
 
 if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
