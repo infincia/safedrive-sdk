@@ -181,6 +181,7 @@ impl From<::bip39::Error> for CryptoError {
             ::bip39::ErrorKind::InvalidWordLength => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
             ::bip39::ErrorKind::InvalidWord => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
             ::bip39::ErrorKind::LanguageUnavailable => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
+            ::bip39::ErrorKind::DataDecode(_) => CryptoError::RecoveryPhraseInvalid(Box::new(e)),
         }
     }
 }
