@@ -1,6 +1,6 @@
 [package]
 name = "sddk"
-version = "0.7.8"
+version = "0.7.9"
 authors = ["Stephen Oliver <steve@infincia.com>"]
 build = "build.rs"
 workspace = ".."
