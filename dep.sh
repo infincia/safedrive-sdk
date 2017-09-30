@@ -221,8 +221,8 @@ fi
 
 if [ ! -f libffi-${FFI_VER}.tar.gz ]; then
     echo "Downloading libffi-${FFI_VER}.tar.gz"
-    echo "From ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
-    curl -L ftp://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
+    echo "From https://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
+    curl -L https://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
 fi
 
 if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
@@ -234,7 +234,7 @@ fi
 if [ ! -f gettext-${GETTEXT_VER}.tar.gz ]; then
     echo "Downloading gettext-${GETTEXT_VER}.tar.gz"
     echo "From http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz"
-    curl -L http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
+    curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
 fi
 
 if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
@@ -246,7 +246,7 @@ fi
 if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
     echo "Downloading glib-${GLIB_VER}.tar.xz"
     echo "From http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz"
-    curl -L http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
+    curl -L https://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
 fi
 
 if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
