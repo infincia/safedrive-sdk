@@ -35,7 +35,7 @@ clear_man() {
 
 # these are at the top for visibility, changing a version will always cause a rebuild, otherwise
 # they will only be rebuilt if the built product is not found
-export SODIUM_VER=1.0.13
+export SODIUM_VER=1.0.14
 export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
 export SODIUM_ARGS="--enable-shared=no"
 
