@@ -3,7 +3,7 @@ fn main() {
         Ok(password) => {
             print!("{}", password);            
         },
-        Err(err) => {
+        Err(_) => {
             std::process::exit(1);
         }
     }
