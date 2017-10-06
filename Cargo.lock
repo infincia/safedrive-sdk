@@ -8,13 +8,11 @@ dependencies = [
  "byteorder 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "cdc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "chrono-humanize 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "clippy 0.0.165 (registry+https://github.com/rust-lang/crates.io-index)",
  "fuse_mt 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.10.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "keyring 0.5.0 (git+https://github.com/infincia/keyring-rs.git?branch=infincia)",
  "lazy_static 0.2.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "libc 0.2.31 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsodium-sys 0.0.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "lz4 1.21.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -28,7 +26,6 @@ dependencies = [
  "pulldown-cmark 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "reed-solomon 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "regex 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.6.2 (git+https://github.com/infincia/reqwest.git?branch=infincia)",
  "rocket 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket_codegen 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -245,14 +242,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "num 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.38 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "chrono-humanize"
-version = "0.0.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1762,7 +1751,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum cdc 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "433ab3df97754a3dd4bce346ab58780e956c630f26d6b586290703899625ad54"
 "checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
 "checksum chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7c20ebe0b2b08b0aeddba49c609fe7957ba2e33449882cb186a180bc60682fa9"
-"checksum chrono-humanize 0.0.10 (registry+https://github.com/rust-lang/crates.io-index)" = "37f0c1ab0076303dd9cca44c5d6386c875f8f4809a3cbd20dec719cda27b0c31"
 "checksum clap 2.26.2 (registry+https://github.com/rust-lang/crates.io-index)" = "3451e409013178663435d6f15fdb212f14ee4424a3d74f979d081d0a66b6f1f2"
 "checksum clippy 0.0.165 (registry+https://github.com/rust-lang/crates.io-index)" = "88f67cdb6697a5d357f8f70cffdf65f4dcb6ec8bb5069f2bc347589b3869cbe8"
 "checksum clippy_lints 0.0.165 (registry+https://github.com/rust-lang/crates.io-index)" = "c8f37194e4a7cb36daeeb5727eac96e32c82965e4ae8b119817885377ddb6715"

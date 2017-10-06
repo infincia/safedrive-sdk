@@ -31,8 +31,6 @@ extern crate simplelog;
 
 extern crate chrono;
 
-extern crate chrono_humanize;
-
 extern crate number_prefix;
 
 extern crate reed_solomon;
@@ -96,7 +94,6 @@ pub use remotefs::RemoteFS;
 /// external crates
 
 extern crate rustc_serialize;
-extern crate libc;
 extern crate sodiumoxide;
 extern crate libsodium_sys;
 extern crate tar;
@@ -106,9 +103,9 @@ extern crate cdc;
 extern crate bip39;
 extern crate serde_json;
 extern crate reqwest;
+#[allow(unused_extern_crates)]
 extern crate serde;
 extern crate uuid;
-extern crate regex;
 extern crate parking_lot;
 extern crate byteorder;
 extern crate blake2_rfc;
