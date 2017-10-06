@@ -1479,9 +1479,9 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
                                                   message: *mut std::os::raw::c_char)) -> std::os::raw::c_int {
     let mut c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let phrase: Option<String> = unsafe {
+    let phrase: Option<String> = {
         if !recovery_phrase.is_null() {
-            let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
+            let c_recovery: &CStr = unsafe { CStr::from_ptr(recovery_phrase) };
             match c_recovery.to_str() {
                 Ok(s) => Some(s.to_owned()),
                 Err(err) => {
@@ -2615,11 +2615,11 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
 
-    let d: Option<String> = unsafe {
+    let d: Option<String> = {
         if date.is_null() {
             None
         } else {
-            let c_date: &CStr = CStr::from_ptr(date);
+            let c_date: &CStr = unsafe { CStr::from_ptr(date) };
             let d: String = match c_date.to_str() {
                 Ok(s) => s.to_owned(),
                 Err(err) => {
@@ -3076,10 +3076,10 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
                                     context: *const std::os::raw::c_char,
                                     mut error: *mut *mut SDDKError) -> std::os::raw::c_int {
 
-    let ucid: String = unsafe {
+    let ucid: String = {
         assert!(!unique_client_id.is_null());
 
-        let c_ucid: &CStr = CStr::from_ptr(unique_client_id);
+        let c_ucid: &CStr = unsafe { CStr::from_ptr(unique_client_id) };
 
         let ucid: String = match c_ucid.to_str() {
             Ok(s) => s.to_owned(),
@@ -3099,10 +3099,10 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
         ucid
     };
 
-    let desc: String = unsafe {
+    let desc: String = {
         assert!(!description.is_null());
 
-        let c_desc: &CStr = CStr::from_ptr(description);
+        let c_desc: &CStr = unsafe { CStr::from_ptr(description) };
 
         let desc: String = match c_desc.to_str() {
             Ok(s) => s.to_owned(),
@@ -3122,10 +3122,10 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
         desc
     };
 
-    let cont: String = unsafe {
+    let cont: String = {
         assert!(!context.is_null());
 
-        let c_cont: &CStr = CStr::from_ptr(context);
+        let c_cont: &CStr = unsafe { CStr::from_ptr(context) };
 
         let cont: String = match c_cont.to_str() {
             Ok(s) => s.to_owned(),
@@ -3145,11 +3145,11 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
         cont
     };
 
-    let ver: Option<String> = unsafe {
+    let ver: Option<String> = {
         if client_version.is_null() {
             None
         } else {
-            let c_client_version: &CStr = CStr::from_ptr(client_version);
+            let c_client_version: &CStr = unsafe { CStr::from_ptr(client_version) };
 
             let ver: String = match c_client_version.to_str() {
                 Ok(s) => s.to_owned(),
@@ -3170,11 +3170,11 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
         }
     };
 
-    let os: Option<String> = unsafe {
+    let os: Option<String> = {
         if operating_system.is_null() {
             None
         } else {
-            let c_operating_system: &CStr = CStr::from_ptr(operating_system);
+            let c_operating_system: &CStr = unsafe { CStr::from_ptr(operating_system) };
 
             let os: String = match c_operating_system.to_str() {
                 Ok(s) => s.to_owned(),
@@ -3542,10 +3542,10 @@ pub extern "C" fn sddk_free_account_details(details: *mut *mut SDDKAccountDetail
 pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let c_path: String = unsafe {
+    let c_path: String = {
         assert!(!remote_path.is_null());
 
-        let c_path: &CStr = CStr::from_ptr(remote_path);
+        let c_path: &CStr = unsafe { CStr::from_ptr(remote_path) };
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
@@ -3615,10 +3615,10 @@ pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut 
 pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let c_path: String = unsafe {
+    let c_path: String = {
         assert!(!remote_path.is_null());
 
-        let c_path: &CStr = CStr::from_ptr(remote_path);
+        let c_path: &CStr = unsafe { CStr::from_ptr(remote_path) };
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
@@ -3690,10 +3690,10 @@ pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut 
 pub extern "C" fn sddk_remote_rm(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char, recursive: std::os::raw::c_uchar) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let c_path: String = unsafe {
+    let c_path: String = {
         assert!(!remote_path.is_null());
 
-        let c_path: &CStr = CStr::from_ptr(remote_path);
+        let c_path: &CStr = unsafe { CStr::from_ptr(remote_path) };
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
@@ -3767,10 +3767,10 @@ pub extern "C" fn sddk_remote_rm(state: *mut SDDKState, mut error: *mut *mut SDD
 pub extern "C" fn sddk_remote_mv(state: *mut SDDKState, mut error: *mut *mut SDDKError, remote_path: *const std::os::raw::c_char, new_path: *const std::os::raw::c_char) -> std::os::raw::c_int {
     let c = unsafe{ assert!(!state.is_null()); &mut * state };
 
-    let c_path: String = unsafe {
+    let c_path: String = {
         assert!(!remote_path.is_null());
 
-        let c_path: &CStr = CStr::from_ptr(remote_path);
+        let c_path: &CStr = unsafe { CStr::from_ptr(remote_path) };
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
@@ -3790,10 +3790,10 @@ pub extern "C" fn sddk_remote_mv(state: *mut SDDKState, mut error: *mut *mut SDD
         path
     };
 
-    let c_newpath: String = unsafe {
+    let c_newpath: String = {
         assert!(!new_path.is_null());
 
-        let c_newpath: &CStr = CStr::from_ptr(new_path);
+        let c_newpath: &CStr = unsafe { CStr::from_ptr(new_path) };
 
         let path: String = match c_newpath.to_str() {
             Ok(s) => s.to_owned(),
