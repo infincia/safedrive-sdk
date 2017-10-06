@@ -539,7 +539,17 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
             match cvs.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             }
         },
     };
@@ -551,7 +561,17 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
             match oss.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             }
         },
     };
@@ -565,7 +585,17 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
             match c_language_code.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             }
         },
     };
@@ -580,7 +610,17 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
             //sane default if nothing was passed in,
             match ::core::get_app_directory(&c) {
                 Ok(p) => p,
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             }
         },
         false => {
@@ -588,7 +628,17 @@ pub extern "C" fn sddk_initialize(client_version: *const std::os::raw::c_char,
 
             let s = match lstorage.to_str() {
                 Ok(s) => s,
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             };
 
             PathBuf::from(s)
@@ -718,7 +768,17 @@ pub extern "C" fn sddk_get_app_directory(config: SDDKConfiguration, mut storage_
 
     let directory: PathBuf = match ::core::get_app_directory(&c) {
         Ok(p) => p,
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let osp: OsString = directory.into_os_string();
@@ -947,7 +1007,17 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 
     let u: String = match luser.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let lservice: &CStr = unsafe {
@@ -957,7 +1027,17 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 
     let s: String = match lservice.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let lsecret: &CStr = unsafe {
@@ -967,7 +1047,17 @@ pub extern "C" fn sddk_set_keychain_item(user: *const std::os::raw::c_char,
 
     let sec: String = match lsecret.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let service = KeychainService::from(s);
@@ -1039,7 +1129,17 @@ pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
 
     let u: String = match luser.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let lservice: &CStr = unsafe {
@@ -1049,7 +1149,17 @@ pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
 
     let s: String = match lservice.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let service = KeychainService::from(s);
@@ -1151,19 +1261,49 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
 
     let uid: String = match uids.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
     let un: String =  match c_username.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let c_password: &CStr = unsafe { CStr::from_ptr(password) };
     let pa: String =  match c_password.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     match login(&uid, &un, &pa) {
@@ -1344,7 +1484,17 @@ pub extern "C" fn sddk_load_keys(context: *mut std::os::raw::c_void,
             let c_recovery: &CStr = CStr::from_ptr(recovery_phrase);
             match c_recovery.to_str() {
                 Ok(s) => Some(s.to_owned()),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             }
         }
         else {
@@ -1653,13 +1803,33 @@ pub extern "C" fn sddk_get_software_clients(username: *const std::os::raw::c_cha
     let c_username: &CStr = unsafe { CStr::from_ptr(username) };
     let un: String =  match c_username.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let c_password: &CStr = unsafe { CStr::from_ptr(password) };
     let pa: String =  match c_password.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let result = match get_software_clients(&un, &pa) {
@@ -1752,14 +1922,34 @@ pub extern "C" fn sddk_add_sync_folder(state: *mut SDDKState,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
 
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = match c_path.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let c_encrypted = encrypted >= 1;
@@ -1839,14 +2029,34 @@ pub extern "C" fn sddk_update_sync_folder(state: *mut SDDKState,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
 
     let c_path: &CStr = unsafe { CStr::from_ptr(path) };
     let p: String = match c_path.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     let c_syncing = syncing >= 1;
@@ -2163,7 +2373,17 @@ pub extern "C" fn sddk_has_conflicting_folder(state: *mut SDDKState,
     let c_name: &CStr = unsafe { CStr::from_ptr(folder_path) };
     let p: PathBuf = match c_name.to_str() {
         Ok(s) => PathBuf::from(s),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
 
@@ -2402,7 +2622,17 @@ pub extern "C" fn sddk_clean_sync_sessions(state: *mut SDDKState,
             let c_date: &CStr = CStr::from_ptr(date);
             let d: String = match c_date.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             };
 
             Some(d)
@@ -2510,7 +2740,17 @@ pub extern "C" fn sddk_cancel_sync_task(name: *const std::os::raw::c_char,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
     cancel_sync_task(&n);
@@ -2584,7 +2824,17 @@ pub extern "C" fn sddk_sync(context: *mut std::os::raw::c_void,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
 
@@ -2697,14 +2947,34 @@ pub extern "C" fn sddk_restore(context: *mut std::os::raw::c_void,
     let c_name: &CStr = unsafe { CStr::from_ptr(name) };
     let n: String = match c_name.to_str() {
         Ok(s) => s.to_owned(),
-        Err(err) => panic!("string is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
 
 
     let c_destination: &CStr = unsafe { CStr::from_ptr(destination) };
     let d: String =  match c_destination.to_str() {
         Ok(p) => p.to_owned(),
-        Err(err) => panic!("path is not valid UTF-8: {}", err),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
     };
     let p = PathBuf::from(d);
 
@@ -2813,7 +3083,17 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
         let ucid: String = match c_ucid.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         ucid
@@ -2826,7 +3106,17 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
         let desc: String = match c_desc.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         desc
@@ -2839,7 +3129,17 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
         let cont: String = match c_cont.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         cont
@@ -2853,7 +3153,17 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
             let ver: String = match c_client_version.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             };
 
             Some(ver)
@@ -2868,7 +3178,17 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 
             let os: String = match c_operating_system.to_str() {
                 Ok(s) => s.to_owned(),
-                Err(err) => panic!("string is not valid UTF-8: {}", err),
+                Err(err) => {
+                    let c_err = SDDKError::from(err);
+
+                    let b = Box::new(c_err);
+                    let ptr = Box::into_raw(b);
+
+                    unsafe {
+                        *error = ptr;
+                    }
+                    return -1;
+                },
             };
 
             Some(os)
@@ -2918,19 +3238,6 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
                            level: SDDKLogLevel) {
 
-    let msg: String = unsafe {
-        assert!(!message.is_null());
-
-        let c_msg: &CStr = CStr::from_ptr(message);
-
-        let msg: String = match c_msg.to_str() {
-            Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
-        };
-
-        msg
-    };
-
     let log_level = match level {
         SDDKLogLevel::Error => ::log::LogLevelFilter::Error,
         SDDKLogLevel::Warn => ::log::LogLevelFilter::Warn,
@@ -2939,7 +3246,22 @@ pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
         SDDKLogLevel::Trace => ::log::LogLevelFilter::Trace,
     };
 
-    log(&msg, log_level);
+    unsafe {
+        assert!(!message.is_null());
+
+        let c_msg: &CStr = CStr::from_ptr(message);
+
+        match c_msg.to_str() {
+            Ok(s) => {
+                log(s, log_level);
+            },
+            Err(err) => {
+                // nothing we can do here, the log line wasn't valid UTF-8 but there is no chance
+                // of error handling, so we just log a static warning
+                log("Log line with invalid UTF-8 was received, dropping", ::log::LogLevelFilter::Warn);
+            },
+        };
+    }
 }
 
 
@@ -3227,7 +3549,17 @@ pub extern "C" fn sddk_remote_mkdir(state: *mut SDDKState, mut error: *mut *mut 
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         path
@@ -3290,7 +3622,17 @@ pub extern "C" fn sddk_remote_rmdir(state: *mut SDDKState, mut error: *mut *mut 
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         path
@@ -3355,7 +3697,17 @@ pub extern "C" fn sddk_remote_rm(state: *mut SDDKState, mut error: *mut *mut SDD
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         path
@@ -3422,7 +3774,17 @@ pub extern "C" fn sddk_remote_mv(state: *mut SDDKState, mut error: *mut *mut SDD
 
         let path: String = match c_path.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         path
@@ -3435,7 +3797,17 @@ pub extern "C" fn sddk_remote_mv(state: *mut SDDKState, mut error: *mut *mut SDD
 
         let path: String = match c_newpath.to_str() {
             Ok(s) => s.to_owned(),
-            Err(err) => panic!("string is not valid UTF-8: {}", err),
+            Err(err) => {
+                let c_err = SDDKError::from(err);
+
+                let b = Box::new(c_err);
+                let ptr = Box::into_raw(b);
+
+                unsafe {
+                    *error = ptr;
+                }
+                return -1;
+            },
         };
 
         path
