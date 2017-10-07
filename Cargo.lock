@@ -91,7 +91,6 @@ name = "askpass"
 version = "0.7.10"
 dependencies = [
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "sddk 0.7.10",
 ]
 
 [[package]]
