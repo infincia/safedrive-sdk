@@ -9,6 +9,7 @@ use prettytable::cell::Cell;
 
 #[macro_use]
 extern crate serde_derive;
+#[allow(unused_extern_crates)]
 extern crate serde;
 extern crate serde_json;
 
