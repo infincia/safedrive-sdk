@@ -51,7 +51,7 @@ pub fn get_app_directory(config: &Configuration) -> Result<PathBuf, String> {
         let p = PathBuf::from(s);
 
         let _: () = msg_send![fm, release];
-        /// these cause a segfault right now, but technically you would release these to avoid a leak
+        // these cause a segfault right now, but technically you would release these to avoid a leak
         //let _: () = msg_send![groupContainerURL, release];
         //let _: () = msg_send![groupContainerPath, release];
 
@@ -195,7 +195,7 @@ pub fn sha256(input: &[u8]) -> String {
 pub fn pad_and_prefix_length(input: &[u8]) -> Vec<u8> {
     let mut buf = Vec::new();
 
-    /// add the length of the input data as little endian u32 in the first 4 bytes
+    // add the length of the input data as little endian u32 in the first 4 bytes
     let input_length = input.len();
 
     assert!(input_length <= u32::max_value() as usize);
@@ -205,13 +205,13 @@ pub fn pad_and_prefix_length(input: &[u8]) -> Vec<u8> {
     LittleEndian::write_u32(&mut size_buf, input_length as u32);
     buf.extend(&size_buf);
 
-    /// add the input data
+    // add the input data
     buf.extend(input);
 
-    /// determine what to round up to for the input size
-    ///
-    /// we don't actually need to map all of these, they're just here to keep the worst case overhead
-    /// visible
+    // determine what to round up to for the input size
+    //
+    // we don't actually need to map all of these, they're just here to keep the worst case overhead
+    // visible
     let round = match input_length {
            0...128  => 128,  // potentially 99%, but necessary and shouldn't affect the average much
          128...256  => 128,  // 50%
@@ -245,11 +245,11 @@ pub fn pad_and_prefix_length(input: &[u8]) -> Vec<u8> {
         _ => 512,            // less than 7.69%, average closer to 1-2%
     };
 
-    /// check to see how much padding we need
+    // check to see how much padding we need
     let nearest = nearest_to(input_length, round);
     let padding_needed = nearest - input_length;
 
-    /// pad the end of the data with zeros if needed
+    // pad the end of the data with zeros if needed
     // buf.resize(size_buf.len() + input_length + padding_needed, 0u8);
 
     // pad the end of the data with random data if needed
@@ -271,7 +271,7 @@ pub fn pad_4bytes() {
     assert!(padded_v.len() == 4 + 128);
 }
 
-/// format helpers
+// format helpers
 
 pub fn pretty_bytes(input: f64) -> String {
     match binary_prefix(input) {
@@ -280,7 +280,7 @@ pub fn pretty_bytes(input: f64) -> String {
     }
 }
 
-/// math helpers
+// math helpers
 
 pub fn timestamp_to_ms(sec: i64, ms: u32) -> i64 {
     (sec * 1000) + (ms as i64)

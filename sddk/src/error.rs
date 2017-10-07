@@ -358,8 +358,8 @@ impl From<SDAPIError> for SDError {
             SDAPIError::BlockMissing => SDError::BlockMissing,
             SDAPIError::SessionMissing => SDError::SessionMissing,
             SDAPIError::Conflict => SDError::Conflict(Box::new(e)),
-            /// we never actually construct an SDError from this variant so it should never be used,
-            /// but the compiler requires it to exist or use a catch-all pattern
+            // we never actually construct an SDError from this variant so it should never be used,
+            // but the compiler requires it to exist or use a catch-all pattern
             SDAPIError::RetryUpload => SDError::RequestFailure(Box::new(e)),
         }
     }

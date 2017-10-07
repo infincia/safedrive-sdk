@@ -30,14 +30,14 @@ pub struct BlockGeneratorStats {
     pub discovered_chunk_size_variance: usize,
 }
 
-/// block abstraction
+// block abstraction
 pub struct BlockGenerator<'a> {
     iter: Box<Iterator<Item=Chunk> + 'a>,
     chunk_file: File,
     main_key: &'a Key,
     hmac_key: &'a Key,
     tweak_key: &'a Key,
-    /// statistics generation
+    // statistics generation
     item_size: u64,
     processed_size: u64,
     processed_size_compressed: u64,
@@ -146,7 +146,7 @@ impl<'a> Iterator for BlockGenerator<'a> {
 }
 
 
-/// chunk abstraction
+// chunk abstraction
 
 pub struct ChunkGenerator<'a> {
     iter: Box<Iterator<Item=Chunk> + 'a>,
@@ -188,7 +188,7 @@ impl<'a> ChunkGenerator<'a> {
 
             SyncVersion::Version2 => {
                 let hash = ::cdc::Rabin64::new(window_size_bits);
-                /// not using a custom hash yet, but we can
+                // not using a custom hash yet, but we can
                 //let hash = RollingBlake2b::new(tweak_key.clone(), window_size_bits);
 
                 let separator_iter = SeparatorIter::custom_new(byte_iter,
@@ -227,7 +227,7 @@ impl<'a> Iterator for ChunkGenerator<'a> {
 
 
 
-/// sep
+// sep
 
 pub struct SeparatorIter<I, F, H> {
     iter: I,
@@ -358,20 +358,20 @@ impl ::cdc::RollingHash64 for RollingBlake2b {
         let _ = self.window_data[self.window_index];
         self.window_data[self.window_index] = *byte;
 
-        /// blake2-rfc
-        /// non-SIMD:
-        /// 2.5MB/s w/128-bit key, 4.35MB/s unkeyed
-        /// SIMD:
-        /// 2.94MB/s w/128-bit key, 5MB/s unkeyed
+        // blake2-rfc
+        // non-SIMD:
+        // 2.5MB/s w/128-bit key, 4.35MB/s unkeyed
+        // SIMD:
+        // 2.94MB/s w/128-bit key, 5MB/s unkeyed
         // let hash = ::blake2_rfc::blake2b::blake2b(8, self.tweak_key.as_blake2_128(), &self.window_data);
 
-        /// sodiumoxide auth, 317KB/s
+        // sodiumoxide auth, 317KB/s
         //let hash = ::sodiumoxide::crypto::auth::authenticate(&self.window_data, &self.tweak_key.as_sodium_auth_key());
 
 
-        /// sodiumoxide blake2b
-        /// non-SIMD:
-        /// 1.56MB/s w/128-bit key
+        // sodiumoxide blake2b
+        // non-SIMD:
+        // 1.56MB/s w/128-bit key
         /*unsafe {
             assert!(::libsodium_sys::crypto_generichash(self._h.as_mut_ptr(),
                                                 self._h.len(),
@@ -382,8 +382,8 @@ impl ::cdc::RollingHash64 for RollingBlake2b {
         }
         */
 
-        /// sodiumoxide blake2b salted
-        /// non-SIMD:
+        // sodiumoxide blake2b salted
+        // non-SIMD:
         unsafe {
             let personal = [0u8; 16];
             ::libsodium_sys::crypto_generichash_blake2b_salt_personal(self._h.as_mut_ptr(),
@@ -397,18 +397,18 @@ impl ::cdc::RollingHash64 for RollingBlake2b {
         }
         let hash = self._h;
 
-        /// blake2b crate, 1.2MB/s
+        // blake2b crate, 1.2MB/s
         //let hash = ::blake2b::blake2b_keyed(8, self.tweak_key.as_ref(), &self.window_data);
 
 
 
-        /// libb2
+        // libb2
         /*let mut state: ::libb2_sys::blake2b_state = unsafe { std::mem::uninitialized() };
 
         let ret = unsafe {
             let key = Some(self.tweak_key.as_blake2_128());
 
-            /// streaming API
+            // streaming API
             match key {
                 Some(key) => ::libb2_sys::blake2b_init_key(&mut state,
                                                            8 as ::libc::size_t,
@@ -426,7 +426,7 @@ impl ::cdc::RollingHash64 for RollingBlake2b {
         /*let ret = unsafe {
             let key = Some(self.tweak_key.as_blake2_128());
 
-            /// convenience API
+            // convenience API
             match key {
                 Some(key) => ::libb2_sys::blake2b(self._h.as_mut_ptr() as *mut ::libc::c_uchar,
                                                   self.window_data.as_slice().as_ptr() as *const ::libc::c_void,
@@ -449,7 +449,7 @@ impl ::cdc::RollingHash64 for RollingBlake2b {
 
         let hash = self._h;*/
 
-        /// grab the hash value
+        // grab the hash value
         let s = hash.as_ref();
 
         self.hash = LittleEndian::read_u64(&s);

@@ -1868,7 +1868,7 @@ pub fn read_block(token: &Token, name: &str) -> Result<Vec<u8>, SDAPIError> {
 
 fn multipart_for_binary<T>(items: &[T], field_name: &str) -> (Vec<u8>, usize, usize) where T: ::binformat::BinaryWriter {
     let mut body = Vec::new();
-    /// these are compile time optimizations
+    // these are compile time optimizations
     let rn = b"\r\n";
     let body_boundary = br"--SAFEDRIVEBINARY";
     let end_boundary =  br"--SAFEDRIVEBINARY--";

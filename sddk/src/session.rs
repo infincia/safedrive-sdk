@@ -45,7 +45,7 @@ impl SyncSession {
 
         let (compressed, maybe_compressed_data, maybe_compressed_size) = match version {
             SyncVersion::Version1 => {
-                /// no compression
+                // no compression
 
                 (false, data, None)
             },
@@ -101,23 +101,23 @@ impl SyncSession {
 
     pub fn to_wrapped(self, main: &Key) -> Result<WrappedSyncSession, CryptoError> {
 
-        /// generate a new session key
+        // generate a new session key
         let session_key = Key::new(KeyType::Session);
 
-        /// We use a random nonce here because we don't need to know what it is in advance, unlike blocks
-        ///
-        /// We use the same nonce both while wrapping the session key, and the session data itself
-        /// this is safe because using the same nonce with 2 different keys is not nonce reuse
+        // We use a random nonce here because we don't need to know what it is in advance, unlike blocks
+        //
+        // We use the same nonce both while wrapping the session key, and the session data itself
+        // this is safe because using the same nonce with 2 different keys is not nonce reuse
         let session_nonce = ::sodiumoxide::crypto::secretbox::gen_nonce();
 
-        /// get the session data, padded and prefixed with a u32 length as little endian
+        // get the session data, padded and prefixed with a u32 length as little endian
         let to_encrypt = match self.version {
             SyncVersion::Version1 => {
-                /// version 1 directly inserts the data before encryption
+                // version 1 directly inserts the data before encryption
                 self.data
             },
             SyncVersion::Version2 => {
-                /// version 2 has padded and prefixed data segments
+                // version 2 has padded and prefixed data segments
                 ::util::pad_and_prefix_length(self.data.as_slice())
             },
             _ => {
@@ -125,10 +125,10 @@ impl SyncSession {
             },
         };
 
-        /// encrypt the data using the session key
+        // encrypt the data using the session key
         let wrapped_data = ::sodiumoxide::crypto::secretbox::seal(&to_encrypt, &session_nonce, &session_key.as_sodium_secretbox_key());
 
-        /// wrap the session key with the main encryption key
+        // wrap the session key with the main encryption key
         let wrapped_session_key = match session_key.to_wrapped(main, Some(&session_nonce)) {
             Ok(wk) => wk,
             Err(e) => return Err(e),
@@ -382,7 +382,7 @@ impl ::binformat::BinaryWriter for WrappedSyncSession {
 
         let mut binary_data = Vec::new();
 
-        /// first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
+        // first 8 bytes are the file ID, type, version, flags, and 2 byte reserved area
         let magic: &'static [u8; 2] = br"sd";
         let file_type: &'static [u8; 1] = br"s";
         let version = self.version.as_ref();
@@ -418,14 +418,14 @@ impl ::binformat::BinaryWriter for WrappedSyncSession {
         binary_data.extend(flag_ref);
         binary_data.extend(reserved.as_ref());
 
-        /// next 48 bytes will be the wrapped session key
+        // next 48 bytes will be the wrapped session key
         binary_data.extend(self.wrapped_key.as_ref());
 
-        /// next 24 bytes will be the nonce
+        // next 24 bytes will be the nonce
         binary_data.extend(self.nonce.as_ref());
         assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
-        /// remainder will be the encrypted session data
+        // remainder will be the encrypted session data
         binary_data.extend(self.wrapped_data.as_slice());
 
         binary_data

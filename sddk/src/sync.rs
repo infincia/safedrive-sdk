@@ -2,11 +2,11 @@ use std::str;
 use std::path::{Path, PathBuf};
 use std::{thread, time};
 
-/// external crate imports
+// external crate imports
 use tar::{Builder, Header};
 use walkdir::WalkDir;
 
-/// internal imports
+// internal imports
 
 use models::*;
 use constants::*;
@@ -86,8 +86,8 @@ pub fn sync(token: &Token,
 
         #[cfg(feature = "locking")]
         defer!({
-            /// try to ensure the folder goes back to unlocked state, but if not there isn't anything
-            /// we can do about it
+            // try to ensure the folder goes back to unlocked state, but if not there isn't anything
+            // we can do about it
             flock.unlock();
         });
 
@@ -186,7 +186,7 @@ pub fn sync(token: &Token,
 
             trace!("examining {}", item.path().display());
 
-            /// call out to the library user with progress
+            // call out to the library user with progress
             let status_message = SyncStatus::Progress(estimated_size, processed_size, 0);
             match sync_status_send.send(status_message) {
                 Ok(()) => {
@@ -216,7 +216,7 @@ pub fn sync(token: &Token,
             let is_dir = md.file_type().is_dir();
             let is_symlink = md.file_type().is_symlink();
 
-            /// store metadata for directory or file
+            // store metadata for directory or file
             let mut header = Header::new_gnu();
             header.set_metadata(&md);
 
@@ -434,27 +434,27 @@ pub fn sync(token: &Token,
                     assert!(stats.processed_size == stream_length);
                     trace!("calculated {} real bytes of blocks, matching stream size {}", stats.processed_size, stream_length);
 
-                    header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); /// hmac list size
+                    header.set_size(stats.discovered_chunk_count * HMAC_SIZE as u64); // hmac list size
                     header.set_cksum();
 
                     ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append session entry header");
 
                 } else {
-                    header.set_size(0); /// hmac list size is zero when file has no actual data
+                    header.set_size(0); // hmac list size is zero when file has no actual data
                     header.set_cksum();
 
                     ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append zero length archive header");
                 }
             } else if is_dir {
-                /// folder
-                header.set_size(0); /// hmac list size is zero when file has no actual data
+                // folder
+                header.set_size(0); // hmac list size is zero when file has no actual data
                 header.set_cksum();
 
                 ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append folder to archive header");
             } else if is_symlink {
-                /// symlink
+                // symlink
 
-                /// get the src
+                // get the src
                 match ::std::fs::read_link(&full_path) {
                     Ok(path) => {
                         match  header.set_link_name(path) {
@@ -487,7 +487,7 @@ pub fn sync(token: &Token,
                     },
                 };
 
-                header.set_size(0); /// hmac list size is zero when file has no actual data
+                header.set_size(0); // hmac list size is zero when file has no actual data
                 header.set_cksum();
 
                 ar.append_data(&mut header, &relative_path, hmac_bag.as_slice()).expect("failed to append symlink to archive header");
@@ -560,10 +560,10 @@ pub fn sync(token: &Token,
 
         debug!("processing session and statistics");
 
-        /// since we're writing to a buffer in memory there shouldn't be any errors here...
-        /// unless the system is also completely out of memory, but there's nothing we can do about that,
-        /// so if it proves to be an issue we'll have to look for anything else that might use a lot of
-        /// memory and use temp files instead, where possible
+        // since we're writing to a buffer in memory there shouldn't be any errors here...
+        // unless the system is also completely out of memory, but there's nothing we can do about that,
+        // so if it proves to be an issue we'll have to look for anything else that might use a lot of
+        // memory and use temp files instead, where possible
         let raw_session = ar.into_inner().unwrap();
 
 
@@ -619,7 +619,7 @@ pub fn sync(token: &Token,
 
         debug!("finishing sync session");
 
-        /// allow caller to tick the progress display, if one exists
+        // allow caller to tick the progress display, if one exists
         let status_message = SyncStatus::Progress(estimated_size, processed_size, 0);
         match sync_status_send.send(status_message) {
             Ok(()) => {

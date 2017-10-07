@@ -276,24 +276,24 @@ pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
 }
 
 pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str), issue: &Fn(&str)) -> Result<Keyset, SDError> {
-    /// generate new keys in all cases, the account *may* already have some stored, we only
-    /// find out for sure while trying to store them.
-    ///
-    /// we do this on purpose:
-    ///
-    ///    1. to eliminate possible race conditions where two clients generate valid keysets and try
-    ///       to store them at the same time, only the server knows who won and we only need one HTTP
-    ///       request to find out
-    ///
-    ///    2. clients are never allowed to supply their own recovery phrases and keys to the SDK.
-    ///       either we actually need new keys, in which case the ones we safely generated internally
-    ///       are stored on the server immediately, or we're wrong and the server tells us what
-    ///       to use instead
-    ///
-    ///
-    /// in all cases, the library will only use keys that have been returned by the server, this
-    /// guarantees that the keys we actually use are correct as long as the server is correct
-    ///
+    // generate new keys in all cases, the account *may* already have some stored, we only
+    // find out for sure while trying to store them.
+    //
+    // we do this on purpose:
+    //
+    //    1. to eliminate possible race conditions where two clients generate valid keysets and try
+    //       to store them at the same time, only the server knows who won and we only need one HTTP
+    //       request to find out
+    //
+    //    2. clients are never allowed to supply their own recovery phrases and keys to the SDK.
+    //       either we actually need new keys, in which case the ones we safely generated internally
+    //       are stored on the server immediately, or we're wrong and the server tells us what
+    //       to use instead
+    //
+    //
+    // in all cases, the library will only use keys that have been returned by the server, this
+    // guarantees that the keys we actually use are correct as long as the server is correct
+    //
     let new_wrapped_keyset = match WrappedKeyset::new() {
         Ok(wks) => wks,
         Err(_) => return Err(SDError::from(CryptoError::KeyGenerationFailed)),
@@ -327,8 +327,8 @@ pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_
                             issue("Warning: keys are legacy key type")
                         }
 
-                        /// a new keyset was generated so we must return the phrase to the caller so it
-                        /// can be stored and displayed
+                        // a new keyset was generated so we must return the phrase to the caller so it
+                        // can be stored and displayed
                         store_recovery_key(&p);
                         Ok(ks)
                     },

@@ -5,13 +5,13 @@ use std::fs::File;
 use std::io::{BufWriter, Read, Write, Seek, SeekFrom};
 use std::{thread, time};
 
-/// external crate imports
+// external crate imports
 use rustc_serialize::hex::{ToHex, FromHex};
 use rand::distributions::{IndependentSample, Range};
 use tar::{Archive, EntryType};
 use nom::IResult::*;
 
-/// internal imports
+// internal imports
 
 use models::*;
 use block::*;
@@ -100,8 +100,8 @@ pub fn restore(token: &Token,
 
         #[cfg(feature = "locking")]
         defer!({
-            /// try to ensure the folder goes back to unlocked state, but if not there isn't anything
-            /// we can do about it
+            // try to ensure the folder goes back to unlocked state, but if not there isn't anything
+            // we can do about it
             flock.unlock();
         });
 
@@ -245,13 +245,13 @@ pub fn restore(token: &Token,
             };
 
 
-            /// call out to the library user with progress
+            // call out to the library user with progress
 
 
 
             let entry_type = file_entry.header().entry_type();
 
-            /// process if not a directory or socket
+            // process if not a directory or socket
             match entry_type {
                 EntryType::Regular => {
                     let f = match File::create(&full_path) {
@@ -340,7 +340,7 @@ pub fn restore(token: &Token,
 
                             let block_start_time = ::std::time::Instant::now();
 
-                            /// allow caller to tick the progress display, if one exists
+                            // allow caller to tick the progress display, if one exists
                             let status_message = SyncStatus::Progress(session_size, processed_size, 0);
                             match sync_status_send.send(status_message) {
                                 Ok(()) => {
@@ -361,7 +361,7 @@ pub fn restore(token: &Token,
                             let mut wrapped_block: Option<WrappedBlock> = None;
                             let block_read_start_time = ::std::time::Instant::now();
 
-                            /// get block from cache if possible
+                            // get block from cache if possible
                             match ::cache::read_block(&block_hmac_hex) {
                                 Ok(br) => {
                                     should_retry = false;
@@ -399,15 +399,15 @@ pub fn restore(token: &Token,
                                 let failed_count = 15.0 - retries_left;
                                 let mut rng = ::rand::thread_rng();
 
-                                /// we pick a multiplier randomly to avoid a bunch of clients trying again
-                                /// at the same 2/4/8/16 back off time over and over if the server
-                                /// is overloaded or down
+                                // we pick a multiplier randomly to avoid a bunch of clients trying again
+                                // at the same 2/4/8/16 back off time over and over if the server
+                                // is overloaded or down
                                 let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
 
                                 if failed_count >= 2.0 && retries_left > 0.0 {
-                                    /// back off significantly every time a call fails but only after the
-                                    /// second try, the first failure could be us not including the data
-                                    /// when we should have
+                                    // back off significantly every time a call fails but only after the
+                                    // second try, the first failure could be us not including the data
+                                    // when we should have
                                     let backoff_time = backoff_multiplier * (failed_count * failed_count);
                                     let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
                                     debug!("backing off for {:?}", delay);
@@ -415,13 +415,13 @@ pub fn restore(token: &Token,
                                     thread::sleep(delay);
                                 }
 
-                                /// get block from the server
+                                // get block from the server
 
                                 match ::sdapi::read_block(&token_local, &block_hmac_hex) {
                                     Ok(rb) => {
                                         trace!("Block read took {} seconds", block_read_start_time.elapsed().as_secs());
 
-                                        /// allow caller to tick the progress display, if one exists
+                                        // allow caller to tick the progress display, if one exists
                                         let status_message = SyncStatus::Progress(session_size, processed_size, 0);
                                         match sync_status_send.send(status_message) {
                                             Ok(()) => {
