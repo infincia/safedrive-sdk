@@ -488,7 +488,7 @@ impl ::binformat::BinaryWriter for WrappedBlock {
         // next 24 bytes will be the nonce
         let n: &[u8] = self.nonce.as_ref();
         binary_data.extend(n);
-        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
+        assert_eq!(binary_data.len(), magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
         // remainder will be the encrypted block data
         binary_data.extend(self.wrapped_data.as_slice());

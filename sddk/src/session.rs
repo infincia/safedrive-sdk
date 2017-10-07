@@ -423,7 +423,7 @@ impl ::binformat::BinaryWriter for WrappedSyncSession {
 
         // next 24 bytes will be the nonce
         binary_data.extend(self.nonce.as_ref());
-        assert!(binary_data.len() == magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
+        assert_eq!(binary_data.len(), magic.len() + file_type.len() + version.len() + flag_ref.len() + reserved.len() + (SECRETBOX_KEY_SIZE + SECRETBOX_MAC_SIZE) + SECRETBOX_NONCE_SIZE);
 
         // remainder will be the encrypted session data
         binary_data.extend(self.wrapped_data.as_slice());
