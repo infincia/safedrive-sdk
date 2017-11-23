@@ -1,6 +1,6 @@
 [package]
 name = "askpass"
-version = "0.7.12"
+version = "0.7.13"
 authors = ["Stephen Oliver <steve@infincia.com>"]
 build = "build.rs"
 workspace = ".."
