@@ -52,7 +52,7 @@ impl Library {
                 "1.8.0"
             },
             Library::Libexpat => {
-                "2.2.2"
+                "2.2.5"
             },
             Library::Libdbus => {
                 "1.10.20"

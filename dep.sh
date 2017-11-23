@@ -43,7 +43,7 @@ export LIBDBUS_VER=1.10.20
 export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
 export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 
-export EXPAT_VER=2.2.2
+export EXPAT_VER=2.2.5
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
