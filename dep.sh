@@ -39,7 +39,7 @@ export SODIUM_VER=1.0.14
 export SODIUM_VER_FILE=${BUILD_PREFIX}/.sodium_ver
 export SODIUM_ARGS="--enable-shared=no"
 
-export LIBDBUS_VER=1.10.20
+export LIBDBUS_VER=1.12.2
 export LIBDBUS_VER_FILE=${BUILD_PREFIX}/.dbus_ver
 export LIBDBUS_ARGS="--enable-shared=no --disable-tests --with-x=no --disable-systemd --disable-launchd --disable-libaudit --disable-selinux --disable-apparmor"
 

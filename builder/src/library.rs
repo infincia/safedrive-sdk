@@ -55,7 +55,7 @@ impl Library {
                 "2.2.5"
             },
             Library::Libdbus => {
-                "1.10.20"
+                "1.12.2"
             },
             Library::Zlib => {
                 "1.2.11"
