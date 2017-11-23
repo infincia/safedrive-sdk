@@ -5,12 +5,8 @@ pub enum Library {
     Libsodium,
     Libressl,
     Libssh2,
-    Libiconv,
-    Libglib,
     Libdbus,
     Libexpat,
-    Libgettext,
-    Libffi,
     Zlib,
 }
 
@@ -29,20 +25,8 @@ impl AsRef<str> for Library {
             Library::Libexpat => {
                 "libexpat"
             },
-            Library::Libiconv => {
-                "libiconv"
-            },
-            Library::Libglib => {
-                "libglib"
-            },
             Library::Libdbus => {
                 "libdbus"
-            },
-            Library::Libgettext => {
-                "libgettext"
-            },
-            Library::Libffi => {
-                "libffi"
             },
             Library::Zlib => {
                 "zlib"
@@ -70,20 +54,8 @@ impl Library {
             Library::Libexpat => {
                 "2.2.2"
             },
-            Library::Libiconv => {
-                "1.15"
-            },
-            Library::Libglib => {
-                "2.52.1"
-            },
             Library::Libdbus => {
                 "1.10.20"
-            },
-            Library::Libgettext => {
-                "0.19.8.1"
-            },
-            Library::Libffi => {
-                "3.2.1"
             },
             Library::Zlib => {
                 "1.2.11"
@@ -105,20 +77,8 @@ impl Library {
             Library::Libexpat => {
                 "expat_ver"
             },
-            Library::Libiconv => {
-                "iconv_ver"
-            },
-            Library::Libglib => {
-                "glib_ver"
-            },
             Library::Libdbus => {
                 "dbus_ver"
-            },
-            Library::Libgettext => {
-                "gettext_ver"
-            },
-            Library::Libffi => {
-                "ffi_ver"
             },
             Library::Zlib => {
                 "z_ver"
@@ -140,19 +100,7 @@ impl Library {
             Library::Libexpat => {
                 false
             },
-            Library::Libiconv => {
-                false
-            },
-            Library::Libglib => {
-                false
-            },
             Library::Libdbus => {
-                false
-            },
-            Library::Libgettext => {
-                false
-            },
-            Library::Libffi => {
                 false
             },
             Library::Zlib => {
@@ -175,19 +123,7 @@ impl Library {
             Library::Libexpat => {
                 false
             },
-            Library::Libiconv => {
-                false
-            },
-            Library::Libglib => {
-                false
-            },
             Library::Libdbus => {
-                false
-            },
-            Library::Libgettext => {
-                false
-            },
-            Library::Libffi => {
                 false
             },
             Library::Zlib => {
@@ -219,28 +155,8 @@ impl Library {
 
                 u
             },
-            Library::Libiconv => {
-                let u = format!("https://ftp.gnu.org/pub/gnu/libiconv/libiconv-{}.tar.gz", version);
-
-                u
-            },
-            Library::Libglib => {
-                let u = format!("http://ftp.gnome.org/pub/GNOME/sources/glib/2.52/glib-{}.tar.xz", version);
-
-                u
-            },
             Library::Libdbus => {
                 let u = format!("https://dbus.freedesktop.org/releases/dbus/dbus-{}.tar.gz", version);
-
-                u
-            },
-            Library::Libgettext => {
-                let u = format!("http://ftp.gnu.org/pub/gnu/gettext/gettext-{}.tar.gz", version);
-
-                u
-            },
-            Library::Libffi => {
-                let u = format!("ftp://sourceware.org/pub/libffi/libffi-{}.tar.gz", version);
 
                 u
             },
@@ -266,20 +182,8 @@ impl Library {
             Library::Libexpat => {
                 vec!["libexpat.lib"]
             },
-            Library::Libiconv => {
-                vec!["libiconv.lib"]
-            },
-            Library::Libglib => {
-                vec!["libglib-2.0.lib"]
-            },
             Library::Libdbus => {
                 vec!["libdbus-1.lib"]
-            },
-            Library::Libgettext => {
-                vec!["libgettext.lib"]
-            },
-            Library::Libffi => {
-                vec!["libffi.lib"]
             },
             Library::Zlib => {
                 vec!["zlib.lib"]
@@ -301,19 +205,7 @@ impl Library {
             Library::Libexpat => {
                 vec![]
             },
-            Library::Libiconv => {
-                vec![]
-            },
-            Library::Libglib => {
-                vec![]
-            },
             Library::Libdbus => {
-                vec![]
-            },
-            Library::Libgettext => {
-                vec![]
-            },
-            Library::Libffi => {
                 vec![]
             },
             Library::Zlib => {
