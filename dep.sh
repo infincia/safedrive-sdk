@@ -47,30 +47,9 @@ export EXPAT_VER=2.2.2
 export EXPAT_VER_FILE=${BUILD_PREFIX}/.expat_ver
 export EXPAT_ARGS="--enable-shared=no"
 
-export ICONV_VER=1.15
-export ICONV_VER_FILE=${BUILD_PREFIX}/.iconv_ver
-export ICONV_ARGS="--enable-shared=no"
-export LIBICONV_CFLAGS=-I${BUILD_PREFIX}/include
-export LIBICONV_LIBS=-L${BUILD_PREFIX}/lib
-
-export GETTEXT_VER=0.19.8.1
-export GETTEXT_VER_FILE=${BUILD_PREFIX}/.gettext_ver
-export GETTEXT_ARGS="--enable-shared=no --enable-fast-install --without-git"
-
-export GLIB_BRANCH=2.52
-export GLIB_VER=2.52.1
-export GLIB_VER_FILE=${BUILD_PREFIX}/.glib_ver
-export GLIB_ARGS="--disable-silent-rules --enable-shared=no --enable-fast-install --disable-maintainer-mode --disable-dependency-tracking --disable-dtrace --disable-libelf"
-
 export OPENSSH_VER=7.5p1
 export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
 export OPENSSH_ARGS="--without-openssl --without-ssl-engine --with-sandbox=darwin"
-
-export SSHFS_VER=2.9
-export SSHFS_VER_FILE=${BUILD_PREFIX}/.sshfs_ver
-export SSHFS_ARGS="--disable-dependency-tracking"
-export SSHFS_CFLAGS="-D_FILE_OFFSET_BITS=64 -I${BUILD_PREFIX}/include/glib-2.0 -I${BUILD_PREFIX}/lib/glib-2.0/include -I${BUILD_PREFIX}/../../../../../sdfs/fuse/include/"
-export SSHFS_LIBS="-framework Carbon -liconv -lintl -lglib-2.0 -lgthread-2.0 -lsdfs.2 -L${BUILD_PREFIX}/lib/glib-2.0 -L${BUILD_PREFIX}/../../../../../dist -Xlinker -rpath -Xlinker @executable_path/../Frameworks -Xlinker -rpath -Xlinker @loader_path/Frameworks"
 
 export LIBRESSL_VER=2.5.5
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
@@ -81,12 +60,6 @@ export RSYNC_VER_FILE=${BUILD_PREFIX}/.rsync_ver
 export RSYNC_ARGS="--with-included-popt --with-included-zlib"
 export RSYNC_CFLAGS="-I${BUILD_PREFIX}/include/openssl"
 export RSYNC_LIBS="-L${BUILD_PREFIX}/lib"
-
-export FFI_VER=3.2.1
-export FFI_VER_FILE=${BUILD_PREFIX}/.ffi_ver
-export FFI_ARGS="--enable-shared=no --enable-static"
-export LIBFFI_CFLAGS="-I${BUILD_PREFIX}/lib/libffi-${FFI_VER}/include"
-export LIBFFI_LIBS="-L${BUILD_PREFIX}/lib -lffi"
 
 export LIBSSH2_VER=1.8.0
 export LIBSSH2_VER_FILE=${BUILD_PREFIX}/.libssh2_ver
@@ -106,15 +79,9 @@ export ac_cv_func_mkostemps="no"
 export BUILD_EXPAT=false
 export BUILD_DBUS=false
 export BUILD_LIBSODIUM=true
-export BUILD_ICONV=false
-export BUILD_GETTEXT=false
-export BUILD_GLIB=false
 export BUILD_OPENSSH=false
 export BUILD_RSYNC=false
-export BUILD_SSHFS=false
-export SSHFS_STATIC=false
 export BUILD_LIBRESSL=false
-export BUILD_FFI=false
 export BUILD_LIBSSH2=false
 
 export CFLAGS="-fPIC -O2 -g -I${BUILD_PREFIX}/include"
@@ -133,16 +100,8 @@ case ${TARGET} in
         export LDFLAGS="${LDFLAGS} ${MAC_ARGS}"
         export BUILD_OPENSSH=true
         export BUILD_RSYNC=true
-        export BUILD_SSHFS=false
         export BUILD_LIBRESSL=true
         export BUILD_LIBSSH2=true
-        export SSHFS_STATIC=true
-        if [ ${BUILD_SSHFS} = true ]; then
-            export BUILD_ICONV=true
-            export BUILD_GETTEXT=true
-            export BUILD_GLIB=true
-            export BUILD_FFI=true
-        fi
         ;;
     x86_64-unknown-linux-gnu)
         export CFLAGS="${CFLAGS}"
@@ -219,41 +178,10 @@ if [ ! -f dbus-${LIBDBUS_VER}.tar.gz ]; then
     curl -L https://dbus.freedesktop.org/releases/dbus/dbus-${LIBDBUS_VER}.tar.gz -o dbus-${LIBDBUS_VER}.tar.gz> /dev/null
 fi
 
-if [ ! -f libffi-${FFI_VER}.tar.gz ]; then
-    echo "Downloading libffi-${FFI_VER}.tar.gz"
-    echo "From https://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz"
-    curl -L https://sourceware.org/pub/libffi/libffi-${FFI_VER}.tar.gz -o libffi-${FFI_VER}.tar.gz > /dev/null
-fi
-
 if [ ! -f libsodium-${SODIUM_VER}.tar.gz ]; then
     echo "Downloading libsodium-${SODIUM_VER}.tar.gz"
     echo "From https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz"
     curl -L https://github.com/jedisct1/libsodium/releases/download/${SODIUM_VER}/libsodium-${SODIUM_VER}.tar.gz -o libsodium-${SODIUM_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f gettext-${GETTEXT_VER}.tar.gz ]; then
-    echo "Downloading gettext-${GETTEXT_VER}.tar.gz"
-    echo "From http://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz"
-    curl -L https://ftp.gnu.org/pub/gnu/gettext/gettext-${GETTEXT_VER}.tar.gz -o gettext-${GETTEXT_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f libiconv-${ICONV_VER}.tar.gz ]; then
-    echo "Downloading iconv-${ICONV_VER}.tar.gz"
-    echo "From https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz"
-    curl -L https://ftp.gnu.org/pub/gnu/libiconv/libiconv-${ICONV_VER}.tar.gz -o libiconv-${ICONV_VER}.tar.gz > /dev/null
-fi
-
-if [ ! -f glib-${GLIB_VER}.tar.xz ]; then
-    echo "Downloading glib-${GLIB_VER}.tar.xz"
-    echo "From http://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz"
-    curl -L https://ftp.gnome.org/pub/GNOME/sources/glib/${GLIB_BRANCH}/glib-${GLIB_VER}.tar.xz -o glib-${GLIB_VER}.tar.xz > /dev/null
-fi
-
-if [ ! -f sshfs-${SSHFS_VER}.tar.gz ]; then
-    echo "Downloading sshfs-${SSHFS_VER}.tar.gz"
-    echo "From https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz"
-    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz -o sshfs-${SSHFS_VER}.tar.gz > /dev/null
-    curl -L https://github.com/libfuse/sshfs/releases/download/sshfs-${SSHFS_VER}/sshfs-${SSHFS_VER}.tar.gz.asc -o sshfs-${SSHFS_VER}.tar.gz.asc > /dev/null
 fi
 
 if [ ! -f libressl-${LIBRESSL_VER}.tar.gz ]; then
@@ -404,86 +332,6 @@ else
     echo "Not set to build libsodium"
 fi
 
-if [ ${BUILD_ICONV} = true ]; then
-    if [ ! -f  ${BUILD_PREFIX}/lib/libiconv.a ] || [ ! -f ${ICONV_VER_FILE} ] || [ ! $(<${ICONV_VER_FILE}) = ${ICONV_VER} ]; then
-        echo "Building iconv ${ICONV_VER} for ${TARGET} in ${BUILD_PREFIX}"
-        rm -rf libiconv*
-        clear_man
-        tar xf ${SRC_PREFIX}/libiconv-${ICONV_VER}.tar.gz > /dev/null
-        pushd libiconv-${ICONV_VER}
-            ./configure --prefix=${BUILD_PREFIX} ${ICONV_ARGS} > /dev/null
-            make > /dev/null
-            make install > /dev/null
-        popd
-        rm -rf libiconv*
-        echo ${ICONV_VER} > ${ICONV_VER_FILE}
-    else
-        echo "Not building iconv"
-    fi
-else
-    echo "Not set to build iconv"
-fi
-
-if [ ${BUILD_GETTEXT} = true ]; then
-    if [ ! -f  ${BUILD_PREFIX}/lib/libintl.a ] || [ ! -f ${GETTEXT_VER_FILE} ] || [ ! $(<${GETTEXT_VER_FILE}) = ${GETTEXT_VER} ]; then
-        echo "Building gettext ${GETTEXT_VER} for ${TARGET} in ${BUILD_PREFIX}"
-        rm -rf gettext*
-        clear_man
-        tar xf ${SRC_PREFIX}/gettext-${GETTEXT_VER}.tar.gz > /dev/null
-        pushd gettext-${GETTEXT_VER}
-            ./configure --prefix=${BUILD_PREFIX} ${GETTEXT_ARGS} > /dev/null
-            make > /dev/null
-            make install > /dev/null
-        popd
-        rm -rf gettext*
-        echo ${GETTEXT_VER} > ${GETTEXT_VER_FILE}
-    else
-        echo "Not building gettext"
-    fi
-else
-    echo "Not set to build gettext"
-fi
-
-if [ ${BUILD_FFI} = true ]; then
-    if [ ! -f  ${BUILD_PREFIX}/lib/libffi.a ] || [ ! -f ${FFI_VER_FILE} ] || [ ! $(<${FFI_VER_FILE}) = ${FFI_VER} ]; then
-        echo "Building libffi ${FFI_VER} for ${TARGET} in ${BUILD_PREFIX}"
-        rm -rf libffi*
-        clear_man
-        tar xf ${SRC_PREFIX}/libffi-${FFI_VER}.tar.gz > /dev/null
-        pushd libffi-${FFI_VER}
-            ./configure --prefix=${BUILD_PREFIX} ${FFI_ARGS} > /dev/null
-            make > /dev/null
-            make install > /dev/null
-        popd
-        rm -rf libffi*
-        echo ${FFI_VER} > ${FFI_VER_FILE}
-    else
-        echo "Not building libffi"
-    fi
-else
-    echo "Not set to build libffi"
-fi
-
-if [ ${BUILD_GLIB} = true ]; then
-    if [ ! -f ${BUILD_PREFIX}/lib/libglib-2.0.a ] || [ ! -f ${GLIB_VER_FILE} ] || [ ! $(<${GLIB_VER_FILE}) = ${GLIB_VER} ]; then
-        echo "Building glib ${GLIB_VER} for ${TARGET} in ${BUILD_PREFIX}"
-        rm -rf glib*
-        clear_man
-        tar xf ${SRC_PREFIX}/glib-${GLIB_VER}.tar.xz > /dev/null
-        pushd glib-${GLIB_VER}
-            PATH=${BUILD_PREFIX}/bin:${PATH} ./configure --prefix=${BUILD_PREFIX} ${GLIB_ARGS} > /dev/null
-            PATH=${BUILD_PREFIX}/bin:${PATH} make > /dev/null
-            PATH=${BUILD_PREFIX}/bin:${PATH} make install > /dev/null
-        popd
-        rm -rf glib*
-        echo ${GLIB_VER} > ${GLIB_VER_FILE}
-    else
-        echo "Not building glib"
-    fi
-else
-    echo "Not set to build glib"
-fi
-
 if [ ${BUILD_OPENSSH} = true ]; then
     if [ ! -f ${BUILD_PREFIX}/bin/ssh-${OPENSSH_VER} ] || [ ! -f ${OPENSSH_VER_FILE} ] || [ ! $(<${OPENSSH_VER_FILE}) = ${OPENSSH_VER} ]; then
         echo "Building OpenSSH ${OPENSSH_VER} for ${TARGET} in ${BUILD_PREFIX}"
@@ -523,28 +371,6 @@ if [ ${BUILD_RSYNC} = true ]; then
     cp ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER} ${DIST_PREFIX}/io.safedrive.SafeDrive.rsync
 else
     echo "Not set to build Rsync"
-fi
-
-if [ ${SSHFS_STATIC} = true ]; then
-    cp -a ${STATIC_DEP_PREFIX}/${TARGET}/io.safedrive.SafeDrive.sshfs ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs || true
-elif [ ${BUILD_SSHFS} = true ]; then
-    if [ ! -f ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ] || [ ! -f ${SSHFS_VER_FILE} ] || [ ! $(<${SSHFS_VER_FILE}) = ${SSHFS_VER} ]; then
-        echo "Building SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
-        rm -rf sshfs*
-        clear_man
-        tar xf ${SRC_PREFIX}/sshfs-${SSHFS_VER}.tar.gz > /dev/null
-        pushd sshfs-${SSHFS_VER}
-            ./configure --prefix=${BUILD_PREFIX} ${SSHFS_ARGS} > /dev/null
-            make > /dev/null
-            echo "Building static SSHFS ${SSHFS_VER} for ${TARGET} in ${BUILD_PREFIX}"
-            cp sshfs ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER}
-        popd
-        rm -rf sshfs*
-        echo ${SSHFS_VER} > ${SSHFS_VER_FILE}
-    fi
-    cp ${BUILD_PREFIX}/bin/sshfs-${SSHFS_VER} ${DIST_PREFIX}/io.safedrive.SafeDrive.sshfs
-else
-    echo "Not set to build sshfs"
 fi
 
 popd > /dev/null
