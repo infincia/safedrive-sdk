@@ -5,6 +5,7 @@ use std::fs;
 /// external crate imports
 use simplelog::{Config as LogConfig, CombinedLogger, TermLogger, WriteLogger, SimpleLogger, SharedLogger};
 use log::LogLevelFilter;
+use log::LogLevel;
 
 /// internal imports
 
@@ -559,26 +560,8 @@ pub fn remove_sync_sessions_before(token: &Token,
     }
 }
 
-pub fn log(text: &str, level: LogLevelFilter) {
-    match level {
-        ::log::LogLevelFilter::Off => {},
-        ::log::LogLevelFilter::Error => {
-            error!("{}", text);
-        },
-        ::log::LogLevelFilter::Warn => {
-            warn!("{}", text);
-        },
-        ::log::LogLevelFilter::Info => {
-            info!("{}", text);
-        },
-        ::log::LogLevelFilter::Debug => {
-            debug!("{}", text);
-        },
-        ::log::LogLevelFilter::Trace => {
-            trace!("{}", text);
-        },
-    };
-
+pub fn log(module: &str, message: &str, level: LogLevel) {
+    log!(target: module, level, "{}", message);
 }
 
 pub fn send_error_report<'a>(client_version: Option<String>, operating_system: Option<String>, unique_client_id: &str, description: &str, context: &str) -> Result<(), SDError> {
