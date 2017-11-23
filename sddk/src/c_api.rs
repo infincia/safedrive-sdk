@@ -3235,32 +3235,53 @@ pub extern "C" fn sddk_report_error(client_version: *const std::os::raw::c_char,
 /// ```
 #[no_mangle]
 #[allow(dead_code)]
-pub extern "C" fn sddk_log(message: *const std::os::raw::c_char,
+pub extern "C" fn sddk_log(module: *const std::os::raw::c_char,
+                           message: *const std::os::raw::c_char,
                            level: SDDKLogLevel) {
 
     let log_level = match level {
-        SDDKLogLevel::Error => ::log::LogLevelFilter::Error,
-        SDDKLogLevel::Warn => ::log::LogLevelFilter::Warn,
-        SDDKLogLevel::Info => ::log::LogLevelFilter::Info,
-        SDDKLogLevel::Debug => ::log::LogLevelFilter::Debug,
-        SDDKLogLevel::Trace => ::log::LogLevelFilter::Trace,
+        SDDKLogLevel::Error => ::log::LogLevel::Error,
+        SDDKLogLevel::Warn => ::log::LogLevel::Warn,
+        SDDKLogLevel::Info => ::log::LogLevel::Info,
+        SDDKLogLevel::Debug => ::log::LogLevel::Debug,
+        SDDKLogLevel::Trace => ::log::LogLevel::Trace,
     };
 
     unsafe {
+        assert!(!module.is_null());
+
+        let c_mod: &CStr = CStr::from_ptr(module);
+
         assert!(!message.is_null());
 
         let c_msg: &CStr = CStr::from_ptr(message);
 
-        match c_msg.to_str() {
-            Ok(s) => {
-                log(s, log_level);
+        let modu = match c_mod.to_str() {
+            Ok(modu) => {
+                modu
+            },
+            Err(err) => {
+                // nothing we can do here, the log module wasn't valid UTF-8 but there is no chance
+                // of error handling, so we just log a static warning
+                log("C API", "Log line with invalid UTF-8 module was received, dropping", ::log::LogLevel::Warn);
+                return;
+            },
+        };
+
+        let msg = match c_msg.to_str() {
+            Ok(msg) => {
+                msg
             },
             Err(err) => {
                 // nothing we can do here, the log line wasn't valid UTF-8 but there is no chance
                 // of error handling, so we just log a static warning
-                log("Log line with invalid UTF-8 was received, dropping", ::log::LogLevelFilter::Warn);
+                log("C API", "Log line with invalid UTF-8 message was received, dropping", ::log::LogLevel::Warn);
+                return;
             },
         };
+
+
+        log(modu, msg, log_level);
     }
 }
 
