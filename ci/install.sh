@@ -15,7 +15,6 @@ install_fuse() {
         linux)
             ;;
         osx)
-            brew cask install osxfuse || true
             ;;
     esac
 }
