@@ -46,7 +46,7 @@ impl Library {
                 "1.0.14"
             },
             Library::Libressl => {
-                "2.5.5"
+                "2.6.3"
             },
             Library::Libssh2 => {
                 "1.8.0"

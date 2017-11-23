@@ -51,7 +51,7 @@ export OPENSSH_VER=7.5p1
 export OPENSSH_VER_FILE=${BUILD_PREFIX}/.openssh_ver
 export OPENSSH_ARGS="--without-openssl --without-ssl-engine --with-sandbox=darwin"
 
-export LIBRESSL_VER=2.5.5
+export LIBRESSL_VER=2.6.3
 export LIBRESSL_VER_FILE=${BUILD_PREFIX}/.libressl_ver
 export LIBRESSL_ARGS="--disable-dependency-tracking --enable-shared=no"
 
