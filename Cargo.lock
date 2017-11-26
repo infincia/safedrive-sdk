@@ -1175,7 +1175,7 @@ dependencies = [
 [[package]]
 name = "schannel"
 version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+source = "git+https://github.com/infincia/schannel-rs.git?branch=infincia#23dfcc66bbc0ce36d4f022f3972e2bc646255e68"
 dependencies = [
  "advapi32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "crypt32-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1185,6 +1185,12 @@ dependencies = [
  "winapi 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi-build 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "schannel"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+replace = "schannel 0.1.8 (git+https://github.com/infincia/schannel-rs.git?branch=infincia)"
 
 [[package]]
 name = "scopeguard"
@@ -1872,6 +1878,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)" = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 "checksum safemem 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e27a8b19b835f7aea908818e871f5cc3a5a186550c30773be987e155e8163d8f"
 "checksum same-file 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "70a18720d745fb9ca6a041b37cb36d0b21066006b6cff8b5b360142d4b81fb60"
+"checksum schannel 0.1.8 (git+https://github.com/infincia/schannel-rs.git?branch=infincia)" = "<none>"
 "checksum schannel 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "7554288337c1110e34d7a2433518d889374c1de1a45f856b7bcddb03702131fc"
 "checksum scopeguard 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "94258f53601af11e6a49f722422f6e3425c52b06245a5cf9bc09908b174f5e27"
 "checksum secret-service 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "83add5e8182ee130ec24cbcf03ded913e76a9c4b155512406db2ec6d4eeb03f2"
