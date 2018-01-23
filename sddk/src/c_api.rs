@@ -33,7 +33,7 @@ use sync_state::cancel_sync_task;
 
 use constants::Configuration;
 
-use models::{RegisteredFolder, AccountStatus, AccountState, AccountDetails, Notification, SyncCleaningSchedule, SoftwareClient};
+use models::{RegisteredFolder, AccountStatus, AccountState, AccountDetails, SFTPFingerprint, Notification, SyncCleaningSchedule, SoftwareClient};
 
 use keychain::KeychainService;
 use core::get_keychain_item;
@@ -46,6 +46,8 @@ use core::generate_unique_client_id;
 
 use core::get_account_status;
 use core::get_account_details;
+
+use core::get_sftp_fingerprints;
 
 use core::remove_software_client;
 
@@ -206,6 +208,25 @@ impl From<AccountDetails> for SDDKAccountDetails {
         }
     }
 }
+
+#[derive(Debug)]
+#[repr(C)]
+pub struct SDDKSFTPFingerprint {
+    pub host: *const std::os::raw::c_char,
+    pub port: u16,
+    pub fingerprint: *const std::os::raw::c_char,
+}
+
+impl From<SFTPFingerprint> for SDDKSFTPFingerprint {
+    fn from(fingerprint: SFTPFingerprint) -> SDDKSFTPFingerprint {
+        SDDKSFTPFingerprint {
+            host: CString::new(fingerprint.host.as_str()).unwrap().into_raw(),
+            fingerprint: CString::new(fingerprint.fingerprint.as_str()).unwrap().into_raw(),
+            port: fingerprint.port,
+        }
+    }
+}
+
 
 #[derive(Debug)]
 #[repr(C)]
@@ -1740,6 +1761,94 @@ pub extern "C" fn sddk_get_account_details(state: *mut SDDKState,
 
     0
 }
+
+
+/// Get a list of current SFTP server fingerprints from the server
+///
+/// The caller does not own the memory pointed to by `fingerprints` after this function returns, it
+/// must be returned and freed by the library.
+///
+/// As a result, any data that the caller wishes to retain must be copied out of the buffer before
+/// it is freed.
+///
+///
+/// Parameters:
+///
+///     `state`: an opaque pointer obtained from calling `sddk_initialize()`
+///
+///     `fingerprints`: an uninitialized pointer that will be allocated and initialized when the
+///                     function returns if the return value was 0
+///
+///                     must be freed by the caller using `sddk_free_folders()`
+///
+///     `error`: an uninitialized pointer that will be allocated and initialized when the function
+///              returns if the return value was -1
+///
+///              must be freed by the caller using `sddk_free_error()`
+///
+/// Return:
+///
+///     -1: failure, `error` will be set with more information
+///
+///     0+: number of fingerprints returned, and number of `SDDKSFTPFingerprint` structs allocated
+///         in fingerprints
+///
+/// # Examples
+///
+/// ```c
+/// SDDKState *state; // retrieve from sddk_initialize()
+/// SDDKError *error = NULL;
+/// SDDKSFTPFingerprint * fingerprints = NULL;
+///
+/// int length = sddk_get_sftp_fingerprints(&state, &fingerprints, &error);
+///
+/// if (0 != length) {
+///     printf("Failed to get fingerprints");
+///     // do something with error here, then free it
+///     sddk_free_error(&error);
+/// }
+/// else {
+///     printf("Got fingerprints");
+///     // do something with fingerprints here, then free it
+///     sddk_free_fingerprints(&fingerprints, length);
+/// }
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_get_sftp_fingerprints(mut fingerprints: *mut *mut SDDKSFTPFingerprint,
+                                             mut error: *mut *mut SDDKError) -> i64 {
+
+    let result = match get_sftp_fingerprints() {
+        Ok(fingerprints) => fingerprints,
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let boxed_error = Box::new(c_err);
+            let ptr = Box::into_raw(boxed_error);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
+    };
+
+    let f = result.into_iter().map(|fingerprint: SFTPFingerprint| {
+        SDDKSFTPFingerprint::from(fingerprint)
+    }).collect::<Vec<SDDKSFTPFingerprint>>();;
+
+    let mut b = f.into_boxed_slice();
+    let ptr = b.as_mut_ptr();
+    let len = b.len();
+    std::mem::forget(b);
+
+    unsafe {
+        *fingerprints = ptr;
+    }
+
+    len as i64
+}
+
 
 /// Get a list of all registered clients from the server
 ///
@@ -3316,6 +3425,36 @@ pub extern "C" fn sddk_free_software_clients(clients: *mut *mut SDDKSoftwareClie
         let _ = unsafe { CString::from_raw(client.unique_client_id as *mut std::os::raw::c_char) };
         let _ = unsafe { CString::from_raw(client.language as *mut std::os::raw::c_char) };
         let _ = unsafe { CString::from_raw(client.operating_system as *mut std::os::raw::c_char) };
+    }
+}
+
+/// Free a pointer to a list of sftp fingerprints
+///
+/// Note: This is *not* the same as calling `free()` in C, they are not interchangeable
+///
+/// Parameters:
+///
+///     `fingerprints`: a pointer obtained from calling `sddk_get_sftp_fingerprints()`
+///
+///     `length`: number of `SDDKSFTPFingerprint` structs that were allocated in the pointer
+///
+///
+/// # Examples
+///
+/// ```c
+///sddk_free_sftp_fingerprints(&fingerprints, length);
+/// ```
+#[no_mangle]
+#[allow(dead_code)]
+pub extern "C" fn sddk_free_sftp_fingerprints(fingerprints: *mut *mut SDDKSFTPFingerprint,
+                                              length: u64) {
+    assert!(!fingerprints.is_null());
+    let l = length as usize;
+
+    let fingerprints: Vec<SDDKSFTPFingerprint> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*fingerprints, l)).into_vec() };
+    for fingerprint in fingerprints {
+        let _ = unsafe { CString::from_raw(fingerprint.host as *mut std::os::raw::c_char) };
+        let _ = unsafe { CString::from_raw(fingerprint.fingerprint as *mut std::os::raw::c_char) };
     }
 }
 
