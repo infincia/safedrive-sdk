@@ -311,6 +311,13 @@ pub struct AccountDetails {
     pub expirationDate: u64,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SFTPFingerprint {
+    pub host: String,
+    pub port: u16,
+    pub fingerprint: String,
+}
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Notification {
