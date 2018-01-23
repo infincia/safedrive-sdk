@@ -122,6 +122,7 @@ pub enum APIEndpoint<'a> {
     GetClients { email: &'a str, password: &'a str, },
     AccountStatus,
     AccountDetails,
+    SFTPFingerprints,
     AccountKey { master: &'a str, main: &'a str, hmac: &'a str, tweak: &'a str },
     ReadFolders,
     CreateFolder { folderPath: &'a str, folderName: &'a str, encrypted: bool, syncing: bool },
@@ -198,6 +199,9 @@ impl<'a> APIEndpoint<'a> {
             APIEndpoint::AccountDetails => {
                 ::reqwest::Method::Get
             },
+            APIEndpoint::SFTPFingerprints => {
+                ::reqwest::Method::Get
+            },
             APIEndpoint::AccountKey { .. } => {
                 ::reqwest::Method::Post
             },
@@ -262,6 +266,9 @@ impl<'a> APIEndpoint<'a> {
             },
             APIEndpoint::AccountDetails => {
                 format!("/api/1/account/details")
+            },
+            APIEndpoint::SFTPFingerprints => {
+                format!("/api/1/server/fingerprint")
             },
             APIEndpoint::AccountKey { .. } => {
                 format!("/api/1/account/key")
@@ -771,6 +778,79 @@ pub fn account_details(token: &Token) -> Result<AccountDetails, SDAPIError> {
                                                         result.status(),
                                                         &response)))
             },
+        }
+    }
+
+}
+
+pub fn read_sftp_fingerprints() -> Result<Vec<SFTPFingerprint>, SDAPIError> {
+
+    let endpoint = APIEndpoint::SFTPFingerprints;
+
+    let user_agent = &**USER_AGENT.read();
+
+    let retries: u8 = 3;
+    let mut retries_left: u8 = retries;
+
+    loop {
+        let agent = UserAgent(user_agent.to_owned());
+
+        let mut c = ClientBuilder::new().unwrap();
+        let client = c.build().unwrap();
+
+        let mut r = client.request(endpoint.method(), endpoint.url()).unwrap();
+
+        r.header(::reqwest::header::Connection::close());
+        r.header(agent);
+
+        let request = r.build();
+
+
+        let failed_count = retries - retries_left;
+        let mut rng = ::rand::thread_rng();
+        let backoff_multiplier = Range::new(0.0, 1.5).ind_sample(&mut rng);
+
+        if failed_count >= 1 {
+            let backoff_time = backoff_multiplier * (failed_count as f64 * failed_count as f64);
+            let delay = time::Duration::from_millis((backoff_time * 1000.0) as u64);
+            thread::sleep(delay);
+        }
+
+        trace!("sending request");
+        let mut result = match client.execute(request) {
+            Ok(result) => result,
+            Err(err) => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::NetworkFailure);
+                }
+                continue;
+            }
+        };
+        trace!("response received");
+        let mut response = String::new();
+        trace!("reading response");
+        result.read_to_string(&mut response)?;
+
+        trace!("response: {}", response);
+
+        match result.status() {
+            ::reqwest::StatusCode::Ok => {
+                let folders: Vec<SFTPFingerprint> = ::serde_json::from_str(&response)?;
+                return Ok(folders);
+            },
+            ::reqwest::StatusCode::Unauthorized => return Err(SDAPIError::Authentication),
+            ::reqwest::StatusCode::BadRequest => {
+                let error: ServerErrorResponse = ::serde_json::from_str(&response)?;
+                return Err(SDAPIError::Internal(error.message));
+            },
+            ::reqwest::StatusCode::ServiceUnavailable => {
+                retries_left = retries_left - 1;
+                if retries_left <= 0 {
+                    return Err(SDAPIError::ServiceUnavailable);
+                }
+            },
+            _ => return Err(SDAPIError::Internal(format!("unexpected response(HTTP{}): {}", result.status(), &response)))
         }
     }
 
