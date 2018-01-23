@@ -276,6 +276,13 @@ pub fn get_account_details(token: &Token) -> Result<AccountDetails, SDError> {
     }
 }
 
+pub fn get_sftp_fingerprints() -> Result<Vec<SFTPFingerprint>, SDError> {
+    match read_sftp_fingerprints() {
+        Ok(d) => Ok(d),
+        Err(e) => Err(SDError::from(e)),
+    }
+}
+
 pub fn load_keys(token: &Token, recovery_phrase: Option<String>, store_recovery_key: &Fn(&str), issue: &Fn(&str)) -> Result<Keyset, SDError> {
     // generate new keys in all cases, the account *may* already have some stored, we only
     // find out for sure while trying to store them.
