@@ -40,24 +40,11 @@ case ${TARGET} in
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
         ;;
-    i686-unknown-linux-gnu)
-        export CFLAGS="${CFLAGS} -m32"
-        export CPPFLAGS="${CPPFLAGS} -m32"
-        export LDFLAGS="${LDFLAGS}"
-        export PKG_CONFIG_ALLOW_CROSS=1
-        ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="${CFLAGS}"
         export CPPFLAGS="${CPPFLAGS}"
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
-        ;;
-    i686-unknown-linux-musl)
-        export CFLAGS="${CFLAGS} -m32"
-        export CPPFLAGS="${CPPFLAGS} -m32"
-        export LDFLAGS="${LDFLAGS}"
-        export CC=musl-gcc
-        export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     wasm32-unknown-emscripten)
         export CPPFLAGS="${CPPFLAGS}"
@@ -109,10 +96,10 @@ case ${TARGET} in
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/io.safedrive.SafeDrive.cli
         cp -a target/${TARGET}/release/askpass ${DIST_PREFIX}/io.safedrive.SafeDrive.askpass
         ;;
-    i686-unknown-linux-musl|x86_64-unknown-linux-musl)
+    x86_64-unknown-linux-musl)
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/
         ;;
-    i686-unknown-linux-gnu|x86_64-unknown-linux-gnu)
+    x86_64-unknown-linux-gnu)
         cp -a target/${TARGET}/release/safedrive ${DIST_PREFIX}/
         ;;
     wasm32-unknown-emscripten)

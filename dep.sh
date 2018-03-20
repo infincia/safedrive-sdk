@@ -112,32 +112,11 @@ case ${TARGET} in
         export BUILD_LIBRESSL=false
         export BUILD_LIBSSH2=false
         ;;
-    i686-unknown-linux-gnu)
-        export CFLAGS="${CFLAGS} -m32"
-        export CPPFLAGS="${CPPFLAGS} -m32"
-        export LDFLAGS="${LDFLAGS}"
-        export PKG_CONFIG_ALLOW_CROSS=1
-        export BUILD_EXPAT=false
-        export BUILD_DBUS=false
-        export BUILD_LIBRESSL=false
-        export BUILD_LIBSSH2=false
-        ;;
     x86_64-unknown-linux-musl)
         export CFLAGS="${CFLAGS} -I/usr/include"
         export CPPFLAGS="${CPPFLAGS} -I/usr/include"
         export LDFLAGS="${LDFLAGS}"
         export CC=musl-gcc
-        export BUILD_EXPAT=true
-        export BUILD_DBUS=true
-        export BUILD_LIBRESSL=true
-        export BUILD_LIBSSH2=true
-        ;;
-    i686-unknown-linux-musl)
-        export CFLAGS="${CFLAGS} -m32 -I/usr/include"
-        export CPPFLAGS="${CPPFLAGS} -m32 -I/usr/include"
-        export LDFLAGS="${LDFLAGS}"
-        export CC=musl-gcc
-        export PKG_CONFIG_ALLOW_CROSS=1
         export BUILD_EXPAT=true
         export BUILD_DBUS=true
         export BUILD_LIBRESSL=true
