@@ -72,7 +72,7 @@ rustup override set ${RUST_VER}
 
 case ${TARGET} in
     wasm32-unknown-emscripten)
-            echo "Building sddk for ${TARGET}"
+        echo "Building sddk for ${TARGET}"
 
         RUST_BACKTRACE=1 cargo build --release -p sddk --target ${TARGET} > /dev/null
 
