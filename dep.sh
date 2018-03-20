@@ -121,6 +121,8 @@ case ${TARGET} in
         export BUILD_DBUS=true
         export BUILD_LIBRESSL=true
         export BUILD_LIBSSH2=true
+        export BUILD_OPENSSH=true
+        export BUILD_RSYNC=true
         ;;
     wasm32-unknown-emscripten)
         export SODIUM_ARGS="${SODIUM_ARGS}"
