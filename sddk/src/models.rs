@@ -253,6 +253,7 @@ impl Default for Token {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SoftwareClient {
+    pub uniqueName: String,
     pub uniqueId: String,
     pub operatingSystem: String,
     pub language: String,
@@ -260,7 +261,7 @@ pub struct SoftwareClient {
 
 impl std::fmt::Display for SoftwareClient {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "SoftwareClient {{ uniqueId: {}, os: {}, language: {} }}", self.uniqueId, self.operatingSystem, self.language)
+        write!(f, "SoftwareClient {{ name: {}, uniqueId: {}, os: {}, language: {} }}", self.uniqueName, self.uniqueId, self.operatingSystem, self.language)
     }
 }
 
