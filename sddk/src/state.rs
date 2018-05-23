@@ -6,6 +6,7 @@ use models::Token;
 #[derive(Debug)]
 pub struct State {
     pub unique_client_id: Option<String>,
+    pub unique_client_name: Option<String>,
     pub host: Option<String>,
     pub port: Option<u16>,
     pub ssh_username: Option<String>,
@@ -22,6 +23,7 @@ impl State {
     pub fn new() -> State {
         State {
             unique_client_id: None,
+            unique_client_name: None,
             host: None,
             port: None,
             ssh_username: None,
@@ -66,6 +68,19 @@ impl State {
             None => panic!("Attempted to use unique client id before it was set"),
         };
         uid
+    }
+
+    pub fn set_unique_client_name(&mut self, unique_client_name: Option<String>) {
+        self.unique_client_name = unique_client_name;
+    }
+
+    #[allow(dead_code)]
+    pub fn get_unique_client_name(&self) -> &str {
+        let uns = match self.unique_client_name {
+            Some(ref u) => u,
+            None => panic!("Attempted to use unique client name before it was set"),
+        };
+        uns
     }
 
     pub fn set_host(&mut self, host: Option<String>) {
