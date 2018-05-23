@@ -619,14 +619,51 @@ pub fn sign_in() -> (Token, Keyset, AccountStatus) {
         },
     };
 
-    let (token, status) = match login(&uid, &username, &password) {
+    let client_list = match get_software_clients(&username, &password) {
+        Ok(cl) => cl,
+        Err(e) => {
+            error!("Read clients error: {}", e);
+            std::process::exit(1);
+        },
+    };
+
+    let clients: Vec<SoftwareClient> = client_list.into_iter().filter(|c| {
+
+        let mut ucid_raw = c.uniqueId.clone();
+        let ucid = match ucid_raw.len() {
+            64 => {
+                let ucid: String = ucid_raw.drain(..64).collect();
+
+                ucid
+            },
+            _ => {
+                error!("Your account has an invalid client present, contact support: {}", ucid_raw);
+                std::process::exit(1);
+            }
+        };
+        let found = &ucid == &uid;
+
+        found
+    }).collect();
+
+    let client = match clients.first() {
+        Some(client) => {
+            client
+        },
+        None => {
+            error!("This computer is not registered with your account yet, try 'safedrive login --email <user@example.com>'");
+            std::process::exit(1);
+
+        },
+    };
+
+    let (token, status) = match login(&client.uniqueId, &client.uniqueName, &username, &password) {
         Ok((t, a)) => (t, a),
         Err(e) => {
             error!("Login error: {}", e);
             std::process::exit(1);
         },
     };
-
 
     // save auth token
     match set_keychain_item(&username, KeychainService::AuthToken, &token.token) {
@@ -689,7 +726,7 @@ pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
     let mut table = Table::new();
 
     // Add a row
-    table.add_row(row!["Name", "OS", "Language", "ID"]);
+    table.add_row(row!["ID", "Name", "OS", "Language"]);
 
     let client_list = match get_software_clients(username, password) {
         Ok(cl) => cl,
@@ -698,6 +735,8 @@ pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
             std::process::exit(1);
         },
     };
+
+    let mut current_index = 1;
 
     for client in client_list {
         let mut ucid_raw = client.uniqueId.clone();
@@ -720,11 +759,13 @@ pub fn list_clients(username: &str, password: &str, single: Option<&str>) {
         }
 
         table.add_row(Row::new(vec![
-            Cell::new(&format!("N/A")),
+            Cell::new(&format!("{}", current_index)),
+            Cell::new(&client.uniqueName),
             Cell::new(&client.operatingSystem),
-            Cell::new(&client.language),
-            Cell::new(&ucid)])
+            Cell::new(&client.language)])
         );
+
+        current_index = current_index + 1;
     }
     table.printstd();
 }
@@ -1293,56 +1334,39 @@ pub fn local_login(username: &str) {
         let replace = replace.trim();
 
         if &replace == &"2" || &replace == &"replacement" || &replace == &"Replacement" {
-            let replacement_id = ::rpassword::prompt_response_stdout("Which computer should this machine replace?: ").unwrap();
-            let replacement_id = replacement_id.trim();
+            println!("Which computer should this machine replace?");
+            println!();
+            let replacement_id = ::rpassword::prompt_response_stdout("ID: ").unwrap();
+            let id: usize = replacement_id.trim().parse().expect("Expected a number");
 
-            let clients: Vec<SoftwareClient> = client_list.into_iter().filter(|c| {
 
-                let mut ucid_raw = c.uniqueId.clone();
-                let ucid = match ucid_raw.len() {
-                    64 => {
-                        let ucid: String = ucid_raw.drain(..64).collect();
+            if id > client_list.len() {
+                error!("Invalid ID entered: {}", id);
+                std::process::exit(1);
+            }
 
-                        ucid
-                    },
-                    _ => {
-                        error!("Your account has an invalid client present, contact support: {}", ucid_raw);
-                        std::process::exit(1);
-                    }
-                };
-                let found = &ucid == &replacement_id;
 
-                found
-            }).collect();
+            let client: &SoftwareClient = &client_list[id - 1];
 
-            let client = clients.first();
+            let mut ucid_raw = client.uniqueId.clone();
+            let ucid = match ucid_raw.len() {
+                64 => {
+                    let ucid: String = ucid_raw.drain(..64).collect();
 
-            match client {
-                Some(client) => {
-                    let mut ucid_raw = client.uniqueId.clone();
-                    let ucid = match ucid_raw.len() {
-                        64 => {
-                            let ucid: String = ucid_raw.drain(..64).collect();
-
-                            ucid
-                        },
-                        _ => {
-                            error!("Your account has an invalid client present, contact support: {}", ucid_raw);
-                            std::process::exit(1);
-                        }
-                    };
-
-                    println!("Replacing client {}", &ucid);
-                    match set_keychain_item(username, KeychainService::UniqueClientID, &ucid) {
-                        Ok(()) => {},
-                        Err(e) => {
-                            error!("{}", e);
-                            std::process::exit(1);
-                        },
-                    }
+                    ucid
                 },
-                None => {
-                    println!("Not a valid client");
+                _ => {
+                    error!("Your account has an invalid client present, contact support: {}", ucid_raw);
+                    std::process::exit(1);
+                }
+            };
+
+            println!("Replacing client {}", &ucid);
+
+            match set_keychain_item(username, KeychainService::UniqueClientID, &ucid) {
+                Ok(()) => {},
+                Err(e) => {
+                    error!("{}", e);
                     std::process::exit(1);
                 },
             }
@@ -1362,6 +1386,16 @@ pub fn local_login(username: &str) {
             Ok(()) => {},
             Err(e) => {
                 error!("{}", e);
+                std::process::exit(1);
+            },
+        }
+
+
+        // default to using the UCID as the client name for now
+        match login(&ucid, &ucid, username, &password) {
+            Ok((_, _)) => {},
+            Err(e) => {
+                error!("Login error: {}", e);
                 std::process::exit(1);
             },
         }
