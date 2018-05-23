@@ -215,13 +215,14 @@ pub fn initialize<'a>(client_version: &'a str, desktop: bool, operating_system: 
 }
 
 pub fn login(unique_client_id: &str,
+             unique_client_name: &str,
              username: &str,
              password:  &str) -> Result<(Token, AccountStatus), SDError> {
 
     let gos = OPERATING_SYSTEM.read();
     let lc = LANGUAGE_CODE.read();
 
-    match register_client(&**gos, &**lc, unique_client_id, username, password) {
+    match register_client(&**gos, &**lc, unique_client_id, unique_client_name, username, password) {
         Ok(t) => {
             let mut cu = CURRENT_USER.write();
             *cu = username.to_string();
