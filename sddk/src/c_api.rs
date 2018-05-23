@@ -291,6 +291,7 @@ impl From<SyncSession> for SDDKSyncSession {
 #[derive(Debug)]
 #[repr(C)]
 pub struct SDDKSoftwareClient {
+    pub unique_client_name: *const std::os::raw::c_char,
     pub unique_client_id: *const std::os::raw::c_char,
     pub operating_system: *const std::os::raw::c_char,
     pub language: *const std::os::raw::c_char,
@@ -299,6 +300,7 @@ pub struct SDDKSoftwareClient {
 impl From<SoftwareClient> for SDDKSoftwareClient {
     fn from(client: SoftwareClient) -> SDDKSoftwareClient {
         SDDKSoftwareClient {
+            unique_client_name: CString::new(client.uniqueName.as_str()).unwrap().into_raw(),
             unique_client_id: CString::new(client.uniqueId.as_str()).unwrap().into_raw(),
             operating_system: CString::new(client.operatingSystem.as_str()).unwrap().into_raw(),
             language: CString::new(client.language.as_str()).unwrap().into_raw(),
@@ -1269,6 +1271,7 @@ pub extern "C" fn sddk_delete_keychain_item(user: *const std::os::raw::c_char,
 #[allow(dead_code)]
 pub extern "C" fn sddk_login(state: *mut SDDKState,
                              unique_client_id: *const std::os::raw::c_char,
+                             unique_client_name: *const std::os::raw::c_char,
                              username: *const std::os::raw::c_char,
                              password:  *const std::os::raw::c_char,
                              mut status: *mut *mut SDDKAccountStatus,
@@ -1280,7 +1283,27 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
         CStr::from_ptr(unique_client_id)
     };
 
+    let ucns: &CStr = unsafe {
+        assert!(!unique_client_name.is_null());
+        CStr::from_ptr(unique_client_name)
+    };
+
     let uid: String = match uids.to_str() {
+        Ok(s) => s.to_owned(),
+        Err(err) => {
+            let c_err = SDDKError::from(err);
+
+            let b = Box::new(c_err);
+            let ptr = Box::into_raw(b);
+
+            unsafe {
+                *error = ptr;
+            }
+            return -1;
+        },
+    };
+
+    let ucn: String = match ucns.to_str() {
         Ok(s) => s.to_owned(),
         Err(err) => {
             let c_err = SDDKError::from(err);
@@ -1327,7 +1350,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
         },
     };
 
-    match login(&uid, &un, &pa) {
+    match login(&uid, &ucn, &un, &pa) {
         Ok((token, account_status)) => {
             {
                 let ref s = account_status;
@@ -1335,6 +1358,7 @@ pub extern "C" fn sddk_login(state: *mut SDDKState,
                 c.0.set_account(Some(un.to_owned()), Some(pa.to_owned()));
                 c.0.set_api_token(Some(token));
                 c.0.set_unique_client_id(Some(uid));
+                c.0.set_unique_client_name(Some(ucn));
                 c.0.set_host(Some(s.host.clone()));
                 c.0.set_port(Some(s.port));
                 c.0.set_ssh_username(Some(s.userName.clone()));
@@ -3422,6 +3446,7 @@ pub extern "C" fn sddk_free_software_clients(clients: *mut *mut SDDKSoftwareClie
 
     let clients: Vec<SDDKSoftwareClient> = unsafe { Box::from_raw(std::slice::from_raw_parts_mut(*clients, l)).into_vec() };
     for client in clients {
+        let _ = unsafe { CString::from_raw(client.unique_client_name as *mut std::os::raw::c_char) };
         let _ = unsafe { CString::from_raw(client.unique_client_id as *mut std::os::raw::c_char) };
         let _ = unsafe { CString::from_raw(client.language as *mut std::os::raw::c_char) };
         let _ = unsafe { CString::from_raw(client.operating_system as *mut std::os::raw::c_char) };
