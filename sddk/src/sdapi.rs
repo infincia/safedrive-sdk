@@ -117,7 +117,7 @@ impl Read for ProgressReader {
 #[serde(untagged)]
 pub enum APIEndpoint<'a> {
     ErrorLog { operatingSystem: &'a str, clientVersion: &'a str, uniqueClientId: &'a str, description: &'a str, context: &'a str, log: &'a Vec<String> },
-    RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str },
+    RegisterClient { email: &'a str, password: &'a str, operatingSystem: &'a str, language: &'a str, uniqueClientId: &'a str, uniqueName: &'a str },
     UnregisterClient,
     GetClients { email: &'a str, password: &'a str, },
     AccountStatus,
@@ -401,7 +401,7 @@ pub fn report_error<'a>(clientVersion: &'a str, uniqueClientId: &'a str, operati
     }
 }
 
-pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClientId: &'a str, email: &'a str, password: &'a str) -> Result<Token, SDAPIError> {
+pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClientId: &'a str, uniqueName: &'a str, email: &'a str, password: &'a str) -> Result<Token, SDAPIError> {
 
     let endpoint = APIEndpoint::RegisterClient {
         operatingSystem: operatingSystem,
@@ -409,6 +409,7 @@ pub fn register_client<'a>(operatingSystem: &str, languageCode: &str, uniqueClie
         password: password,
         language: languageCode,
         uniqueClientId: uniqueClientId,
+        uniqueName: uniqueName,
     };
 
     let user_agent = &**USER_AGENT.read();
