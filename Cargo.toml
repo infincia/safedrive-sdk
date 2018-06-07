@@ -8,3 +8,4 @@ debug = true
 "security-framework:0.1.16" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "security-framework-sys:0.1.16" = { git = "https://github.com/infincia/rust-security-framework.git", branch = "infincia" }
 "schannel:0.1.8" = { git = "https://github.com/infincia/schannel-rs.git", branch = "infincia" }
+"ring:0.11.0" = { git = "https://github.com/infincia/ring.git", branch = "infincia" }
