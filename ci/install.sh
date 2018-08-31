@@ -8,7 +8,7 @@ export PATH=${HOME}/.cargo/bin:${PATH}
 
 . $(dirname $0)/utils.sh
 
-RUST_VER_FILE=$(dirname $0)/../rustver.conf
+RUST_VER_FILE=$(dirname $0)/../rust-toolchain
 
 install_fuse() {
     case "${TRAVIS_OS_NAME}" in

@@ -249,7 +249,7 @@ fn main() {
 fn set_rust_version(current_dir: &Path) -> Result<(), BuildError> {
 
     let mut full_path: PathBuf = PathBuf::from(current_dir);
-    full_path.push("rustver.conf");
+    full_path.push("rust-toolchain");
 
     let mut file = OpenOptions::new().read(true).write(false).truncate(false).open(&full_path)?;
     let mut ver = String::new();

@@ -68,7 +68,7 @@ echo "Building test dependencies for ${TARGET}"
 
 bash dep.sh
 
-RUST_VER_FILE=$(dirname $0)/rustver.conf
+RUST_VER_FILE=$(dirname $0)/rust-toolchain
 
 RUST_VER=$(<${RUST_VER_FILE})
 
