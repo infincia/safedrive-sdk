@@ -343,7 +343,10 @@ if [ ${BUILD_RSYNC} = true ]; then
         rm -rf rsync-*
         clear_man
         tar xf ${SRC_PREFIX}/rsync-${RSYNC_VER}.tar.gz > /dev/null
+        tar xf ${SRC_PREFIX}/rsync-patches-${RSYNC_VER}.tar.gz > /dev/null
         pushd rsync-${RSYNC_VER} > /dev/null
+            patch -p1 < patches/fileflags.diff
+            patch -p1 < patches/crtimes.diff
             ./configure --prefix=${BUILD_PREFIX} ${RSYNC_ARGS} > /dev/null
             make install > /dev/null
             cp rsync ${BUILD_PREFIX}/bin/rsync-${RSYNC_VER}
