@@ -177,10 +177,12 @@ if [ ! -f openssh-${OPENSSH_VER}.tar.gz ]; then
     curl -L https://mirrors.evowise.com/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VER}.tar.gz.asc -o openssh-${OPENSSH_VER}.tar.gz.asc > /dev/null
 fi
 
-if [ ! -f rsync-${RSYNC_VER}.tar.gz ]; then
+if [ ! -f rsync-${RSYNC_VER}.tar.gz ] || [ ! -f rsync-patches-${RSYNC_VER}.tar.gz ]; then
     echo "Downloading rsync-${RSYNC_VER}.tar.gz"
     curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz -o rsync-${RSYNC_VER}.tar.gz > /dev/null
     curl -L https://download.samba.org/pub/rsync/src/rsync-${RSYNC_VER}.tar.gz.asc -o rsync-${RSYNC_VER}.tar.gz.asc > /dev/null
+    curl -L https://download.samba.org/pub/rsync/src/rsync-patches-${RSYNC_VER}.tar.gz -o rsync-patches-${RSYNC_VER}.tar.gz > /dev/null
+    curl -L https://download.samba.org/pub/rsync/src/rsync-patches-${RSYNC_VER}.tar.gz.asc -o rsync-patches-${RSYNC_VER}.tar.gz.asc > /dev/null
 fi
 
 
