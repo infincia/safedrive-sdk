@@ -7,7 +7,7 @@ if [ -z "${TARGET}" ]; then
 fi
 
 export SRC_PREFIX=${PWD}/src
-export PATCH_PREFIX=${PWD}
+export PATCH_PREFIX=${PWD}/builder/patches
 export STATIC_DEP_PREFIX=${PWD}/dep-static
 
 export DIST_PREFIX=${PWD}/target/${TARGET}/release
