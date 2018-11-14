@@ -1,6 +1,6 @@
 [package]
 name = "builder"
-version = "0.8.4"
+version = "0.8.5"
 authors = ["Stephen Oliver <steve@infincia.com>"]
 build = "build.rs"
 workspace = ".."
